@@ -5,7 +5,7 @@
     <name>CloseButton</name>
     <message>
       <source>Close Tab</source>
-      <translation type="unfinished">Close Tab</translation>
+      <translation>Už&amp;verti kortelę</translation>
     </message>
   </context>
   <context>
@@ -16,11 +16,11 @@
     </message>
     <message>
       <source>Hide %1</source>
-      <translation type="unfinished">Hide %1</translation>
+      <translation>Paslėpti %1</translation>
     </message>
     <message>
       <source>Hide Others</source>
-      <translation type="unfinished">Hide Others</translation>
+      <translation>Slėpti kitus</translation>
     </message>
     <message>
       <source>Show All</source>
@@ -28,155 +28,155 @@
     </message>
     <message>
       <source>Preferences...</source>
-      <translation type="unfinished">Preferences...</translation>
+      <translation>Parinktys...</translation>
     </message>
     <message>
       <source>Quit %1</source>
-      <translation type="unfinished">Quit %1</translation>
+      <translation>Baigti %1</translation>
     </message>
     <message>
       <source>About %1</source>
-      <translation type="unfinished">About %1</translation>
+      <translation>Apie %1</translation>
     </message>
   </context>
   <context>
     <name>QAbstractSpinBox</name>
     <message>
       <source>&amp;Select All</source>
-      <translation type="unfinished">&amp;Select All</translation>
+      <translation>Pažymėti visus</translation>
     </message>
     <message>
       <source>&amp;Step up</source>
-      <translation type="unfinished">&amp;Step up</translation>
+      <translation>&amp;Padidinti</translation>
     </message>
     <message>
       <source>Step &amp;down</source>
-      <translation type="unfinished">Step &amp;down</translation>
+      <translation>Pa&amp;mažinti</translation>
     </message>
   </context>
   <context>
     <name>QAccessibleActionInterface</name>
     <message>
       <source>Press</source>
-      <translation type="unfinished">Press</translation>
+      <translation>Spauskite</translation>
     </message>
     <message>
       <source>Increase</source>
-      <translation type="unfinished">Increase</translation>
+      <translation>Padidinti</translation>
     </message>
     <message>
       <source>Decrease</source>
-      <translation type="unfinished">Decrease</translation>
+      <translation>Sumažinti</translation>
     </message>
     <message>
       <source>ShowMenu</source>
-      <translation type="unfinished">ShowMenu</translation>
+      <translation>Rodyti meniu</translation>
     </message>
     <message>
       <source>SetFocus</source>
-      <translation type="unfinished">SetFocus</translation>
+      <translation>Nustatyti fokusą</translation>
     </message>
     <message>
       <source>Toggle</source>
-      <translation type="unfinished">Toggle</translation>
+      <translation>Įjungti</translation>
     </message>
     <message>
       <source>Scroll Left</source>
-      <translation type="unfinished">Scroll Left</translation>
+      <translation>Slinkti į kairę</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation type="unfinished">Scroll Right</translation>
+      <translation>Slinkti į dešinę</translation>
     </message>
     <message>
       <source>Scroll Up</source>
-      <translation type="unfinished">Scroll Up</translation>
+      <translation>Slinktis į viršų</translation>
     </message>
     <message>
       <source>Scroll Down</source>
-      <translation type="unfinished">Scroll Down</translation>
+      <translation>Slinkti žemyn</translation>
     </message>
     <message>
       <source>Previous Page</source>
-      <translation type="unfinished">Previous Page</translation>
+      <translation>Ankst. puslapis</translation>
     </message>
     <message>
       <source>Next Page</source>
-      <translation type="unfinished">Next Page</translation>
+      <translation>Kitame puslapyje (Automatic Translation)</translation>
     </message>
     <message>
       <source>Triggers the action</source>
-      <translation type="unfinished">Triggers the action</translation>
+      <translation>Sukelia veiksmą</translation>
     </message>
     <message>
       <source>Increase the value</source>
-      <translation type="unfinished">Increase the value</translation>
+      <translation>Padidinkite vertę</translation>
     </message>
     <message>
       <source>Decrease the value</source>
-      <translation type="unfinished">Decrease the value</translation>
+      <translation>Sumažinti reikšmę</translation>
     </message>
     <message>
       <source>Shows the menu</source>
-      <translation type="unfinished">Shows the menu</translation>
+      <translation>Rodyti meniu</translation>
     </message>
     <message>
       <source>Sets the focus</source>
-      <translation type="unfinished">Sets the focus</translation>
+      <translation>Nustato fokusą</translation>
     </message>
     <message>
       <source>Toggles the state</source>
-      <translation type="unfinished">Toggles the state</translation>
+      <translation>Perjungia būseną</translation>
     </message>
     <message>
       <source>Scrolls to the left</source>
-      <translation type="unfinished">Scrolls to the left</translation>
+      <translation>Slinkti kairėn</translation>
     </message>
     <message>
       <source>Scrolls to the right</source>
-      <translation type="unfinished">Scrolls to the right</translation>
+      <translation>Slenka į dešinę</translation>
     </message>
     <message>
       <source>Scrolls up</source>
-      <translation type="unfinished">Scrolls up</translation>
+      <translation>Slinkti aukštyn</translation>
     </message>
     <message>
       <source>Scrolls down</source>
-      <translation type="unfinished">Scrolls down</translation>
+      <translation>Slinkti žemyn</translation>
     </message>
     <message>
       <source>Goes back a page</source>
-      <translation type="unfinished">Goes back a page</translation>
+      <translation>Grįžta vienu puslapiu atgal</translation>
     </message>
     <message>
       <source>Goes to the next page</source>
-      <translation type="unfinished">Goes to the next page</translation>
+      <translation>Eiti į kitą puslapį</translation>
     </message>
   </context>
   <context>
     <name>QAndroidPlatformTheme</name>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Taip</translation>
     </message>
     <message>
       <source>Yes to All</source>
-      <translation type="unfinished">Yes to All</translation>
+      <translation>Taip visiems</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Ne</translation>
     </message>
     <message>
       <source>No to All</source>
-      <translation type="unfinished">No to All</translation>
+      <translation>Ne visiems</translation>
     </message>
   </context>
   <context>
     <name>QCocoaMenuItem</name>
     <message>
       <source>About Qt</source>
-      <translation type="unfinished">About Qt</translation>
+      <translation>Apie „Qt“</translation>
     </message>
     <message>
       <source>About</source>
@@ -184,19 +184,19 @@
     </message>
     <message>
       <source>Config</source>
-      <translation type="unfinished">Config</translation>
+      <translation>Konfigūruoti</translation>
     </message>
     <message>
       <source>Preference</source>
-      <translation type="unfinished">Preference</translation>
+      <translation>Nuostatos</translation>
     </message>
     <message>
       <source>Options</source>
-      <translation type="unfinished">Options</translation>
+      <translation>Nustatymai</translation>
     </message>
     <message>
       <source>Setting</source>
-      <translation type="unfinished">Setting</translation>
+      <translation>Nustatymai</translation>
     </message>
     <message>
       <source>Setup</source>
@@ -204,7 +204,7 @@
     </message>
     <message>
       <source>Quit</source>
-      <translation type="unfinished">Quit</translation>
+      <translation>Baigti</translation>
     </message>
     <message>
       <source>Exit</source>
@@ -212,102 +212,102 @@
     </message>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>Iškirpti</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Kopijuoti</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Įklijuoti</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Pasirinkti viską</translation>
     </message>
   </context>
   <context>
     <name>QCocoaTheme</name>
     <message>
       <source>Don&apos;t Save</source>
-      <translation type="unfinished">Don&apos;t Save</translation>
+      <translation>Neišsaugoti&apos;</translation>
     </message>
   </context>
   <context>
     <name>QColorDialog</name>
     <message>
       <source>Hu&amp;e:</source>
-      <translation type="unfinished">Hu&amp;e:</translation>
+      <translation>Atspalvis:</translation>
     </message>
     <message>
       <source>&amp;Sat:</source>
-      <translation type="unfinished">&amp;Sat:</translation>
+      <translation>&amp;Šeš:</translation>
     </message>
     <message>
       <source>&amp;Val:</source>
-      <translation type="unfinished">&amp;Val:</translation>
+      <translation>&amp;Val:</translation>
     </message>
     <message>
       <source>&amp;Red:</source>
-      <translation type="unfinished">&amp;Red:</translation>
+      <translation>&amp;Raudona:</translation>
     </message>
     <message>
       <source>&amp;Green:</source>
-      <translation type="unfinished">&amp;Green:</translation>
+      <translation>&amp;Žalia:</translation>
     </message>
     <message>
       <source>Bl&amp;ue:</source>
-      <translation type="unfinished">Bl&amp;ue:</translation>
+      <translation>Mėlyna:</translation>
     </message>
     <message>
       <source>A&amp;lpha channel:</source>
-      <translation type="unfinished">A&amp;lpha channel:</translation>
+      <translation>A&amp;alfa kanalas:</translation>
     </message>
     <message>
       <source>&amp;HTML:</source>
-      <translation type="unfinished">&amp;HTML:</translation>
+      <translation>&amp;HTML:</translation>
     </message>
     <message>
       <source>Cursor at %1, %2
 Press ESC to cancel</source>
-      <translation type="unfinished">Cursor at %1, %2
-Press ESC to cancel</translation>
+      <translation>Žymeklis ties %1, %2
+Paspauskite ESC, kad atšauktumėte</translation>
     </message>
     <message>
       <source>&amp;Pick Screen Color</source>
-      <translation type="unfinished">&amp;Pick Screen Color</translation>
+      <translation>&amp;Pasirinkti ekrano spalvą</translation>
     </message>
     <message>
       <source>Select Color</source>
-      <translation type="unfinished">Select Color</translation>
+      <translation>Pasirinkite spalvą</translation>
     </message>
     <message>
       <source>&amp;Basic colors</source>
-      <translation type="unfinished">&amp;Basic colors</translation>
+      <translation>&amp;Pagrindinės spalvos</translation>
     </message>
     <message>
       <source>&amp;Custom colors</source>
-      <translation type="unfinished">&amp;Custom colors</translation>
+      <translation>Pasirinktinės spalvos</translation>
     </message>
     <message>
       <source>&amp;Add to Custom Colors</source>
-      <translation type="unfinished">&amp;Add to Custom Colors</translation>
+      <translation>&amp;Pridėti prie pasirinktinių spalvų</translation>
     </message>
   </context>
   <context>
     <name>QComboBox</name>
     <message>
       <source>False</source>
-      <translation type="unfinished">False</translation>
+      <translation>Netiesa</translation>
     </message>
     <message>
       <source>True</source>
-      <translation type="unfinished">True</translation>
+      <translation>Tiesa</translation>
     </message>
     <message>
       <source>Open the combo box selection popup</source>
-      <translation type="unfinished">Open the combo box selection popup</translation>
+      <translation>Atidaryti išskleidžiamojo lauko pasirinkimo iššokantįjį langą</translation>
     </message>
   </context>
   <context>
@@ -333,7 +333,7 @@ Press ESC to cancel</translation>
     <name>QDialog</name>
     <message>
       <source>What&apos;s This?</source>
-      <translation type="unfinished">What&apos;s This?</translation>
+      <translation>Kas tai yra?&apos;</translation>
     </message>
   </context>
   <context>
@@ -356,7 +356,7 @@ Press ESC to cancel</translation>
     <message>
       <source>Kind</source>
       <comment>Match OS X Finder</comment>
-      <translation type="unfinished">Kind</translation>
+      <translation>Rūšį</translation>
     </message>
     <message>
       <source>Type</source>
@@ -365,61 +365,61 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>Date Modified</source>
-      <translation type="unfinished">Date Modified</translation>
+      <translation>Redagavimo data</translation>
     </message>
   </context>
   <context>
     <name>QFile</name>
     <message>
       <source>Destination file is the same file.</source>
-      <translation type="unfinished">Destination file is the same file.</translation>
+      <translation>Paskirties failas yra tas pats failas.</translation>
     </message>
     <message>
       <source>Source file does not exist.</source>
-      <translation type="unfinished">Source file does not exist.</translation>
+      <translation>Šaltinio failo nėra.</translation>
     </message>
     <message>
       <source>Destination file exists</source>
-      <translation type="unfinished">Destination file exists</translation>
+      <translation>Paskirties failas jau yra</translation>
     </message>
     <message>
       <source>Error while renaming.</source>
-      <translation type="unfinished">Error while renaming.</translation>
+      <translation>Pervadinant įvyko klaida.</translation>
     </message>
     <message>
       <source>Unable to restore from %1: %2</source>
-      <translation type="unfinished">Unable to restore from %1: %2</translation>
+      <translation>Nepavyko atkurti iš %1: %2</translation>
     </message>
     <message>
       <source>Will not rename sequential file using block copy</source>
-      <translation type="unfinished">Will not rename sequential file using block copy</translation>
+      <translation>Nepervadins nuoseklaus failo naudojant blokinę kopiją</translation>
     </message>
     <message>
       <source>Cannot remove source file</source>
-      <translation type="unfinished">Cannot remove source file</translation>
+      <translation>Nepavyksta pašalinti šaltinio failo</translation>
     </message>
     <message>
       <source>Cannot open %1 for input</source>
-      <translation type="unfinished">Cannot open %1 for input</translation>
+      <translation>Nepavyksta atidaryti %1 įvesties laukeliui</translation>
     </message>
     <message>
       <source>Cannot open for output</source>
-      <translation type="unfinished">Cannot open for output</translation>
+      <translation>Nepavyksta atidaryti išvesties</translation>
     </message>
     <message>
       <source>Failure to write block</source>
-      <translation type="unfinished">Failure to write block</translation>
+      <translation>Nepavyko įrašyti bloko</translation>
     </message>
     <message>
       <source>Cannot create %1 for output</source>
-      <translation type="unfinished">Cannot create %1 for output</translation>
+      <translation>Negalima sukurti %1 išvesčiai</translation>
     </message>
   </context>
   <context>
     <name>QFileDialog</name>
     <message>
       <source>Look in:</source>
-      <translation type="unfinished">Look in:</translation>
+      <translation>Vieta:</translation>
     </message>
     <message>
       <source>Back</source>
@@ -427,79 +427,79 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>Go back</source>
-      <translation type="unfinished">Go back</translation>
+      <translation>Grįžti</translation>
     </message>
     <message>
       <source>Forward</source>
-      <translation type="unfinished">Forward</translation>
+      <translation>Persiųsti</translation>
     </message>
     <message>
       <source>Go forward</source>
-      <translation type="unfinished">Go forward</translation>
+      <translation>Eiti pirmyn</translation>
     </message>
     <message>
       <source>Parent Directory</source>
-      <translation type="unfinished">Parent Directory</translation>
+      <translation>Vienu lygiu aukščiau</translation>
     </message>
     <message>
       <source>Go to the parent directory</source>
-      <translation type="unfinished">Go to the parent directory</translation>
+      <translation>Eiti į vienu lygiu aukštesnį aplanką</translation>
     </message>
     <message>
       <source>Create New Folder</source>
-      <translation type="unfinished">Create New Folder</translation>
+      <translation>Sukurti naują aplanką</translation>
     </message>
     <message>
       <source>Create a New Folder</source>
-      <translation type="unfinished">Create a New Folder</translation>
+      <translation>Sukurti naują aplanką</translation>
     </message>
     <message>
       <source>List View</source>
-      <translation type="unfinished">List View</translation>
+      <translation>Sąrašo rodinys</translation>
     </message>
     <message>
       <source>Change to list view mode</source>
-      <translation type="unfinished">Change to list view mode</translation>
+      <translation>Aplanko turinį rodyti kaip paprastą sąrašą</translation>
     </message>
     <message>
       <source>Detail View</source>
-      <translation type="unfinished">Detail View</translation>
+      <translation>Išsamusis rodinys</translation>
     </message>
     <message>
       <source>Change to detail view mode</source>
-      <translation type="unfinished">Change to detail view mode</translation>
+      <translation>Aplanko turinį rodyti kaip sąrašą su išsamia informacija</translation>
     </message>
     <message>
       <source>Files of type:</source>
-      <translation type="unfinished">Files of type:</translation>
+      <translation>Failų tipas:</translation>
     </message>
     <message>
       <source>Find Directory</source>
-      <translation type="unfinished">Find Directory</translation>
+      <translation>Ieškoti aplanko</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation type="unfinished">Open</translation>
+      <translation>Atidaryti</translation>
     </message>
     <message>
       <source>Save As</source>
-      <translation type="unfinished">Save As</translation>
+      <translation>Žurnalo įrašymas</translation>
     </message>
     <message>
       <source>Directory:</source>
-      <translation type="unfinished">Directory:</translation>
+      <translation>Katalogas</translation>
     </message>
     <message>
       <source>File &amp;name:</source>
-      <translation type="unfinished">File &amp;name:</translation>
+      <translation>Failo pavadinimas:</translation>
     </message>
     <message>
       <source>&amp;Open</source>
-      <translation type="unfinished">&amp;Open</translation>
+      <translation>&amp;Atverti</translation>
     </message>
     <message>
       <source>&amp;Choose</source>
-      <translation type="unfinished">&amp;Choose</translation>
+      <translation>&amp;Pasirinkti</translation>
     </message>
     <message>
       <source>&amp;Save</source>
@@ -507,7 +507,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>All Files (*)</source>
-      <translation type="unfinished">All Files (*)</translation>
+      <translation>Visi failai (*)</translation>
     </message>
     <message>
       <source>Show </source>
@@ -523,7 +523,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>Show &amp;hidden files</source>
-      <translation type="unfinished">Show &amp;hidden files</translation>
+      <translation>Rodyti pa&amp;slėptus failus</translation>
     </message>
     <message>
       <source>&amp;New Folder</source>
@@ -531,33 +531,33 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>All files (*)</source>
-      <translation type="unfinished">All files (*)</translation>
+      <translation>Visi failai (*)</translation>
     </message>
     <message>
       <source>Directories</source>
-      <translation type="unfinished">Directories</translation>
+      <translation>Katalogai</translation>
     </message>
     <message>
       <source>%1
 Directory not found.
 Please verify the correct directory name was given.</source>
-      <translation type="unfinished">%1
-Directory not found.
-Please verify the correct directory name was given.</translation>
+      <translation>%1
+Aplankas nerastas.
+Įsitikinkite, jog nurodėte teisingą aplanko vardą.</translation>
     </message>
     <message>
       <source>%1 already exists.
 Do you want to replace it?</source>
-      <translation type="unfinished">%1 already exists.
-Do you want to replace it?</translation>
+      <translation>%1 jau yra.
+Ar norite jį pakeisti?</translation>
     </message>
     <message>
       <source>%1
 File not found.
 Please verify the correct file name was given.</source>
-      <translation type="unfinished">%1
-File not found.
-Please verify the correct file name was given.</translation>
+      <translation>%1
+Failas nerastas.
+Patikrinkite, ar nurodytas teisingas failo pavadinimas.</translation>
     </message>
     <message>
       <source>New Folder</source>
@@ -570,20 +570,20 @@ Please verify the correct file name was given.</translation>
     <message>
       <source>&apos;%1&apos; is write protected.
 Do you want to delete it anyway?</source>
-      <translation type="unfinished">&apos;%1&apos; is write protected.
-Do you want to delete it anyway?</translation>
+      <translation>&apos;%1&apos; yra apsaugota nuo rašymo.
+Ar vis tiek norite ištrinti?</translation>
     </message>
     <message>
       <source>Are you sure you want to delete &apos;%1&apos;?</source>
-      <translation type="unfinished">Are you sure you want to delete &apos;%1&apos;?</translation>
+      <translation>Ar tikrai norite naikinti „%1“?</translation>
     </message>
     <message>
       <source>Could not delete directory.</source>
-      <translation type="unfinished">Could not delete directory.</translation>
+      <translation>Nepavyko pašalinti aplanko.</translation>
     </message>
     <message>
       <source>Recent Places</source>
-      <translation type="unfinished">Recent Places</translation>
+      <translation>Paskiausios vietos</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -591,67 +591,67 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>My Computer</source>
-      <translation type="unfinished">My Computer</translation>
+      <translation>Kompiuteris</translation>
     </message>
     <message>
       <source>%1 File</source>
       <extracomment>%1 is a file name suffix, for example txt</extracomment>
-      <translation type="unfinished">%1 File</translation>
+      <translation>%1 Failas</translation>
     </message>
     <message>
       <source>Sidebar</source>
-      <translation type="unfinished">Sidebar</translation>
+      <translation>Šoninė juosta</translation>
     </message>
     <message>
       <source>List of places and bookmarks</source>
-      <translation type="unfinished">List of places and bookmarks</translation>
+      <translation>Vietų ir žymių sąrašas</translation>
     </message>
     <message>
       <source>Files</source>
-      <translation type="unfinished">Files</translation>
+      <translation>Failai</translation>
     </message>
     <message>
       <source>Alt+Left</source>
-      <translation type="unfinished">Alt+Left</translation>
+      <translation>Alt + kairėn</translation>
     </message>
     <message>
       <source>Alt+Right</source>
-      <translation type="unfinished">Alt+Right</translation>
+      <translation>Alt + dešinėn</translation>
     </message>
     <message>
       <source>Alt+Up</source>
-      <translation type="unfinished">Alt+Up</translation>
+      <translation>Alt + aukštyn</translation>
     </message>
   </context>
   <context>
     <name>QFileSystemModel</name>
     <message>
       <source>%1 TB</source>
-      <translation type="unfinished">%1 TB</translation>
+      <translation>%1 TB</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation type="unfinished">%1 GB</translation>
+      <translation>%1 GB</translation>
     </message>
     <message>
       <source>%1 MB</source>
-      <translation type="unfinished">%1 MB</translation>
+      <translation>%1 MB</translation>
     </message>
     <message>
       <source>%1 KB</source>
-      <translation type="unfinished">%1 KB</translation>
+      <translation>%1 KB</translation>
     </message>
     <message>
       <source>%1 bytes</source>
-      <translation type="unfinished">%1 bytes</translation>
+      <translation>%1 B</translation>
     </message>
     <message>
       <source>Invalid filename</source>
-      <translation type="unfinished">Invalid filename</translation>
+      <translation>Neleistinas failo vardas</translation>
     </message>
     <message>
       <source>&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</source>
-      <translation type="unfinished">&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</translation>
+      <translation>&lt;b&gt;Pavadinimo &quot;%1&quot; naudoti negalima.&lt;/b&gt;&lt;p&gt;Pabandykite naudoti kitą pavadinimą su mažiau simbolių arba be skyrybos ženklų.</translation>
     </message>
     <message>
       <source>Name</source>
@@ -664,7 +664,7 @@ Do you want to delete it anyway?</translation>
     <message>
       <source>Kind</source>
       <comment>Match OS X Finder</comment>
-      <translation type="unfinished">Kind</translation>
+      <translation>Rūšį</translation>
     </message>
     <message>
       <source>Type</source>
@@ -673,19 +673,19 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Date Modified</source>
-      <translation type="unfinished">Date Modified</translation>
+      <translation>Redagavimo data</translation>
     </message>
     <message>
       <source>My Computer</source>
-      <translation type="unfinished">My Computer</translation>
+      <translation>Kompiuteris</translation>
     </message>
     <message>
       <source>Computer</source>
-      <translation type="unfinished">Computer</translation>
+      <translation>Su kompiuteriu</translation>
     </message>
     <message>
       <source>%1 byte(s)</source>
-      <translation type="unfinished">%1 byte(s)</translation>
+      <translation>%1 baitas(-ai)</translation>
     </message>
   </context>
   <context>
@@ -708,7 +708,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Close without Saving</source>
-      <translation type="unfinished">Close without Saving</translation>
+      <translation>Užverti neįrašius</translation>
     </message>
   </context>
   <context>
@@ -716,110 +716,110 @@ Do you want to delete it anyway?</translation>
     <message>
       <source>QT_LAYOUT_DIRECTION</source>
       <comment>Translate this string to the string &apos;LTR&apos; in left-to-right languages or to &apos;RTL&apos; in right-to-left languages (such as Hebrew and Arabic) to get proper widget layout.</comment>
-      <translation type="unfinished">QT_LAYOUT_DIRECTION</translation>
+      <translation>QT_LAYOUT_DIRECTION</translation>
     </message>
   </context>
   <context>
     <name>QIODevice</name>
     <message>
       <source>Permission denied</source>
-      <translation type="unfinished">Permission denied</translation>
+      <translation>Leidimas atmestas</translation>
     </message>
     <message>
       <source>Too many open files</source>
-      <translation type="unfinished">Too many open files</translation>
+      <translation>Per daug atvertų failų.</translation>
     </message>
     <message>
       <source>No such file or directory</source>
-      <translation type="unfinished">No such file or directory</translation>
+      <translation>Nėra tokio failo ar katalogo</translation>
     </message>
     <message>
       <source>No space left on device</source>
-      <translation type="unfinished">No space left on device</translation>
+      <translation>Įrenginyje nebėra vietos</translation>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Nežinoma klaida</translation>
     </message>
     <message>
       <source>file to open is a directory</source>
-      <translation type="unfinished">file to open is a directory</translation>
+      <translation>atidaromas failas yra katalogas</translation>
     </message>
   </context>
   <context>
     <name>QImageReader</name>
     <message>
       <source>Invalid device</source>
-      <translation type="unfinished">Invalid device</translation>
+      <translation>Netinkamas įrenginys.</translation>
     </message>
     <message>
       <source>File not found</source>
-      <translation type="unfinished">File not found</translation>
+      <translation>Puslapis nerastas</translation>
     </message>
     <message>
       <source>Unsupported image format</source>
-      <translation type="unfinished">Unsupported image format</translation>
+      <translation>Nepalaikomas vaizdo formatas</translation>
     </message>
     <message>
       <source>Unable to read image data</source>
-      <translation type="unfinished">Unable to read image data</translation>
+      <translation>Nepavyko nuskaityti vaizdo duomenų</translation>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Nežinoma klaida</translation>
     </message>
   </context>
   <context>
     <name>QImageWriter</name>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Nežinoma klaida</translation>
     </message>
     <message>
       <source>Device is not set</source>
-      <translation type="unfinished">Device is not set</translation>
+      <translation>Įrenginys nenustatytas</translation>
     </message>
     <message>
       <source>Device not writable</source>
-      <translation type="unfinished">Device not writable</translation>
+      <translation>Įrenginys nerašomas</translation>
     </message>
     <message>
       <source>Unsupported image format</source>
-      <translation type="unfinished">Unsupported image format</translation>
+      <translation>Nepalaikomas vaizdo formatas</translation>
     </message>
   </context>
   <context>
     <name>QInputDialog</name>
     <message>
       <source>Enter a value:</source>
-      <translation type="unfinished">Enter a value:</translation>
+      <translation>Įveskite reikšmę:</translation>
     </message>
   </context>
   <context>
     <name>QKeySequenceEdit</name>
     <message>
       <source>Press shortcut</source>
-      <translation type="unfinished">Press shortcut</translation>
+      <translation>Paspauskite spartųjį klavišą</translation>
     </message>
     <message>
       <source>%1, ...</source>
       <extracomment>This text is an &quot;unfinished&quot; shortcut, expands like &quot;Ctrl+A, ...&quot;</extracomment>
-      <translation type="unfinished">%1, ...</translation>
+      <translation>%1, ...</translation>
     </message>
   </context>
   <context>
     <name>QLineEdit</name>
     <message>
       <source>&amp;Undo</source>
-      <translation type="unfinished">&amp;Undo</translation>
+      <translation>Atša&amp;ukti</translation>
     </message>
     <message>
       <source>&amp;Redo</source>
-      <translation type="unfinished">&amp;Redo</translation>
+      <translation>&amp;Perdaryti</translation>
     </message>
     <message>
       <source>Cu&amp;t</source>
-      <translation type="unfinished">Cu&amp;t</translation>
+      <translation>Iškirpti</translation>
     </message>
     <message>
       <source>&amp;Copy</source>
@@ -827,7 +827,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>&amp;Paste</source>
-      <translation type="unfinished">&amp;Paste</translation>
+      <translation>Į&amp;dėti į šį paveikslą</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -835,18 +835,18 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Pasirinkti viską</translation>
     </message>
   </context>
   <context>
     <name>QMessageBox</name>
     <message>
       <source>Show Details...</source>
-      <translation type="unfinished">Show Details...</translation>
+      <translation>Rodyti išsamią informaciją...</translation>
     </message>
     <message>
       <source>Hide Details...</source>
-      <translation type="unfinished">Hide Details...</translation>
+      <translation>Slėpti išsamią informaciją...</translation>
     </message>
     <message>
       <source>OK</source>
@@ -869,31 +869,31 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Save All</source>
-      <translation type="unfinished">Save All</translation>
+      <translation>Išsaugoti viską</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation type="unfinished">Open</translation>
+      <translation>Atidaryti</translation>
     </message>
     <message>
       <source>&amp;Yes</source>
-      <translation type="unfinished">&amp;Yes</translation>
+      <translation>&amp;Taip</translation>
     </message>
     <message>
       <source>Yes to &amp;All</source>
-      <translation type="unfinished">Yes to &amp;All</translation>
+      <translation>Taip &amp;viskam</translation>
     </message>
     <message>
       <source>&amp;No</source>
-      <translation type="unfinished">&amp;No</translation>
+      <translation>&amp;Ne</translation>
     </message>
     <message>
       <source>N&amp;o to All</source>
-      <translation type="unfinished">N&amp;o to All</translation>
+      <translation>N&amp;e nieko</translation>
     </message>
     <message>
       <source>Abort</source>
-      <translation type="unfinished">Abort</translation>
+      <translation>Atšaukti</translation>
     </message>
     <message>
       <source>Retry</source>
@@ -901,7 +901,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Ignore</source>
-      <translation type="unfinished">Ignore</translation>
+      <translation>Ignoruoti</translation>
     </message>
     <message>
       <source>Close</source>
@@ -929,7 +929,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Restore Defaults</source>
-      <translation type="unfinished">Restore Defaults</translation>
+      <translation>Atstatyti numatytas parinktis</translation>
     </message>
   </context>
   <context>
@@ -943,112 +943,112 @@ Do you want to delete it anyway?</translation>
     <name>QQnxFileDialogHelper</name>
     <message>
       <source>All files (*.*)</source>
-      <translation type="unfinished">All files (*.*)</translation>
+      <translation>Visi failai (*.*)</translation>
     </message>
   </context>
   <context>
     <name>QSaveFile</name>
     <message>
       <source>Existing file %1 is not writable</source>
-      <translation type="unfinished">Existing file %1 is not writable</translation>
+      <translation>Esamo failo %1 negalima rašyti</translation>
     </message>
     <message>
       <source>Filename refers to a directory</source>
-      <translation type="unfinished">Filename refers to a directory</translation>
+      <translation>Failo pavadinimas nurodo katalogą</translation>
     </message>
     <message>
       <source>Writing canceled by application</source>
-      <translation type="unfinished">Writing canceled by application</translation>
+      <translation>Rašymas atšauktas programos</translation>
     </message>
   </context>
   <context>
     <name>QScrollBar</name>
     <message>
       <source>Scroll here</source>
-      <translation type="unfinished">Scroll here</translation>
+      <translation>Slinkite čia</translation>
     </message>
     <message>
       <source>Left edge</source>
-      <translation type="unfinished">Left edge</translation>
+      <translation>Kairysis kraštas</translation>
     </message>
     <message>
       <source>Top</source>
-      <translation type="unfinished">Top</translation>
+      <translation>Viršuje</translation>
     </message>
     <message>
       <source>Right edge</source>
-      <translation type="unfinished">Right edge</translation>
+      <translation>Dešinysis kraštas</translation>
     </message>
     <message>
       <source>Bottom</source>
-      <translation type="unfinished">Bottom</translation>
+      <translation>Apačia</translation>
     </message>
     <message>
       <source>Page left</source>
-      <translation type="unfinished">Page left</translation>
+      <translation>Puslapis kairėje</translation>
     </message>
     <message>
       <source>Page up</source>
-      <translation type="unfinished">Page up</translation>
+      <translation>Puslapis aukštyn</translation>
     </message>
     <message>
       <source>Page right</source>
-      <translation type="unfinished">Page right</translation>
+      <translation>Puslapis dešinėn</translation>
     </message>
     <message>
       <source>Page down</source>
-      <translation type="unfinished">Page down</translation>
+      <translation>Puslapis žemyn</translation>
     </message>
     <message>
       <source>Scroll left</source>
-      <translation type="unfinished">Scroll left</translation>
+      <translation>Slinkti kairėn</translation>
     </message>
     <message>
       <source>Scroll up</source>
-      <translation type="unfinished">Scroll up</translation>
+      <translation>Slinkti aukštyn</translation>
     </message>
     <message>
       <source>Scroll right</source>
-      <translation type="unfinished">Scroll right</translation>
+      <translation>Slinkti dešinėn</translation>
     </message>
     <message>
       <source>Scroll down</source>
-      <translation type="unfinished">Scroll down</translation>
+      <translation>Slinkite žemyn</translation>
     </message>
   </context>
   <context>
     <name>QStandardPaths</name>
     <message>
       <source>Desktop</source>
-      <translation type="unfinished">Desktop</translation>
+      <translation>Darbalaukis</translation>
     </message>
     <message>
       <source>Documents</source>
-      <translation type="unfinished">Documents</translation>
+      <translation>Dokumentai</translation>
     </message>
     <message>
       <source>Fonts</source>
-      <translation type="unfinished">Fonts</translation>
+      <translation>Šriftai</translation>
     </message>
     <message>
       <source>Applications</source>
-      <translation type="unfinished">Applications</translation>
+      <translation>Paraiškos</translation>
     </message>
     <message>
       <source>Music</source>
-      <translation type="unfinished">Music</translation>
+      <translation>Muzika</translation>
     </message>
     <message>
       <source>Movies</source>
-      <translation type="unfinished">Movies</translation>
+      <translation>Filmai</translation>
     </message>
     <message>
       <source>Pictures</source>
-      <translation type="unfinished">Pictures</translation>
+      <translation>Paveikslėliai</translation>
     </message>
     <message>
       <source>Temporary Directory</source>
-      <translation type="unfinished">Temporary Directory</translation>
+      <translation>Laikinas katalogas</translation>
     </message>
     <message>
       <source>Home</source>
@@ -1056,23 +1056,23 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Application Data</source>
-      <translation type="unfinished">Application Data</translation>
+      <translation>Programos duomenys</translation>
     </message>
     <message>
       <source>Application Configuration</source>
-      <translation type="unfinished">Application Configuration</translation>
+      <translation>Aplikacijos nustatymai</translation>
     </message>
     <message>
       <source>Cache</source>
-      <translation type="unfinished">Cache</translation>
+      <translation>Talpykla</translation>
     </message>
     <message>
       <source>Shared Data</source>
-      <translation type="unfinished">Shared Data</translation>
+      <translation>Bendrinami duomenys</translation>
     </message>
     <message>
       <source>Runtime</source>
-      <translation type="unfinished">Runtime</translation>
+      <translation>Vykdymo laikas</translation>
     </message>
     <message>
       <source>Configuration</source>
@@ -1080,11 +1080,11 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Shared Configuration</source>
-      <translation type="unfinished">Shared Configuration</translation>
+      <translation>Atkurti konfigūraciją</translation>
     </message>
     <message>
       <source>Shared Cache</source>
-      <translation type="unfinished">Shared Cache</translation>
+      <translation>Bendrinama talpykla</translation>
     </message>
     <message>
       <source>Download</source>
@@ -1095,33 +1095,33 @@ Do you want to delete it anyway?</translation>
     <name>QTabBar</name>
     <message>
       <source>Scroll Left</source>
-      <translation type="unfinished">Scroll Left</translation>
+      <translation>Slinkti į kairę</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation type="unfinished">Scroll Right</translation>
+      <translation>Slinkti dešinėn</translation>
     </message>
   </context>
   <context>
     <name>QWhatsThisAction</name>
     <message>
       <source>What&apos;s This?</source>
-      <translation type="unfinished">What&apos;s This?</translation>
+      <translation>Kas tai yra?&apos;</translation>
     </message>
   </context>
   <context>
     <name>QWidgetTextControl</name>
     <message>
       <source>&amp;Undo</source>
-      <translation type="unfinished">&amp;Undo</translation>
+      <translation>&amp;Anuliuoti</translation>
     </message>
     <message>
       <source>&amp;Redo</source>
-      <translation type="unfinished">&amp;Redo</translation>
+      <translation>&amp;Atlikti iš naujo</translation>
     </message>
     <message>
       <source>Cu&amp;t</source>
-      <translation type="unfinished">Cu&amp;t</translation>
+      <translation>Iškirpti</translation>
     </message>
     <message>
       <source>&amp;Copy</source>
@@ -1129,11 +1129,11 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Copy &amp;Link Location</source>
-      <translation type="unfinished">Copy &amp;Link Location</translation>
+      <translation>Kopijuoti ir nuorodos vieta</translation>
     </message>
     <message>
       <source>&amp;Paste</source>
-      <translation type="unfinished">&amp;Paste</translation>
+      <translation>&amp;Įklijuoti</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -1141,38 +1141,38 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Pasirinkti viską</translation>
     </message>
   </context>
   <context>
     <name>QAbstractFileIconProvider</name>
     <message>
       <source>Drive</source>
-      <translation type="unfinished">Drive</translation>
+      <translation>Važiuokite</translation>
     </message>
     <message>
       <source>File</source>
-      <translation type="unfinished">File</translation>
+      <translation>Failas</translation>
     </message>
     <message>
       <source>File Folder</source>
       <comment>Match Windows Explorer</comment>
-      <translation type="unfinished">File Folder</translation>
+      <translation>Failų aplankas</translation>
     </message>
     <message>
       <source>Folder</source>
       <comment>All other platforms</comment>
-      <translation type="unfinished">Folder</translation>
+      <translation>Aplankai</translation>
     </message>
     <message>
       <source>Alias</source>
       <comment>OS X Finder</comment>
-      <translation type="unfinished">Alias</translation>
+      <translation>Slapyvardis</translation>
     </message>
     <message>
       <source>Shortcut</source>
       <comment>All other platforms</comment>
-      <translation type="unfinished">Shortcut</translation>
+      <translation>Spartusis klavišas</translation>
     </message>
     <message>
       <source>Unknown</source>

@@ -5,27 +5,27 @@
     <name>ActionDurationPickerWidget</name>
     <message>
       <source>For the duration of event</source>
-      <translation type="unfinished">For the duration of event</translation>
+      <translation>Renginio metu</translation>
     </message>
     <message>
       <source>Of fixed duration</source>
-      <translation type="unfinished">Of fixed duration</translation>
+      <translation>Fiksuotos trukmės</translation>
     </message>
     <message>
       <source>Event occurs</source>
-      <translation type="unfinished">Event occurs</translation>
+      <translation>Įvykis įvyksta</translation>
     </message>
     <message>
       <source>Event starts</source>
-      <translation type="unfinished">Event starts</translation>
+      <translation>Renginys prasideda</translation>
     </message>
     <message>
       <source>Event stops</source>
-      <translation type="unfinished">Event stops</translation>
+      <translation>Renginių sustojimai</translation>
     </message>
     <message>
       <source>Duration</source>
-      <translation type="unfinished">Duration</translation>
+      <translation>Trukmė</translation>
     </message>
     <message>
       <source>For</source>
@@ -36,31 +36,31 @@
     <name>AnalyticsSearchWidget::Private</name>
     <message>
       <source>Any type</source>
-      <translation type="unfinished">Any type</translation>
+      <translation>Bet kokio tipo</translation>
     </message>
     <message>
       <source>Select area</source>
-      <translation type="unfinished">Select area</translation>
+      <translation>Pasirinkti vietą</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation type="unfinished">Select some area on the video...</translation>
+      <translation>Pasirinkite tam tikrą vaizdo įrašo sritį...</translation>
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>Pasirinktoje srityje</translation>
     </message>
     <message>
       <source>Any plugin</source>
-      <translation type="unfinished">Any plugin</translation>
+      <translation>Bet koks įskiepis</translation>
     </message>
     <message numerus="yes">
       <source>%1 with %n attributes</source>
-      <translation type="unfinished">
-        <numerusform>%1 with %n attributes</numerusform>
-        <numerusform>%1 with %n attributes</numerusform>
-        <numerusform>%1 with %n attributes</numerusform>
-        <numerusform>%1 with %n attributes</numerusform>
+      <translation>
+        <numerusform>%1 su %n atributais</numerusform>
+        <numerusform>%1 su %n atributais</numerusform>
+        <numerusform>%1 su %n atributais</numerusform>
+        <numerusform>%1 su %n atributais</numerusform>
       </translation>
     </message>
   </context>
@@ -68,7 +68,7 @@
     <name>CameraDiagnostics::DiagnoseTool</name>
     <message>
       <source>No connection to Server %1.</source>
-      <translation type="unfinished">No connection to Server %1.</translation>
+      <translation>Nėra ryšio su serveriu %1.</translation>
     </message>
   </context>
   <context>
@@ -76,21 +76,21 @@
     <message numerus="yes">
       <source>%1 are used</source>
       <comment>Numerus: text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are used</numerusform>
-        <numerusform>%1 are used</numerusform>
-        <numerusform>%1 are used</numerusform>
-        <numerusform>%1 are used</numerusform>
+      <translation>
+        <numerusform>Naudojami %1</numerusform>
+        <numerusform>Naudojami %1</numerusform>
+        <numerusform>Naudojami %1</numerusform>
+        <numerusform>Naudojami %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 are required</source>
       <comment>Numerus: text like &apos;5 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are required</numerusform>
-        <numerusform>%1 are required</numerusform>
-        <numerusform>%1 are required</numerusform>
-        <numerusform>%1 are required</numerusform>
+      <translation>
+        <numerusform>%1 reikia daugiau</numerusform>
+        <numerusform>%1 reikia daugiau</numerusform>
+        <numerusform>%1 reikia daugiau</numerusform>
+        <numerusform>%1 reikia daugiau</numerusform>
       </translation>
     </message>
   </context>
@@ -98,15 +98,15 @@
     <name>CellWidget</name>
     <message>
       <source>Canceled</source>
-      <translation type="unfinished">Canceled</translation>
+      <translation>Atšauktas</translation>
     </message>
     <message>
       <source>Added</source>
-      <translation type="unfinished">Added</translation>
+      <translation>Pridėta</translation>
     </message>
     <message>
       <source>Adding</source>
-      <translation type="unfinished">Adding</translation>
+      <translation>Pridedama</translation>
     </message>
   </context>
   <context>
@@ -117,7 +117,7 @@
     </message>
     <message>
       <source>Issuer</source>
-      <translation type="unfinished">Issuer</translation>
+      <translation>Leidėjas</translation>
     </message>
     <message>
       <source>Expires</source>
@@ -129,45 +129,45 @@
     <message>
       <source>Copied</source>
       <comment>to Clipboard</comment>
-      <translation type="unfinished">Copied</translation>
+      <translation>Nukopijuota</translation>
     </message>
   </context>
   <context>
     <name>ComboBoxUtils</name>
     <message>
       <source>multiple values</source>
-      <translation type="unfinished">multiple values</translation>
+      <translation>Keletas reikšmių</translation>
     </message>
   </context>
   <context>
     <name>CompatibilityVersionInstallationDialog</name>
     <message>
       <source>Installing version %1</source>
-      <translation type="unfinished">Installing version %1</translation>
+      <translation>Diegiama %1 versija</translation>
     </message>
     <message>
       <source>Installation failed</source>
-      <translation type="unfinished">Installation failed</translation>
+      <translation>Įdiegti nepavyko</translation>
     </message>
     <message>
       <source>Installation completed</source>
-      <translation type="unfinished">Installation completed</translation>
+      <translation>Įdiegimas baigtas</translation>
     </message>
     <message>
       <source>Getting update information from the server</source>
-      <translation type="unfinished">Getting update information from the server</translation>
+      <translation>Gaunama atnaujinimo informacija iš serverio</translation>
     </message>
     <message>
       <source>Downloading update package</source>
-      <translation type="unfinished">Downloading update package</translation>
+      <translation>Atsisiunčiamas atnaujinimo paketas</translation>
     </message>
     <message>
       <source>Installing</source>
-      <translation type="unfinished">Installing</translation>
+      <translation>Vyksta diegimas</translation>
     </message>
     <message>
       <source>Verifying update package</source>
-      <translation type="unfinished">Verifying update package</translation>
+      <translation>Tikrinamas atnaujinimo paketas</translation>
     </message>
   </context>
   <context>
@@ -178,51 +178,51 @@
     </message>
     <message>
       <source>Control Video Wall</source>
-      <translation type="unfinished">Control Video Wall</translation>
+      <translation>Valdymo vaizdo siena</translation>
     </message>
     <message>
       <source>Push my screen</source>
-      <translation type="unfinished">Push my screen</translation>
+      <translation>Paspauskite mano ekraną</translation>
     </message>
     <message>
       <source>Select Time Server</source>
-      <translation type="unfinished">Select Time Server</translation>
+      <translation>Pasirinkite laiko serverį</translation>
     </message>
     <message>
       <source>Fit in View</source>
-      <translation type="unfinished">Fit in View</translation>
+      <translation>Talpinti rodinyje</translation>
     </message>
     <message>
       <source>Main Menu</source>
-      <translation type="unfinished">Main Menu</translation>
+      <translation>Pagrindinis meniu</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>Prisijungti prie svetainės...</translation>
     </message>
     <message>
       <source>Disconnect from Server</source>
-      <translation type="unfinished">Disconnect from Server</translation>
+      <translation>Atsijungti nuo serverio</translation>
     </message>
     <message>
       <source>Browse Local Files</source>
-      <translation type="unfinished">Browse Local Files</translation>
+      <translation>Naršyti vietinius failus</translation>
     </message>
     <message>
       <source>Show Welcome Screen</source>
-      <translation type="unfinished">Show Welcome Screen</translation>
+      <translation>Rodyti pasveikinimo ekraną</translation>
     </message>
     <message>
       <source>Window</source>
-      <translation type="unfinished">Window</translation>
+      <translation>Langas</translation>
     </message>
     <message>
       <source>New Window</source>
-      <translation type="unfinished">New Window</translation>
+      <translation>Naujas langas</translation>
     </message>
     <message>
       <source>User...</source>
-      <translation type="unfinished">User...</translation>
+      <translation>Vartotojas...</translation>
     </message>
     <message>
       <source>Video Wall...</source>
@@ -230,7 +230,7 @@
     </message>
     <message>
       <source>Web Page...</source>
-      <translation type="unfinished">Web Page...</translation>
+      <translation>Tinklalapiai...</translation>
     </message>
     <message>
       <source>New Layout...</source>
@@ -238,94 +238,94 @@
     </message>
     <message>
       <source>Open Layout...</source>
-      <translation type="unfinished">Open Layout...</translation>
+      <translation>Naujas išdėstymas...</translation>
     </message>
     <message>
       <source>Folder...</source>
-      <translation type="unfinished">Folder...</translation>
+      <translation>Aplankas…</translation>
     </message>
     <message>
       <source>Web Client...</source>
-      <translation type="unfinished">Web Client...</translation>
+      <translation>Žiniatinklio klientas...</translation>
     </message>
     <message>
       <source>Open Web Client...</source>
-      <translation type="unfinished">Open Web Client...</translation>
+      <translation>Atidaryti žiniatinklio klientą...</translation>
     </message>
     <message>
       <source>Save Current Layout</source>
-      <translation type="unfinished">Save Current Layout</translation>
+      <translation>Išsaugoti dabartinį išdėstymą</translation>
     </message>
     <message>
       <source>Save Current Layout As...</source>
-      <translation type="unfinished">Save Current Layout As...</translation>
+      <translation>Įrašyti dabartinį maketą kaip...</translation>
     </message>
     <message>
       <source>Save Video Wall View</source>
-      <translation type="unfinished">Save Video Wall View</translation>
+      <translation>Išsaugoti vaizdo sienos rodinį</translation>
     </message>
     <message>
       <source>Start Screen Recording</source>
-      <translation type="unfinished">Start Screen Recording</translation>
+      <translation>Pradėti ekrano įrašymą</translation>
     </message>
     <message>
       <source>Stop Screen Recording</source>
-      <translation type="unfinished">Stop Screen Recording</translation>
+      <translation>Sustabdyti ekrano įrašymą</translation>
     </message>
     <message>
       <source>Stop current action</source>
-      <translation type="unfinished">Stop current action</translation>
+      <translation>Sustabdyti dabartinį veiksmą</translation>
     </message>
     <message>
       <source>Go to Fullscreen</source>
-      <translation type="unfinished">Go to Fullscreen</translation>
+      <translation>Eiti į viso ekrano režimą</translation>
     </message>
     <message>
       <source>Exit Fullscreen</source>
-      <translation type="unfinished">Exit Fullscreen</translation>
+      <translation>Išeiti iš viso ekrano režimo</translation>
     </message>
     <message>
       <source>Minimize</source>
-      <translation type="unfinished">Minimize</translation>
+      <translation>Sumažinti</translation>
     </message>
     <message>
       <source>Maximize</source>
-      <translation type="unfinished">Maximize</translation>
+      <translation>Padidinti</translation>
     </message>
     <message>
       <source>Restore Down</source>
-      <translation type="unfinished">Restore Down</translation>
+      <translation>Atkurti žemyn</translation>
     </message>
     <message>
       <source>Open in Browser...</source>
-      <translation type="unfinished">Open in Browser...</translation>
+      <translation>Atidaryti naršyklėje...</translation>
     </message>
     <message>
       <source>User Management...</source>
-      <translation type="unfinished">User Management...</translation>
+      <translation>Vartotojų valdymas...</translation>
     </message>
     <message>
       <source>Local Settings...</source>
-      <translation type="unfinished">Local Settings...</translation>
+      <translation>Vietiniai nustatymai...</translation>
     </message>
     <message>
       <source>Audit Trail...</source>
-      <translation type="unfinished">Audit Trail...</translation>
+      <translation>Audito seka...</translation>
     </message>
     <message>
       <source>Log in to %1...</source>
       <comment>Log in to Nx Cloud</comment>
-      <translation type="unfinished">Log in to %1...</translation>
+      <translation>Prisijunkite prie %1...</translation>
     </message>
     <message>
       <source>Log out from %1</source>
       <comment>Log out from Nx Cloud</comment>
-      <translation type="unfinished">Log out from %1</translation>
+      <translation>Atsijungti nuo %1</translation>
     </message>
     <message>
       <source>Open %1 Portal...</source>
       <comment>Open Nx Cloud Portal</comment>
-      <translation type="unfinished">Open %1 Portal...</translation>
+      <translation>Atidaryti portalą %1...</translation>
     </message>
     <message>
       <source>Account Settings...</source>
@@ -337,19 +337,19 @@
     </message>
     <message>
       <source>Event Rules...</source>
-      <translation type="unfinished">Event Rules...</translation>
+      <translation>Renginio taisyklės...</translation>
     </message>
     <message>
       <source>Devices List</source>
-      <translation type="unfinished">Devices List</translation>
+      <translation>Įrenginių sąrašas</translation>
     </message>
     <message>
       <source>Cameras List</source>
-      <translation type="unfinished">Cameras List</translation>
+      <translation>Kamerų sąrašas</translation>
     </message>
     <message>
       <source>About...</source>
-      <translation type="unfinished">About...</translation>
+      <translation>Apie...</translation>
     </message>
     <message>
       <source>Exit</source>
@@ -369,7 +369,7 @@
     </message>
     <message>
       <source>Zoom to Selection</source>
-      <translation type="unfinished">Zoom to Selection</translation>
+      <translation>Priartinti iki pasirinkimo</translation>
     </message>
     <message>
       <source>Add Bookmark...</source>
@@ -381,51 +381,51 @@
     </message>
     <message>
       <source>Preview Search...</source>
-      <translation type="unfinished">Preview Search...</translation>
+      <translation>Atstatyti paiešką...</translation>
     </message>
     <message>
       <source>Server...</source>
-      <translation type="unfinished">Server...</translation>
+      <translation>Serveris...</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation type="unfinished">Open</translation>
+      <translation>Atidaryti</translation>
     </message>
     <message>
       <source>Monitor</source>
-      <translation type="unfinished">Monitor</translation>
+      <translation>Monitorius</translation>
     </message>
     <message>
       <source>Open Video Wall</source>
-      <translation type="unfinished">Open Video Wall</translation>
+      <translation>Atidaryti vaizdo sieną</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation type="unfinished">Open Containing Folder</translation>
+      <translation>Atidaryti talpinantį aplanką</translation>
     </message>
     <message>
       <source>Identify</source>
-      <translation type="unfinished">Identify</translation>
+      <translation>Identifikuoti</translation>
     </message>
     <message>
       <source>Attach to Video Wall...</source>
-      <translation type="unfinished">Attach to Video Wall...</translation>
+      <translation>Pritvirtinkite prie vaizdo sienos...</translation>
     </message>
     <message>
       <source>Switch to Video Wall mode...</source>
-      <translation type="unfinished">Switch to Video Wall mode...</translation>
+      <translation>Perjungti į vaizdo sienos režimą...</translation>
     </message>
     <message>
       <source>Save Video Wall</source>
-      <translation type="unfinished">Save Video Wall</translation>
+      <translation>Išsaugoti vaizdo sieną</translation>
     </message>
     <message>
       <source>Save Current Matrix</source>
-      <translation type="unfinished">Save Current Matrix</translation>
+      <translation>Išsaugoti dabartinę matricą</translation>
     </message>
     <message>
       <source>Load Matrix</source>
-      <translation type="unfinished">Load Matrix</translation>
+      <translation>Apkrovos matrica</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -433,11 +433,11 @@
     </message>
     <message>
       <source>Stop Video Wall</source>
-      <translation type="unfinished">Stop Video Wall</translation>
+      <translation>Sustabdyti vaizdo sieną</translation>
     </message>
     <message>
       <source>Clear Screen</source>
-      <translation type="unfinished">Clear Screen</translation>
+      <translation>Išvalyti ekraną</translation>
     </message>
     <message>
       <source>Save Layout</source>
@@ -445,7 +445,7 @@
     </message>
     <message>
       <source>Save Layout As...</source>
-      <translation type="unfinished">Save Layout As...</translation>
+      <translation>Išsaugoti išdėstymą...</translation>
     </message>
     <message>
       <source>Maximize Item</source>
@@ -453,59 +453,59 @@
     </message>
     <message>
       <source>Restore Item</source>
-      <translation type="unfinished">Restore Item</translation>
+      <translation>Restore item</translation>
     </message>
     <message>
       <source>Save Current Position...</source>
-      <translation type="unfinished">Save Current Position...</translation>
+      <translation>Išsaugoti dabartinę poziciją...</translation>
     </message>
     <message>
       <source>Manage...</source>
-      <translation type="unfinished">Manage...</translation>
+      <translation>Vadybininkas...</translation>
     </message>
     <message>
       <source>Show Motion/Smart Search</source>
-      <translation type="unfinished">Show Motion/Smart Search</translation>
+      <translation>Rodyti judesį / išmaniąją paiešką</translation>
     </message>
     <message>
       <source>Show Motion</source>
-      <translation type="unfinished">Show Motion</translation>
+      <translation>Rodyti judesį</translation>
     </message>
     <message>
       <source>Hide Motion/Smart Search</source>
-      <translation type="unfinished">Hide Motion/Smart Search</translation>
+      <translation>Slėpti judesio / išmaniąją paiešką</translation>
     </message>
     <message>
       <source>Hide Motion</source>
-      <translation type="unfinished">Hide Motion</translation>
+      <translation>Slėpti judesį</translation>
     </message>
     <message>
       <source>Clear Motion Selection</source>
-      <translation type="unfinished">Clear Motion Selection</translation>
+      <translation>Išvalyti judesio pasirinkimą</translation>
     </message>
     <message>
       <source>Check File Watermark</source>
-      <translation type="unfinished">Check File Watermark</translation>
+      <translation>Patikrinkite failo vandenženklį</translation>
     </message>
     <message>
       <source>Image Enhancement...</source>
-      <translation type="unfinished">Image Enhancement...</translation>
+      <translation>Vaizdo gerinimas...</translation>
     </message>
     <message>
       <source>0 degrees</source>
-      <translation type="unfinished">0 degrees</translation>
+      <translation>0 laipsnių</translation>
     </message>
     <message>
       <source>90 degrees</source>
-      <translation type="unfinished">90 degrees</translation>
+      <translation>90 laipsnių</translation>
     </message>
     <message>
       <source>180 degrees</source>
-      <translation type="unfinished">180 degrees</translation>
+      <translation>180 laipsnių</translation>
     </message>
     <message>
       <source>270 degrees</source>
-      <translation type="unfinished">270 degrees</translation>
+      <translation>270 laipsnių</translation>
     </message>
     <message>
       <source>Remove from Layout</source>
@@ -517,59 +517,59 @@
     </message>
     <message>
       <source>Delete from Disk</source>
-      <translation type="unfinished">Delete from Disk</translation>
+      <translation>Ištrinti iš disko</translation>
     </message>
     <message>
       <source>Set as Layout Background</source>
-      <translation type="unfinished">Set as Layout Background</translation>
+      <translation>Nustatyti kaip maketo foną</translation>
     </message>
     <message>
       <source>User Settings...</source>
-      <translation type="unfinished">User Settings...</translation>
+      <translation>Serverio nustatymai...</translation>
     </message>
     <message>
       <source>Check Device Issues...</source>
-      <translation type="unfinished">Check Device Issues...</translation>
+      <translation>Patikrinkite įrenginio problemas...</translation>
     </message>
     <message>
       <source>Check Devices Issues...</source>
-      <translation type="unfinished">Check Devices Issues...</translation>
+      <translation>Patikrinkite įrenginių problemas...</translation>
     </message>
     <message>
       <source>Check Camera Issues...</source>
-      <translation type="unfinished">Check Camera Issues...</translation>
+      <translation>Patikrinkite kameros problemas...</translation>
     </message>
     <message>
       <source>Check Cameras Issues...</source>
-      <translation type="unfinished">Check Cameras Issues...</translation>
+      <translation>Patikrinkite kamerų problemas...</translation>
     </message>
     <message>
       <source>Check I/O Module Issues...</source>
-      <translation type="unfinished">Check I/O Module Issues...</translation>
+      <translation>Patikrinkite įvesties / išvesties modulio problemas...</translation>
     </message>
     <message>
       <source>Check I/O Modules Issues...</source>
-      <translation type="unfinished">Check I/O Modules Issues...</translation>
+      <translation>Patikrinkite įvesties / išvesties modulių problemas...</translation>
     </message>
     <message>
       <source>Device Rules...</source>
-      <translation type="unfinished">Device Rules...</translation>
+      <translation>Įrenginio taisyklės...</translation>
     </message>
     <message>
       <source>Camera Rules...</source>
-      <translation type="unfinished">Camera Rules...</translation>
+      <translation>Kameros taisyklės...</translation>
     </message>
     <message>
       <source>I/O Module Rules...</source>
-      <translation type="unfinished">I/O Module Rules...</translation>
+      <translation>Įvesties/išvesties modulio taisyklės...</translation>
     </message>
     <message>
       <source>Device Settings...</source>
-      <translation type="unfinished">Device Settings...</translation>
+      <translation>Įrenginio nustatymai...</translation>
     </message>
     <message>
       <source>Devices Settings...</source>
-      <translation type="unfinished">Devices Settings...</translation>
+      <translation>Įrenginių nustatymai...</translation>
     </message>
     <message>
       <source>Camera Settings...</source>
@@ -577,19 +577,19 @@
     </message>
     <message>
       <source>Cameras Settings...</source>
-      <translation type="unfinished">Cameras Settings...</translation>
+      <translation>Kameros nustatymai...</translation>
     </message>
     <message>
       <source>I/O Module Settings...</source>
-      <translation type="unfinished">I/O Module Settings...</translation>
+      <translation>Įvesties / išvesties modulio nustatymai...</translation>
     </message>
     <message>
       <source>I/O Modules Settings...</source>
-      <translation type="unfinished">I/O Modules Settings...</translation>
+      <translation>Įvesties/išvesties modulių nustatymai...</translation>
     </message>
     <message>
       <source>File Settings...</source>
-      <translation type="unfinished">File Settings...</translation>
+      <translation>Svetainės nustatymai...</translation>
     </message>
     <message>
       <source>Layout Settings...</source>
@@ -597,27 +597,27 @@
     </message>
     <message>
       <source>Video Wall Settings...</source>
-      <translation type="unfinished">Video Wall Settings...</translation>
+      <translation>Vaizdo sienos nustatymai...</translation>
     </message>
     <message>
       <source>Devices List by Server...</source>
-      <translation type="unfinished">Devices List by Server...</translation>
+      <translation>Įrenginių sąrašas pagal serverį...</translation>
     </message>
     <message>
       <source>Cameras List by Server...</source>
-      <translation type="unfinished">Cameras List by Server...</translation>
+      <translation>Kamerų sąrašas pagal serverį...</translation>
     </message>
     <message>
       <source>Server Logs...</source>
-      <translation type="unfinished">Server Logs...</translation>
+      <translation>Serverio žurnalai...</translation>
     </message>
     <message>
       <source>Server Diagnostics...</source>
-      <translation type="unfinished">Server Diagnostics...</translation>
+      <translation>Serverio diagnostika...</translation>
     </message>
     <message>
       <source>Server Web Page...</source>
-      <translation type="unfinished">Server Web Page...</translation>
+      <translation>Serverio tinklalapis...</translation>
     </message>
     <message>
       <source>Server Settings...</source>
@@ -629,7 +629,7 @@
     </message>
     <message>
       <source>Small</source>
-      <translation type="unfinished">Small</translation>
+      <translation>Mažas</translation>
     </message>
     <message>
       <source>Medium</source>
@@ -637,7 +637,7 @@
     </message>
     <message>
       <source>Large</source>
-      <translation type="unfinished">Large</translation>
+      <translation>Didelis</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -649,7 +649,7 @@
     </message>
     <message>
       <source>Close All But This</source>
-      <translation type="unfinished">Close All But This</translation>
+      <translation>Uždaryti viską, išskyrus šį</translation>
     </message>
     <message>
       <source>Play</source>
@@ -669,23 +669,23 @@
     </message>
     <message>
       <source>To Start</source>
-      <translation type="unfinished">To Start</translation>
+      <translation>Norėdami pradėti</translation>
     </message>
     <message>
       <source>To End</source>
-      <translation type="unfinished">To End</translation>
+      <translation>Iki pabaigos</translation>
     </message>
     <message>
       <source>Volume Down</source>
-      <translation type="unfinished">Volume Down</translation>
+      <translation>Garsumą mažinti</translation>
     </message>
     <message>
       <source>Volume Up</source>
-      <translation type="unfinished">Volume Up</translation>
+      <translation>Garsumo didinimas</translation>
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>Perjungti garso išjungimą</translation>
     </message>
     <message>
       <source>Jump to Live</source>
@@ -693,71 +693,71 @@
     </message>
     <message>
       <source>Synchronize Streams</source>
-      <translation type="unfinished">Synchronize Streams</translation>
+      <translation>Sinchronizuoti srautus</translation>
     </message>
     <message>
       <source>Disable Stream Synchronization</source>
-      <translation type="unfinished">Disable Stream Synchronization</translation>
+      <translation>Išjungti srauto sinchronizavimą</translation>
     </message>
     <message>
       <source>Show Bookmarks</source>
-      <translation type="unfinished">Show Bookmarks</translation>
+      <translation>Rodyti žymes</translation>
     </message>
     <message>
       <source>Hide Bookmarks</source>
-      <translation type="unfinished">Hide Bookmarks</translation>
+      <translation>Pridėti žymę</translation>
     </message>
     <message>
       <source>Show Calendar</source>
-      <translation type="unfinished">Show Calendar</translation>
+      <translation>Rodyti kalendorių</translation>
     </message>
     <message>
       <source>Hide Calendar</source>
-      <translation type="unfinished">Hide Calendar</translation>
+      <translation>Slėpti kalendorius (Automatic Translation)</translation>
     </message>
     <message>
       <source>Show Title Bar</source>
-      <translation type="unfinished">Show Title Bar</translation>
+      <translation>Rodyti pavadinimo juostą</translation>
     </message>
     <message>
       <source>Hide Title Bar</source>
-      <translation type="unfinished">Hide Title Bar</translation>
+      <translation>Slėpti antraštės juostą</translation>
     </message>
     <message>
       <source>Show Timeline</source>
-      <translation type="unfinished">Show Timeline</translation>
+      <translation>Rodyti laiko juostą</translation>
     </message>
     <message>
       <source>Hide Timeline</source>
-      <translation type="unfinished">Hide Timeline</translation>
+      <translation>Slėpti laiko juostą</translation>
     </message>
     <message>
       <source>Bookmark Log...</source>
-      <translation type="unfinished">Bookmark Log...</translation>
+      <translation>Žymių žurnalas...</translation>
     </message>
     <message>
       <source>Showreel...</source>
-      <translation type="unfinished">Showreel...</translation>
+      <translation>Rodyti...</translation>
     </message>
     <message>
       <source>Remove from Showreel</source>
-      <translation type="unfinished">Remove from Showreel</translation>
+      <translation>Pašalinti iš demonstracinės juostos</translation>
     </message>
     <message>
       <source>Make Showreel</source>
-      <translation type="unfinished">Make Showreel</translation>
+      <translation>Sukurti demonstracinę juostą</translation>
     </message>
     <message>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Įkelti failą...</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Įkelti aplanką...</translation>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation type="unfinished">Some cameras require passwords to be set</translation>
+      <translation>Kai kurioms kameroms reikia nustatyti slaptažodžius</translation>
     </message>
     <message>
       <source>Export Video...</source>
@@ -765,143 +765,143 @@
     </message>
     <message>
       <source>Export Bookmark...</source>
-      <translation type="unfinished">Export Bookmark...</translation>
+      <translation>Redaguoti žymę...</translation>
     </message>
     <message>
       <source>Screen Settings...</source>
-      <translation type="unfinished">Screen Settings...</translation>
+      <translation>Serverio nustatymai...</translation>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Eksportuoti žymes...</translation>
     </message>
     <message>
       <source>Forget password</source>
-      <translation type="unfinished">Forget password</translation>
+      <translation>Pamiršote slaptažodį?</translation>
     </message>
     <message>
       <source>Cancel Upload...</source>
-      <translation type="unfinished">Cancel Upload...</translation>
+      <translation>Atšaukti įkėlimą...</translation>
     </message>
     <message>
       <source>Analytics Engine Settings...</source>
-      <translation type="unfinished">Analytics Engine Settings...</translation>
+      <translation>Analizės modulio nustatymai...</translation>
     </message>
     <message>
       <source>Show Thumbnails</source>
-      <translation type="unfinished">Show Thumbnails</translation>
+      <translation>Rodyti miniatiūras</translation>
     </message>
     <message>
       <source>Hide Thumbnails</source>
-      <translation type="unfinished">Hide Thumbnails</translation>
+      <translation>Slėpti miniatiūras</translation>
     </message>
     <message>
       <source>Virtual Camera...</source>
-      <translation type="unfinished">Virtual Camera...</translation>
+      <translation>Virtuali kamera...</translation>
     </message>
     <message>
       <source>Show Tree</source>
-      <translation type="unfinished">Show Tree</translation>
+      <translation>Rodyti medį</translation>
     </message>
     <message>
       <source>Hide Tree</source>
-      <translation type="unfinished">Hide Tree</translation>
+      <translation>Slėpti medį</translation>
     </message>
     <message>
       <source>Show Notifications</source>
-      <translation type="unfinished">Show Notifications</translation>
+      <translation>Rodyti Pranešimus</translation>
     </message>
     <message>
       <source>Hide Notifications</source>
-      <translation type="unfinished">Hide Notifications</translation>
+      <translation>Slėpti pranešimus</translation>
     </message>
     <message>
       <source>Files...</source>
-      <translation type="unfinished">Files...</translation>
+      <translation>Failai...</translation>
     </message>
     <message>
       <source>Switch to Notifications tab</source>
-      <translation type="unfinished">Switch to Notifications tab</translation>
+      <translation>Perjungti į pranešimų skirtuką</translation>
     </message>
     <message>
       <source>Switch to Motion tab</source>
-      <translation type="unfinished">Switch to Motion tab</translation>
+      <translation>Perjungti į skirtuką „Judėjimas“</translation>
     </message>
     <message>
       <source>Switch to Bookmarks tab</source>
-      <translation type="unfinished">Switch to Bookmarks tab</translation>
+      <translation>Perjungti į skirtuką „Žymės“</translation>
     </message>
     <message>
       <source>Switch to Events tab</source>
-      <translation type="unfinished">Switch to Events tab</translation>
+      <translation>Perjungti į skirtuką „Įvykiai“</translation>
     </message>
     <message>
       <source>Switch to Objects tab</source>
-      <translation type="unfinished">Switch to Objects tab</translation>
+      <translation>Perjungti į skirtuką Objektai</translation>
     </message>
     <message>
       <source>Page...</source>
-      <translation type="unfinished">Page...</translation>
+      <translation>Puslapis...</translation>
     </message>
     <message>
       <source>Connect to this Server</source>
-      <translation type="unfinished">Connect to this Server</translation>
+      <translation>Prisijungti prie šio serverio</translation>
     </message>
     <message>
       <source>Pin</source>
-      <translation type="unfinished">Pin</translation>
+      <translation>Pin</translation>
     </message>
     <message>
       <source>Switch to Cameras &amp; Resources tab</source>
-      <translation type="unfinished">Switch to Cameras &amp; Resources tab</translation>
+      <translation>Perjungti į skirtuką „Kameros ir ištekliai“</translation>
     </message>
     <message>
       <source>Search Cameras &amp; Resources</source>
-      <translation type="unfinished">Search Cameras &amp; Resources</translation>
+      <translation>Ieškoti fotoaparatų ir išteklių</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>
-      <translation type="unfinished">Connect to Another Server...</translation>
+      <translation>Prisijungti prie kito serverio...</translation>
     </message>
     <message>
       <source>New</source>
-      <translation type="unfinished">New</translation>
+      <translation>Naujas</translation>
     </message>
     <message>
       <source>Add Web Page...</source>
-      <translation type="unfinished">Add Web Page...</translation>
+      <translation>Pridėti tinklalapį...</translation>
     </message>
     <message>
       <source>Show Servers</source>
-      <translation type="unfinished">Show Servers</translation>
+      <translation>Rodyti serverius</translation>
     </message>
     <message>
       <source>Save Window Configuration</source>
-      <translation type="unfinished">Save Window Configuration</translation>
+      <translation>Įrašyti lango konfigūraciją</translation>
     </message>
     <message>
       <source>Save Windows Configuration</source>
-      <translation type="unfinished">Save Windows Configuration</translation>
+      <translation>Išsaugoti „Windows“ konfigūraciją</translation>
     </message>
     <message>
       <source>Windows Configuration</source>
-      <translation type="unfinished">Windows Configuration</translation>
+      <translation>„Windows“ konfigūracija</translation>
     </message>
     <message>
       <source>Save Current State</source>
-      <translation type="unfinished">Save Current State</translation>
+      <translation>Išsaugoti dabartinę būseną</translation>
     </message>
     <message>
       <source>Restore Saved State</source>
-      <translation type="unfinished">Restore Saved State</translation>
+      <translation>Atkurti išsaugotą būseną</translation>
     </message>
     <message>
       <source>Delete Saved State</source>
-      <translation type="unfinished">Delete Saved State</translation>
+      <translation>Ištrinti išsaugotą būseną</translation>
     </message>
     <message>
       <source>Close all Windows</source>
-      <translation type="unfinished">Close all Windows</translation>
+      <translation>Užverti visus langus</translation>
     </message>
     <message>
       <source>Delete Bookmark...</source>
@@ -909,7 +909,7 @@
     </message>
     <message>
       <source>Delete Bookmarks...</source>
-      <translation type="unfinished">Delete Bookmarks...</translation>
+      <translation>Ištrinti žymes...</translation>
     </message>
     <message>
       <source>PTZ</source>
@@ -921,63 +921,63 @@
     </message>
     <message>
       <source>Create Group</source>
-      <translation type="unfinished">Create Group</translation>
+      <translation>Sukurti grupę</translation>
     </message>
     <message>
       <source>Remove Group</source>
-      <translation type="unfinished">Remove Group</translation>
+      <translation>Šalinti grupę</translation>
     </message>
     <message>
       <source>Cell Spacing</source>
-      <translation type="unfinished">Cell Spacing</translation>
+      <translation>Langelių tarpai</translation>
     </message>
     <message>
       <source>Joystick Settings...</source>
-      <translation type="unfinished">Joystick Settings...</translation>
+      <translation>Valdymo svirties nustatymai...</translation>
     </message>
     <message>
       <source>Advanced...</source>
-      <translation type="unfinished">Advanced...</translation>
+      <translation>Išplėstinė...</translation>
     </message>
     <message>
       <source>Archive filter...</source>
-      <translation type="unfinished">Archive filter...</translation>
+      <translation>Archyvų filtras...</translation>
     </message>
     <message>
       <source>Copy Bookmark Text</source>
-      <translation type="unfinished">Copy Bookmark Text</translation>
+      <translation>Kopijuoti žymės tekstą</translation>
     </message>
     <message>
       <source>Copy Bookmarks Text</source>
-      <translation type="unfinished">Copy Bookmarks Text</translation>
+      <translation>Kopijuoti žymių tekstą</translation>
     </message>
     <message>
       <source>Web Page Settings...</source>
-      <translation type="unfinished">Web Page Settings...</translation>
+      <translation>Tinklalapio nustatymai...</translation>
     </message>
     <message>
       <source>Account Security...</source>
-      <translation type="unfinished">Account Security...</translation>
+      <translation>Paskyros saugumas...</translation>
     </message>
     <message>
       <source>Replace Camera...</source>
-      <translation type="unfinished">Replace Camera...</translation>
+      <translation>Pasirinkite kamerą...</translation>
     </message>
     <message>
       <source>Save Current Layout As Cloud...</source>
-      <translation type="unfinished">Save Current Layout As Cloud...</translation>
+      <translation>Išsaugoti dabartinį maketą kaip debesies...</translation>
     </message>
     <message>
       <source>Save Layout As Cloud...</source>
-      <translation type="unfinished">Save Layout As Cloud...</translation>
+      <translation>Išsaugoti maketą kaip debesį...</translation>
     </message>
     <message>
       <source>Save Cloud Layout</source>
-      <translation type="unfinished">Save Cloud Layout</translation>
+      <translation>Išsaugoti debesies išdėstymą</translation>
     </message>
     <message>
       <source>Save Cloud Layout As...</source>
-      <translation type="unfinished">Save Cloud Layout As...</translation>
+      <translation>Įrašyti debesies išdėstymą kaip...</translation>
     </message>
     <message>
       <source>Add</source>
@@ -985,7 +985,7 @@
     </message>
     <message>
       <source>Device...</source>
-      <translation type="unfinished">Device...</translation>
+      <translation>Įrenginiai...</translation>
     </message>
     <message>
       <source>Add User...</source>
@@ -993,51 +993,51 @@
     </message>
     <message>
       <source>Integration...</source>
-      <translation type="unfinished">Integration...</translation>
+      <translation>Integracijos...</translation>
     </message>
     <message>
       <source>New Integration...</source>
-      <translation type="unfinished">New Integration...</translation>
+      <translation>Visos integracijos...</translation>
     </message>
     <message>
       <source>New Web Page...</source>
-      <translation type="unfinished">New Web Page...</translation>
+      <translation>Naujas tinklalapis...</translation>
     </message>
     <message>
       <source>Add Showreel...</source>
-      <translation type="unfinished">Add Showreel...</translation>
+      <translation>Pridėti demonstracinę juostą...</translation>
     </message>
     <message>
       <source>Add Virtual Camera...</source>
-      <translation type="unfinished">Add Virtual Camera...</translation>
+      <translation>Pridėti virtualią kamerą...</translation>
     </message>
     <message>
       <source>Integration Settings...</source>
-      <translation type="unfinished">Integration Settings...</translation>
+      <translation>Integracijos nustatymai...</translation>
     </message>
     <message>
       <source>Proxied Integration...</source>
-      <translation type="unfinished">Proxied Integration...</translation>
+      <translation>Integracija su tarpiniu serveriu...</translation>
     </message>
     <message>
       <source>Proxied Web Page...</source>
-      <translation type="unfinished">Proxied Web Page...</translation>
+      <translation>Tarpinis tinklalapis...</translation>
     </message>
     <message>
       <source>Show Proxied Resources</source>
-      <translation type="unfinished">Show Proxied Resources</translation>
+      <translation>Rodyti tarpinius išteklius</translation>
     </message>
     <message>
       <source>Import From Devices...</source>
-      <translation type="unfinished">Import From Devices...</translation>
+      <translation>Importuoti iš įrenginių...</translation>
     </message>
     <message>
       <source>User Manual...</source>
-      <translation type="unfinished">User Manual...</translation>
+      <translation>Naudotojo vadovas...</translation>
     </message>
     <message>
       <source>Convert to Shared Layout</source>
-      <translation type="unfinished">Convert to Shared Layout</translation>
+      <translation>Konvertuoti į bendrinamą maketą</translation>
     </message>
     <message>
       <source>Connect to Site</source>
@@ -1049,15 +1049,15 @@
     </message>
     <message>
       <source>Site Update...</source>
-      <translation type="unfinished">Site Update...</translation>
+      <translation>Svetainės atnaujinimas...</translation>
     </message>
     <message>
       <source>Lists Management...</source>
-      <translation type="unfinished">Lists Management...</translation>
+      <translation>Sąrašų valdymas...</translation>
     </message>
     <message>
       <source>Open Integrations...</source>
-      <translation type="unfinished">Open Integrations...</translation>
+      <translation>Visos integracijos...</translation>
     </message>
     <message>
       <source>Merge Sites...</source>
@@ -1066,22 +1066,22 @@
     <message>
       <source>Open in</source>
       <comment>The &quot;Open in&quot; menu, which has a submenu</comment>
-      <translation type="unfinished">Open in</translation>
+      <translation>Atverti naudojant</translation>
     </message>
     <message>
       <source>New Tab</source>
       <comment>The &quot;Open in&quot; submenu item</comment>
-      <translation type="unfinished">New Tab</translation>
+      <translation>Naujas skirtukas</translation>
     </message>
     <message>
       <source>New Window</source>
       <comment>The &quot;Open in&quot; submenu item</comment>
-      <translation type="unfinished">New Window</translation>
+      <translation>Naujas langas</translation>
     </message>
     <message>
       <source>Dedicated Window</source>
       <comment>The &quot;Open in&quot; submenu item</comment>
-      <translation type="unfinished">Dedicated Window</translation>
+      <translation>Specialus langas</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -1089,19 +1089,19 @@
     </message>
     <message>
       <source>JavaScript API...</source>
-      <translation type="unfinished">JavaScript API...</translation>
+      <translation>„JavaScript“ API...</translation>
     </message>
     <message>
       <source>Merge to Currently Connected Site...</source>
-      <translation type="unfinished">Merge to Currently Connected Site...</translation>
+      <translation>Sujungti su šiuo metu prijungta svetaine...</translation>
     </message>
     <message>
       <source>Cell Aspect Ratio</source>
-      <translation type="unfinished">Cell Aspect Ratio</translation>
+      <translation>Išlaikyti kraštinių santykį</translation>
     </message>
     <message>
       <source>Layout</source>
-      <translation type="unfinished">Layout</translation>
+      <translation>Išdėstymas</translation>
     </message>
     <message>
       <source>New Layout</source>
@@ -1109,19 +1109,19 @@
     </message>
     <message>
       <source>Welcome Screen</source>
-      <translation type="unfinished">Welcome Screen</translation>
+      <translation>Sveikinimo ekranas</translation>
     </message>
     <message>
       <source>New Welcome Screen</source>
-      <translation type="unfinished">New Welcome Screen</translation>
+      <translation>Naujas pasveikinimo ekranas</translation>
     </message>
     <message>
       <source>Monitor in New Tab</source>
-      <translation type="unfinished">Monitor in New Tab</translation>
+      <translation>Stebėti naujame skirtuke</translation>
     </message>
     <message>
       <source>Monitor in New Window</source>
-      <translation type="unfinished">Monitor in New Window</translation>
+      <translation>Stebėti naujame lange</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -1130,82 +1130,82 @@
     <message numerus="yes">
       <source>Show on Items</source>
       <comment>Numerus form depends on the amount of items</comment>
-      <translation type="unfinished">
-        <numerusform>Show on Items</numerusform>
-        <numerusform>Show on Items</numerusform>
-        <numerusform>Show on Items</numerusform>
-        <numerusform>Show on Items</numerusform>
+      <translation>
+        <numerusform>Rodyti elemente</numerusform>
+        <numerusform>Rodyti elemente</numerusform>
+        <numerusform>Rodyti elemente</numerusform>
+        <numerusform>Rodyti elemente</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Mute Items</source>
       <comment>Numerus form depends on the amount of items</comment>
-      <translation type="unfinished">
-        <numerusform>Mute Items</numerusform>
-        <numerusform>Mute Items</numerusform>
-        <numerusform>Mute Items</numerusform>
-        <numerusform>Mute Items</numerusform>
+      <translation>
+        <numerusform>Nutildyti elementus</numerusform>
+        <numerusform>Nutildyti elementus</numerusform>
+        <numerusform>Nutildyti elementus</numerusform>
+        <numerusform>Nutildyti elementus</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Unmute Items</source>
       <comment>Numerus form depends on the amount of items</comment>
-      <translation type="unfinished">
-        <numerusform>Unmute Items</numerusform>
-        <numerusform>Unmute Items</numerusform>
-        <numerusform>Unmute Items</numerusform>
-        <numerusform>Unmute Items</numerusform>
+      <translation>
+        <numerusform>Įjungti elementų garsą</numerusform>
+        <numerusform>Įjungti elementų garsą</numerusform>
+        <numerusform>Įjungti elementų garsą</numerusform>
+        <numerusform>Įjungti elementų garsą</numerusform>
       </translation>
     </message>
     <message>
       <source>Event log...</source>
-      <translation type="unfinished">Event log...</translation>
+      <translation>Įvykių žurnalas...</translation>
     </message>
   </context>
   <context>
     <name>Deactivator</name>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>Neatpažinta klaida.</translation>
     </message>
     <message>
       <source>License does not exist.</source>
-      <translation type="unfinished">License does not exist.</translation>
+      <translation>Licenzijos nėra.</translation>
     </message>
     <message>
       <source>License is disabled.</source>
-      <translation type="unfinished">License is disabled.</translation>
+      <translation>Licencija išjungta.</translation>
     </message>
     <message>
       <source>License is inactive.</source>
-      <translation type="unfinished">License is inactive.</translation>
+      <translation>Licencija neaktyvi.</translation>
     </message>
     <message>
       <source>Invalid license.</source>
-      <translation type="unfinished">Invalid license.</translation>
+      <translation>Klaidinga Licencija</translation>
     </message>
     <message>
       <source>License is trial.</source>
-      <translation type="unfinished">License is trial.</translation>
+      <translation>Licencija yra bandomoji.</translation>
     </message>
     <message>
       <source>License is in pending deactivation state, but has not been deactivated yet.</source>
-      <translation type="unfinished">License is in pending deactivation state, but has not been deactivated yet.</translation>
+      <translation>Licencija yra deaktyvavimo laukiamoje būsenoje, bet dar nėra deaktyvuota.</translation>
     </message>
     <message>
       <source>Number of deactivations exceeded limit for this license.</source>
-      <translation type="unfinished">Number of deactivations exceeded limit for this license.</translation>
+      <translation>Deaktyvavimų skaičius viršijo šios licencijos limitą.</translation>
     </message>
     <message>
       <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
-      <translation type="unfinished">Hardware ID of Server with this license does not match Hardware ID on which license was activated.</translation>
+      <translation>Serverio su šia licencija aparatinės įrangos ID nesutampa su aparatinės įrangos ID, kuriame licencija buvo aktyvuota.</translation>
     </message>
   </context>
   <context>
     <name>DirectParentsModel</name>
     <message>
       <source>LDAP group membership is managed on LDAP server</source>
-      <translation type="unfinished">LDAP group membership is managed on LDAP server</translation>
+      <translation>LDAP grupės narystė tvarkoma LDAP serveryje</translation>
     </message>
   </context>
   <context>
@@ -1213,17 +1213,17 @@
     <message>
       <source>Also include</source>
       <comment>Part of the text, action duration: Also include &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Also include</translation>
+      <translation>Taip pat įtraukti</translation>
     </message>
     <message>
       <source>Begin</source>
       <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Begin</translation>
+      <translation>Pradėti</translation>
     </message>
     <message>
       <source>Before Event</source>
       <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Before Event</translation>
+      <translation>Prieš įvykį</translation>
     </message>
     <message>
       <source>End</source>
@@ -1233,87 +1233,87 @@
     <message>
       <source>After Event</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">After Event</translation>
+      <translation>Po renginio</translation>
     </message>
   </context>
   <context>
     <name>EncryptedLayoutStrings</name>
     <message>
       <source>Please enter a valid password</source>
-      <translation type="unfinished">Please enter a valid password</translation>
+      <translation>Įveskite galiojantį slaptažodį</translation>
     </message>
     <message>
       <source>The password is not valid.</source>
-      <translation type="unfinished">The password is not valid.</translation>
+      <translation>Slaptažodis negalioja.</translation>
     </message>
     <message>
       <source>Encrypted layout</source>
-      <translation type="unfinished">Encrypted layout</translation>
+      <translation>Užšifruotas išdėstymas</translation>
     </message>
     <message>
       <source>The file %1 is encrypted. Please enter the password:</source>
-      <translation type="unfinished">The file %1 is encrypted. Please enter the password:</translation>
+      <translation>Failas %1 yra užšifruotas. Įveskite slaptažodį:</translation>
     </message>
     <message>
       <source>Please re-enter password for layout %1:</source>
-      <translation type="unfinished">Please re-enter password for layout %1:</translation>
+      <translation>Prašome dar kartą įvesti slaptažodį maketui %1:</translation>
     </message>
     <message>
       <source>Corrupted input file.</source>
-      <translation type="unfinished">Corrupted input file.</translation>
+      <translation>Sugadintas įvesties failas.</translation>
     </message>
   </context>
   <context>
     <name>FileExtensions</name>
     <message>
       <source>Pictures</source>
-      <translation type="unfinished">Pictures</translation>
+      <translation>Nuotraukos</translation>
     </message>
     <message>
       <source>Video</source>
-      <translation type="unfinished">Video</translation>
+      <translation>Vaizdo įrašas</translation>
     </message>
     <message>
       <source>All Files</source>
-      <translation type="unfinished">All Files</translation>
+      <translation>Visi failai</translation>
     </message>
   </context>
   <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
-      <translation type="unfinished">Audio Video Interleave</translation>
+      <translation>Garso ir vaizdo įrašas</translation>
     </message>
     <message>
       <source>Matroska</source>
-      <translation type="unfinished">Matroska</translation>
+      <translation>Matroska</translation>
     </message>
     <message>
       <source>MPEG-4 Part 14</source>
-      <translation type="unfinished">MPEG-4 Part 14</translation>
+      <translation>MPEG-4 14 dalis</translation>
     </message>
     <message>
       <source>%1 Media File</source>
-      <translation type="unfinished">%1 Media File</translation>
+      <translation>%1 Medijos failas</translation>
     </message>
     <message>
       <source>Executable %1 Media File</source>
-      <translation type="unfinished">Executable %1 Media File</translation>
+      <translation>Vykdomasis %1 medijos failas</translation>
     </message>
   </context>
   <context>
     <name>Groups</name>
     <message>
       <source>Delete group?</source>
-      <translation type="unfinished">Delete group?</translation>
+      <translation>Ištrinti išdėstymą?</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n groups?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n groups?</numerusform>
-        <numerusform>Delete %n groups?</numerusform>
-        <numerusform>Delete %n groups?</numerusform>
-        <numerusform>Delete %n groups?</numerusform>
+      <translation>
+        <numerusform>Ištrinti %n grupes?</numerusform>
+        <numerusform>Ištrinti %n grupes?</numerusform>
+        <numerusform>Ištrinti %n grupes?</numerusform>
+        <numerusform>Ištrinti %n grupes?</numerusform>
       </translation>
     </message>
   </context>
@@ -1321,82 +1321,82 @@
     <name>IntercomManager::Private</name>
     <message>
       <source>%1 Layout</source>
-      <translation type="unfinished">%1 Layout</translation>
+      <translation>Naujas išdėstymas</translation>
     </message>
   </context>
   <context>
     <name>LicenseActivationDialogs</name>
     <message>
       <source>Incompatible license</source>
-      <translation type="unfinished">Incompatible license</translation>
+      <translation>Nesuderinama licencija</translation>
     </message>
     <message>
       <source>License you are trying to activate is incompatible with your software.</source>
-      <translation type="unfinished">License you are trying to activate is incompatible with your software.</translation>
+      <translation>Licencija, kurią bandote aktyvuoti, nesuderinama su jūsų programine įranga.</translation>
     </message>
     <message>
       <source>To report the issue please contact %1.</source>
-      <translation type="unfinished">To report the issue please contact %1.</translation>
+      <translation>Norėdami pranešti apie problemą, susisiekite su %1.</translation>
     </message>
     <message>
       <source>Failed to activate license</source>
-      <translation type="unfinished">Failed to activate license</translation>
+      <translation>Nepavyko suaktyvinti licencijos</translation>
     </message>
     <message>
       <source>Invalid data received.</source>
-      <translation type="unfinished">Invalid data received.</translation>
+      <translation>Pateikti neteisingi duomenys.</translation>
     </message>
     <message>
       <source>Database error occurred.</source>
-      <translation type="unfinished">Database error occurred.</translation>
+      <translation>Įvyko duomenų bazės klaida.</translation>
     </message>
     <message>
       <source>Invalid License Key</source>
-      <translation type="unfinished">Invalid License Key</translation>
+      <translation>Neteisingas licencijos raktas</translation>
     </message>
     <message>
       <source>Please make sure it is entered correctly.</source>
-      <translation type="unfinished">Please make sure it is entered correctly.</translation>
+      <translation>Įsitikinkite, kad jis įvestas teisingai.</translation>
     </message>
     <message>
       <source>Invalid activation key file</source>
-      <translation type="unfinished">Invalid activation key file</translation>
+      <translation>Neteisingas aktyvinimo rakto failas</translation>
     </message>
     <message>
       <source>Select a valid activation key file to continue.</source>
-      <translation type="unfinished">Select a valid activation key file to continue.</translation>
+      <translation>Norėdami tęsti, pasirinkite galiojantį aktyvinimo rakto failą.</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1</source>
-      <translation type="unfinished">This license is already activated and linked to Hardware ID %1</translation>
+      <translation>Ši licencija jau aktyvuota ir susieta su aparatinės įrangos ID %1</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1 on %2</source>
-      <translation type="unfinished">This license is already activated and linked to Hardware ID %1 on %2</translation>
+      <translation>Ši licencija jau aktyvuota ir susieta su aparatinės įrangos ID %1 , esančiu %2</translation>
     </message>
     <message>
       <source>License already activated on another server</source>
-      <translation type="unfinished">License already activated on another server</translation>
+      <translation>Licencija jau aktyvuota kitame serveryje</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact %1.</source>
-      <translation type="unfinished">To activate License Key manually please contact %1.</translation>
+      <translation>Norėdami rankiniu būdu suaktyvinti licencijos raktą, susisiekite su %1.</translation>
     </message>
     <message>
       <source>Network error</source>
-      <translation type="unfinished">Network error</translation>
+      <translation>Tinklo klaida</translation>
     </message>
     <message>
       <source>License activated</source>
-      <translation type="unfinished">License activated</translation>
+      <translation>Licencijos raktas aktyvuotas</translation>
     </message>
     <message>
       <source>To report the issue please contact your Regional / License support:</source>
-      <translation type="unfinished">To report the issue please contact your Regional / License support:</translation>
+      <translation>Norėdami pranešti apie problemą, susisiekite su savo regionine / licencijų palaikymo tarnyba:</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact your Regional / License support:</source>
-      <translation type="unfinished">To activate License Key manually please contact your Regional / License support:</translation>
+      <translation>Norėdami rankiniu būdu suaktyvinti licencijos raktą, susisiekite su regioniniu / licencijų palaikymo centru:</translation>
     </message>
     <message>
       <source>Hardware ID</source>
@@ -1404,57 +1404,57 @@
     </message>
     <message>
       <source>License Key</source>
-      <translation type="unfinished">License Key</translation>
+      <translation>Licencijos raktas</translation>
     </message>
     <message>
       <source>Failed to activate free license</source>
-      <translation type="unfinished">Failed to activate free license</translation>
+      <translation>Nepavyko suaktyvinti nemokamos licencijos</translation>
     </message>
     <message>
       <source>Copied</source>
-      <translation type="unfinished">Copied</translation>
+      <translation>Nukopijuota</translation>
     </message>
     <message>
       <source>Hardware ID: %1
 License Key: %2</source>
-      <translation type="unfinished">Hardware ID: %1
-License Key: %2</translation>
+      <translation>Aparatinės įrangos ID: %1
+Licencijos raktas: %2</translation>
     </message>
     <message>
       <source>Copy Parameters</source>
-      <translation type="unfinished">Copy Parameters</translation>
+      <translation>Kopijuoti parametrus</translation>
     </message>
     <message>
       <source>License has already been activated</source>
-      <translation type="unfinished">License has already been activated</translation>
+      <translation>Licencija jau aktyvuota</translation>
     </message>
     <message>
       <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-      <translation type="unfinished">If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
+      <translation>Jei jūsų svetainė neturi prieigos prie interneto, prašome nusiųsti pateiktą licencijos raktą ir aparatinės įrangos ID adresu %1 , kad gautumėte aktyvinimo failą.</translation>
     </message>
     <message>
       <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation type="unfinished">If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
+      <translation>Jei jūsų svetainė neturi prieigos prie interneto, nusiųskite pateiktą licencijos raktą ir aparatinės įrangos ID savo regioninei / licencijų palaikymo komandai, kad gautumėte aktyvinimo failą:</translation>
     </message>
   </context>
   <context>
     <name>LicenseDeactivationDialogs</name>
     <message numerus="yes">
       <source>Failed to deactivate %n licenses</source>
-      <translation type="unfinished">
-        <numerusform>Failed to deactivate %n licenses</numerusform>
-        <numerusform>Failed to deactivate %n licenses</numerusform>
-        <numerusform>Failed to deactivate %n licenses</numerusform>
-        <numerusform>Failed to deactivate %n licenses</numerusform>
+      <translation>
+        <numerusform>Nepavyko deaktyvuoti %n licencijų</numerusform>
+        <numerusform>Nepavyko deaktyvuoti %n licencijų</numerusform>
+        <numerusform>Nepavyko deaktyvuoti %n licencijų</numerusform>
+        <numerusform>Nepavyko deaktyvuoti %n licencijų</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n licenses cannot be deactivated</source>
-      <translation type="unfinished">
-        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
-        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
-        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
-        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
+      <translation>
+        <numerusform>%1 iš %n licencijų negalima deaktyvuoti</numerusform>
+        <numerusform>%1 iš %n licencijų negalima deaktyvuoti</numerusform>
+        <numerusform>%1 iš %n licencijų negalima deaktyvuoti</numerusform>
+        <numerusform>%1 iš %n licencijų negalima deaktyvuoti</numerusform>
       </translation>
     </message>
     <message>
@@ -1463,47 +1463,47 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Cannot connect to the License Server</source>
-      <translation type="unfinished">Cannot connect to the License Server</translation>
+      <translation>Nepavyksta prisijungti prie licencijų serverio</translation>
     </message>
     <message>
       <source>Please make sure your server has active Internet connection or check firewall settings.</source>
-      <translation type="unfinished">Please make sure your server has active Internet connection or check firewall settings.</translation>
+      <translation>Įsitikinkite, kad jūsų serveris turi aktyvų interneto ryšį, arba patikrinkite užkardos nustatymus.</translation>
     </message>
     <message>
       <source>License Server error</source>
-      <translation type="unfinished">License Server error</translation>
+      <translation>Licencijos serverio klaida</translation>
     </message>
     <message>
       <source>Failed to remove license from Server</source>
-      <translation type="unfinished">Failed to remove license from Server</translation>
+      <translation>Nepavyko pašalinti licencijos iš serverio</translation>
     </message>
     <message numerus="yes">
       <source>%n licenses deactivated</source>
-      <translation type="unfinished">
-        <numerusform>%n licenses deactivated</numerusform>
-        <numerusform>%n licenses deactivated</numerusform>
-        <numerusform>%n licenses deactivated</numerusform>
-        <numerusform>%n licenses deactivated</numerusform>
+      <translation>
+        <numerusform>%n licencijos deaktyvuotos</numerusform>
+        <numerusform>%n licencijos deaktyvuotos</numerusform>
+        <numerusform>%n licencijos deaktyvuotos</numerusform>
+        <numerusform>%n licencijos deaktyvuotos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
       <comment>Numerus form depends on the amount of licenses</comment>
-      <translation type="unfinished">
-        <numerusform>Cannot deactivate licenses</numerusform>
-        <numerusform>Cannot deactivate licenses</numerusform>
-        <numerusform>Cannot deactivate licenses</numerusform>
-        <numerusform>Cannot deactivate licenses</numerusform>
+      <translation>
+        <numerusform>Negalima deaktyvuoti licencijų</numerusform>
+        <numerusform>Negalima deaktyvuoti licencijų</numerusform>
+        <numerusform>Negalima deaktyvuoti licencijų</numerusform>
+        <numerusform>Negalima deaktyvuoti licencijų</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
       <comment>Numerus: %n is the count of licenses which can be deactivated</comment>
-      <translation type="unfinished">
-        <numerusform>Deactivate %n Other</numerusform>
-        <numerusform>Deactivate %n Other</numerusform>
-        <numerusform>Deactivate %n Other</numerusform>
-        <numerusform>Deactivate %n Other</numerusform>
+      <translation>
+        <numerusform>Išjungti %n Kita</numerusform>
+        <numerusform>Išjungti %n Kita</numerusform>
+        <numerusform>Išjungti %n Kita</numerusform>
+        <numerusform>Išjungti %n Kita</numerusform>
       </translation>
     </message>
   </context>
@@ -1511,68 +1511,68 @@ License Key: %2</translation>
     <name>LicenseManagementMessagesPrivate</name>
     <message numerus="yes">
       <source>%n channels.</source>
-      <translation type="unfinished">
-        <numerusform>%n channels.</numerusform>
-        <numerusform>%n channels.</numerusform>
-        <numerusform>%n channels.</numerusform>
-        <numerusform>%n channels.</numerusform>
+      <translation>
+        <numerusform>kanalai.</numerusform>
+        <numerusform>kanalai.</numerusform>
+        <numerusform>kanalai.</numerusform>
+        <numerusform>kanalai.</numerusform>
       </translation>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
-      <translation type="unfinished">To get a valid License Key please contact %1.</translation>
+      <translation>Norėdami gauti galiojantį licencijos raktą, susisiekite su %1.</translation>
     </message>
     <message>
       <source>If the problem persists, please contact %1.</source>
-      <translation type="unfinished">If the problem persists, please contact %1.</translation>
+      <translation>Jei problema išlieka, susisiekite su %1.</translation>
     </message>
     <message>
       <source>Please contact %1.</source>
-      <translation type="unfinished">Please contact %1.</translation>
+      <translation>Prašome susisiekti %1.</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact your Regional / License support:</source>
-      <translation type="unfinished">To get a valid License Key please contact your Regional / License support:</translation>
+      <translation>Norėdami gauti galiojantį licencijos raktą, susisiekite su savo regionine / licencijų palaikymo tarnyba:</translation>
     </message>
     <message>
       <source>If the problem persists, please contact your Regional / License support:</source>
-      <translation type="unfinished">If the problem persists, please contact your Regional / License support:</translation>
+      <translation>Jei problema išlieka, susisiekite su regionine / licencijų palaikymo tarnyba:</translation>
     </message>
     <message>
       <source>Please contact your Regional / License support:</source>
-      <translation type="unfinished">Please contact your Regional / License support:</translation>
+      <translation>Susisiekite su savo regionine / licencijų palaikymo tarnyba:</translation>
     </message>
   </context>
   <context>
     <name>LocalFiles</name>
     <message>
       <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
-      <translation type="unfinished">Path &quot;%1&quot; is invalid. Please try another path.</translation>
+      <translation>Kelias &quot;%1&quot; neteisingas. Pabandykite kitą kelią.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; already exists. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; already exists. Please try another name.</translation>
+      <translation>Failas &quot;%1&quot; jau yra. Pabandykite kitą pavadinimą.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process.</source>
-      <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
+      <translation>Failą &quot;%1&quot; naudoja kitas procesas.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
+      <translation>Į failą &quot;%1&quot; įrašyti negalima. Pabandykite kitą pavadinimą.</translation>
     </message>
     <message>
       <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation type="unfinished">File name &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+      <translation>Failo pavadinimas &quot;%1&quot; yra rezervuotas operacinės sistemos. Pabandykite kitą pavadinimą.</translation>
     </message>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Numerus form depends on the amount of characters</comment>
-      <translation type="unfinished">
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+      <translation>
+        <numerusform>Failo pavadinime negali būti šių rezervuotų simbolių:</numerusform>
+        <numerusform>Failo pavadinime negali būti šių rezervuotų simbolių:</numerusform>
+        <numerusform>Failo pavadinime negali būti šių rezervuotų simbolių:</numerusform>
+        <numerusform>Failo pavadinime negali būti šių rezervuotų simbolių:</numerusform>
       </translation>
     </message>
   </context>
@@ -1587,11 +1587,11 @@ License Key: %2</translation>
     <name>OutgoingMailSettingsWidget::Private</name>
     <message>
       <source>TLS</source>
-      <translation type="unfinished">TLS</translation>
+      <translation>„TLS“</translation>
     </message>
     <message>
       <source>SSL</source>
-      <translation type="unfinished">SSL</translation>
+      <translation>SSL</translation>
     </message>
     <message>
       <source>Check</source>
@@ -1599,7 +1599,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>URL is not valid.</source>
-      <translation type="unfinished">URL is not valid.</translation>
+      <translation>URL neteisingas.</translation>
     </message>
     <message>
       <source>Active</source>
@@ -1607,7 +1607,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Not configured</source>
-      <translation type="unfinished">Not configured</translation>
+      <translation>Nesukonfigūravota</translation>
     </message>
     <message>
       <source>Error</source>
@@ -1615,26 +1615,26 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Set your email address or SMTP server</source>
-      <translation type="unfinished">Set your email address or SMTP server</translation>
+      <translation>Nustatykite savo el. pašto adresą arba SMTP serverį</translation>
     </message>
     <message>
       <source>%1 users are receiving emails</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 users are receiving emails</translation>
+      <translation>%1 vartotojai gauna el. laiškus</translation>
     </message>
     <message>
       <source>%1 is not available</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 is not available</translation>
+      <translation>%1 nepasiekiamas</translation>
     </message>
     <message>
       <source>Route via %1</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">Route via %1</translation>
+      <translation>Maršrutas per %1</translation>
     </message>
     <message>
       <source>Route via SMTP server</source>
-      <translation type="unfinished">Route via SMTP server</translation>
+      <translation>Maršrutas per SMTP serverį</translation>
     </message>
     <message>
       <source>Success</source>
@@ -1642,153 +1642,153 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Authentication failed</source>
-      <translation type="unfinished">Authentication failed</translation>
+      <translation>Autentifikacija nepavyko</translation>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Nežinoma klaida</translation>
     </message>
     <message>
       <source>%1 users will start receiving emails immediately after you apply these settings</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 users will start receiving emails immediately after you apply these settings</translation>
+      <translation>%1 vartotojai pradės gauti el. laiškus iš karto, kai pritaikysite šiuos nustatymus</translation>
     </message>
     <message>
       <source>Cannot reach the server</source>
-      <translation type="unfinished">Cannot reach the server</translation>
+      <translation>Nepavyksta pasiekti serverio</translation>
     </message>
     <message>
       <source>Username or Password are incorrect</source>
-      <translation type="unfinished">Username or Password are incorrect</translation>
+      <translation>Vartotojo vardas arba slaptažodis neteisingas</translation>
     </message>
     <message>
       <source>Insecure</source>
-      <translation type="unfinished">Insecure</translation>
+      <translation>Nesaugus</translation>
     </message>
     <message>
       <source>Connection failed</source>
-      <translation type="unfinished">Connection failed</translation>
+      <translation>Nepavyko užmegzti ryšio</translation>
     </message>
     <message>
       <source>Username cannot be empty</source>
-      <translation type="unfinished">Username cannot be empty</translation>
+      <translation>Vartotojo vardo laukelis negali būti tuščias</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>Password cannot be empty</translation>
     </message>
     <message>
       <source>Users are receiving emails</source>
-      <translation type="unfinished">Users are receiving emails</translation>
+      <translation>Vartotojai gauna el. laiškus</translation>
     </message>
     <message>
       <source>Users will start receiving emails right after you apply settings</source>
-      <translation type="unfinished">Users will start receiving emails right after you apply settings</translation>
+      <translation>Vartotojai pradės gauti el. laiškus iškart po to, kai pritaikysite nustatymus</translation>
     </message>
     <message>
       <source>Unable to test SMTP server</source>
-      <translation type="unfinished">Unable to test SMTP server</translation>
+      <translation>Nepavyko patikrinti SMTP serverio</translation>
     </message>
     <message>
       <source>Additional info required</source>
-      <translation type="unfinished">Additional info required</translation>
+      <translation>Reikalinga papildoma informacija</translation>
     </message>
     <message>
       <source>Enter a short Site description here.</source>
-      <translation type="unfinished">Enter a short Site description here.</translation>
+      <translation>Čia įveskite trumpą svetainės aprašymą.</translation>
     </message>
   </context>
   <context>
     <name>PasswordInformation</name>
     <message>
       <source>Good</source>
-      <translation type="unfinished">Good</translation>
+      <translation>Geras</translation>
     </message>
     <message>
       <source>Fair</source>
-      <translation type="unfinished">Fair</translation>
+      <translation>Visai nieko</translation>
     </message>
     <message>
       <source>Weak</source>
-      <translation type="unfinished">Weak</translation>
+      <translation>Silpnas</translation>
     </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
-      <translation type="unfinished">
-        <numerusform>Password should contain %n different combinations of either characters, symbols, or digits</numerusform>
-        <numerusform>Password should contain %n different combinations of either characters, symbols, or digits</numerusform>
-        <numerusform>Password should contain %n different combinations of either characters, symbols, or digits</numerusform>
-        <numerusform>Password should contain %n different combinations of either characters, symbols, or digits</numerusform>
+      <translation>
+        <numerusform>Slaptažodyje turėtų būti %n skirtingų simbolių, skaitmenų ar raidžių derinių</numerusform>
+        <numerusform>Slaptažodyje turėtų būti %n skirtingų simbolių, skaitmenų ar raidžių derinių</numerusform>
+        <numerusform>Slaptažodyje turėtų būti %n skirtingų simbolių, skaitmenų ar raidžių derinių</numerusform>
+        <numerusform>Slaptažodyje turėtų būti %n skirtingų simbolių, skaitmenų ar raidžių derinių</numerusform>
       </translation>
     </message>
     <message>
       <source>Short</source>
-      <translation type="unfinished">Short</translation>
+      <translation>Trumpas</translation>
     </message>
     <message>
       <source>Long</source>
-      <translation type="unfinished">Long</translation>
+      <translation>Ilgas</translation>
     </message>
     <message>
       <source>Common</source>
-      <translation type="unfinished">Common</translation>
+      <translation>Įprastai</translation>
     </message>
     <message>
       <source>Incorrect</source>
-      <translation type="unfinished">Incorrect</translation>
+      <translation>Neteisingas</translation>
     </message>
     <message>
       <source>Password should contain different types of symbols</source>
-      <translation type="unfinished">Password should contain different types of symbols</translation>
+      <translation>Slaptažodyje turėtų būti įvairių tipų simbolių</translation>
     </message>
     <message numerus="yes">
       <source>Password must be at least %n characters long</source>
-      <translation type="unfinished">
-        <numerusform>Password must be at least %n characters long</numerusform>
-        <numerusform>Password must be at least %n characters long</numerusform>
-        <numerusform>Password must be at least %n characters long</numerusform>
-        <numerusform>Password must be at least %n characters long</numerusform>
+      <translation>
+        <numerusform>Slaptažodį privalo sudaryti mažiausiai tiek ženklų: %@.</numerusform>
+        <numerusform>Slaptažodį privalo sudaryti mažiausiai tiek ženklų: %@.</numerusform>
+        <numerusform>Slaptažodį privalo sudaryti mažiausiai tiek ženklų: %@.</numerusform>
+        <numerusform>Slaptažodį privalo sudaryti mažiausiai tiek ženklų: %@.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters</source>
-      <translation type="unfinished">
-        <numerusform>Password must be no longer than %n characters</numerusform>
-        <numerusform>Password must be no longer than %n characters</numerusform>
-        <numerusform>Password must be no longer than %n characters</numerusform>
-        <numerusform>Password must be no longer than %n characters</numerusform>
+      <translation>
+        <numerusform>Slaptažodis negali būti ilgesnis nei 128 simboliai.</numerusform>
+        <numerusform>Slaptažodis negali būti ilgesnis nei 128 simboliai.</numerusform>
+        <numerusform>Slaptažodis negali būti ilgesnis nei 128 simboliai.</numerusform>
+        <numerusform>Slaptažodis negali būti ilgesnis nei 128 simboliai.</numerusform>
       </translation>
     </message>
     <message>
       <source>This password is in list of the most popular passwords</source>
-      <translation type="unfinished">This password is in list of the most popular passwords</translation>
+      <translation>Šis slaptažodis yra populiariausių slaptažodžių sąraše.</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols %1 are allowed</source>
-      <translation type="unfinished">Only latin letters, numbers and keyboard symbols %1 are allowed</translation>
+      <translation>Leidžiami tik lotyniški raidės, skaičiai ir klaviatūros simboliai %1</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed</source>
-      <translation type="unfinished">Only latin letters, numbers and keyboard symbols are allowed</translation>
+      <translation>Leidžiami tik lotyniški raidės, skaičiai ir klaviatūros simboliai</translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together</source>
       <comment>Numerus: %n is a hardcoded 4</comment>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
-        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
-        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
-        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
+      <translation>
+        <numerusform>Slaptažodyje neturėtų būti %n ar daugiau iš eilės einančių simbolių</numerusform>
+        <numerusform>Slaptažodyje neturėtų būti %n ar daugiau iš eilės einančių simbolių</numerusform>
+        <numerusform>Slaptažodyje neturėtų būti %n ar daugiau iš eilės einančių simbolių</numerusform>
+        <numerusform>Slaptažodyje neturėtų būti %n ar daugiau iš eilės einančių simbolių</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters</source>
       <comment>Numerus: %n is a hardcoded 4</comment>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
+      <translation>
+        <numerusform>Slaptažodyje neturėtų būti %n ar daugiau pasikartojančių simbolių</numerusform>
+        <numerusform>Slaptažodyje neturėtų būti %n ar daugiau pasikartojančių simbolių</numerusform>
+        <numerusform>Slaptažodyje neturėtų būti %n ar daugiau pasikartojančių simbolių</numerusform>
+        <numerusform>Slaptažodyje neturėtų būti %n ar daugiau pasikartojančių simbolių</numerusform>
       </translation>
     </message>
   </context>
@@ -1796,42 +1796,42 @@ License Key: %2</translation>
     <name>Ptz</name>
     <message>
       <source>Cannot get the current position from camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot get the current position from camera &quot;%1&quot;</translation>
+      <translation>Nepavyksta gauti dabartinės padėties iš kameros &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Please wait for the camera to go online.</source>
-      <translation type="unfinished">Please wait for the camera to go online.</translation>
+      <translation>Palaukite, kol kamera prisijungs prie interneto.</translation>
     </message>
     <message>
       <source>Failed to get current position</source>
-      <translation type="unfinished">Failed to get current position</translation>
+      <translation>Nepavyko gauti dabartinės padėties</translation>
     </message>
     <message>
       <source>Cannot set the current position for camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot set the current position for camera &quot;%1&quot;</translation>
+      <translation>Nepavyksta nustatyti dabartinės kameros padėties &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Failed to set current position</source>
-      <translation type="unfinished">Failed to set current position</translation>
+      <translation>Nepavyko nustatyti dabartinės padėties</translation>
     </message>
     <message>
       <source>Preset used by some tours. Delete it anyway?</source>
-      <translation type="unfinished">Preset used by some tours. Delete it anyway?</translation>
+      <translation>Kai kuriose ekskursijose naudojamas iš anksto nustatytas nustatymas. Vis tiek ištrinti?</translation>
     </message>
     <message>
       <source>These tours will become invalid.</source>
-      <translation type="unfinished">These tours will become invalid.</translation>
+      <translation>Šios ekskursijos taps negaliojančios.</translation>
     </message>
   </context>
   <context>
     <name>PtzInstrument</name>
     <message>
       <source>Layout is locked</source>
-      <translation type="unfinished">Layout is locked</translation>
+      <translation>Išdėstymas užrakintas</translation>
     </message>
     <message>
       <source>This camera does not support advanced PTZ</source>
-      <translation type="unfinished">This camera does not support advanced PTZ</translation>
+      <translation>Ši kamera nepalaiko pažangių PTZ funkcijų</translation>
     </message>
     <message>
       <source>Zooming out...</source>
@@ -1851,76 +1851,76 @@ License Key: %2</translation>
     </message>
     <message>
       <source>PTZ can only be used in the live mode</source>
-      <translation type="unfinished">PTZ can only be used in the live mode</translation>
+      <translation>PTZ galima naudoti tik tiesioginio ryšio režimu.</translation>
     </message>
   </context>
   <context>
     <name>PtzOverlayWidget</name>
     <message>
       <source>Zoom In</source>
-      <translation type="unfinished">Zoom In</translation>
+      <translation>Didinti</translation>
     </message>
     <message>
       <source>Zoom Out</source>
-      <translation type="unfinished">Zoom Out</translation>
+      <translation>Tolinti</translation>
     </message>
     <message>
       <source>Focus Far</source>
-      <translation type="unfinished">Focus Far</translation>
+      <translation>Fokusuoti toli</translation>
     </message>
     <message>
       <source>Focus Near</source>
-      <translation type="unfinished">Focus Near</translation>
+      <translation>Fokusuoti šalia</translation>
     </message>
     <message>
       <source>Auto Focus</source>
-      <translation type="unfinished">Auto Focus</translation>
+      <translation>Automatinis fokusavimas</translation>
     </message>
     <message>
       <source>Change Dewarping Mode</source>
-      <translation type="unfinished">Change Dewarping Mode</translation>
+      <translation>Keisti iškraipymo režimą</translation>
     </message>
   </context>
   <context>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>Ar tikrai norite išeiti iš šio puslapio? Jūsų atlikti pakeitimai gali būti neišsaugoti.</translation>
     </message>
   </context>
   <context>
     <name>QnAboutDialog</name>
     <message>
       <source>OpenGL version</source>
-      <translation type="unfinished">OpenGL version</translation>
+      <translation>Myanmar</translation>
     </message>
     <message>
       <source>OpenGL renderer</source>
-      <translation type="unfinished">OpenGL renderer</translation>
+      <translation>OpenGL atvaizdavimas</translation>
     </message>
     <message>
       <source>OpenGL vendor</source>
-      <translation type="unfinished">OpenGL vendor</translation>
+      <translation>OpenGL tiekėjas</translation>
     </message>
     <message>
       <source>OpenGL max texture size</source>
-      <translation type="unfinished">OpenGL max texture size</translation>
+      <translation>OpenGL maksimalus tekstūros dydis</translation>
     </message>
     <message>
       <source>%1 version %2 (%3).</source>
-      <translation type="unfinished">%1 version %2 (%3).</translation>
+      <translation>%1 versija %2 (%3).</translation>
     </message>
     <message>
       <source>Built for %1-%2 with %3.</source>
-      <translation type="unfinished">Built for %1-%2 with %3.</translation>
+      <translation>Sukurta %1-%2 su %3.</translation>
     </message>
     <message>
       <source>Regional / License support</source>
-      <translation type="unfinished">Regional / License support</translation>
+      <translation>Regioninė / licencijų pagalba</translation>
     </message>
     <message>
       <source>Partner information</source>
-      <translation type="unfinished">Partner information</translation>
+      <translation>Pardavėjo informacija</translation>
     </message>
     <message>
       <source>Phones</source>
@@ -1932,39 +1932,39 @@ License Key: %2</translation>
     </message>
     <message>
       <source>RHI backend</source>
-      <translation type="unfinished">RHI backend</translation>
+      <translation>RHI vidinė sistema</translation>
     </message>
     <message>
       <source>RHI device</source>
-      <translation type="unfinished">RHI device</translation>
+      <translation>RHI įrenginys</translation>
     </message>
     <message>
       <source>RHI device ID</source>
-      <translation type="unfinished">RHI device ID</translation>
+      <translation>RHI įrenginio ID</translation>
     </message>
     <message>
       <source>RHI vendor ID</source>
-      <translation type="unfinished">RHI vendor ID</translation>
+      <translation>RHI tiekėjo ID</translation>
     </message>
     <message>
       <source>RHI max texture size</source>
-      <translation type="unfinished">RHI max texture size</translation>
+      <translation>RHI maksimalus tekstūros dydis</translation>
     </message>
     <message>
       <source>Graphics API</source>
-      <translation type="unfinished">Graphics API</translation>
+      <translation>Grafikos API</translation>
     </message>
     <message>
       <source>Unable to get GPU information for %1</source>
-      <translation type="unfinished">Unable to get GPU information for %1</translation>
+      <translation>Nepavyko gauti GPU informacijos, skirtos %1</translation>
     </message>
     <message>
       <source>Platform</source>
-      <translation type="unfinished">Platform</translation>
+      <translation>Platforma</translation>
     </message>
     <message>
       <source>Developer Build</source>
-      <translation type="unfinished">Developer Build</translation>
+      <translation>Kūrėjo įrankiai</translation>
     </message>
   </context>
   <context>
@@ -1975,33 +1975,33 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Saving...</source>
-      <translation type="unfinished">Saving...</translation>
+      <translation>Išsaugoma...</translation>
     </message>
   </context>
   <context>
     <name>QnAdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
-      <translation type="unfinished">Image Enhancement</translation>
+      <translation>Vaizdo gerinimas</translation>
     </message>
     <message>
       <source>Image Enhancement - %1</source>
-      <translation type="unfinished">Image Enhancement - %1</translation>
+      <translation>Vaizdo gerinimas - %1</translation>
     </message>
   </context>
   <context>
     <name>QnAdvancedSettingsWidget</name>
     <message>
       <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
-      <translation type="unfinished">Helps avoid problems with OpenGL drawing which result in 100% CPU load.</translation>
+      <translation>Padeda išvengti problemų dėl OpenGL piešimo, dėl kurių procesorius apkraunamas 100 %.</translation>
     </message>
     <message>
       <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
-      <translation type="unfinished">Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</translation>
+      <translation>Nustatykite mažiausią reikšmę, kuri nesumažina tiesioginio vaizdo kokybės. Didesnis buferis leidžia atkurti sklandžiau, bet padidina vėlavimą tarp realaus laiko ir tiesioginio vaizdo; mažesnis buferis sumažina vėlavimą, bet gali sukelti mirgėjimą.</translation>
     </message>
     <message>
       <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
-      <translation type="unfinished">Warning! This is an experimental option that saves CPU but may affect animation.</translation>
+      <translation>Įspėjimas! Tai eksperimentinė parinktis, taupanti procesoriaus energiją, bet galinti paveikti animaciją.</translation>
     </message>
     <message>
       <source>Disabled</source>
@@ -2009,35 +2009,35 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Rekomenduojama</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation type="unfinished">Strict</translation>
+      <translation>Griežtas</translation>
     </message>
     <message>
       <source>May lead to privacy issues</source>
-      <translation type="unfinished">May lead to privacy issues</translation>
+      <translation>Gali sukelti privatumo problemų</translation>
     </message>
     <message>
       <source>Connect only servers with public certificate</source>
-      <translation type="unfinished">Connect only servers with public certificate</translation>
+      <translation>Jungtis tik su serveriais, turinčiais viešąjį sertifikatą</translation>
     </message>
     <message>
       <source>Certificate storage will be cleared.</source>
-      <translation type="unfinished">Certificate storage will be cleared.</translation>
+      <translation>Sertifikatų saugykla bus išvalyta.</translation>
     </message>
     <message>
       <source>Current client instance will be disconnected.</source>
-      <translation type="unfinished">Current client instance will be disconnected.</translation>
+      <translation>Dabartinis kliento egzempliorius bus atjungtas.</translation>
     </message>
     <message>
       <source>All other client windows will be closed.</source>
-      <translation type="unfinished">All other client windows will be closed.</translation>
+      <translation>Visi kiti kliento langai bus uždaryti.</translation>
     </message>
     <message>
       <source>Security settings changed</source>
-      <translation type="unfinished">Security settings changed</translation>
+      <translation>Saugos nustatymai pakeisti</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -2045,50 +2045,50 @@ License Key: %2</translation>
     </message>
     <message>
       <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
-      <translation type="unfinished">On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</translation>
+      <translation>Pirmą kartą prisijungus prie serverio, jūsų bus paprašyta patvirtinti sertifikato priėmimą, jei jame yra klaidų.</translation>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Pasirinkite aplanką...</translation>
     </message>
     <message>
       <source>Failed to save logs to the selected folder</source>
-      <translation type="unfinished">Failed to save logs to the selected folder</translation>
+      <translation>Nepavyko išsaugoti žurnalų pasirinktame aplanke</translation>
     </message>
     <message>
       <source>Download complete!</source>
-      <translation type="unfinished">Download complete!</translation>
+      <translation>Atsiuntimas baigtas.</translation>
     </message>
     <message>
       <source>Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</source>
-      <translation type="unfinished">Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</translation>
+      <translation>Pastaba: vaizdo gerinimas negalimas, kai įjungtas aparatinis vaizdo dekodavimas.</translation>
     </message>
     <message>
       <source>Cannot clear WebEngine cache</source>
-      <translation type="unfinished">Cannot clear WebEngine cache</translation>
+      <translation>Nepavyksta išvalyti WebEngine talpyklos</translation>
     </message>
     <message>
       <source>Please close all web pages and try again.</source>
-      <translation type="unfinished">Please close all web pages and try again.</translation>
+      <translation>Uždarykite visus tinklalapius ir bandykite dar kartą.</translation>
     </message>
     <message>
       <source>The files may be locked by another process.</source>
-      <translation type="unfinished">The files may be locked by another process.</translation>
+      <translation>Failus gali užrakinti kitas procesas.</translation>
     </message>
     <message>
       <source>WebEngine cache partially cleared</source>
-      <translation type="unfinished">WebEngine cache partially cleared</translation>
+      <translation>„WebEngine“ talpykla iš dalies išvalyta</translation>
     </message>
     <message>
       <source>Some files may be locked by another process.</source>
-      <translation type="unfinished">Some files may be locked by another process.</translation>
+      <translation>Kai kuriuos failus gali užrakinti kitas procesas.</translation>
     </message>
   </context>
   <context>
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>Site shut down. To attach to a Video Wall, the Site should be in active state. %1</source>
-      <translation type="unfinished">Site shut down. To attach to a Video Wall, the Site should be in active state. %1</translation>
+      <translation>Svetainė išjungta. Norint prisijungti prie vaizdo sienos, svetainė turi būti aktyvios būsenos. %1</translation>
     </message>
   </context>
   <context>
@@ -2099,38 +2099,38 @@ License Key: %2</translation>
     </message>
     <message>
       <source>User settings...</source>
-      <translation type="unfinished">User settings...</translation>
+      <translation>Serverio nustatymai...</translation>
     </message>
     <message>
       <source>Server settings...</source>
-      <translation type="unfinished">Server settings...</translation>
+      <translation>Serverio nustatymai...</translation>
     </message>
     <message>
       <source>Camera settings...</source>
-      <translation type="unfinished">Camera settings...</translation>
+      <translation>Kameros nustatymai...</translation>
     </message>
     <message>
       <source>internal</source>
-      <translation type="unfinished">internal</translation>
+      <translation>vidinis</translation>
     </message>
   </context>
   <context>
     <name>QnAuditLogDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation type="unfinished">Copy Selection to Clipboard</translation>
+      <translation>Kopijuoti pasirinkimą į iškarpinę</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation type="unfinished">Export Selection to File...</translation>
+      <translation>Eksportuoti pasirinkimą į failą...</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Pažymėti visus</translation>
     </message>
     <message>
       <source>Export selected records to a file</source>
-      <translation type="unfinished">Export selected records to a file</translation>
+      <translation>Eksportuoti pasirinktus įrašus į failą</translation>
     </message>
     <message>
       <source>Devices</source>
@@ -2142,92 +2142,92 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Device actions</source>
-      <translation type="unfinished">Device actions</translation>
+      <translation>Įrenginio veiksmai</translation>
     </message>
     <message>
       <source>Camera actions</source>
-      <translation type="unfinished">Camera actions</translation>
+      <translation>Kameros veiksmai</translation>
     </message>
     <message>
       <source>No sessions</source>
-      <translation type="unfinished">No sessions</translation>
+      <translation>Nėra seansų</translation>
     </message>
     <message>
       <source>No cameras</source>
-      <translation type="unfinished">No cameras</translation>
+      <translation>Nėra kamerų</translation>
     </message>
     <message>
       <source>Select sessions to see their details</source>
-      <translation type="unfinished">Select sessions to see their details</translation>
+      <translation>Pasirinkite sesijas, kad pamatytumėte jų išsamią informaciją</translation>
     </message>
     <message>
       <source>Select cameras to see their details</source>
-      <translation type="unfinished">Select cameras to see their details</translation>
+      <translation>Pasirinkite kameras, kad pamatytumėte jų išsamią informaciją</translation>
     </message>
     <message>
       <source>No archive for this position</source>
-      <translation type="unfinished">No archive for this position</translation>
+      <translation>Šiai pozicijai nėra archyvo</translation>
     </message>
     <message>
       <source>Audit trail replay</source>
-      <translation type="unfinished">Audit trail replay</translation>
+      <translation>Audito žurnalo pakartojimas</translation>
     </message>
     <message numerus="yes">
       <source>Details for %n sessions of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n sessions of %1</numerusform>
-        <numerusform>Details for %n sessions of %1</numerusform>
-        <numerusform>Details for %n sessions of %1</numerusform>
-        <numerusform>Details for %n sessions of %1</numerusform>
+      <translation>
+        <numerusform>Išsami informacija apie %n sesijas, atliktas naudojant %1</numerusform>
+        <numerusform>Išsami informacija apie %n sesijas, atliktas naudojant %1</numerusform>
+        <numerusform>Išsami informacija apie %n sesijas, atliktas naudojant %1</numerusform>
+        <numerusform>Išsami informacija apie %n sesijas, atliktas naudojant %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n cameras of %1</numerusform>
-        <numerusform>Details for %n cameras of %1</numerusform>
-        <numerusform>Details for %n cameras of %1</numerusform>
-        <numerusform>Details for %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>Išsami informacija apie %n kameras, esančias %1</numerusform>
+        <numerusform>Išsami informacija apie %n kameras, esančias %1</numerusform>
+        <numerusform>Išsami informacija apie %n kameras, esančias %1</numerusform>
+        <numerusform>Išsami informacija apie %n kameras, esančias %1</numerusform>
       </translation>
     </message>
     <message>
       <source>This server is removed from Site</source>
-      <translation type="unfinished">This server is removed from Site</translation>
+      <translation>Šis serveris pašalintas iš svetainės</translation>
     </message>
     <message>
       <source>This user is removed from Site</source>
-      <translation type="unfinished">This user is removed from Site</translation>
+      <translation>Šis naudotojas pašalintas iš svetainės</translation>
     </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>
       <comment>Numerus form depends on the number of devices</comment>
-      <translation type="unfinished">
-        <numerusform>These devices are removed from Site</numerusform>
-        <numerusform>These devices are removed from Site</numerusform>
-        <numerusform>These devices are removed from Site</numerusform>
-        <numerusform>These devices are removed from Site</numerusform>
+      <translation>
+        <numerusform>Šie įrenginiai pašalinti iš svetainės</numerusform>
+        <numerusform>Šie įrenginiai pašalinti iš svetainės</numerusform>
+        <numerusform>Šie įrenginiai pašalinti iš svetainės</numerusform>
+        <numerusform>Šie įrenginiai pašalinti iš svetainės</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from Site</source>
       <comment>Numerus form depends on the number of cameras</comment>
-      <translation type="unfinished">
-        <numerusform>These cameras are removed from Site</numerusform>
-        <numerusform>These cameras are removed from Site</numerusform>
-        <numerusform>These cameras are removed from Site</numerusform>
-        <numerusform>These cameras are removed from Site</numerusform>
+      <translation>
+        <numerusform>Šios kameros pašalintos iš aikštelės</numerusform>
+        <numerusform>Šios kameros pašalintos iš aikštelės</numerusform>
+        <numerusform>Šios kameros pašalintos iš aikštelės</numerusform>
+        <numerusform>Šios kameros pašalintos iš aikštelės</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from Site</source>
       <comment>Numerus form depends on the number of resources</comment>
-      <translation type="unfinished">
-        <numerusform>These resources are removed from Site</numerusform>
-        <numerusform>These resources are removed from Site</numerusform>
-        <numerusform>These resources are removed from Site</numerusform>
-        <numerusform>These resources are removed from Site</numerusform>
+      <translation>
+        <numerusform>Šie ištekliai pašalinti iš svetainės</numerusform>
+        <numerusform>Šie ištekliai pašalinti iš svetainės</numerusform>
+        <numerusform>Šie ištekliai pašalinti iš svetainės</numerusform>
+        <numerusform>Šie ištekliai pašalinti iš svetainės</numerusform>
       </translation>
     </message>
   </context>
@@ -2239,7 +2239,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Unsuccessful login</source>
-      <translation type="unfinished">Unsuccessful login</translation>
+      <translation>Nesėkmingas prisijungimas</translation>
     </message>
     <message>
       <source>Login</source>
@@ -2247,55 +2247,55 @@ License Key: %2</translation>
     </message>
     <message>
       <source>User updated</source>
-      <translation type="unfinished">User updated</translation>
+      <translation>Vartotojas atnaujintas</translation>
     </message>
     <message>
       <source>Watching live</source>
-      <translation type="unfinished">Watching live</translation>
+      <translation>Stebima tiesiogiai</translation>
     </message>
     <message>
       <source>Watching archive</source>
-      <translation type="unfinished">Watching archive</translation>
+      <translation>Stebėjimo archyvas</translation>
     </message>
     <message>
       <source>Exporting video</source>
-      <translation type="unfinished">Exporting video</translation>
+      <translation>Vaizdo įrašas eksportuojamas…</translation>
     </message>
     <message>
       <source>General settings updated</source>
-      <translation type="unfinished">General settings updated</translation>
+      <translation>Bendrieji nustatymai atnaujinti</translation>
     </message>
     <message>
       <source>Server updated</source>
-      <translation type="unfinished">Server updated</translation>
+      <translation>Server updated</translation>
     </message>
     <message>
       <source>Server removed</source>
-      <translation type="unfinished">Server removed</translation>
+      <translation>Serveris pašalintas</translation>
     </message>
     <message>
       <source>User removed</source>
-      <translation type="unfinished">User removed</translation>
+      <translation>Vartotojas pašalintas</translation>
     </message>
     <message>
       <source>Database restored</source>
-      <translation type="unfinished">Database restored</translation>
+      <translation>Duomenų bazė atkurta</translation>
     </message>
     <message>
       <source>Session begins</source>
-      <translation type="unfinished">Session begins</translation>
+      <translation>Sesija prasideda</translation>
     </message>
     <message>
       <source>Session ends</source>
-      <translation type="unfinished">Session ends</translation>
+      <translation>Sesija baigiasi</translation>
     </message>
     <message>
       <source>Duration</source>
-      <translation type="unfinished">Duration</translation>
+      <translation>Trukmė</translation>
     </message>
     <message>
       <source>User</source>
-      <translation type="unfinished">User</translation>
+      <translation>Naudotojas</translation>
     </message>
     <message>
       <source>Activity</source>
@@ -2315,134 +2315,134 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Click to expand</source>
-      <translation type="unfinished">Click to expand</translation>
+      <translation>Click to expand</translation>
     </message>
     <message>
       <source>Device updated</source>
-      <translation type="unfinished">Device updated</translation>
+      <translation>Įrenginys atnaujintas</translation>
     </message>
     <message>
       <source>Camera updated</source>
-      <translation type="unfinished">Camera updated</translation>
+      <translation>Kamera atnaujinta</translation>
     </message>
     <message>
       <source>Device added</source>
-      <translation type="unfinished">Device added</translation>
+      <translation>Įrenginys pridėtas</translation>
     </message>
     <message>
       <source>Camera added</source>
-      <translation type="unfinished">Camera added</translation>
+      <translation>Kamera pridėta</translation>
     </message>
     <message>
       <source>Device removed</source>
-      <translation type="unfinished">Device removed</translation>
+      <translation>Įrenginys pašalintas</translation>
     </message>
     <message>
       <source>Camera removed</source>
-      <translation type="unfinished">Camera removed</translation>
+      <translation>Kamera pašalinta</translation>
     </message>
     <message>
       <source>Email settings changed</source>
-      <translation type="unfinished">Email settings changed</translation>
+      <translation>El. pašto nustatymai pakeisti</translation>
     </message>
     <message>
       <source>Filled circle mark means the archive is still available</source>
-      <translation type="unfinished">Filled circle mark means the archive is still available</translation>
+      <translation>Užpildytas apskritimas reiškia, kad archyvas vis dar pasiekiamas</translation>
     </message>
     <message>
       <source>Update installed</source>
-      <translation type="unfinished">Update installed</translation>
+      <translation>Atnaujinimas įdiegtas</translation>
     </message>
     <message numerus="yes">
       <source>%n actions</source>
-      <translation type="unfinished">
-        <numerusform>%n actions</numerusform>
-        <numerusform>%n actions</numerusform>
-        <numerusform>%n actions</numerusform>
-        <numerusform>%n actions</numerusform>
+      <translation>
+        <numerusform>%n veiksmai</numerusform>
+        <numerusform>%n veiksmai</numerusform>
+        <numerusform>%n veiksmai</numerusform>
+        <numerusform>%n veiksmai</numerusform>
       </translation>
     </message>
     <message>
       <source>Event rule changed</source>
-      <translation type="unfinished">Event rule changed</translation>
+      <translation>Įvykio taisyklė pakeista</translation>
     </message>
     <message>
       <source>Event rule removed</source>
-      <translation type="unfinished">Event rule removed</translation>
+      <translation>Įvykio taisyklė pašalinta</translation>
     </message>
     <message>
       <source>Storage added</source>
-      <translation type="unfinished">Storage added</translation>
+      <translation>Pridėta saugykla</translation>
     </message>
     <message>
       <source>Storage updated</source>
-      <translation type="unfinished">Storage updated</translation>
+      <translation>Saugykla atnaujinta</translation>
     </message>
     <message>
       <source>Storage removed</source>
-      <translation type="unfinished">Storage removed</translation>
+      <translation>Saugykla pašalinta</translation>
     </message>
     <message>
       <source>MitM Attack</source>
-      <translation type="unfinished">MitM Attack</translation>
+      <translation>MitM ataka</translation>
     </message>
     <message>
       <source>MitM attack from server %1</source>
-      <translation type="unfinished">MitM attack from server %1</translation>
+      <translation>MitM ataka iš serverio %1</translation>
     </message>
     <message>
       <source>Connected to %1</source>
       <comment>%1 is the Cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connected to %1</translation>
+      <translation>Prisijungti prie %1</translation>
     </message>
     <message>
       <source>Disconnected from %1</source>
       <comment>%1 is the Cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Disconnected from %1</translation>
+      <translation>Atsijungti nuo %1</translation>
     </message>
     <message>
       <source>Connected to %1 via %2</source>
       <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 6.0.0.0)</comment>
-      <translation type="unfinished">Connected to %1 via %2</translation>
+      <translation>Prijungta prie %1 per %2</translation>
     </message>
     <message>
       <source>Disconnected from %1 via %2</source>
       <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 6.0.0.0)</comment>
-      <translation type="unfinished">Disconnected from %1 via %2</translation>
+      <translation>Atjungtas nuo %1 per %2</translation>
     </message>
     <message>
       <source>Site name changed</source>
-      <translation type="unfinished">Site name changed</translation>
+      <translation>Svetainės pavadinimas išsaugotas</translation>
     </message>
     <message>
       <source>Site merge</source>
-      <translation type="unfinished">Site merge</translation>
+      <translation>Svetainių sujungimas</translation>
     </message>
     <message>
       <source>Server proxy connection</source>
-      <translation type="unfinished">Server proxy connection</translation>
+      <translation>Serverio tarpinio serverio ryšys</translation>
     </message>
     <message>
       <source>Site has been updated to version %1</source>
-      <translation type="unfinished">Site has been updated to version %1</translation>
+      <translation>Svetainė atnaujinta į %1 versiją</translation>
     </message>
     <message>
       <source>%1 - %2, Duration: %3, Target: %4</source>
       <comment>%1 is start time of proxy connection, %2 is end time of proxy connection, %3 is proxy connection duration, %4 is proxy connection target address</comment>
-      <translation type="unfinished">%1 - %2, Duration: %3, Target: %4</translation>
+      <translation>%1 - %2, Trukmė: %3, Tikslas: %4</translation>
     </message>
     <message>
       <source>Start time: %1, Target: %2</source>
       <comment>%1 is start time of proxy connection, %2 is proxy connection target address</comment>
-      <translation type="unfinished">Start time: %1, Target: %2</translation>
+      <translation>Pradžios laikas: %1, Tikslas: %2</translation>
     </message>
     <message>
       <source>User IP</source>
-      <translation type="unfinished">User IP</translation>
+      <translation>Vartotojo IP</translation>
     </message>
     <message>
       <source>Device</source>
-      <translation type="unfinished">Device</translation>
+      <translation>Įrenginys</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -2450,11 +2450,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Device IP</source>
-      <translation type="unfinished">Device IP</translation>
+      <translation>Įrenginio IP</translation>
     </message>
     <message>
       <source>Camera IP</source>
-      <translation type="unfinished">Camera IP</translation>
+      <translation>Kameros ID</translation>
     </message>
     <message>
       <source>Server</source>
@@ -2462,18 +2462,18 @@ License Key: %2</translation>
     </message>
     <message>
       <source>This action was performed by a plugin.</source>
-      <translation type="unfinished">This action was performed by a plugin.</translation>
+      <translation>Šį veiksmą atliko įskiepis.</translation>
     </message>
   </context>
   <context>
     <name>QnBlinkingImageButtonWidget</name>
     <message numerus="yes">
       <source>You have %n notifications</source>
-      <translation type="unfinished">
-        <numerusform>You have %n notifications</numerusform>
-        <numerusform>You have %n notifications</numerusform>
-        <numerusform>You have %n notifications</numerusform>
-        <numerusform>You have %n notifications</numerusform>
+      <translation>
+        <numerusform>Pranešimų nėra</numerusform>
+        <numerusform>Pranešimų nėra</numerusform>
+        <numerusform>Pranešimų nėra</numerusform>
+        <numerusform>Pranešimų nėra</numerusform>
       </translation>
     </message>
   </context>
@@ -2481,31 +2481,31 @@ License Key: %2</translation>
     <name>QnBookmarkWidget</name>
     <message>
       <source>Do not lock archive</source>
-      <translation type="unfinished">Do not lock archive</translation>
+      <translation>Neužrakinti archyvo</translation>
     </message>
     <message>
       <source>1 month</source>
-      <translation type="unfinished">1 month</translation>
+      <translation>1 mėnuo</translation>
     </message>
     <message>
       <source>3 month</source>
-      <translation type="unfinished">3 month</translation>
+      <translation>3 mėnesiai</translation>
     </message>
     <message>
       <source>6 month</source>
-      <translation type="unfinished">6 month</translation>
+      <translation>6 mėnesių</translation>
     </message>
     <message>
       <source>Name cannot be empty.</source>
-      <translation type="unfinished">Name cannot be empty.</translation>
+      <translation>prisijungimas negali būti tuščias.</translation>
     </message>
     <message>
       <source>Description cannot be empty</source>
-      <translation type="unfinished">Description cannot be empty</translation>
+      <translation>Aprašymas negali būti tuščias</translation>
     </message>
     <message>
       <source>Year</source>
-      <translation type="unfinished">Year</translation>
+      <translation>Metai</translation>
     </message>
   </context>
   <context>
@@ -2513,7 +2513,7 @@ License Key: %2</translation>
     <message>
       <source>%1 Running</source>
       <comment>%1 will be substituted with desktop client display name, e.g &apos;NX Witness Client&apos;</comment>
-      <translation type="unfinished">%1 Running</translation>
+      <translation>%1 Bėgimas</translation>
     </message>
   </context>
   <context>
@@ -2524,139 +2524,139 @@ License Key: %2</translation>
     </message>
     <message>
       <source>FAILED: %1</source>
-      <translation type="unfinished">FAILED: %1</translation>
+      <translation>NESĖKMĖ: %1</translation>
     </message>
     <message>
       <source>Confirming server availability.</source>
-      <translation type="unfinished">Confirming server availability.</translation>
+      <translation>Serverio prieinamumo patvirtinimas.</translation>
     </message>
     <message>
       <source>Evaluating media stream for errors.</source>
-      <translation type="unfinished">Evaluating media stream for errors.</translation>
+      <translation>Medijos srauto klaidų vertinimas.</translation>
     </message>
     <message>
       <source>Diagnostics for device %1</source>
-      <translation type="unfinished">Diagnostics for device %1</translation>
+      <translation>Įrenginio %1 diagnostika</translation>
     </message>
     <message>
       <source>Diagnostics for camera %1</source>
-      <translation type="unfinished">Diagnostics for camera %1</translation>
+      <translation>Kameros diagnostika %1</translation>
     </message>
     <message>
       <source>Device Diagnostics</source>
-      <translation type="unfinished">Device Diagnostics</translation>
+      <translation>Įrenginio diagnostika</translation>
     </message>
     <message>
       <source>Camera Diagnostics</source>
-      <translation type="unfinished">Camera Diagnostics</translation>
+      <translation>Kameros diagnostika</translation>
     </message>
     <message>
       <source>Confirming device is accessible.</source>
-      <translation type="unfinished">Confirming device is accessible.</translation>
+      <translation>Patvirtinama, kad įrenginys pasiekiamas.</translation>
     </message>
     <message>
       <source>Confirming camera is accessible.</source>
-      <translation type="unfinished">Confirming camera is accessible.</translation>
+      <translation>Patvirtinama, kad kamera pasiekiama.</translation>
     </message>
     <message>
       <source>Confirming target device provides media stream.</source>
-      <translation type="unfinished">Confirming target device provides media stream.</translation>
+      <translation>Patvirtinamas tikslinis įrenginys, teikiantis medijos srautą.</translation>
     </message>
     <message>
       <source>Confirming target camera provides media stream.</source>
-      <translation type="unfinished">Confirming target camera provides media stream.</translation>
+      <translation>Patvirtinant tikslinę kamerą, perduodamas medijos srautas.</translation>
     </message>
     <message>
       <source>Diagnostics for I/O module %1</source>
-      <translation type="unfinished">Diagnostics for I/O module %1</translation>
+      <translation>Įvesties/išvesties modulio diagnostika %1</translation>
     </message>
     <message>
       <source>I/O Module Diagnostics</source>
-      <translation type="unfinished">I/O Module Diagnostics</translation>
+      <translation>Įvesties / išvesties modulio diagnostika</translation>
     </message>
     <message>
       <source>Confirming I/O module is accessible.</source>
-      <translation type="unfinished">Confirming I/O module is accessible.</translation>
+      <translation>Patvirtinama, kad įvesties / išvesties modulis yra prieinamas.</translation>
     </message>
     <message>
       <source>Confirming target I/O module provides media stream.</source>
-      <translation type="unfinished">Confirming target I/O module provides media stream.</translation>
+      <translation>Patvirtinamas tikslinio įvesties / išvesties modulio medijos srauto tiekimas.</translation>
     </message>
     <message>
       <source>Diagnostics complete</source>
-      <translation type="unfinished">Diagnostics complete</translation>
+      <translation>Diagnostika baigta</translation>
     </message>
   </context>
   <context>
     <name>QnCameraListDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation type="unfinished">Copy Selection to Clipboard</translation>
+      <translation>Kopijuoti pasirinkimą į iškarpinę</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation type="unfinished">Export Selection to File...</translation>
+      <translation>Eksportuoti pasirinkimą į failą...</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Pažymėti visus</translation>
     </message>
     <message>
       <source>Devices List</source>
-      <translation type="unfinished">Devices List</translation>
+      <translation>Įrenginių sąrašas</translation>
     </message>
     <message>
       <source>Cameras List</source>
-      <translation type="unfinished">Cameras List</translation>
+      <translation>Kamerų sąrašas</translation>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
-      <translation type="unfinished">
-        <numerusform>%n devices found</numerusform>
-        <numerusform>%n devices found</numerusform>
-        <numerusform>%n devices found</numerusform>
-        <numerusform>%n devices found</numerusform>
+      <translation>
+        <numerusform>Rasta %n įrenginių</numerusform>
+        <numerusform>Rasta %n įrenginių</numerusform>
+        <numerusform>Rasta %n įrenginių</numerusform>
+        <numerusform>Rasta %n įrenginių</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras found</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras found</numerusform>
-        <numerusform>%n cameras found</numerusform>
-        <numerusform>%n cameras found</numerusform>
-        <numerusform>%n cameras found</numerusform>
+      <translation>
+        <numerusform>Rasta %n kamerų</numerusform>
+        <numerusform>Nerasta jokių kamerų</numerusform>
+        <numerusform>Nerasta jokių kamerų</numerusform>
+        <numerusform>Nerasta jokių kamerų</numerusform>
       </translation>
     </message>
     <message>
       <source>Export selected devices to a file.</source>
-      <translation type="unfinished">Export selected devices to a file.</translation>
+      <translation>Eksportuoti pasirinktus įrenginius į failą.</translation>
     </message>
     <message>
       <source>Export selected cameras to a file.</source>
-      <translation type="unfinished">Export selected cameras to a file.</translation>
+      <translation>Eksportuoti pasirinktas kameras į failą.</translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules found</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O modules found</numerusform>
-        <numerusform>%n I/O modules found</numerusform>
-        <numerusform>%n I/O modules found</numerusform>
-        <numerusform>%n I/O modules found</numerusform>
+      <translation>
+        <numerusform>Rasta %n Įvesties/išvesties moduliai</numerusform>
+        <numerusform>Rasta %n Įvesties/išvesties moduliai</numerusform>
+        <numerusform>Rasta %n Įvesties/išvesties moduliai</numerusform>
+        <numerusform>Rasta %n Įvesties/išvesties moduliai</numerusform>
       </translation>
     </message>
     <message>
       <source>No cameras</source>
-      <translation type="unfinished">No cameras</translation>
+      <translation>Nėra kamerų</translation>
     </message>
     <message>
       <source>Devices List for %1</source>
       <comment>%1 will be substituted with a server name</comment>
-      <translation type="unfinished">Devices List for %1</translation>
+      <translation>Įrenginių sąrašas, skirtas %1</translation>
     </message>
     <message>
       <source>Cameras List for %1</source>
       <comment>%1 will be substituted with a server name</comment>
-      <translation type="unfinished">Cameras List for %1</translation>
+      <translation>Kamerų sąrašas, skirtas %1</translation>
     </message>
   </context>
   <context>
@@ -2683,11 +2683,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>IP/Name</source>
-      <translation type="unfinished">IP/Name</translation>
+      <translation>IP/vardas</translation>
     </message>
     <message>
       <source>MAC address</source>
-      <translation type="unfinished">MAC address</translation>
+      <translation>MAC address</translation>
     </message>
     <message>
       <source>Server</source>
@@ -2695,7 +2695,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>ID</source>
-      <translation type="unfinished">ID</translation>
+      <translation>ID</translation>
     </message>
     <message>
       <source>Logical ID</source>
@@ -2714,11 +2714,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
-      <translation type="unfinished">Password should be at least 8 symbols long and contain different types of characters.</translation>
+      <translation>Slaptažodis turi būti sudarytas iš bent 8 simbolių ir jame turi būti įvairių tipų simbolių.</translation>
     </message>
     <message>
       <source>Password should not be equal to camera&apos;s user name</source>
-      <translation type="unfinished">Password should not be equal to camera&apos;s user name</translation>
+      <translation>Slaptažodis neturėtų būti lygus kameros&apos;vartotojo vardui</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
@@ -2733,7 +2733,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation type="unfinished">Confirm Password</translation>
+      <translation>Patvirtinkite slaptažodį</translation>
     </message>
     <message>
       <source>Current Password</source>
@@ -2745,11 +2745,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>To modify your password please enter the existing one</source>
-      <translation type="unfinished">To modify your password please enter the existing one</translation>
+      <translation>Norėdami pakeisti slaptažodį, įveskite esamą</translation>
     </message>
     <message>
       <source>Invalid current password</source>
-      <translation type="unfinished">Invalid current password</translation>
+      <translation>Blogas dabartinis slaptažodis</translation>
     </message>
   </context>
   <context>
@@ -2757,7 +2757,7 @@ License Key: %2</translation>
     <message>
       <source>Open %1 Portal</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Open %1 Portal</translation>
+      <translation>Atidaryti %1 portalą</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -2766,37 +2766,37 @@ License Key: %2</translation>
     <message>
       <source>Disconnect Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Disconnect Site from %1</translation>
+      <translation>Atjungti svetainę nuo %1</translation>
     </message>
     <message>
       <source>Connect Site to %1...</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1...</translation>
+      <translation>Prijungti svetainę prie %1...</translation>
     </message>
     <message>
       <source>There is currently no connection between your site and %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">There is currently no connection between your site and %1.</translation>
+      <translation>Šiuo metu nėra ryšio tarp jūsų svetainės ir %1.</translation>
     </message>
     <message>
       <source>Enter your account password to disconnect Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to disconnect Site from %1</translation>
+      <translation>Įveskite savo paskyros slaptažodį, kad atjungtumėte svetainę nuo %1</translation>
     </message>
     <message>
       <source>Cannot disconnect the Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot disconnect the Site from %1</translation>
+      <translation>Nepavyksta atjungti svetainės nuo %1</translation>
     </message>
     <message>
       <source>Site disconnected from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Site disconnected from %1</translation>
+      <translation>Svetainė atjungta nuo %1</translation>
     </message>
     <message>
       <source>Disconnect site from %1?</source>
       <comment>%1 is the cloud name, like Nx Cloud</comment>
-      <translation type="unfinished">Disconnect site from %1?</translation>
+      <translation>Atjungti svetainę nuo %1?</translation>
     </message>
     <message>
       <source>Recording will stop and all Service Subscriptions will be removed</source>
@@ -2805,15 +2805,15 @@ License Key: %2</translation>
     <message>
       <source>All %1 users will be removed from the site</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">All %1 users will be removed from the site</translation>
+      <translation>Visi %1 vartotojai bus pašalinti iš svetainės</translation>
     </message>
     <message>
       <source>You will be logged out of the site. The site will be accessible only via local network</source>
-      <translation type="unfinished">You will be logged out of the site. The site will be accessible only via local network</translation>
+      <translation>Būsite atjungti nuo svetainės. Svetainė bus pasiekiama tik per vietinį tinklą.</translation>
     </message>
     <message>
       <source>The site will be accessible only via local network</source>
-      <translation type="unfinished">The site will be accessible only via local network</translation>
+      <translation>Svetainė bus pasiekiama tik per vietinį tinklą</translation>
     </message>
     <message>
       <source>Existing data (site settings and archive) will be preserved</source>
@@ -2828,19 +2828,19 @@ License Key: %2</translation>
     <name>QnCloudResultInfo</name>
     <message>
       <source>Successful.</source>
-      <translation type="unfinished">Successful.</translation>
+      <translation>Sėkmingas:</translation>
     </message>
     <message>
       <source>Invalid login or password.</source>
-      <translation type="unfinished">Invalid login or password.</translation>
+      <translation>Neteisingas el. pašto adresas arba slaptažodis.</translation>
     </message>
     <message>
       <source>Requested operation is not allowed with provided credentials.</source>
-      <translation type="unfinished">Requested operation is not allowed with provided credentials.</translation>
+      <translation>Prašoma operacija neleidžiama su pateiktais prisijungimo duomenimis.</translation>
     </message>
     <message>
       <source>This account is not activated. Please check your email.</source>
-      <translation type="unfinished">This account is not activated. Please check your email.</translation>
+      <translation>Ši paskyra neaktyvuota. Patikrinkite savo el. paštą.</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
@@ -2848,25 +2848,25 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
-      <translation type="unfinished">Network error. Please check your Internet connection and try again.</translation>
+      <translation>Tinklo klaida. Patikrinkite interneto ryšį ir bandykite dar kartą.</translation>
     </message>
     <message>
       <source>Invalid login.</source>
-      <translation type="unfinished">Invalid login.</translation>
+      <translation>Klaidingas prisijungimo vardas</translation>
     </message>
     <message>
       <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 is temporary unavailable. Please try again later.</translation>
+      <translation>%1 šiuo metu nepasiekiamas. Bandykite dar kartą vėliau.</translation>
     </message>
     <message>
       <source>Credentials are no longer valid.</source>
-      <translation type="unfinished">Credentials are no longer valid.</translation>
+      <translation>Įgaliojimai nebegalioja.</translation>
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Internal %1 error. Please contact support team.</translation>
+      <translation>Vidinė %1 klaida. Susisiekite su palaikymo komanda.</translation>
     </message>
   </context>
   <context>
@@ -2877,16 +2877,16 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Account is not activated.</source>
-      <translation type="unfinished">Account is not activated.</translation>
+      <translation>Paskyra neaktyvuota.</translation>
     </message>
     <message>
       <source>Please log in to %1 and follow the provided instructions.</source>
       <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
-      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
+      <translation>Prisijunkite prie %1 ir vykdykite pateiktus nurodymus.</translation>
     </message>
     <message>
       <source>Invalid password</source>
-      <translation type="unfinished">Invalid password</translation>
+      <translation>Neteisingas slaptažodis</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
@@ -2902,21 +2902,21 @@ License Key: %2</translation>
     <message>
       <source>Cannot connect to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>Nepavyksta prisijungti prie %1</translation>
     </message>
     <message>
       <source>Connect to Server</source>
-      <translation type="unfinished">Connect to Server</translation>
+      <translation>Prisijungti prie serverio</translation>
     </message>
     <message>
       <source>Log in to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Log in to %1</translation>
+      <translation>Prisijunkite prie %1</translation>
     </message>
     <message>
       <source>Logged in as %1</source>
       <comment>%1 is the cloud login name (like user@domain.com</comment>
-      <translation type="unfinished">Logged in as %1</translation>
+      <translation>Prisijungta kaip %@</translation>
     </message>
   </context>
   <context>
@@ -2930,29 +2930,29 @@ License Key: %2</translation>
     <name>QnConnectionDiagnosticsHelper</name>
     <message>
       <source>Please close the application and start it again using the shortcut in the start menu.</source>
-      <translation type="unfinished">Please close the application and start it again using the shortcut in the start menu.</translation>
+      <translation>Uždarykite programą ir paleiskite ją iš naujo naudodami spartųjį klavišą meniu Pradėti.</translation>
     </message>
     <message>
       <source>Failed to connect to Server</source>
-      <translation type="unfinished">Failed to connect to Server</translation>
+      <translation>Nepavyko prisijungti prie serverio</translation>
     </message>
     <message>
       <source>Client and Server have different versions</source>
-      <translation type="unfinished">Client and Server have different versions</translation>
+      <translation>Klientas ir serveris turi skirtingas versijas</translation>
     </message>
     <message>
       <source>Client - %1</source>
       <comment>%1 is version</comment>
-      <translation type="unfinished">Client - %1</translation>
+      <translation>Klientas - %1</translation>
     </message>
     <message>
       <source>Server - %1</source>
       <comment>%1 is version</comment>
-      <translation type="unfinished">Server - %1</translation>
+      <translation>Serveris - %1</translation>
     </message>
     <message>
       <source>Download Client version %1?</source>
-      <translation type="unfinished">Download Client version %1?</translation>
+      <translation>Atsisiųsti kliento versiją %1?</translation>
     </message>
     <message>
       <source>Restart</source>
@@ -2960,7 +2960,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Failed to download and launch version %1</source>
-      <translation type="unfinished">Failed to download and launch version %1</translation>
+      <translation>Nepavyko atsisiųsti ir paleisti versijos %1</translation>
     </message>
     <message>
       <source>Try Again</source>
@@ -2968,39 +2968,39 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Failed to restart %1 in compatibility mode</source>
-      <translation type="unfinished">Failed to restart %1 in compatibility mode</translation>
+      <translation>Nepavyko paleisti iš naujo %1 suderinamumo režimu</translation>
     </message>
     <message>
       <source>Please close %1 and start it again using the shortcut in the start menu.</source>
-      <translation type="unfinished">Please close %1 and start it again using the shortcut in the start menu.</translation>
+      <translation>Uždarykite %1 ir paleiskite jį iš naujo naudodami spartųjį klavišą pradžios meniu.</translation>
     </message>
     <message>
       <source>You have to download another version of %1 to connect to this Server.</source>
-      <translation type="unfinished">You have to download another version of %1 to connect to this Server.</translation>
+      <translation>Norėdami prisijungti prie šio serverio, turite atsisiųsti kitą %1 versiją.</translation>
     </message>
     <message>
       <source>You have to restart %1 in compatibility mode to connect to this Server.</source>
-      <translation type="unfinished">You have to restart %1 in compatibility mode to connect to this Server.</translation>
+      <translation>Norėdami prisijungti prie šio serverio, turite paleisti %1 iš naujo suderinamumo režimu.</translation>
     </message>
     <message>
       <source>Restart %1 in compatibility mode?</source>
-      <translation type="unfinished">Restart %1 in compatibility mode?</translation>
+      <translation>Paleisti iš naujo %1 suderinamumo režimu?</translation>
     </message>
     <message>
       <source>Failed to restart %1</source>
-      <translation type="unfinished">Failed to restart %1</translation>
+      <translation>Nepavyko paleisti iš naujo %1</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Atsisiųsti ir įdiegti</translation>
     </message>
     <message>
       <source>Failed to enter compatibility mode for version %1</source>
-      <translation type="unfinished">Failed to enter compatibility mode for version %1</translation>
+      <translation>Nepavyko įjungti suderinamumo režimo su %1 versija</translation>
     </message>
     <message>
       <source>Log In...</source>
-      <translation type="unfinished">Log In...</translation>
+      <translation>Prisijungti...</translation>
     </message>
     <message>
       <source>Your session has expired</source>
@@ -3008,62 +3008,62 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Please sign in again with your link to continue</source>
-      <translation type="unfinished">Please sign in again with your link to continue</translation>
+      <translation>Norėdami tęsti, prisijunkite dar kartą naudodami savo nuorodą.</translation>
     </message>
     <message>
       <source>Site is not compatible with two-factor authentication</source>
-      <translation type="unfinished">Site is not compatible with two-factor authentication</translation>
+      <translation>Svetainė nesuderinama su dviejų veiksnių autentifikavimu</translation>
     </message>
     <message>
       <source>Failed to log in to Site &quot;%1&quot;</source>
-      <translation type="unfinished">Failed to log in to Site &quot;%1&quot;</translation>
+      <translation>Nepavyko prisijungti prie svetainės &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
     <name>QnDatabaseManagementWidget</name>
     <message>
       <source>Save Database Backup...</source>
-      <translation type="unfinished">Save Database Backup...</translation>
+      <translation>Įrašyti duomenų bazės atsarginę kopiją...</translation>
     </message>
     <message>
       <source>Database backup is being downloaded from the server. Please wait.</source>
-      <translation type="unfinished">Database backup is being downloaded from the server. Please wait.</translation>
+      <translation>Iš serverio atsisiunčiama duomenų bazės atsarginė kopija. Palaukite.</translation>
     </message>
     <message>
       <source>Open Database Backup...</source>
-      <translation type="unfinished">Open Database Backup...</translation>
+      <translation>Atidaryti duomenų bazės atsarginę kopiją...</translation>
     </message>
     <message>
       <source>Database backup is being uploaded to the server. Please wait.</source>
-      <translation type="unfinished">Database backup is being uploaded to the server. Please wait.</translation>
+      <translation>Į serverį įkeliama duomenų bazės atsarginė kopija. Palaukite.</translation>
     </message>
     <message>
       <source>Failed to back up database</source>
-      <translation type="unfinished">Failed to back up database</translation>
+      <translation>Nepavyko sukurti duomenų bazės atsarginės kopijos</translation>
     </message>
     <message>
       <source>Database backed up to file</source>
-      <translation type="unfinished">Database backed up to file</translation>
+      <translation>Duomenų bazės atsarginė kopija sukurta faile</translation>
     </message>
     <message>
       <source>Failed to open file</source>
-      <translation type="unfinished">Failed to open file</translation>
+      <translation>Nepavyko atidaryti failo:</translation>
     </message>
     <message>
       <source>Failed to restore database</source>
-      <translation type="unfinished">Failed to restore database</translation>
+      <translation>Nepavyko atkurti duomenų bazės</translation>
     </message>
     <message>
       <source>Database Backup Files</source>
-      <translation type="unfinished">Database Backup Files</translation>
+      <translation>Duomenų bazės atsarginių kopijų failai</translation>
     </message>
     <message>
       <source>Save Database Backup</source>
-      <translation type="unfinished">Save Database Backup</translation>
+      <translation>Įrašyti duomenų bazės atsarginę kopiją</translation>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
-      <translation type="unfinished">Enter your account password to create backup</translation>
+      <translation>Įveskite savo paskyros slaptažodį, kad sukurtumėte atsarginę kopiją</translation>
     </message>
     <message>
       <source>Create</source>
@@ -3071,7 +3071,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Restore from Database Backup</source>
-      <translation type="unfinished">Restore from Database Backup</translation>
+      <translation>Atkurti iš duomenų bazės atsarginės kopijos</translation>
     </message>
     <message>
       <source>Restore</source>
@@ -3079,48 +3079,48 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Restore database?</source>
-      <translation type="unfinished">Restore database?</translation>
+      <translation>Atkurti duombazę</translation>
     </message>
     <message>
       <source>Database successfully restored. Server application will restart shortly.</source>
-      <translation type="unfinished">Database successfully restored. Server application will restart shortly.</translation>
+      <translation>Duomenų bazė sėkmingai atkurta. Serverio programa netrukus bus paleista iš naujo.</translation>
     </message>
     <message>
       <source>Site configuration will be restored from backup, Server application will be restarted.</source>
-      <translation type="unfinished">Site configuration will be restored from backup, Server application will be restarted.</translation>
+      <translation>Svetainės konfigūracija bus atkurta iš atsarginės kopijos, serverio programa bus paleista iš naujo.</translation>
     </message>
     <message>
       <source>Enter your account password to restore Site from backup</source>
-      <translation type="unfinished">Enter your account password to restore Site from backup</translation>
+      <translation>Įveskite savo paskyros slaptažodį, kad atkurtumėte svetainę iš atsarginės kopijos</translation>
     </message>
   </context>
   <context>
     <name>QnFileMessages</name>
     <message>
       <source>Overwrite existing file?</source>
-      <translation type="unfinished">Overwrite existing file?</translation>
+      <translation>Perrašyti egzistuojančius failus?</translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation type="unfinished">Failed to overwrite file</translation>
+      <translation>Nepavyko perrašyti failo</translation>
     </message>
   </context>
   <context>
     <name>QnGLCheckerInstrument</name>
     <message>
       <source>Video card drivers are outdated or not installed</source>
-      <translation type="unfinished">Video card drivers are outdated or not installed</translation>
+      <translation>Vaizdo plokštės tvarkyklės pasenusios arba neįdiegtos</translation>
     </message>
     <message>
       <source>%1 may not work properly.</source>
-      <translation type="unfinished">%1 may not work properly.</translation>
+      <translation>%1 gali neveikti tinkamai.</translation>
     </message>
   </context>
   <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Folder already added</source>
-      <translation type="unfinished">Folder already added</translation>
+      <translation>Aplankas jau pridėtas</translation>
     </message>
     <message>
       <source>None</source>
@@ -3128,38 +3128,38 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Auto (%1)</source>
-      <translation type="unfinished">Auto (%1)</translation>
+      <translation>Automatinis (%1)</translation>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Pasirinkti aplankalą...</translation>
     </message>
     <message>
       <source>Notifications filters are moved to the right panel</source>
-      <translation type="unfinished">Notifications filters are moved to the right panel</translation>
+      <translation>Pranešimų filtrai perkelti į dešinįjį skydelį</translation>
     </message>
   </context>
   <context>
     <name>QnGeneralSystemAdministrationWidget</name>
     <message>
       <source>Open Event Log</source>
-      <translation type="unfinished">Open Event Log</translation>
+      <translation>Atidaryti įvykių žurnalą</translation>
     </message>
     <message>
       <source>Open Bookmarks List</source>
-      <translation type="unfinished">Open Bookmarks List</translation>
+      <translation>Atidaryti žymių sąrašą</translation>
     </message>
     <message>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>Renginio taisyklės</translation>
     </message>
     <message>
       <source>Event Log</source>
-      <translation type="unfinished">Event Log</translation>
+      <translation>Įvykių žurnalas</translation>
     </message>
     <message>
       <source>Audit Trail</source>
-      <translation type="unfinished">Audit Trail</translation>
+      <translation>Audit trail</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -3167,27 +3167,27 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Device List</source>
-      <translation type="unfinished">Device List</translation>
+      <translation>Įrenginių sąrašas</translation>
     </message>
     <message>
       <source>Camera List</source>
-      <translation type="unfinished">Camera List</translation>
+      <translation>Kamerų sąrašas</translation>
     </message>
     <message>
       <source>Open Event Rules Management</source>
-      <translation type="unfinished">Open Event Rules Management</translation>
+      <translation>Atvirų įvykių taisyklių valdymas</translation>
     </message>
     <message>
       <source>Open Audit Trail Log</source>
-      <translation type="unfinished">Open Audit Trail Log</translation>
+      <translation>Atidaryti audito žurnalą</translation>
     </message>
     <message>
       <source>Open Device List</source>
-      <translation type="unfinished">Open Device List</translation>
+      <translation>Atidaryti įrenginių sąrašą</translation>
     </message>
     <message>
       <source>Open Camera List</source>
-      <translation type="unfinished">Open Camera List</translation>
+      <translation>Atidaryti kamerų sąrašą</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -3195,14 +3195,14 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Open Integrations</source>
-      <translation type="unfinished">Open Integrations</translation>
+      <translation>Visos integracijos</translation>
     </message>
   </context>
   <context>
     <name>QnHistogramWidget</name>
     <message>
       <source>Gamma %1</source>
-      <translation type="unfinished">Gamma %1</translation>
+      <translation>Gama %1</translation>
     </message>
   </context>
   <context>
@@ -3213,7 +3213,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Default state</source>
-      <translation type="unfinished">Default state</translation>
+      <translation>Numatytoji būsena</translation>
     </message>
     <message>
       <source>Name</source>
@@ -3232,12 +3232,12 @@ License Key: %2</translation>
     <message>
       <source>Input</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Input</translation>
+      <translation>Įvestis</translation>
     </message>
     <message>
       <source>Output</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Output</translation>
+      <translation>Išvestis</translation>
     </message>
     <message>
       <source>Invalid</source>
@@ -3247,80 +3247,80 @@ License Key: %2</translation>
     <message>
       <source>Grounded circuit</source>
       <comment>IO Port State</comment>
-      <translation type="unfinished">Grounded circuit</translation>
+      <translation>Įžeminta grandinė</translation>
     </message>
     <message>
       <source>Invalid state</source>
       <comment>IO Port State</comment>
-      <translation type="unfinished">Invalid state</translation>
+      <translation>Neteisinga valstija</translation>
     </message>
     <message>
       <source>On click</source>
-      <translation type="unfinished">On click</translation>
+      <translation>Spustelėjus</translation>
     </message>
     <message>
       <source>Duration</source>
-      <translation type="unfinished">Duration</translation>
+      <translation>Trukmė</translation>
     </message>
     <message>
       <source>Open circuit</source>
       <comment>IO Port State</comment>
-      <translation type="unfinished">Open circuit</translation>
+      <translation>Atvira grandinė</translation>
     </message>
     <message>
       <source>Toggle state</source>
       <comment>IO Output Port Action</comment>
-      <translation type="unfinished">Toggle state</translation>
+      <translation>Perjungti būseną</translation>
     </message>
     <message>
       <source>Impulse</source>
       <comment>IO Output Port Action</comment>
-      <translation type="unfinished">Impulse</translation>
+      <translation>Impulsas</translation>
     </message>
     <message>
       <source>ID</source>
-      <translation type="unfinished">ID</translation>
+      <translation>ID</translation>
     </message>
   </context>
   <context>
     <name>QnInputDialog</name>
     <message>
       <source>Please enter a value.</source>
-      <translation type="unfinished">Please enter a value.</translation>
+      <translation>Prašom įvesti reikšmę.</translation>
     </message>
     <message>
       <source>Please enter a password.</source>
-      <translation type="unfinished">Please enter a password.</translation>
+      <translation>Įveskite savo slaptažodį.</translation>
     </message>
   </context>
   <context>
     <name>QnIoModuleOverlayWidgetPrivate</name>
     <message>
       <source>Failed to turn off I/O port %1</source>
-      <translation type="unfinished">Failed to turn off I/O port %1</translation>
+      <translation>Nepavyko išjungti įvesties/išvesties prievado %1</translation>
     </message>
     <message>
       <source>Failed to turn on I/O port %1</source>
-      <translation type="unfinished">Failed to turn on I/O port %1</translation>
+      <translation>Nepavyko įjungti įvesties/išvesties prievado %1</translation>
     </message>
   </context>
   <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>License Type</source>
-      <translation type="unfinished">License Type</translation>
+      <translation>Licencijos tipas</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation type="unfinished">License Key</translation>
+      <translation>Licencijos raktas</translation>
     </message>
     <message>
       <source>Locked to Hardware ID</source>
-      <translation type="unfinished">Locked to Hardware ID</translation>
+      <translation>Užrakinta pagal aparatinės įrangos ID</translation>
     </message>
     <message>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
+      <translation>Bendrinis</translation>
     </message>
     <message>
       <source>Features</source>
@@ -3328,19 +3328,19 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Screens Allowed</source>
-      <translation type="unfinished">Screens Allowed</translation>
+      <translation>Leidžiami ekranai</translation>
     </message>
     <message>
       <source>Control Sessions Allowed</source>
-      <translation type="unfinished">Control Sessions Allowed</translation>
+      <translation>Leidžiami valdymo seansai</translation>
     </message>
     <message>
       <source>Archive Streams Allowed</source>
-      <translation type="unfinished">Archive Streams Allowed</translation>
+      <translation>Archyvų srautai leidžiami</translation>
     </message>
     <message>
       <source>Deactivations Remaining</source>
-      <translation type="unfinished">Deactivations Remaining</translation>
+      <translation>Likę deaktyvavimai</translation>
     </message>
   </context>
   <context>
@@ -3351,7 +3351,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation type="unfinished">License Key</translation>
+      <translation>Licencijos raktas</translation>
     </message>
     <message>
       <source>Status</source>
@@ -3363,7 +3363,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Never</source>
-      <translation type="unfinished">Never</translation>
+      <translation>Niekada</translation>
     </message>
     <message>
       <source>Expired</source>
@@ -3387,31 +3387,31 @@ License Key: %2</translation>
     </message>
     <message>
       <source>License is active</source>
-      <translation type="unfinished">License is active</translation>
+      <translation>Licencija aktyvi</translation>
     </message>
     <message>
       <source>License is expired</source>
-      <translation type="unfinished">License is expired</translation>
+      <translation>Licencija galioja nebegalioja</translation>
     </message>
     <message>
       <source>Expires soon</source>
-      <translation type="unfinished">Expires soon</translation>
+      <translation>Galiojimo laikas baigiasi netrukus</translation>
     </message>
     <message>
       <source>License expires today</source>
-      <translation type="unfinished">License expires today</translation>
+      <translation>Licencija baigiasi šiandien</translation>
     </message>
     <message>
       <source>License expires tomorrow</source>
-      <translation type="unfinished">License expires tomorrow</translation>
+      <translation>Licencija baigsis rytoj</translation>
     </message>
     <message numerus="yes">
       <source>License expires in %n days</source>
-      <translation type="unfinished">
-        <numerusform>License expires in %n days</numerusform>
-        <numerusform>License expires in %n days</numerusform>
-        <numerusform>License expires in %n days</numerusform>
-        <numerusform>License expires in %n days</numerusform>
+      <translation>
+        <numerusform>Licencija baigs galioti po %n dienų</numerusform>
+        <numerusform>Licencija baigs galioti po %n dienų</numerusform>
+        <numerusform>Licencija baigs galioti po %n dienų</numerusform>
+        <numerusform>Licencija baigs galioti po %n dienų</numerusform>
       </translation>
     </message>
     <message>
@@ -3420,39 +3420,39 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Not verified</source>
-      <translation type="unfinished">Not verified</translation>
+      <translation>Nepatvirtintas</translation>
     </message>
   </context>
   <context>
     <name>QnLicenseWidget</name>
     <message>
       <source>Activate Trial License</source>
-      <translation type="unfinished">Activate Trial License</translation>
+      <translation>Aktyvuoti nemokamą licenciją</translation>
     </message>
     <message>
       <source>Open License File</source>
-      <translation type="unfinished">Open License File</translation>
+      <translation>Atidaryti licencijos failą</translation>
     </message>
     <message>
       <source>Failed to open file</source>
-      <translation type="unfinished">Failed to open file</translation>
+      <translation>Nepavyko atidaryti failo:</translation>
     </message>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
-      <translation type="unfinished">To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</translation>
+      <translation>Norėdami gauti aktyvinimo rakto failą, nusiųskite pateiktą licencijos raktą ir aparatinės įrangos ID adresu %1.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</translation>
+      <translation>Norėdami gauti aktyvinimo rakto failą, nusiųskite pateiktą licencijos raktą ir aparatinės įrangos ID savo regioniniam / licencijų palaikymo centrui.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</translation>
+      <translation>Norėdami gauti aktyvinimo rakto failą, nusiųskite pateiktą licencijos raktą ir aparatinės įrangos ID savo regioniniam / licencijų palaikymo centrui (%1).</translation>
     </message>
     <message>
       <source>Text Files</source>
-      <translation type="unfinished">Text Files</translation>
+      <translation>Tekstiniai failai</translation>
     </message>
   </context>
   <context>
@@ -3463,90 +3463,90 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Look and Feel</source>
-      <translation type="unfinished">Look and Feel</translation>
+      <translation>Išvaizda ir jausmas</translation>
     </message>
     <message>
       <source>Screen Recording</source>
-      <translation type="unfinished">Screen Recording</translation>
+      <translation>Ekrano įrašymas</translation>
     </message>
     <message>
       <source>Advanced</source>
-      <translation type="unfinished">Advanced</translation>
+      <translation>Papildomi nustatymai</translation>
     </message>
     <message>
       <source>Restart required</source>
-      <translation type="unfinished">Restart required</translation>
+      <translation>Reikia paleisti iš naujo</translation>
     </message>
     <message>
       <source>Restart Now</source>
-      <translation type="unfinished">Restart Now</translation>
+      <translation>Restart Now</translation>
     </message>
     <message>
       <source>Restart Later</source>
-      <translation type="unfinished">Restart Later</translation>
+      <translation>Paleisti iš naujo vėliau</translation>
     </message>
     <message>
       <source>Some changes will take effect only after %1 restart</source>
-      <translation type="unfinished">Some changes will take effect only after %1 restart</translation>
+      <translation>Kai kurie pakeitimai įsigalios tik po %1 perkrovimo</translation>
     </message>
     <message>
       <source>Settings are read-only. Please contact your site administrator. All changes will be lost after program exit.</source>
-      <translation type="unfinished">Settings are read-only. Please contact your site administrator. All changes will be lost after program exit.</translation>
+      <translation>Nustatymai skirti tik skaitymui. Susisiekite su svetainės administratoriumi. Uždarius programą, visi pakeitimai bus prarasti.</translation>
     </message>
   </context>
   <context>
     <name>QnLookAndFeelPreferencesWidget</name>
     <message>
       <source>Preparing Image...</source>
-      <translation type="unfinished">Preparing Image...</translation>
+      <translation>Ruošiamas vaizdas...</translation>
     </message>
     <message>
       <source>Please wait while image is being prepared...</source>
-      <translation type="unfinished">Please wait while image is being prepared...</translation>
+      <translation>Palaukite, kol ruošiamas vaizdas...</translation>
     </message>
     <message>
       <source>Server Time</source>
-      <translation type="unfinished">Server Time</translation>
+      <translation>Serverio laikas</translation>
     </message>
     <message>
       <source>Client Time</source>
-      <translation type="unfinished">Client Time</translation>
+      <translation>Kliento laikas</translation>
     </message>
     <message>
       <source>Stretch</source>
-      <translation type="unfinished">Stretch</translation>
+      <translation>Ištampyti</translation>
     </message>
     <message>
       <source>Fit</source>
-      <translation type="unfinished">Fit</translation>
+      <translation>Tinka</translation>
     </message>
     <message>
       <source>Crop</source>
-      <translation type="unfinished">Crop</translation>
+      <translation>Apkarpyti</translation>
     </message>
     <message>
       <source>This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</source>
-      <translation type="unfinished">This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</translation>
+      <translation>Ši parinktis neturės įtakos įrašymo grafikui. Įrašymo grafikas visada nustatomas pagal serverio laiką.</translation>
     </message>
     <message>
       <source>Select File...</source>
-      <translation type="unfinished">Select File...</translation>
+      <translation>Pasirinkite failą...</translation>
     </message>
     <message>
       <source>No image</source>
-      <translation type="unfinished">No image</translation>
+      <translation>Nėra paveikslėlio</translation>
     </message>
     <message>
       <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
-      <translation type="unfinished">Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</translation>
+      <translation>Nustato laiką, kuris bus naudojamas kliento programoje (laiko juosta, laiko žymos ir kt.), kai kliento ir serverio kompiuteriai yra skirtingose laiko juostose.</translation>
     </message>
     <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
-      <translation type="unfinished">Length of time each camera on layout will be displayed if you start a Tour.</translation>
+      <translation>Kiekvienos maketo kameros rodymo trukmė, jei pradėsite ekskursiją.</translation>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers.</source>
-      <translation type="unfinished">Displays IP addresses for cameras and servers.</translation>
+      <translation>Rodo kamerų ir serverių IP adresus.</translation>
     </message>
   </context>
   <context>
@@ -3565,11 +3565,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Create Zoom Window</source>
-      <translation type="unfinished">Create Zoom Window</translation>
+      <translation>Sukurti mastelio keitimo langą</translation>
     </message>
     <message>
       <source>Hi-Res</source>
-      <translation type="unfinished">Hi-Res</translation>
+      <translation>Didelės raiškos</translation>
     </message>
     <message>
       <source>LIVE</source>
@@ -3577,7 +3577,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>%1 (Tour &quot;%2&quot; is active)</source>
-      <translation type="unfinished">%1 (Tour &quot;%2&quot; is active)</translation>
+      <translation>%1 (Turas &quot;%2&quot; aktyvus)</translation>
     </message>
     <message>
       <source>I/O Module</source>
@@ -3585,23 +3585,23 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Lo-Res</source>
-      <translation type="unfinished">Lo-Res</translation>
+      <translation>Žemos raiškos</translation>
     </message>
     <message>
       <source>Area Zoom</source>
-      <translation type="unfinished">Area Zoom</translation>
+      <translation>Ploto mastelio keitimas</translation>
     </message>
     <message>
       <source>Motion Search</source>
-      <translation type="unfinished">Motion Search</translation>
+      <translation>Judesio paieška</translation>
     </message>
     <message>
       <source>Object Search</source>
-      <translation type="unfinished">Object Search</translation>
+      <translation>Objektų paieška</translation>
     </message>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>Karštieji taškai</translation>
     </message>
     <message>
       <source>Mute</source>
@@ -3609,11 +3609,11 @@ License Key: %2</translation>
     </message>
     <message numerus="yes">
       <source>Set for %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Set for %n devices</numerusform>
-        <numerusform>Set for %n devices</numerusform>
-        <numerusform>Set for %n devices</numerusform>
-        <numerusform>Set for %n devices</numerusform>
+      <translation>
+        <numerusform>Nustatyti %n įrenginiams</numerusform>
+        <numerusform>Nustatyti %n įrenginiams</numerusform>
+        <numerusform>Nustatyti %n įrenginiams</numerusform>
+        <numerusform>Nustatyti %n įrenginiams</numerusform>
       </translation>
     </message>
   </context>
@@ -3633,7 +3633,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Skip</source>
-      <translation type="unfinished">Skip</translation>
+      <translation>Praleisti</translation>
     </message>
     <message>
       <source>Close</source>
@@ -3641,18 +3641,18 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Sustabdyti</translation>
     </message>
   </context>
   <context>
     <name>QnNewVirtualCameraDialog</name>
     <message>
       <source>Virtual Camera</source>
-      <translation type="unfinished">Virtual Camera</translation>
+      <translation>Virtuali kamera</translation>
     </message>
     <message>
       <source>Virtual Camera %1</source>
-      <translation type="unfinished">Virtual Camera %1</translation>
+      <translation>Virtuali kamera %1</translation>
     </message>
     <message>
       <source>Name</source>
@@ -3660,87 +3660,87 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Name cannot be empty</source>
-      <translation type="unfinished">Name cannot be empty</translation>
+      <translation>Pavadinimo laukas negali būti tuščias</translation>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your Site and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your Site and be accessed by any user.</translation>
+      <translation>&quot;Virtuali kamera&quot; yra virtuali vaizdo failų saugykla, kurią galima įkelti į bet kurį jūsų svetainės serverį ir prie kurios gali prisijungti bet kuris vartotojas.</translation>
     </message>
   </context>
   <context>
     <name>QnNotificationSoundManagerDialog</name>
     <message>
       <source>Clip sound up to %1 seconds</source>
-      <translation type="unfinished">Clip sound up to %1 seconds</translation>
+      <translation>Įrašykite garsą iki %1 sekundžių</translation>
     </message>
     <message>
       <source>Rename sound</source>
-      <translation type="unfinished">Rename sound</translation>
+      <translation>Pervardyti garsą</translation>
     </message>
     <message>
       <source>Custom title:</source>
-      <translation type="unfinished">Custom title:</translation>
+      <translation>Jūsų pasirinktas pavadinimas</translation>
     </message>
     <message>
       <source>Sound Files</source>
-      <translation type="unfinished">Sound Files</translation>
+      <translation>Garso failai</translation>
     </message>
     <message>
       <source>Select File...</source>
-      <translation type="unfinished">Select File...</translation>
+      <translation>Pasirinkite failą...</translation>
     </message>
     <message>
       <source>Enter New Title:</source>
-      <translation type="unfinished">Enter New Title:</translation>
+      <translation>Įveskite naują pavadinimą:</translation>
     </message>
     <message>
       <source>Failed to add file</source>
-      <translation type="unfinished">Failed to add file</translation>
+      <translation>Nepavyko įkelti JSON failo</translation>
     </message>
     <message>
       <source>Failed to set new title</source>
-      <translation type="unfinished">Failed to set new title</translation>
+      <translation>Nepavyko nustatyti naujo pavadinimo</translation>
     </message>
     <message>
       <source>Delete sound?</source>
-      <translation type="unfinished">Delete sound?</translation>
+      <translation>Ištrinti paskyrą?</translation>
     </message>
   </context>
   <context>
     <name>QnNotificationSoundModel</name>
     <message>
       <source>Downloading sound list...</source>
-      <translation type="unfinished">Downloading sound list...</translation>
+      <translation>Atsisiunčiamas garsų sąrašas...</translation>
     </message>
     <message>
       <source>No Sound</source>
-      <translation type="unfinished">No Sound</translation>
+      <translation>Nėra garso</translation>
     </message>
     <message>
       <source>Downloading sound...</source>
-      <translation type="unfinished">Downloading sound...</translation>
+      <translation>Atsisiunčiamas garsas...</translation>
     </message>
     <message>
       <source>Uploading sound...</source>
-      <translation type="unfinished">Uploading sound...</translation>
+      <translation>Įkeliamas garsas...</translation>
     </message>
   </context>
   <context>
     <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
     <message>
       <source>Rotation</source>
-      <translation type="unfinished">Rotation</translation>
+      <translation>Pasukimas</translation>
     </message>
   </context>
   <context>
     <name>QnPtzManageDialog</name>
     <message>
       <source>Manage PTZ for %1...</source>
-      <translation type="unfinished">Manage PTZ for %1...</translation>
+      <translation>Tvarkyti PTZ, skirtą %1...</translation>
     </message>
     <message>
       <source>Apply changes before exiting?</source>
-      <translation type="unfinished">Apply changes before exiting?</translation>
+      <translation>Pritaikyti pakeitimus prieš išeinant?</translation>
     </message>
   </context>
   <context>
@@ -3751,7 +3751,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Hotkey</source>
-      <translation type="unfinished">Hotkey</translation>
+      <translation>Spartusis klavišas</translation>
     </message>
     <message>
       <source>Home</source>
@@ -3759,15 +3759,15 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Išsami informacija</translation>
     </message>
     <message>
       <source>Tours</source>
-      <translation type="unfinished">Tours</translation>
+      <translation>Ekskursijos</translation>
     </message>
     <message>
       <source>Positions</source>
-      <translation type="unfinished">Positions</translation>
+      <translation>Pozicijos</translation>
     </message>
     <message>
       <source>None</source>
@@ -3775,53 +3775,53 @@ License Key: %2</translation>
     </message>
     <message numerus="yes">
       <source>This preset will be activated after %n minutes of inactivity</source>
-      <translation type="unfinished">
-        <numerusform>This preset will be activated after %n minutes of inactivity</numerusform>
-        <numerusform>This preset will be activated after %n minutes of inactivity</numerusform>
-        <numerusform>This preset will be activated after %n minutes of inactivity</numerusform>
-        <numerusform>This preset will be activated after %n minutes of inactivity</numerusform>
+      <translation>
+        <numerusform>Šis išankstinis nustatymas bus aktyvuotas po %n minučių neaktyvumo</numerusform>
+        <numerusform>Šis išankstinis nustatymas bus aktyvuotas po %n minučių neaktyvumo</numerusform>
+        <numerusform>Šis išankstinis nustatymas bus aktyvuotas po %n minučių neaktyvumo</numerusform>
+        <numerusform>Šis išankstinis nustatymas bus aktyvuotas po %n minučių neaktyvumo</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Tour has %n identical positions</source>
-      <translation type="unfinished">
-        <numerusform>Tour has %n identical positions</numerusform>
-        <numerusform>Tour has %n identical positions</numerusform>
-        <numerusform>Tour has %n identical positions</numerusform>
-        <numerusform>Tour has %n identical positions</numerusform>
+      <translation>
+        <numerusform>Turas turi %n identiškas pozicijas</numerusform>
+        <numerusform>Turas turi %n identiškas pozicijas</numerusform>
+        <numerusform>Turas turi %n identiškas pozicijas</numerusform>
+        <numerusform>Turas turi %n identiškas pozicijas</numerusform>
       </translation>
     </message>
     <message>
       <source>less than a minute</source>
-      <translation type="unfinished">less than a minute</translation>
+      <translation>mažiau nei minutę</translation>
     </message>
     <message>
       <source>Invalid tour</source>
-      <translation type="unfinished">Invalid tour</translation>
+      <translation>Neteisingas kodas</translation>
     </message>
     <message>
       <source>New Tour %1</source>
-      <translation type="unfinished">New Tour %1</translation>
+      <translation>Naujas turas %1</translation>
     </message>
     <message>
       <source>Saved Position %1</source>
-      <translation type="unfinished">Saved Position %1</translation>
+      <translation>Išsaugota pozicija %1</translation>
     </message>
     <message>
       <source>Tour should contain at least 2 positions.</source>
-      <translation type="unfinished">Tour should contain at least 2 positions.</translation>
+      <translation>Ekskursijoje turi būti bent 2 pozicijos.</translation>
     </message>
     <message>
       <source>Tour Time: %1.</source>
-      <translation type="unfinished">Tour Time: %1.</translation>
+      <translation>Ekskursijos laikas: %1.</translation>
     </message>
     <message numerus="yes">
       <source>about %n minutes</source>
-      <translation type="unfinished">
-        <numerusform>about %n minutes</numerusform>
-        <numerusform>about %n minutes</numerusform>
-        <numerusform>about %n minutes</numerusform>
-        <numerusform>about %n minutes</numerusform>
+      <translation>
+        <numerusform>apie %n minučių</numerusform>
+        <numerusform>apie %n minučių</numerusform>
+        <numerusform>apie %n minučių</numerusform>
+        <numerusform>apie %n minučių</numerusform>
       </translation>
     </message>
   </context>
@@ -3829,7 +3829,7 @@ License Key: %2</translation>
     <name>QnPtzPresetDialog</name>
     <message>
       <source>Saved Position %1</source>
-      <translation type="unfinished">Saved Position %1</translation>
+      <translation>Išsaugota pozicija %1</translation>
     </message>
     <message>
       <source>None</source>
@@ -3844,22 +3844,22 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Reassign</source>
-      <translation type="unfinished">Reassign</translation>
+      <translation>Priskirti iš naujo (Automatic Translation)</translation>
     </message>
     <message>
       <source>Hotkey used by preset &quot;%1&quot;</source>
-      <translation type="unfinished">Hotkey used by preset &quot;%1&quot;</translation>
+      <translation>Išankstinio nustatymo naudojamas karštasis klavišas &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Hotkey used by tour &quot;%1&quot;</source>
-      <translation type="unfinished">Hotkey used by tour &quot;%1&quot;</translation>
+      <translation>Ekskursijos metu naudojamas karštasis klavišas &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
     <name>QnPtzTourSpotsModel</name>
     <message>
       <source>Lowest</source>
-      <translation type="unfinished">Lowest</translation>
+      <translation>Mažiausia</translation>
     </message>
     <message>
       <source>Low</source>
@@ -3867,7 +3867,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Normal</source>
-      <translation type="unfinished">Normal</translation>
+      <translation>Normalus</translation>
     </message>
     <message>
       <source>High</source>
@@ -3875,23 +3875,23 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Highest</source>
-      <translation type="unfinished">Highest</translation>
+      <translation>Aukščiausias</translation>
     </message>
     <message>
       <source>Instant</source>
-      <translation type="unfinished">Instant</translation>
+      <translation>Akimirksniu</translation>
     </message>
     <message>
       <source>Position</source>
-      <translation type="unfinished">Position</translation>
+      <translation>Vieta:</translation>
     </message>
     <message>
       <source>Stay Time</source>
-      <translation type="unfinished">Stay Time</translation>
+      <translation>Buvimo laikas</translation>
     </message>
     <message>
       <source>Speed</source>
-      <translation type="unfinished">Speed</translation>
+      <translation>Greitis</translation>
     </message>
     <message>
       <source>Invalid</source>
@@ -3902,36 +3902,36 @@ License Key: %2</translation>
     <name>QnRecordingStats</name>
     <message>
       <source>Cameras from other servers and removed cameras</source>
-      <translation type="unfinished">Cameras from other servers and removed cameras</translation>
+      <translation>Kameros iš kitų serverių ir pašalintos kameros</translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
-        <numerusform>Total %1 %n devices</numerusform>
-        <numerusform>Total %1 %n devices</numerusform>
-        <numerusform>Total %1 %n devices</numerusform>
-        <numerusform>Total %1 %n devices</numerusform>
+      <translation>
+        <numerusform>Iš viso %1 %n įrenginių</numerusform>
+        <numerusform>Iš viso %1 %n įrenginių</numerusform>
+        <numerusform>Iš viso %1 %n įrenginių</numerusform>
+        <numerusform>Iš viso %1 %n įrenginių</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n cameras</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
-        <numerusform>Total %1 %n cameras</numerusform>
-        <numerusform>Total %1 %n cameras</numerusform>
-        <numerusform>Total %1 %n cameras</numerusform>
-        <numerusform>Total %1 %n cameras</numerusform>
+      <translation>
+        <numerusform>Iš viso %1 %n kamerų</numerusform>
+        <numerusform>Iš viso %1 %n kamerų</numerusform>
+        <numerusform>Iš viso %1 %n kamerų</numerusform>
+        <numerusform>Iš viso %1 %n kamerų</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n I/O modules</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
-        <numerusform>Total %1 %n I/O modules</numerusform>
-        <numerusform>Total %1 %n I/O modules</numerusform>
-        <numerusform>Total %1 %n I/O modules</numerusform>
-        <numerusform>Total %1 %n I/O modules</numerusform>
+      <translation>
+        <numerusform>Iš viso %1 %n įvesties/išvesties modulių</numerusform>
+        <numerusform>Iš viso %1 %n įvesties/išvesties modulių</numerusform>
+        <numerusform>Iš viso %1 %n įvesties/išvesties modulių</numerusform>
+        <numerusform>Iš viso %1 %n įvesties/išvesties modulių</numerusform>
       </translation>
     </message>
   </context>
@@ -3943,15 +3943,15 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Calendar Days</source>
-      <translation type="unfinished">Calendar Days</translation>
+      <translation>Kalendorinės dienos</translation>
     </message>
     <message>
       <source>%1 Mbps</source>
-      <translation type="unfinished">%1 Mbps</translation>
+      <translation>%1 Mbps</translation>
     </message>
     <message>
       <source>Device</source>
-      <translation type="unfinished">Device</translation>
+      <translation>Įrenginys</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -3959,15 +3959,15 @@ License Key: %2</translation>
     </message>
     <message>
       <source>%1 TB</source>
-      <translation type="unfinished">%1 TB</translation>
+      <translation>%1 TB</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation type="unfinished">%1 GB</translation>
+      <translation>%1 GB</translation>
     </message>
     <message>
       <source>Current Bitrate</source>
-      <translation type="unfinished">Current Bitrate</translation>
+      <translation>Tikslinis bitų srautas</translation>
     </message>
   </context>
   <context>
@@ -3993,11 +3993,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Exit Fullscreen</source>
-      <translation type="unfinished">Exit Fullscreen</translation>
+      <translation>Išeiti iš viso ekrano režimo</translation>
     </message>
     <message>
       <source>Enter Fullscreen</source>
-      <translation type="unfinished">Enter Fullscreen</translation>
+      <translation>Įjungti visą ekraną</translation>
     </message>
     <message>
       <source>Zoom Window</source>
@@ -4005,7 +4005,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Move to a dedicated window</source>
-      <translation type="unfinished">Move to a dedicated window</translation>
+      <translation>Perkelti į tam skirtą langą</translation>
     </message>
   </context>
   <context>
@@ -4028,33 +4028,33 @@ License Key: %2</translation>
     </message>
     <message>
       <source>URL already added</source>
-      <translation type="unfinished">URL already added</translation>
+      <translation>URL jau pridėtas</translation>
     </message>
   </context>
   <context>
     <name>QnScreenshotLoader</name>
     <message>
       <source>Top left corner</source>
-      <translation type="unfinished">Top left corner</translation>
+      <translation>Virðutinis kairysis kampas</translation>
     </message>
     <message>
       <source>Top right corner</source>
-      <translation type="unfinished">Top right corner</translation>
+      <translation>Virðutinis deðinysis kampas</translation>
     </message>
     <message>
       <source>Bottom left corner</source>
-      <translation type="unfinished">Bottom left corner</translation>
+      <translation>Apatinis kairysis kampas</translation>
     </message>
     <message>
       <source>Bottom right corner</source>
-      <translation type="unfinished">Bottom right corner</translation>
+      <translation>Apatinis deðinysis kampas</translation>
     </message>
   </context>
   <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
       <source>No bookmarks</source>
-      <translation type="unfinished">No bookmarks</translation>
+      <translation>Žymių nėra</translation>
     </message>
     <message>
       <source>Search</source>
@@ -4073,11 +4073,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Start time</source>
-      <translation type="unfinished">Start time</translation>
+      <translation>Pradžios laikas</translation>
     </message>
     <message>
       <source>Length</source>
-      <translation type="unfinished">Length</translation>
+      <translation>Trukmė</translation>
     </message>
     <message>
       <source>Tags</source>
@@ -4089,11 +4089,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Created</source>
-      <translation type="unfinished">Created</translation>
+      <translation>Sukurti</translation>
     </message>
     <message>
       <source>Creator</source>
-      <translation type="unfinished">Creator</translation>
+      <translation>Creator</translation>
     </message>
     <message>
       <source>Description</source>
@@ -4104,50 +4104,50 @@ License Key: %2</translation>
     <name>QnSelectDevicesButton</name>
     <message>
       <source>Any Device</source>
-      <translation type="unfinished">Any Device</translation>
+      <translation>Bet kuris prietaisas</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation type="unfinished">Any Camera</translation>
+      <translation>Bet kokia kamera</translation>
     </message>
     <message>
       <source>All Devices</source>
-      <translation type="unfinished">All Devices</translation>
+      <translation>Visi įrenginiai</translation>
     </message>
     <message>
       <source>All Cameras</source>
-      <translation type="unfinished">All Cameras</translation>
+      <translation>Visos kameros</translation>
     </message>
     <message>
       <source>Select devices...</source>
-      <translation type="unfinished">Select devices...</translation>
+      <translation>Pasirinkite įrenginius...</translation>
     </message>
     <message>
       <source>Select cameras...</source>
-      <translation type="unfinished">Select cameras...</translation>
+      <translation>Pasirinkite kamerą...</translation>
     </message>
   </context>
   <context>
     <name>QnSelectLayoutsButton</name>
     <message>
       <source>Any Layout</source>
-      <translation type="unfinished">Any Layout</translation>
+      <translation>Pridėti išdėstymą</translation>
     </message>
     <message>
       <source>All Layouts</source>
-      <translation type="unfinished">All Layouts</translation>
+      <translation>Pridėti išdėstymą</translation>
     </message>
     <message>
       <source>Select Layouts...</source>
-      <translation type="unfinished">Select Layouts...</translation>
+      <translation>Pasirinktas maketas...</translation>
     </message>
     <message numerus="yes">
       <source>%n Layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n Layouts</numerusform>
-        <numerusform>%n Layouts</numerusform>
-        <numerusform>%n Layouts</numerusform>
-        <numerusform>%n Layouts</numerusform>
+      <translation>
+        <numerusform>Pridėti išdėstymą</numerusform>
+        <numerusform>Pridėti išdėstymą</numerusform>
+        <numerusform>Pridėti išdėstymą</numerusform>
+        <numerusform>Pridėti išdėstymą</numerusform>
       </translation>
     </message>
   </context>
@@ -4155,7 +4155,7 @@ License Key: %2</translation>
     <name>QnSelectServersButton</name>
     <message>
       <source>Any Server</source>
-      <translation type="unfinished">Any Server</translation>
+      <translation>Visi serveriai</translation>
     </message>
     <message>
       <source>All Servers</source>
@@ -4163,15 +4163,15 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Select Servers...</source>
-      <translation type="unfinished">Select Servers...</translation>
+      <translation>Ištrinti serverį...</translation>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation type="unfinished">
-        <numerusform>%n Servers</numerusform>
-        <numerusform>%n Servers</numerusform>
-        <numerusform>%n Servers</numerusform>
-        <numerusform>%n Servers</numerusform>
+      <translation>
+        <numerusform>Visi serveriai</numerusform>
+        <numerusform>Serveriai</numerusform>
+        <numerusform>Serveriai</numerusform>
+        <numerusform>Serveriai</numerusform>
       </translation>
     </message>
   </context>
@@ -4179,23 +4179,23 @@ License Key: %2</translation>
     <name>QnSelectUsersButton</name>
     <message>
       <source>Any User</source>
-      <translation type="unfinished">Any User</translation>
+      <translation>Pridėti vartotoją</translation>
     </message>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>Visi vartotojai šioje grupėje</translation>
     </message>
     <message>
       <source>Select Users...</source>
-      <translation type="unfinished">Select Users...</translation>
+      <translation>Pasirinkite naudotojus...</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>Nėra vartotojų</numerusform>
+        <numerusform>Nėra vartotojų</numerusform>
+        <numerusform>Nėra vartotojų</numerusform>
+        <numerusform>Nėra vartotojų</numerusform>
       </translation>
     </message>
   </context>
@@ -4210,15 +4210,15 @@ License Key: %2</translation>
     <name>QnServerResourceWidget</name>
     <message>
       <source>Show Log</source>
-      <translation type="unfinished">Show Log</translation>
+      <translation>Rodyti žurnalą</translation>
     </message>
     <message>
       <source>Check Issues</source>
-      <translation type="unfinished">Check Issues</translation>
+      <translation>Patikrinkite problemas</translation>
     </message>
     <message>
       <source>%1 (up %2)</source>
-      <translation type="unfinished">%1 (up %2)</translation>
+      <translation>%1 (aukštyn %2)</translation>
     </message>
   </context>
   <context>
@@ -4233,11 +4233,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Server Settings - %1 (readonly)</source>
-      <translation type="unfinished">Server Settings - %1 (readonly)</translation>
+      <translation>Serverio nustatymai - %1 (tik skaitymui)</translation>
     </message>
     <message>
       <source>Server Settings - %1</source>
-      <translation type="unfinished">Server Settings - %1</translation>
+      <translation>Serverio nustatymai</translation>
     </message>
     <message>
       <source>Server Settings</source>
@@ -4245,23 +4245,23 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Storage Management</source>
-      <translation type="unfinished">Storage Management</translation>
+      <translation>Saugyklos valdymas</translation>
     </message>
     <message>
       <source>Apply changes before switching to another server?</source>
-      <translation type="unfinished">Apply changes before switching to another server?</translation>
+      <translation>Pritaikyti pakeitimus prieš perjungiant į kitą serverį?</translation>
     </message>
     <message>
       <source>Server Web Page</source>
-      <translation type="unfinished">Server Web Page</translation>
+      <translation>Serverio tinklalapis</translation>
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Pluginai</translation>
     </message>
     <message>
       <source>PoE</source>
-      <translation type="unfinished">PoE</translation>
+      <translation>PoE</translation>
     </message>
     <message>
       <source>Backup</source>
@@ -4269,48 +4269,48 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Failover</source>
-      <translation type="unfinished">Failover</translation>
+      <translation>Perėjimas per atsarginę kopiją</translation>
     </message>
   </context>
   <context>
     <name>QnServerSettingsWidget</name>
     <message numerus="yes">
       <source>Server utilizes these %n SSL certificates to authenticate its identity</source>
-      <translation type="unfinished">
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
+      <translation>
+        <numerusform>Serveris naudoja šiuos %n SSL sertifikatus savo tapatybei patvirtinti</numerusform>
+        <numerusform>Serveris naudoja šiuos %n SSL sertifikatus savo tapatybei patvirtinti</numerusform>
+        <numerusform>Serveris naudoja šiuos %n SSL sertifikatus savo tapatybei patvirtinti</numerusform>
+        <numerusform>Serveris naudoja šiuos %n SSL sertifikatus savo tapatybei patvirtinti</numerusform>
       </translation>
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Išsami informacija</translation>
     </message>
     <message>
       <source>The certificate received from the Server does not match the pinned certificate.</source>
-      <translation type="unfinished">The certificate received from the Server does not match the pinned certificate.</translation>
+      <translation>Iš serverio gautas sertifikatas neatitinka prisegto sertifikato.</translation>
     </message>
     <message>
       <source>Certificate details are not available</source>
-      <translation type="unfinished">Certificate details are not available</translation>
+      <translation>Sertifikato duomenys nepasiekiami</translation>
     </message>
     <message>
       <source>To access certificate details, enable the Audit Trail feature.</source>
-      <translation type="unfinished">To access certificate details, enable the Audit Trail feature.</translation>
+      <translation>Norėdami pasiekti sertifikato informaciją, įjunkite audito sekimo funkciją.</translation>
     </message>
     <message>
       <source>Insecure (digest) authentication must be disabled for your account before remote access will be available.</source>
-      <translation type="unfinished">Insecure (digest) authentication must be disabled for your account before remote access will be available.</translation>
+      <translation>Prieš nuotolinės prieigos suteikimą, jūsų paskyroje turi būti išjungtas nesaugus (santraukų santraukos) autentifikavimas.</translation>
     </message>
     <message numerus="yes">
       <source>Certificates</source>
       <comment>Numerus form depends on the certificates count</comment>
-      <translation type="unfinished">
-        <numerusform>Certificates</numerusform>
-        <numerusform>Certificates</numerusform>
-        <numerusform>Certificates</numerusform>
-        <numerusform>Certificates</numerusform>
+      <translation>
+        <numerusform>sertifikatai</numerusform>
+        <numerusform>sertifikatai</numerusform>
+        <numerusform>sertifikatai</numerusform>
+        <numerusform>sertifikatai</numerusform>
       </translation>
     </message>
   </context>
@@ -4318,26 +4318,26 @@ License Key: %2</translation>
     <name>QnSignInfo</name>
     <message>
       <source>Analyzing: %1%</source>
-      <translation type="unfinished">Analyzing: %1%</translation>
+      <translation>Analizuojama: %1%</translation>
     </message>
     <message>
       <source>Invalid watermark</source>
-      <translation type="unfinished">Invalid watermark</translation>
+      <translation>Neteisingas vandens ženklas</translation>
     </message>
     <message>
       <source>Watermark Not Found</source>
-      <translation type="unfinished">Watermark Not Found</translation>
+      <translation>Vandens ženklas nerastas</translation>
     </message>
     <message>
       <source>Watermark Matched</source>
-      <translation type="unfinished">Watermark Matched</translation>
+      <translation>Vandens ženklas atitiko</translation>
     </message>
   </context>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
       <source>Device Settings</source>
-      <translation type="unfinished">Device Settings</translation>
+      <translation>Įrenginio nustatymai</translation>
     </message>
     <message>
       <source>Camera Settings</source>
@@ -4345,23 +4345,23 @@ License Key: %2</translation>
     </message>
     <message>
       <source>I/O Module Settings</source>
-      <translation type="unfinished">I/O Module Settings</translation>
+      <translation>Įvesties / išvesties modulio nustatymai</translation>
     </message>
     <message>
       <source>Diagnostics</source>
-      <translation type="unfinished">Diagnostics</translation>
+      <translation>Diagnostika</translation>
     </message>
     <message>
       <source>Activate License</source>
-      <translation type="unfinished">Activate License</translation>
+      <translation>Aktyvuoti licencija</translation>
     </message>
     <message>
       <source>Unlock</source>
-      <translation type="unfinished">Unlock</translation>
+      <translation>Atrakinti</translation>
     </message>
     <message>
       <source>Authorize</source>
-      <translation type="unfinished">Authorize</translation>
+      <translation>Autorizuoti</translation>
     </message>
     <message>
       <source>Set</source>
@@ -4373,14 +4373,14 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Set Up 2FA</source>
-      <translation type="unfinished">Set Up 2FA</translation>
+      <translation>Nustatyti 2FA</translation>
     </message>
   </context>
   <context>
     <name>QnStatusOverlayWidget</name>
     <message>
       <source>NOT ENOUGH LICENSES</source>
-      <translation type="unfinished">NOT ENOUGH LICENSES</translation>
+      <translation>NEPAKANKA LICENCIJŲ</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -4392,7 +4392,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>UNSUPPORTED</source>
-      <translation type="unfinished">UNSUPPORTED</translation>
+      <translation>NEPALAIKOMA</translation>
     </message>
     <message>
       <source>PASSWORD REQUIRED</source>
@@ -4400,11 +4400,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>SITE SHUT DOWN</source>
-      <translation type="unfinished">SITE SHUT DOWN</translation>
+      <translation>SVETAINĖS UŽDARYMAS</translation>
     </message>
     <message>
       <source>INFORMATION REQUIRED</source>
-      <translation type="unfinished">INFORMATION REQUIRED</translation>
+      <translation>REIKALINGA INFORMACIJA</translation>
     </message>
     <message>
       <source>NO DATA</source>
@@ -4416,11 +4416,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>NO EXPORT PERMISSION</source>
-      <translation type="unfinished">NO EXPORT PERMISSION</translation>
+      <translation>EKSPORTO LEIDIMAS NEDRUKIAMAS</translation>
     </message>
     <message>
       <source>TOO MANY CONNECTIONS</source>
-      <translation type="unfinished">TOO MANY CONNECTIONS</translation>
+      <translation>PER DAUG RYŠIŲ</translation>
     </message>
     <message>
       <source>NO LIVE STREAM</source>
@@ -4428,27 +4428,28 @@ License Key: %2</translation>
     </message>
     <message>
       <source>ARCHIVE ENCRYPTED</source>
-      <translation type="unfinished">ARCHIVE ENCRYPTED</translation>
+      <translation>ARCHYVAS
+UŽŠIFRUOTA</translation>
     </message>
     <message>
       <source>CERTIFICATE ERROR</source>
-      <translation type="unfinished">CERTIFICATE ERROR</translation>
+      <translation>SERTIFIKATO KLAIDA</translation>
     </message>
     <message>
       <source>This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</source>
-      <translation type="unfinished">This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</translation>
+      <translation>Prie šios kameros negalima prisijungti. Norėdami gauti daugiau informacijos, atlikite kameros diagnostiką darbalaukio kliente .</translation>
     </message>
     <message>
       <source>Access to this camera requires authorization credentials.</source>
-      <translation type="unfinished">Access to this camera requires authorization credentials.</translation>
+      <translation>Prieigai prie šios kameros reikalingi autorizacijos duomenys.</translation>
     </message>
     <message>
       <source>CONNECTION LOST</source>
-      <translation type="unfinished">CONNECTION LOST</translation>
+      <translation>RYŠYS NUTIKTAS</translation>
     </message>
     <message>
       <source>NOT ACTIVATED</source>
-      <translation type="unfinished">NOT ACTIVATED</translation>
+      <translation>NEAKTYVUOTA</translation>
     </message>
     <message>
       <source>2FA DISABLED</source>
@@ -4459,15 +4460,15 @@ License Key: %2</translation>
     <name>QnStorageAnalyticsWidget</name>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Pažymėti visus</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation type="unfinished">Export Selection to File...</translation>
+      <translation>Eksportuoti pasirinkimą į failą...</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation type="unfinished">Copy Selection to Clipboard</translation>
+      <translation>Kopijuoti pasirinkimą į iškarpinę</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -4475,37 +4476,37 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Export selected events to file</source>
-      <translation type="unfinished">Export selected events to file</translation>
+      <translation>Eksportuoti pasirinktus įvykius į failą</translation>
     </message>
     <message>
       <source>Last 5 minutes</source>
-      <translation type="unfinished">Last 5 minutes</translation>
+      <translation>Paskutinės 5 minutės</translation>
     </message>
     <message>
       <source>Last 60 minutes</source>
-      <translation type="unfinished">Last 60 minutes</translation>
+      <translation>Paskutinės 60 minučių</translation>
     </message>
     <message>
       <source>Last 24 hours</source>
-      <translation type="unfinished">Last 24 hours</translation>
+      <translation>Paskutines 24 valandas</translation>
     </message>
     <message>
       <source>Longest period available</source>
-      <translation type="unfinished">Longest period available</translation>
+      <translation>Ilgiausias galimas laikotarpis</translation>
     </message>
     <message>
       <source>Forecast available only for cameras with enabled recording.</source>
-      <translation type="unfinished">Forecast available only for cameras with enabled recording.</translation>
+      <translation>Prognozė galima tik kameroms su įjungta įrašymu.</translation>
     </message>
     <message>
       <source>TB</source>
       <comment>TB for terabytes</comment>
-      <translation type="unfinished">TB</translation>
+      <translation>TiB</translation>
     </message>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>Numerus: TB for terabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
@@ -4525,35 +4526,35 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Depending on the total size of the archive, reindexing can take up to several hours.</source>
-      <translation type="unfinished">Depending on the total size of the archive, reindexing can take up to several hours.</translation>
+      <translation>Priklausomai nuo bendro archyvo dydžio, pakartotinis indeksavimas gali užtrukti iki kelių valandų.</translation>
     </message>
     <message>
       <source>Reindexing is only necessary if your archive folders have been moved, renamed or deleted.</source>
-      <translation type="unfinished">Reindexing is only necessary if your archive folders have been moved, renamed or deleted.</translation>
+      <translation>Pakartotinis indeksavimas būtinas tik tuo atveju, jei archyvo aplankai buvo perkelti, pervadinti arba ištrinti.</translation>
     </message>
     <message>
       <source>You can cancel this operation at any moment without data loss.</source>
-      <translation type="unfinished">You can cancel this operation at any moment without data loss.</translation>
+      <translation>Šią operaciją galite bet kada atšaukti neprarasdami duomenų.</translation>
     </message>
     <message>
       <source>Continue anyway?</source>
-      <translation type="unfinished">Continue anyway?</translation>
+      <translation>Ar vis tiek tęsti?</translation>
     </message>
     <message>
       <source>Hard disk load will increase significantly</source>
-      <translation type="unfinished">Hard disk load will increase significantly</translation>
+      <translation>Kietojo disko apkrova žymiai padidės</translation>
     </message>
     <message>
       <source>Archive reindexing completed</source>
-      <translation type="unfinished">Archive reindexing completed</translation>
+      <translation>Archyvo pakartotinis indeksavimas baigtas</translation>
     </message>
     <message>
       <source>Backup reindexing completed</source>
-      <translation type="unfinished">Backup reindexing completed</translation>
+      <translation>Atsarginių kopijų saugyklos pakartotinis indeksavimas baigtas</translation>
     </message>
     <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
-      <translation type="unfinished">Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</translation>
+      <translation>Pakartotinis indeksavimas gali išspręsti archyvavimo ar atsarginių kopijų kūrimo problemas, jei jie buvo prarasti ar sugadinti arba jei buvo pakeista kokia nors įranga.</translation>
     </message>
     <message>
       <source>What to do with current analytics data?</source>
@@ -4574,32 +4575,32 @@ License Key: %2</translation>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>Dabartiniai analizės duomenys nebus automatiškai perkelti į kitą vietą ir taps nepasiekiami. Galite juos pasilikti ir vėliau perkelti rankiniu būdu arba visam laikui ištrinti.
+Jei ketinote perkelti analizės duomenis į kitą saugyklos vietą, prieš tęsdami susisiekite su palaikymo tarnyba.</translation>
     </message>
     <message>
       <source>Insufficient permissions to store analytics data.</source>
-      <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
+      <translation>Nepakanka leidimų saugoti analizės duomenis.</translation>
     </message>
     <message>
       <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</translation>
+      <translation>Analizės duomenys gali užimti daug vietos. Rekomenduojame jiems pasirinkti kitą vietą, o ne sistemos skaidinį.</translation>
     </message>
     <message>
       <source>Analytics and motion data will continue to be stored on the disabled storage</source>
-      <translation type="unfinished">Analytics and motion data will continue to be stored on the disabled storage</translation>
+      <translation>Analizės ir judėjimo duomenys ir toliau bus saugomi išjungtoje saugykloje.</translation>
     </message>
     <message>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation type="unfinished">Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</translation>
+      <translation>Įrašymas į išjungtą saugojimo vietą bus sustabdytas. Tačiau pasenusių filmuotų įrašų trynimas iš jos bus tęsiamas.</translation>
     </message>
     <message>
       <source>Recording was enabled on the USB storage</source>
-      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+      <translation>Įrašymas USB atmintinėje buvo įjungtas</translation>
     </message>
     <message>
       <source>Choose a read-write policy to define how interact with storage directories.</source>
-      <translation type="unfinished">Choose a read-write policy to define how interact with storage directories.</translation>
+      <translation>Pasirinkite skaitymo ir rašymo politiką, kad apibrėžtumėte, kaip sąveikauti su saugyklos katalogais.</translation>
     </message>
     <message>
       <source>Exclusive</source>
@@ -4615,71 +4616,71 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>The Site Servers have different read-write policies for the storage</source>
-      <translation type="unfinished">The Site Servers have different read-write policies for the storage</translation>
+      <translation>Svetainės serveriai turi skirtingas skaitymo ir rašymo politikas saugyklai.</translation>
     </message>
     <message>
       <source>URL: %1</source>
       <comment>%1 will be substituted with storage URL, e.g &apos;192.168.1.10/media&apos;</comment>
-      <translation type="unfinished">URL: %1</translation>
+      <translation>URL: %1</translation>
     </message>
     <message>
       <source>Exclusive - server reads from all folders but writes only to its own folder. It deletes old data from all folders.</source>
-      <translation type="unfinished">Exclusive - server reads from all folders but writes only to its own folder. It deletes old data from all folders.</translation>
+      <translation>Išskirtinis – serveris skaito iš visų aplankų, bet rašo tik į savo aplanką. Iš visų aplankų ištrinami seni duomenys.</translation>
     </message>
     <message>
       <source>Shared - server reads from all folders but writes only to its own folder. It deletes old data only from its own folder.</source>
-      <translation type="unfinished">Shared - server reads from all folders but writes only to its own folder. It deletes old data only from its own folder.</translation>
+      <translation>Bendrinamas – serveris skaito iš visų aplankų, bet rašo tik į savo aplanką. Senus duomenis jis ištrina tik iš savo aplanko.</translation>
     </message>
     <message>
       <source>Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</source>
-      <translation type="unfinished">Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</translation>
+      <translation>Izoliuotas – serveris skaito ir rašo tik į savo aplanką. Senus duomenis jis ištrina tik iš savo aplanko.</translation>
     </message>
     <message>
       <source>Cloud storage cannot be enabled.</source>
-      <translation type="unfinished">Cloud storage cannot be enabled.</translation>
+      <translation>Debesijos saugyklos įjungti negalima.</translation>
     </message>
     <message>
       <source>To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</source>
-      <translation type="unfinished">To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</translation>
+      <translation>Norėdami jį aktyvuoti, pridėkite %1 daugiau tinkamų paslaugų arba sumažinkite kamerų, kuriose įjungtas atsarginis kopijavimas, skaičių.</translation>
     </message>
     <message>
       <source>Insufficient services</source>
-      <translation type="unfinished">Insufficient services</translation>
+      <translation>Nepakankamos paslaugos</translation>
     </message>
     <message>
       <source>All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</source>
-      <translation type="unfinished">All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</translation>
+      <translation>Įjungus atsarginių kopijų kūrimo debesyje funkciją, visos ne debesyje esančios atsarginių kopijų saugyklos bus išjungtos. Įrenginiuose, sukonfigūruotuose su &quot;Visų archyvų&quot; nustatymas bus pakeistas į &quot;Judesio, objekto ir žymių&quot;</translation>
     </message>
     <message>
       <source>Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</source>
-      <translation type="unfinished">Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</translation>
+      <translation>Įrenginiai, sukonfigūruoti su &quot;Visų archyvų&quot; nustatymai bus pakeisti į &quot;Judesiai, objektai ir žymės&quot; , kai įjungtas atsarginių kopijų kūrimas debesyje.</translation>
     </message>
     <message>
       <source>Cloud backup has been stopped because the Site has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Cloud backup has been stopped because the Site has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance.</translation>
+      <translation>Atsarginių kopijų kūrimas debesyje buvo sustabdytas, nes svetainė buvo uždaryta. Norint sukurti atsarginę kopiją debesies saugykloje, ji turi būti aktyvi. Dėl pagalbos kreipkitės į savo kanalo partnerį.</translation>
     </message>
     <message>
       <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. Contact your channel partner for assistance.</translation>
+      <translation>Atsarginių kopijų kūrimas debesyje tęsiasi, tačiau svetainė šiuo metu sustabdyta. Norint pakeisti atsarginių kopijų konfigūraciją arba įjungti debesies saugyklą, ji turi būti aktyvi. Norėdami gauti pagalbos, susisiekite su savo kanalo partneriu.</translation>
     </message>
     <message>
       <source>The Site must be active to enable cloud storage location. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">The Site must be active to enable cloud storage location. Contact your channel partner for assistance.</translation>
+      <translation>Svetainė turi būti aktyvi, kad būtų galima įjungti debesies saugyklą. Dėl pagalbos kreipkitės į savo kanalo partnerį.</translation>
     </message>
     <message>
       <source>Site suspended</source>
-      <translation type="unfinished">Site suspended</translation>
+      <translation>Svetainė sustabdyta</translation>
     </message>
     <message>
       <source>Disabling cloud storage on one server will disable it on all servers. Local backup must be configured manually.</source>
-      <translation type="unfinished">Disabling cloud storage on one server will disable it on all servers. Local backup must be configured manually.</translation>
+      <translation>Išjungus debesies saugyklą viename serveryje, ji bus išjungta visuose serveriuose. Vietinę atsarginę kopiją reikia konfigūruoti rankiniu būdu.</translation>
     </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
     <message>
       <source>Invalid storage</source>
-      <translation type="unfinished">Invalid storage</translation>
+      <translation>Neteisingas saugyklos kelias</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -4691,15 +4692,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%1 (Checking...)</source>
-      <translation type="unfinished">%1 (Checking...)</translation>
+      <translation>Tikrinama...)</translation>
     </message>
     <message>
       <source>%1 (Scanning... %2%)</source>
-      <translation type="unfinished">%1 (Scanning... %2%)</translation>
+      <translation>%1 (Skenuojama... %2%)</translation>
     </message>
     <message>
       <source>%1 (Rebuilding... %2%)</source>
-      <translation type="unfinished">%1 (Rebuilding... %2%)</translation>
+      <translation>%1 (Atstatoma... %2%)</translation>
     </message>
     <message>
       <source>Loading...</source>
@@ -4715,7 +4716,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
-      <translation type="unfinished">Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</translation>
+      <translation>Per maža, ir sistemos skaidiniai rezervuojami ir nenaudojami rašymui, jei yra pakankamai kitos laisvos vietos saugykloje.</translation>
     </message>
     <message>
       <source>Reserved</source>
@@ -4727,15 +4728,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>ram</source>
-      <translation type="unfinished">ram</translation>
+      <translation>avinas</translation>
     </message>
     <message>
       <source>optical</source>
-      <translation type="unfinished">optical</translation>
+      <translation>optinis</translation>
     </message>
     <message>
       <source>swap</source>
-      <translation type="unfinished">swap</translation>
+      <translation>mainai</translation>
     </message>
     <message>
       <source>network</source>
@@ -4743,15 +4744,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>smb</source>
-      <translation type="unfinished">smb</translation>
+      <translation>kažkas</translation>
     </message>
     <message>
       <source>Use to store analytics and motion data</source>
-      <translation type="unfinished">Use to store analytics and motion data</translation>
+      <translation>Naudojama analizei ir judėjimo duomenims saugoti</translation>
     </message>
     <message>
       <source>Stores analytics and motion data</source>
-      <translation type="unfinished">Stores analytics and motion data</translation>
+      <translation>Saugo analizės ir judėjimo duomenis</translation>
     </message>
     <message>
       <source>cloud</source>
@@ -4767,7 +4768,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Purpose</source>
-      <translation type="unfinished">Purpose</translation>
+      <translation>Tikslas</translation>
     </message>
     <message>
       <source>Size</source>
@@ -4787,7 +4788,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Undefined</source>
-      <translation type="unfinished">Undefined</translation>
+      <translation>Undefined</translation>
     </message>
     <message>
       <source>removable</source>
@@ -4795,7 +4796,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown size</source>
-      <translation type="unfinished">Unknown size</translation>
+      <translation>Nežinomas dydis</translation>
     </message>
     <message>
       <source>The storage has different read-write policies across various Servers in the Site</source>
@@ -4803,7 +4804,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Click on the icon to see Servers list</source>
-      <translation type="unfinished">Click on the icon to see Servers list</translation>
+      <translation>Spustelėkite piktogramą, kad pamatytumėte serverių sąrašą</translation>
     </message>
     <message>
       <source>Read-Write Policy</source>
@@ -4818,34 +4819,34 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnStorageRebuildWidget</name>
     <message>
       <source>Fast Backup Scan...</source>
-      <translation type="unfinished">Fast Backup Scan...</translation>
+      <translation>Greitas atsarginių kopijų nuskaitymas...</translation>
     </message>
     <message>
       <source>Fast Archive Scan...</source>
-      <translation type="unfinished">Fast Archive Scan...</translation>
+      <translation>Greitas archyvo nuskaitymas...</translation>
     </message>
     <message>
       <source>Reindexing Backup...</source>
-      <translation type="unfinished">Reindexing Backup...</translation>
+      <translation>Iš naujo indeksuojama atsarginių kopijų saugykla...</translation>
     </message>
     <message>
       <source>Reindexing Archive...</source>
-      <translation type="unfinished">Reindexing Archive...</translation>
+      <translation>Pakartotinio indeksavimo archyvas...</translation>
     </message>
   </context>
   <context>
     <name>QnStorageUrlDialog</name>
     <message>
       <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
-      <translation type="unfinished">\\&lt;Computer Name&gt;\&lt;Folder&gt;</translation>
+      <translation>&lt;Computer Name&gt;&lt;Folder&gt;</translation>
     </message>
     <message>
       <source>Network Shared Resource</source>
-      <translation type="unfinished">Network Shared Resource</translation>
+      <translation>Tinklo bendrinamas išteklius</translation>
     </message>
     <message>
       <source>Invalid credentials for external storage</source>
-      <translation type="unfinished">Invalid credentials for external storage</translation>
+      <translation>Neteisingi išorinės saugyklos prisijungimo duomenys</translation>
     </message>
     <message>
       <source>Invalid storage path</source>
@@ -4857,7 +4858,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Storage path used by another server</source>
-      <translation type="unfinished">Storage path used by another server</translation>
+      <translation>Saugojimo kelias  jau naudojamas kito serverio</translation>
     </message>
     <message>
       <source>Add Storage</source>
@@ -4865,11 +4866,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>It is not recommended to use one recording location for different servers.</source>
-      <translation type="unfinished">It is not recommended to use one recording location for different servers.</translation>
+      <translation>Nerekomenduojama naudoti vienos įrašymo vietos skirtingiems serveriams.</translation>
     </message>
     <message>
       <source>Storage is available but will not be writable because it is too small in comparison to the already present storages</source>
-      <translation type="unfinished">Storage is available but will not be writable because it is too small in comparison to the already present storages</translation>
+      <translation>Saugykla yra prieinama, bet į ją nebus galima rašyti, nes ji per maža, palyginti su jau esamomis saugyklomis.</translation>
     </message>
   </context>
   <context>
@@ -4888,7 +4889,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Updates</source>
-      <translation type="unfinished">Updates</translation>
+      <translation>Atnaujinimai</translation>
     </message>
     <message>
       <source>Security</source>
@@ -4896,23 +4897,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>User Management</source>
-      <translation type="unfinished">User Management</translation>
+      <translation>Vartotojų valdymas</translation>
     </message>
     <message>
       <source>Time Sync</source>
-      <translation type="unfinished">Time Sync</translation>
+      <translation>Laiko sinchronizavimas</translation>
     </message>
     <message>
       <source>Routing</source>
-      <translation type="unfinished">Routing</translation>
+      <translation>Maršruto sudarymas</translation>
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Pluginai</translation>
     </message>
     <message>
       <source>Advanced</source>
-      <translation type="unfinished">Advanced</translation>
+      <translation>Papildomi nustatymai</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -4924,54 +4925,54 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to save site settings</source>
-      <translation type="unfinished">Failed to save site settings</translation>
+      <translation>Nepavyko atnaujinti svetainės nustatymų</translation>
     </message>
   </context>
   <context>
     <name>QnSystemHealthStringsHelper</name>
     <message>
       <source>Email address is not set</source>
-      <translation type="unfinished">Email address is not set</translation>
+      <translation>El. pašto adresas nenustatytas</translation>
     </message>
     <message>
       <source>No licenses</source>
-      <translation type="unfinished">No licenses</translation>
+      <translation>Nėra licencijų</translation>
     </message>
     <message>
       <source>Email server is not set</source>
-      <translation type="unfinished">Email server is not set</translation>
+      <translation>El. pašto serveris nenustatytas</translation>
     </message>
     <message>
       <source>Storage is not configured</source>
-      <translation type="unfinished">Storage is not configured</translation>
+      <translation>Saugykla nesukonfigūruota</translation>
     </message>
     <message>
       <source>Rebuilding archive index is completed</source>
-      <translation type="unfinished">Rebuilding archive index is completed</translation>
+      <translation>Archyvo indekso atkūrimas baigtas</translation>
     </message>
     <message>
       <source>Rebuilding archive index is canceled by user</source>
-      <translation type="unfinished">Rebuilding archive index is canceled by user</translation>
+      <translation>Vartotojas atšaukė archyvo indekso atkūrimą</translation>
     </message>
     <message>
       <source>Email address is not set.</source>
-      <translation type="unfinished">Email address is not set.</translation>
+      <translation>El. pašto adresas nenustatytas.</translation>
     </message>
     <message>
       <source>Email server is not set.</source>
-      <translation type="unfinished">Email server is not set.</translation>
+      <translation>El. pašto serveris nenustatytas.</translation>
     </message>
     <message>
       <source>You have no licenses.</source>
-      <translation type="unfinished">You have no licenses.</translation>
+      <translation>Jūs neturite licencijų.</translation>
     </message>
     <message>
       <source>You cannot record video from cameras.</source>
-      <translation type="unfinished">You cannot record video from cameras.</translation>
+      <translation>Negalite įrašyti vaizdo iš kamerų.</translation>
     </message>
     <message>
       <source>Learn more</source>
-      <translation type="unfinished">Learn more</translation>
+      <translation>Sužinokite daugiau</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -4979,43 +4980,43 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some users have not set their email addresses</source>
-      <translation type="unfinished">Some users have not set their email addresses</translation>
+      <translation>Kai kurie vartotojai nenustatė savo el. pašto adresų</translation>
     </message>
     <message>
       <source>Some users have not set their email addresses.</source>
-      <translation type="unfinished">Some users have not set their email addresses.</translation>
+      <translation>Kai kurie vartotojai nenustatė savo el. pašto adresų.</translation>
     </message>
     <message>
       <source>Error while sending email</source>
-      <translation type="unfinished">Error while sending email</translation>
+      <translation>Klaida siunčiant el. laišką</translation>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
-      <translation type="unfinished">Archive integrity problem detected</translation>
+      <translation>Aptikta archyvo vientisumo problema</translation>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation type="unfinished">Some cameras require passwords to be set</translation>
+      <translation>Kai kurioms kameroms reikia nustatyti slaptažodžius</translation>
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
-      <translation type="unfinished">No server has internet access for time synchronization</translation>
+      <translation>Joks serveris neturi interneto prieigos laiko sinchronizavimui</translation>
     </message>
     <message>
       <source>Backup storage is not configured</source>
-      <translation type="unfinished">Backup storage is not configured</translation>
+      <translation>Atsarginių kopijų saugykla nesukonfigūruota</translation>
     </message>
     <message>
       <source>Camera recording schedule is invalid</source>
-      <translation type="unfinished">Camera recording schedule is invalid</translation>
+      <translation>Kameros įrašymo grafikas netinkamas</translation>
     </message>
     <message>
       <source>Storage for analytics data is not set</source>
-      <translation type="unfinished">Storage for analytics data is not set</translation>
+      <translation>Analizės duomenų saugykla nenustatyta</translation>
     </message>
     <message>
       <source>System storage is used for analytics data</source>
-      <translation type="unfinished">System storage is used for analytics data</translation>
+      <translation>Sistemos saugykla naudojama analizės duomenims</translation>
     </message>
     <message>
       <source>Analytics data can take up large amounts of space.</source>
@@ -5023,208 +5024,208 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>We recommend choosing another location for it instead of the system partition.</source>
-      <translation type="unfinished">We recommend choosing another location for it instead of the system partition.</translation>
+      <translation>Rekomenduojame pasirinkti kitą vietą, o ne sistemos skaidinį.</translation>
     </message>
     <message>
       <source>Local recording services overused</source>
-      <translation type="unfinished">Local recording services overused</translation>
+      <translation>Vietinės įrašymo paslaugos naudojamos per daug</translation>
     </message>
     <message>
       <source>Cloud storage services overused</source>
-      <translation type="unfinished">Cloud storage services overused</translation>
+      <translation>Debesų saugyklos paslaugos naudojamos per daug</translation>
     </message>
     <message>
       <source>Paid integrations services overused</source>
-      <translation type="unfinished">Paid integrations services overused</translation>
+      <translation>Per daug naudojamos mokamos integracijos paslaugos</translation>
     </message>
     <message>
       <source>Intercom call</source>
-      <translation type="unfinished">Intercom call</translation>
+      <translation>Domofono skambutis</translation>
     </message>
     <message>
       <source>Intercom missed call</source>
-      <translation type="unfinished">Intercom missed call</translation>
+      <translation>Praleistas skambutis domofonu</translation>
     </message>
     <message>
       <source>The Site has no internet access for time synchronization</source>
-      <translation type="unfinished">The Site has no internet access for time synchronization</translation>
+      <translation>Svetainėje nėra interneto prieigos, kad būtų galima sinchronizuoti laiką.</translation>
     </message>
     <message>
       <source>System partition is used for analytics data</source>
-      <translation type="unfinished">System partition is used for analytics data</translation>
+      <translation>Sistemos skaidinys naudojamas analizės duomenims</translation>
     </message>
     <message>
       <source>Site suspended</source>
-      <translation type="unfinished">Site suspended</translation>
+      <translation>Svetainė sustabdyta</translation>
     </message>
     <message>
       <source>Site shut down</source>
-      <translation type="unfinished">Site shut down</translation>
+      <translation>Svetainė uždaryta</translation>
     </message>
     <message>
       <source>Email address is not set for your account</source>
-      <translation type="unfinished">Email address is not set for your account</translation>
+      <translation>Jūsų paskyrai nenustatytas el. pašto adresas</translation>
     </message>
     <message>
       <source>Calling...</source>
-      <translation type="unfinished">Calling...</translation>
+      <translation>Calling...</translation>
     </message>
     <message>
       <source>Missed call</source>
-      <translation type="unfinished">Missed call</translation>
+      <translation>Praleistas skambutis</translation>
     </message>
     <message numerus="yes">
       <source>Storage is not configured on %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Storage is not configured on %n servers</numerusform>
-        <numerusform>Storage is not configured on %n servers</numerusform>
-        <numerusform>Storage is not configured on %n servers</numerusform>
-        <numerusform>Storage is not configured on %n servers</numerusform>
+      <translation>
+        <numerusform>Saugykla nesukonfigūruota %n serveriuose</numerusform>
+        <numerusform>Saugykla nesukonfigūruota %n serveriuose</numerusform>
+        <numerusform>Saugykla nesukonfigūruota %n serveriuose</numerusform>
+        <numerusform>Saugykla nesukonfigūruota %n serveriuose</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Backup storage is not configured on %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Backup storage is not configured on %n servers</numerusform>
-        <numerusform>Backup storage is not configured on %n servers</numerusform>
-        <numerusform>Backup storage is not configured on %n servers</numerusform>
-        <numerusform>Backup storage is not configured on %n servers</numerusform>
+      <translation>
+        <numerusform>Atsarginių kopijų saugykla nesukonfigūruota %n serveriuose</numerusform>
+        <numerusform>Atsarginių kopijų saugykla nesukonfigūruota %n serveriuose</numerusform>
+        <numerusform>Atsarginių kopijų saugykla nesukonfigūruota %n serveriuose</numerusform>
+        <numerusform>Atsarginių kopijų saugykla nesukonfigūruota %n serveriuose</numerusform>
       </translation>
     </message>
     <message>
       <source>Recording schedule is invalid</source>
-      <translation type="unfinished">Recording schedule is invalid</translation>
+      <translation>Įrašymo grafikas netinkamas</translation>
     </message>
     <message numerus="yes">
       <source>Recording schedule is invalid on %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Recording schedule is invalid on %n cameras</numerusform>
-        <numerusform>Recording schedule is invalid on %n cameras</numerusform>
-        <numerusform>Recording schedule is invalid on %n cameras</numerusform>
-        <numerusform>Recording schedule is invalid on %n cameras</numerusform>
+      <translation>
+        <numerusform>Įrašymo grafikas netinkamas %n kamerose</numerusform>
+        <numerusform>Įrašymo grafikas netinkamas %n kamerose</numerusform>
+        <numerusform>Įrašymo grafikas netinkamas %n kamerose</numerusform>
+        <numerusform>Įrašymo grafikas netinkamas %n kamerose</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
-      <translation type="unfinished">
-        <numerusform>Email address is not set for %n users</numerusform>
-        <numerusform>Email address is not set for %n users</numerusform>
-        <numerusform>Email address is not set for %n users</numerusform>
-        <numerusform>Email address is not set for %n users</numerusform>
+      <translation>
+        <numerusform>%n naudotojų el. pašto adresas nenustatytas</numerusform>
+        <numerusform>%n naudotojų el. pašto adresas nenustatytas</numerusform>
+        <numerusform>%n naudotojų el. pašto adresas nenustatytas</numerusform>
+        <numerusform>%n naudotojų el. pašto adresas nenustatytas</numerusform>
       </translation>
     </message>
     <message>
       <source>Check out %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Check out %1</translation>
+      <translation>Peržiūrėkite %1</translation>
     </message>
     <message>
       <source>Remote archive synchronization failed</source>
-      <translation type="unfinished">Remote archive synchronization failed</translation>
+      <translation>Maksimalus nuotolinio archyvo sinchronizavimo gijų skaičius</translation>
     </message>
     <message numerus="yes">
       <source>Storage for analytics data is not set on %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
-        <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
-        <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
-        <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
+      <translation>
+        <numerusform>Analitinių duomenų saugykla nenustatyta %n serveriuose</numerusform>
+        <numerusform>Analitinių duomenų saugykla nenustatyta %n serveriuose</numerusform>
+        <numerusform>Analitinių duomenų saugykla nenustatyta %n serveriuose</numerusform>
+        <numerusform>Analitinių duomenų saugykla nenustatyta %n serveriuose</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>System storage is used for analytics data on %n servers</source>
-      <translation type="unfinished">
-        <numerusform>System storage is used for analytics data on %n servers</numerusform>
-        <numerusform>System storage is used for analytics data on %n servers</numerusform>
-        <numerusform>System storage is used for analytics data on %n servers</numerusform>
-        <numerusform>System storage is used for analytics data on %n servers</numerusform>
+      <translation>
+        <numerusform>Sistemos saugykla naudojama analizės duomenims %n serveriuose</numerusform>
+        <numerusform>Sistemos saugykla naudojama analizės duomenims %n serveriuose</numerusform>
+        <numerusform>Sistemos saugykla naudojama analizės duomenims %n serveriuose</numerusform>
+        <numerusform>Sistemos saugykla naudojama analizės duomenims %n serveriuose</numerusform>
       </translation>
     </message>
     <message>
       <source>Connect to your Site from anywhere!</source>
-      <translation type="unfinished">Connect to your Site from anywhere!</translation>
+      <translation>Prisijunkite prie savo svetainės iš bet kurios vietos!</translation>
     </message>
     <message>
       <source>No online server in the site has internet access for time synchronization.</source>
-      <translation type="unfinished">No online server in the site has internet access for time synchronization.</translation>
+      <translation>Svetainėje nėra interneto serverio, kuris galėtų sinchronizuoti laiką.</translation>
     </message>
     <message>
       <source>You cannot receive Site notifications by email.</source>
-      <translation type="unfinished">You cannot receive Site notifications by email.</translation>
+      <translation>Negalite gauti svetainės pranešimų el. paštu.</translation>
     </message>
     <message>
       <source>They cannot receive Site notifications by email.</source>
-      <translation type="unfinished">They cannot receive Site notifications by email.</translation>
+      <translation>Jie negali gauti svetainės pranešimų el. paštu.</translation>
     </message>
     <message>
       <source>Some cameras are set to record in a mode they do not support.</source>
-      <translation type="unfinished">Some cameras are set to record in a mode they do not support.</translation>
+      <translation>Kai kurios kameros nustatytos įrašyti režimu, kurio jos nepalaiko.</translation>
     </message>
     <message>
       <source>Site will stop functioning soon</source>
-      <translation type="unfinished">Site will stop functioning soon</translation>
+      <translation>Svetainė netrukus nustos veikti</translation>
     </message>
     <message>
       <source>Site has stopped functioning</source>
-      <translation type="unfinished">Site has stopped functioning</translation>
+      <translation>Svetainė nustojo veikti</translation>
     </message>
     <message>
       <source>Site will stop functioning today</source>
-      <translation type="unfinished">Site will stop functioning today</translation>
+      <translation>Svetainė šiandien nustos veikti</translation>
     </message>
     <message>
       <source>Site will stop functioning tomorrow</source>
-      <translation type="unfinished">Site will stop functioning tomorrow</translation>
+      <translation>Svetainė rytoj nustos veikti</translation>
     </message>
     <message numerus="yes">
       <source>Site will stop functioning in %n days</source>
-      <translation type="unfinished">
-        <numerusform>Site will stop functioning in %n days</numerusform>
-        <numerusform>Site will stop functioning in %n days</numerusform>
-        <numerusform>Site will stop functioning in %n days</numerusform>
-        <numerusform>Site will stop functioning in %n days</numerusform>
+      <translation>
+        <numerusform>Svetainė nustos veikti po %n dienų</numerusform>
+        <numerusform>Svetainė nustos veikti po %n dienų</numerusform>
+        <numerusform>Svetainė nustos veikti po %n dienų</numerusform>
+        <numerusform>Svetainė nustos veikti po %n dienų</numerusform>
       </translation>
     </message>
     <message>
       <source>Notification and interface languages differ</source>
-      <translation type="unfinished">Notification and interface languages differ</translation>
+      <translation>Pranešimų ir sąsajos kalbos skiriasi</translation>
     </message>
     <message>
       <source>Notifications language differs from the interface language</source>
-      <translation type="unfinished">Notifications language differs from the interface language</translation>
+      <translation>Pranešimų kalba skiriasi nuo sąsajos kalbos</translation>
     </message>
     <message>
       <source>Recording disabled</source>
-      <translation type="unfinished">Recording disabled</translation>
+      <translation>Įrašymas išjungtas</translation>
     </message>
     <message>
       <source>Cloud storage backup disabled</source>
-      <translation type="unfinished">Cloud storage backup disabled</translation>
+      <translation>Atsarginių kopijų kūrimas debesies saugykloje išjungtas</translation>
     </message>
     <message>
       <source>Paid integration services disabled</source>
-      <translation type="unfinished">Paid integration services disabled</translation>
+      <translation>Mokamos integracijos paslaugos išjungtos</translation>
     </message>
     <message>
       <source>Cloud storage is available</source>
-      <translation type="unfinished">Cloud storage is available</translation>
+      <translation>Yra debesies saugykla</translation>
     </message>
     <message>
       <source>Cloud storage is enabled</source>
-      <translation type="unfinished">Cloud storage is enabled</translation>
+      <translation>Debesijos saugykla įjungta</translation>
     </message>
     <message>
       <source>Cloud Storage is enabled</source>
-      <translation type="unfinished">Cloud Storage is enabled</translation>
+      <translation>Debesijos saugykla įjungta</translation>
     </message>
     <message numerus="yes">
       <source>+ %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>+ %n more</numerusform>
-        <numerusform>+ %n more</numerusform>
-        <numerusform>+ %n more</numerusform>
-        <numerusform>+ %n more</numerusform>
+      <translation>
+        <numerusform>+ %n daugiau</numerusform>
+        <numerusform>+ %n daugiau</numerusform>
+        <numerusform>+ %n daugiau</numerusform>
+        <numerusform>+ %n daugiau</numerusform>
       </translation>
     </message>
   </context>
@@ -5232,61 +5233,61 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnSystemSettingsWidget</name>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
-      <translation type="unfinished">Does not include any personal information and is completely anonymous.</translation>
+      <translation>Neįtraukia jokios asmeninės informacijos ir yra visiškai anonimiškas.</translation>
     </message>
     <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
-      <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
+      <translation>Įgalinti įrenginių ir serverių automatinį aptikimą ir automatinį įrenginių būsenos patikrinimą</translation>
     </message>
     <message>
       <source>Enable cameras and servers autodiscovery and automated camera status check</source>
-      <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+      <translation>Įgalinti automatinį kamerų ir serverių aptikimą bei automatinį kamerų būsenos patikrinimą</translation>
     </message>
     <message>
       <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
-      <translation type="unfinished">If Failover is enabled, server may still request camera status updates regardless of this setting.</translation>
+      <translation>Jei įjungtas atsarginis perjungimas, serveris vis tiek gali prašyti kameros būsenos atnaujinimų, nepaisant šio nustatymo.</translation>
     </message>
     <message>
       <source>When enabled, new cameras and servers are continuously discovered and discovery requests are sent to cameras for status updates.</source>
-      <translation type="unfinished">When enabled, new cameras and servers are continuously discovered and discovery requests are sent to cameras for status updates.</translation>
+      <translation>Kai ši funkcija įjungta, nuolat aptinkamos naujos kameros ir serveriai, o kameroms siunčiamos aptikimo užklausos dėl būsenos atnaujinimų.</translation>
     </message>
     <message>
       <source>Includes information about site, such as cameras models and firmware versions, number of servers, etc.</source>
-      <translation type="unfinished">Includes information about site, such as cameras models and firmware versions, number of servers, etc.</translation>
+      <translation>Apima informaciją apie svetainę, pvz., kamerų modelius ir programinės įrangos versijas, serverių skaičių ir kt.</translation>
     </message>
     <message>
       <source>Allow optimize device settings</source>
-      <translation type="unfinished">Allow optimize device settings</translation>
+      <translation>Leisti optimizuoti įrenginio nustatymus</translation>
     </message>
     <message>
       <source>Allow optimize camera settings</source>
-      <translation type="unfinished">Allow optimize camera settings</translation>
+      <translation>Leisti svetainei optimizuoti kameros nustatymus</translation>
     </message>
   </context>
   <context>
     <name>QnTableExportHelper</name>
     <message>
       <source>Close all programs which may use this file and try again</source>
-      <translation type="unfinished">Close all programs which may use this file and try again</translation>
+      <translation>Uždarykite visas programas, kurios gali naudoti šį failą, ir bandykite dar kartą</translation>
     </message>
     <message>
       <source>File used by another process</source>
-      <translation type="unfinished">File used by another process</translation>
+      <translation>Failą naudoja kitas procesas</translation>
     </message>
     <message>
       <source>HTML file</source>
-      <translation type="unfinished">HTML file</translation>
+      <translation>HTML byla</translation>
     </message>
     <message>
       <source>Spread Sheet (CSV) File</source>
-      <translation type="unfinished">Spread Sheet (CSV) File</translation>
+      <translation>Skaičiuoklės (CSV) failas</translation>
     </message>
   </context>
   <context>
     <name>QnTimeSlider</name>
     <message>
       <source>No thumbnails available</source>
-      <translation type="unfinished">No thumbnails available</translation>
+      <translation>Miniatiūrų nėra</translation>
     </message>
   </context>
   <context>
@@ -5297,68 +5298,68 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Custom access rights</source>
-      <translation type="unfinished">Custom access rights</translation>
+      <translation>Pasirinktinės prieigos teisės</translation>
     </message>
   </context>
   <context>
     <name>QnValidatorStrings</name>
     <message>
       <source>Email cannot be empty</source>
-      <translation type="unfinished">Email cannot be empty</translation>
+      <translation>El. paštas negali būti tuščias.</translation>
     </message>
     <message>
       <source>Email is not valid</source>
-      <translation type="unfinished">Email is not valid</translation>
+      <translation>El. Pašto adresas negalioja</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>Password cannot be empty</translation>
     </message>
     <message>
       <source>Avoid leading and trailing spaces</source>
-      <translation type="unfinished">Avoid leading and trailing spaces</translation>
+      <translation>Venkite tarpų pradžioje ir pabaigoje</translation>
     </message>
   </context>
   <context>
     <name>QnVideowallManageWidget</name>
     <message>
       <source>Screen</source>
-      <translation type="unfinished">Screen</translation>
+      <translation>Ekranas</translation>
     </message>
     <message>
       <source>Screen %1</source>
-      <translation type="unfinished">Screen %1</translation>
+      <translation>Ekranas %1</translation>
     </message>
   </context>
   <context>
     <name>QnVideowallManageWidgetPrivate</name>
     <message>
       <source>New Item</source>
-      <translation type="unfinished">New Item</translation>
+      <translation>Naujos prekės (Automatic Translation)</translation>
     </message>
     <message>
       <source>Display %1</source>
-      <translation type="unfinished">Display %1</translation>
+      <translation>Rodyti %1</translation>
     </message>
     <message>
       <source>Delete &quot;%1&quot;?</source>
-      <translation type="unfinished">Delete &quot;%1&quot;?</translation>
+      <translation>Ištrinti "%1"?</translation>
     </message>
   </context>
   <context>
     <name>QnVideowallScreenWidget</name>
     <message>
       <source>PC %1</source>
-      <translation type="unfinished">PC %1</translation>
+      <translation>Kompiuteris %1</translation>
     </message>
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>Numerus form depend on the number of displays. %2 will be substituted by a list of them</comment>
-      <translation type="unfinished">
-        <numerusform>PC %1 - Displays %2</numerusform>
-        <numerusform>PC %1 - Displays %2</numerusform>
-        <numerusform>PC %1 - Displays %2</numerusform>
-        <numerusform>PC %1 - Displays %2</numerusform>
+      <translation>
+        <numerusform>PC %1 - Rodo %2</numerusform>
+        <numerusform>PC %1 - Rodo %2</numerusform>
+        <numerusform>PC %1 - Rodo %2</numerusform>
+        <numerusform>PC %1 - Rodo %2</numerusform>
       </translation>
     </message>
   </context>
@@ -5366,15 +5367,15 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWebResourceWidget</name>
     <message>
       <source>Integration settings...</source>
-      <translation type="unfinished">Integration settings...</translation>
+      <translation>Integracijos nustatymai...</translation>
     </message>
     <message>
       <source>Web Page settings...</source>
-      <translation type="unfinished">Web Page settings...</translation>
+      <translation>Tinklalapio nustatymai...</translation>
     </message>
     <message>
       <source>Auto-refresh every %1</source>
-      <translation type="unfinished">Auto-refresh every %1</translation>
+      <translation>Automatinis atnaujinimas kas %1</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -5385,7 +5386,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWorkbenchBookmarksHandler</name>
     <message>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>Žymės</translation>
     </message>
     <message>
       <source>Server offline</source>
@@ -5393,19 +5394,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Bookmarks can only be edited on an online Server.</source>
-      <translation type="unfinished">Bookmarks can only be edited on an online Server.</translation>
+      <translation>Žymes galima redaguoti tik internetiniame serveryje.</translation>
     </message>
     <message>
       <source>Delete bookmark?</source>
-      <translation type="unfinished">Delete bookmark?</translation>
+      <translation>Ištrinti žymę?</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n bookmarks?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n bookmarks?</numerusform>
-        <numerusform>Delete %n bookmarks?</numerusform>
-        <numerusform>Delete %n bookmarks?</numerusform>
-        <numerusform>Delete %n bookmarks?</numerusform>
+      <translation>
+        <numerusform>Ištrinti žymę?</numerusform>
+        <numerusform>Ištrinti žymę?</numerusform>
+        <numerusform>Ištrinti žymę?</numerusform>
+        <numerusform>Ištrinti žymę?</numerusform>
       </translation>
     </message>
   </context>
@@ -5413,7 +5414,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWorkbenchController</name>
     <message>
       <source>To switch between cameras press Shift + Arrow</source>
-      <translation type="unfinished">To switch between cameras press Shift + Arrow</translation>
+      <translation>Norėdami perjungti kameras, paspauskite „Shift“ + rodyklė</translation>
     </message>
   </context>
   <context>
@@ -5436,31 +5437,31 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Camera %1 does not support PTZ</source>
-      <translation type="unfinished">Camera %1 does not support PTZ</translation>
+      <translation>Kamera %1 nepalaiko PTZ</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchResourcesChangesWatcher</name>
     <message numerus="yes">
       <source>The following %n items are not saved:</source>
-      <translation type="unfinished">
-        <numerusform>The following %n items are not saved:</numerusform>
-        <numerusform>The following %n items are not saved:</numerusform>
-        <numerusform>The following %n items are not saved:</numerusform>
-        <numerusform>The following %n items are not saved:</numerusform>
+      <translation>
+        <numerusform>Šie %n elementai nėra išsaugoti:</numerusform>
+        <numerusform>Šie %n elementai nėra išsaugoti:</numerusform>
+        <numerusform>Šie %n elementai nėra išsaugoti:</numerusform>
+        <numerusform>Šie %n elementai nėra išsaugoti:</numerusform>
       </translation>
     </message>
     <message>
       <source>Failed to save changes</source>
-      <translation type="unfinished">Failed to save changes</translation>
+      <translation>Nepavyko išsaugoti pakeitimų</translation>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n items:</source>
-      <translation type="unfinished">
-        <numerusform>Failed to delete %n items:</numerusform>
-        <numerusform>Failed to delete %n items:</numerusform>
-        <numerusform>Failed to delete %n items:</numerusform>
-        <numerusform>Failed to delete %n items:</numerusform>
+      <translation>
+        <numerusform>Nepavyko ištrinti |{ siteName }:</numerusform>
+        <numerusform>Nepavyko ištrinti |{ siteName }:</numerusform>
+        <numerusform>Nepavyko ištrinti |{ siteName }:</numerusform>
+        <numerusform>Nepavyko ištrinti |{ siteName }:</numerusform>
       </translation>
     </message>
   </context>
@@ -5468,47 +5469,47 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWorkbenchScreenshotHandler</name>
     <message>
       <source>Save Screenshot As...</source>
-      <translation type="unfinished">Save Screenshot As...</translation>
+      <translation>Įrašyti ekrano kopiją kaip...</translation>
     </message>
     <message>
       <source>Timestamp:</source>
-      <translation type="unfinished">Timestamp:</translation>
+      <translation>Laiko žymė</translation>
     </message>
     <message>
       <source>Saving %1</source>
-      <translation type="unfinished">Saving %1</translation>
+      <translation>Taupymas %1</translation>
     </message>
     <message>
       <source>Saving Screenshot...</source>
-      <translation type="unfinished">Saving Screenshot...</translation>
+      <translation>Išsaugoma ekrano kopija...</translation>
     </message>
     <message>
       <source>Failed to save screenshot</source>
-      <translation type="unfinished">Failed to save screenshot</translation>
+      <translation>Nepavyko išsaugoti ekrano kopijos</translation>
     </message>
     <message>
       <source>Failed to take screenshot</source>
-      <translation type="unfinished">Failed to take screenshot</translation>
+      <translation>Nepavyko padaryti ekrano kopijos</translation>
     </message>
     <message>
       <source>PNG Image</source>
-      <translation type="unfinished">PNG Image</translation>
+      <translation>PNG paveikslėlis</translation>
     </message>
     <message>
       <source>JPEG Image</source>
-      <translation type="unfinished">JPEG Image</translation>
+      <translation>JPEG paveikslėlis</translation>
     </message>
     <message>
       <source>No timestamp</source>
-      <translation type="unfinished">No timestamp</translation>
+      <translation>Nėra laiko žymos</translation>
     </message>
     <message>
       <source>No camera name</source>
-      <translation type="unfinished">No camera name</translation>
+      <translation>Nėra kameros pavadinimo</translation>
     </message>
     <message>
       <source>Camera name:</source>
-      <translation type="unfinished">Camera name:</translation>
+      <translation>Kameros pavadinimas</translation>
     </message>
   </context>
   <context>
@@ -5519,19 +5520,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Video Wall %1</source>
-      <translation type="unfinished">Video Wall %1</translation>
+      <translation>Vaizdo siena</translation>
     </message>
     <message>
       <source>New Video Wall...</source>
-      <translation type="unfinished">New Video Wall...</translation>
+      <translation>Vaizdo siena...</translation>
     </message>
     <message>
       <source>New Matrix %1</source>
-      <translation type="unfinished">New Matrix %1</translation>
+      <translation>Nauja matrica %1</translation>
     </message>
     <message>
       <source>To enable this feature, please activate a Video Wall license.</source>
-      <translation type="unfinished">To enable this feature, please activate a Video Wall license.</translation>
+      <translation>Norėdami įjungti šią funkciją, aktyvuokite vaizdo sienos licenciją.</translation>
     </message>
     <message>
       <source>Failed to apply changes</source>
@@ -5539,92 +5540,92 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Stop Video Wall?</source>
-      <translation type="unfinished">Stop Video Wall?</translation>
+      <translation>Sustabdyti vaizdo sieną?</translation>
     </message>
     <message>
       <source>To start it again, you should have physical access to its computer.</source>
-      <translation type="unfinished">To start it again, you should have physical access to its computer.</translation>
+      <translation>Norėdami jį paleisti iš naujo, turėtumėte turėti fizinę prieigą prie jo kompiuterio.</translation>
     </message>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Sustabdyti</translation>
     </message>
     <message>
       <source>More Video Wall licenses required</source>
-      <translation type="unfinished">More Video Wall licenses required</translation>
+      <translation>Reikalingos daugiau vaizdo sienos licencijų</translation>
     </message>
     <message>
       <source>Control session cannot be started.</source>
-      <translation type="unfinished">Control session cannot be started.</translation>
+      <translation>Nepavyksta pradėti valdymo sesijos.</translation>
     </message>
     <message>
       <source>Cannot save empty matrix</source>
-      <translation type="unfinished">Cannot save empty matrix</translation>
+      <translation>Nepavyksta išsaugoti tuščios matricos</translation>
     </message>
     <message>
       <source>Screen is being controlled by another user</source>
-      <translation type="unfinished">Screen is being controlled by another user</translation>
+      <translation>Ekraną valdo kitas naudotojas</translation>
     </message>
     <message>
       <source>Enter the name of Video Wall to create:</source>
-      <translation type="unfinished">Enter the name of Video Wall to create:</translation>
+      <translation>Įveskite norimos sukurti vaizdo sienos pavadinimą:</translation>
     </message>
     <message>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Aktyvuoti nemokamą licenciją...</translation>
     </message>
     <message numerus="yes">
       <source>Failed to open %n devices on the video wall:</source>
-      <translation type="unfinished">
-        <numerusform>Failed to open %n devices on the video wall:</numerusform>
-        <numerusform>Failed to open %n devices on the video wall:</numerusform>
-        <numerusform>Failed to open %n devices on the video wall:</numerusform>
-        <numerusform>Failed to open %n devices on the video wall:</numerusform>
+      <translation>
+        <numerusform>Nepavyko atidaryti %n įrenginių vaizdo sienoje:</numerusform>
+        <numerusform>Nepavyko atidaryti %n įrenginių vaizdo sienoje:</numerusform>
+        <numerusform>Nepavyko atidaryti %n įrenginių vaizdo sienoje:</numerusform>
+        <numerusform>Nepavyko atidaryti %n įrenginių vaizdo sienoje:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to open %n cameras on the video wall:</source>
-      <translation type="unfinished">
-        <numerusform>Failed to open %n cameras on the video wall:</numerusform>
-        <numerusform>Failed to open %n cameras on the video wall:</numerusform>
-        <numerusform>Failed to open %n cameras on the video wall:</numerusform>
-        <numerusform>Failed to open %n cameras on the video wall:</numerusform>
+      <translation>
+        <numerusform>Nepavyko atidaryti %n kamerų vaizdo sienoje:</numerusform>
+        <numerusform>Nepavyko atidaryti %n kamerų vaizdo sienoje:</numerusform>
+        <numerusform>Nepavyko atidaryti %n kamerų vaizdo sienoje:</numerusform>
+        <numerusform>Nepavyko atidaryti %n kamerų vaizdo sienoje:</numerusform>
       </translation>
     </message>
     <message>
       <source>Screen is locked and cannot be changed</source>
-      <translation type="unfinished">Screen is locked and cannot be changed</translation>
+      <translation>Ekranas užrakintas ir jo negalima pakeisti</translation>
     </message>
     <message>
       <source>Site shut down</source>
-      <translation type="unfinished">Site shut down</translation>
+      <translation>Svetainė uždaryta</translation>
     </message>
     <message>
       <source>To add a Video Wall, the Site should be in active state. %1</source>
-      <translation type="unfinished">To add a Video Wall, the Site should be in active state. %1</translation>
+      <translation>Norint pridėti vaizdo sieną, svetainė turi būti aktyvios būsenos. %1</translation>
     </message>
     <message>
       <source>Cannot find compatible client version: %1</source>
-      <translation type="unfinished">Cannot find compatible client version: %1</translation>
+      <translation>Nepavyksta rasti suderinamos kliento versijos: %1</translation>
     </message>
     <message numerus="yes">
       <source>You cannot add to the video wall devices for which you do not have View Live permission.</source>
       <comment>Numerus form depends on the number of devices</comment>
-      <translation type="unfinished">
-        <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
-        <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
-        <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
-        <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
+      <translation>
+        <numerusform>Negalite prie vaizdo sienos pridėti įrenginių, kuriems neturite tiesioginės peržiūros leidimo.</numerusform>
+        <numerusform>Negalite prie vaizdo sienos pridėti įrenginių, kuriems neturite tiesioginės peržiūros leidimo.</numerusform>
+        <numerusform>Negalite prie vaizdo sienos pridėti įrenginių, kuriems neturite tiesioginės peržiūros leidimo.</numerusform>
+        <numerusform>Negalite prie vaizdo sienos pridėti įrenginių, kuriems neturite tiesioginės peržiūros leidimo.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You cannot add to the video wall cameras for which you do not have View Live permission.</source>
       <comment>Numerus form depends on the number of cameras</comment>
-      <translation type="unfinished">
-        <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
-        <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
-        <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
-        <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
+      <translation>
+        <numerusform>Negalite prie vaizdo sienos pridėti kamerų, kurioms neturite tiesioginės peržiūros leidimo.</numerusform>
+        <numerusform>Negalite prie vaizdo sienos pridėti kamerų, kurioms neturite tiesioginės peržiūros leidimo.</numerusform>
+        <numerusform>Negalite prie vaizdo sienos pridėti kamerų, kurioms neturite tiesioginės peržiūros leidimo.</numerusform>
+        <numerusform>Negalite prie vaizdo sienos pridėti kamerų, kurioms neturite tiesioginės peržiūros leidimo.</numerusform>
       </translation>
     </message>
   </context>
@@ -5632,11 +5633,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>Resources</name>
     <message>
       <source>There is another layout with the same name</source>
-      <translation type="unfinished">There is another layout with the same name</translation>
+      <translation>Yra dar vienas išdėstymas tuo pačiu pavadinimu</translation>
     </message>
     <message>
       <source>You do not have permission to overwrite it.</source>
-      <translation type="unfinished">You do not have permission to overwrite it.</translation>
+      <translation>Jūs neturite leidimų atlikti šio veiksmo</translation>
     </message>
     <message>
       <source>Overwrite existing layout?</source>
@@ -5644,23 +5645,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>There is another layout with the same name.</source>
-      <translation type="unfinished">There is another layout with the same name.</translation>
+      <translation>Yra dar vienas to paties pavadinimo išdėstymas.</translation>
     </message>
     <message>
       <source>Changes will affect other users</source>
-      <translation type="unfinished">Changes will affect other users</translation>
+      <translation>Pakeitimai paveiks ir kitus naudotojus</translation>
     </message>
     <message>
       <source>This layout is shared with other users, so you change it for them too.</source>
-      <translation type="unfinished">This layout is shared with other users, so you change it for them too.</translation>
+      <translation>Šis išdėstymas bendrinamas su kitais vartotojais, todėl galite jį pakeisti ir jiems.</translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from layout?</source>
-      <translation type="unfinished">
-        <numerusform>Remove %n items from layout?</numerusform>
-        <numerusform>Remove %n items from layout?</numerusform>
-        <numerusform>Remove %n items from layout?</numerusform>
-        <numerusform>Remove %n items from layout?</numerusform>
+      <translation>
+        <numerusform>Pašalinti elementą iš maketo?</numerusform>
+        <numerusform>Pašalinti elementą iš maketo?</numerusform>
+        <numerusform>Pašalinti elementą iš maketo?</numerusform>
+        <numerusform>Pašalinti elementą iš maketo?</numerusform>
       </translation>
     </message>
     <message>
@@ -5669,132 +5670,132 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
-      <translation type="unfinished">You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</translation>
+      <translation>Ketinate ištrinti kai kuriuos išteklius, prie kurių turite prieigą tik per vaizdo sieną. Po to jų nebematysite savo išteklių sąraše ir negalėsite jų vėl pridėti prie vaizdo sienos.</translation>
     </message>
     <message>
       <source>You will lose access to following resources:</source>
-      <translation type="unfinished">You will lose access to following resources:</translation>
+      <translation>Prarasite prieigą prie šių išteklių:</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n devices?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n devices?</numerusform>
-        <numerusform>Delete %n devices?</numerusform>
-        <numerusform>Delete %n devices?</numerusform>
-        <numerusform>Delete %n devices?</numerusform>
+      <translation>
+        <numerusform>Ištrinti %n įrenginius?</numerusform>
+        <numerusform>Ištrinti %n įrenginius?</numerusform>
+        <numerusform>Ištrinti %n įrenginius?</numerusform>
+        <numerusform>Ištrinti %n įrenginius?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n cameras?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n cameras?</numerusform>
-        <numerusform>Delete %n cameras?</numerusform>
-        <numerusform>Delete %n cameras?</numerusform>
-        <numerusform>Delete %n cameras?</numerusform>
+      <translation>
+        <numerusform>Ištrinti %n kameras?</numerusform>
+        <numerusform>Ištrinti %n kameras?</numerusform>
+        <numerusform>Ištrinti %n kameras?</numerusform>
+        <numerusform>Ištrinti %n kameras?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n I/O Modules?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n I/O Modules?</numerusform>
-        <numerusform>Delete %n I/O Modules?</numerusform>
-        <numerusform>Delete %n I/O Modules?</numerusform>
-        <numerusform>Delete %n I/O Modules?</numerusform>
+      <translation>
+        <numerusform>Ištrinti %n įvesties/išvesties modulius?</numerusform>
+        <numerusform>Ištrinti %n įvesties/išvesties modulius?</numerusform>
+        <numerusform>Ištrinti %n įvesties/išvesties modulius?</numerusform>
+        <numerusform>Ištrinti %n įvesties/išvesties modulius?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n items?</numerusform>
-        <numerusform>Delete %n items?</numerusform>
-        <numerusform>Delete %n items?</numerusform>
-        <numerusform>Delete %n items?</numerusform>
+      <translation>
+        <numerusform>Ištrinti %n elementus?</numerusform>
+        <numerusform>Ištrinti %n elementus?</numerusform>
+        <numerusform>Ištrinti %n elementus?</numerusform>
+        <numerusform>Ištrinti %n elementus?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of them are auto-discovered.</source>
-      <translation type="unfinished">
-        <numerusform>%n of them are auto-discovered.</numerusform>
-        <numerusform>%n of them are auto-discovered.</numerusform>
-        <numerusform>%n of them are auto-discovered.</numerusform>
-        <numerusform>%n of them are auto-discovered.</numerusform>
+      <translation>
+        <numerusform>%n iš jų yra atrandami automatiškai.</numerusform>
+        <numerusform>%n iš jų yra atrandami automatiškai.</numerusform>
+        <numerusform>%n iš jų yra atrandami automatiškai.</numerusform>
+        <numerusform>%n iš jų yra atrandami automatiškai.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras are auto-discovered.</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras are auto-discovered.</numerusform>
-        <numerusform>%n cameras are auto-discovered.</numerusform>
-        <numerusform>%n cameras are auto-discovered.</numerusform>
-        <numerusform>%n cameras are auto-discovered.</numerusform>
+      <translation>
+        <numerusform>%n kameros aptinkamos automatiškai.</numerusform>
+        <numerusform>%n kameros aptinkamos automatiškai.</numerusform>
+        <numerusform>%n kameros aptinkamos automatiškai.</numerusform>
+        <numerusform>%n kameros aptinkamos automatiškai.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules are auto-discovered.</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O modules are auto-discovered.</numerusform>
-        <numerusform>%n I/O modules are auto-discovered.</numerusform>
-        <numerusform>%n I/O modules are auto-discovered.</numerusform>
-        <numerusform>%n I/O modules are auto-discovered.</numerusform>
+      <translation>
+        <numerusform>%n Įvesties/išvesties moduliai aptinkami automatiškai.</numerusform>
+        <numerusform>%n Įvesties/išvesties moduliai aptinkami automatiškai.</numerusform>
+        <numerusform>%n Įvesties/išvesties moduliai aptinkami automatiškai.</numerusform>
+        <numerusform>%n Įvesties/išvesties moduliai aptinkami automatiškai.</numerusform>
       </translation>
     </message>
     <message>
       <source>They may be auto-discovered again after removing.</source>
-      <translation type="unfinished">They may be auto-discovered again after removing.</translation>
+      <translation>Jie gali būti automatiškai aptikti vėl pašalinus.</translation>
     </message>
     <message>
       <source>Overwrite existing showreel?</source>
-      <translation type="unfinished">Overwrite existing showreel?</translation>
+      <translation>Perrašyti esamą išdėstymą?</translation>
     </message>
     <message>
       <source>There is another showreel with the same name.</source>
-      <translation type="unfinished">There is another showreel with the same name.</translation>
+      <translation>Yra dar vienas to paties pavadinimo serialas.</translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from showreel?</source>
-      <translation type="unfinished">
-        <numerusform>Remove %n items from showreel?</numerusform>
-        <numerusform>Remove %n items from showreel?</numerusform>
-        <numerusform>Remove %n items from showreel?</numerusform>
-        <numerusform>Remove %n items from showreel?</numerusform>
+      <translation>
+        <numerusform>Pašalinti %n elementus iš demonstracinės juostos?</numerusform>
+        <numerusform>Pašalinti %n elementus iš demonstracinės juostos?</numerusform>
+        <numerusform>Pašalinti %n elementus iš demonstracinės juostos?</numerusform>
+        <numerusform>Pašalinti %n elementus iš demonstracinės juostos?</numerusform>
       </translation>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>Sustabdyti įkėlimą?</translation>
     </message>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Sustabdyti</translation>
     </message>
     <message numerus="yes">
       <source>Some video files are still being uploaded to %n virtual cameras:</source>
-      <translation type="unfinished">
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
+      <translation>
+        <numerusform>Kai kurie vaizdo failai vis dar įkeliami į %n virtualias kameras:</numerusform>
+        <numerusform>Kai kurie vaizdo failai vis dar įkeliami į %n virtualias kameras:</numerusform>
+        <numerusform>Kai kurie vaizdo failai vis dar įkeliami į %n virtualias kameras:</numerusform>
+        <numerusform>Kai kurie vaizdo failai vis dar įkeliami į %n virtualias kameras:</numerusform>
       </translation>
     </message>
     <message>
       <source>Merge this group with %1?</source>
-      <translation type="unfinished">Merge this group with %1?</translation>
+      <translation>Sujungti šią grupę su %1?</translation>
     </message>
     <message>
       <source>Two groups with the same name cannot exist.</source>
-      <translation type="unfinished">Two groups with the same name cannot exist.</translation>
+      <translation>Dvi grupės tuo pačiu pavadinimu negali egzistuoti.</translation>
     </message>
     <message>
       <source>Merge</source>
-      <translation type="unfinished">Merge</translation>
+      <translation>Sujungti</translation>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</translation>
+      <translation>Viso turinio perdavimas per tarpinį serverį šio tinklalapio vartotojams atveria bet kurią serverio&apos;tinkle esančią paslaugą ar įrenginį.</translation>
     </message>
     <message>
       <source>Move anyway?</source>
-      <translation type="unfinished">Move anyway?</translation>
+      <translation>Vis tiek persikelti?</translation>
     </message>
     <message>
       <source>Move</source>
@@ -5806,52 +5807,52 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>Virtualių kamerų, USB arba internetinių kamerų negalima perkelti tarp serverių. Šie įrenginiai liks %1:</translation>
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">USB or web cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>USB arba internetinių kamerų negalima perkelti tarp serverių. Šie įrenginiai liks %1:</translation>
     </message>
     <message>
       <source>Virtual cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">Virtual cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>Virtualių kamerų negalima perkelti tarp serverių. Šie įrenginiai liks %1:</translation>
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual cameras, USB or web cameras cannot be moved between servers</translation>
+      <translation>Virtualių kamerų, USB arba internetinių kamerų negalima perkelti tarp serverių</translation>
     </message>
     <message>
       <source>Virtual cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual cameras cannot be moved between servers</translation>
+      <translation>Virtualių kamerų negalima perkelti tarp serverių</translation>
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers</source>
-      <translation type="unfinished">USB or web cameras cannot be moved between servers</translation>
+      <translation>USB arba internetinių kamerų negalima perkelti tarp serverių</translation>
     </message>
     <message>
       <source>Only some of the selected devices can be moved to %1</source>
-      <translation type="unfinished">Only some of the selected devices can be moved to %1</translation>
+      <translation>Tik kai kuriuos pasirinktus įrenginius galima perkelti į %1</translation>
     </message>
     <message>
       <source>Move Partially</source>
-      <translation type="unfinished">Move Partially</translation>
+      <translation>Perkelti iš dalies</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n layouts?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n layouts?</numerusform>
-        <numerusform>Delete %n layouts?</numerusform>
-        <numerusform>Delete %n layouts?</numerusform>
-        <numerusform>Delete %n layouts?</numerusform>
+      <translation>
+        <numerusform>Ištrinti „%n“ išdėstymą?</numerusform>
+        <numerusform>Ištrinti „%n“ išdėstymą?</numerusform>
+        <numerusform>Ištrinti „%n“ išdėstymą?</numerusform>
+        <numerusform>Ištrinti „%n“ išdėstymą?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n items were not deleted.</source>
-      <translation type="unfinished">
-        <numerusform>%n items were not deleted.</numerusform>
-        <numerusform>%n items were not deleted.</numerusform>
-        <numerusform>%n items were not deleted.</numerusform>
-        <numerusform>%n items were not deleted.</numerusform>
+      <translation>
+        <numerusform>%n elementai nebuvo ištrinti.</numerusform>
+        <numerusform>%n elementai nebuvo ištrinti.</numerusform>
+        <numerusform>%n elementai nebuvo ištrinti.</numerusform>
+        <numerusform>%n elementai nebuvo ištrinti.</numerusform>
       </translation>
     </message>
     <message>
@@ -5864,67 +5865,67 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Delete %n matrices?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n matrices?</numerusform>
-        <numerusform>Delete %n matrices?</numerusform>
-        <numerusform>Delete %n matrices?</numerusform>
-        <numerusform>Delete %n matrices?</numerusform>
+      <translation>
+        <numerusform>Ištrinti %n matricas?</numerusform>
+        <numerusform>Ištrinti %n matricas?</numerusform>
+        <numerusform>Ištrinti %n matricas?</numerusform>
+        <numerusform>Ištrinti %n matricas?</numerusform>
       </translation>
     </message>
     <message>
       <source>All members of %1 and %2 groups will get access to this layout</source>
       <comment>%1 and %2 will be substituted with user group names</comment>
-      <translation type="unfinished">All members of %1 and %2 groups will get access to this layout</translation>
+      <translation>Visi %1 ir %2 grupių nariai gaus prieigą prie šio maketo</translation>
     </message>
     <message>
       <source>Convert</source>
       <comment>Converting layout to shared</comment>
-      <translation type="unfinished">Convert</translation>
+      <translation>Konvertuoti</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
-        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
-        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
-        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+      <translation>
+        <numerusform>%n maketai yra bendrinami su kitais vartotojais, todėl jie bus ištrinti ir jų paskyrose.</numerusform>
+        <numerusform>Išdėstymas |%n| yra bendrinamas su kitais vartotojais, todėl jis bus ištrintas ir iš jų paskyrų.</numerusform>
+        <numerusform>Išdėstymas |%n| yra bendrinamas su kitais vartotojais, todėl jis bus ištrintas ir iš jų paskyrų.</numerusform>
+        <numerusform>Išdėstymas |%n| yra bendrinamas su kitais vartotojais, todėl jis bus ištrintas ir iš jų paskyrų.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n users?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n users?</numerusform>
-        <numerusform>Delete %n users?</numerusform>
-        <numerusform>Delete %n users?</numerusform>
-        <numerusform>Delete %n users?</numerusform>
+      <translation>
+        <numerusform>Ištrinti vartotoją?</numerusform>
+        <numerusform>Ištrinti vartotoją?</numerusform>
+        <numerusform>Ištrinti vartotoją?</numerusform>
+        <numerusform>Ištrinti vartotoją?</numerusform>
       </translation>
     </message>
     <message>
       <source>Unable to move device</source>
-      <translation type="unfinished">Unable to move device</translation>
+      <translation>Nepavyko perkelti įrenginio</translation>
     </message>
     <message>
       <source>Maximum number of devices for this server is reached</source>
-      <translation type="unfinished">Maximum number of devices for this server is reached</translation>
+      <translation>Pasiektas maksimalus šio serverio įrenginių skaičius</translation>
     </message>
     <message numerus="yes">
       <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
       <comment>Numerus form depends on the amount of layouts</comment>
-      <translation type="unfinished">
-        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
-        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
-        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
-        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+      <translation>
+        <numerusform>Išdėstymas || yra bendrinamas su kitais vartotojais, todėl jis bus ištrintas ir iš jų paskyrų.</numerusform>
+        <numerusform>Išdėstymas || yra bendrinamas su kitais vartotojais, todėl jis bus ištrintas ir iš jų paskyrų.</numerusform>
+        <numerusform>Išdėstymas || yra bendrinamas su kitais vartotojais, todėl jis bus ištrintas ir iš jų paskyrų.</numerusform>
+        <numerusform>Išdėstymas || yra bendrinamas su kitais vartotojais, todėl jis bus ištrintas ir iš jų paskyrų.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
       <comment>Numerus form depends on the amount of web pages</comment>
-      <translation type="unfinished">
-        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
-        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
-        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
-        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
+      <translation>
+        <numerusform>Šiuos tinklalapius ketinate perkelti į serverį &quot;%1&quot;. Šie tinklalapiai naudoja visą prašomą turinį kaip tarpinį serverį, o jų tarpinis serveris pasikeis į serverį &quot;%1&quot;.</numerusform>
+        <numerusform>Šiuos tinklalapius ketinate perkelti į serverį &quot;%1&quot;. Šie tinklalapiai naudoja visą prašomą turinį kaip tarpinį serverį, o jų tarpinis serveris pasikeis į serverį &quot;%1&quot;.</numerusform>
+        <numerusform>Šiuos tinklalapius ketinate perkelti į serverį &quot;%1&quot;. Šie tinklalapiai naudoja visą prašomą turinį kaip tarpinį serverį, o jų tarpinis serveris pasikeis į serverį &quot;%1&quot;.</numerusform>
+        <numerusform>Šiuos tinklalapius ketinate perkelti į serverį &quot;%1&quot;. Šie tinklalapiai naudoja visą prašomą turinį kaip tarpinį serverį, o jų tarpinis serveris pasikeis į serverį &quot;%1&quot;.</numerusform>
       </translation>
     </message>
   </context>
@@ -5932,55 +5933,55 @@ If you intended to move analytics data to another storage location, please conta
     <name>RestErrorStrings</name>
     <message>
       <source>Error code: %1</source>
-      <translation type="unfinished">Error code: %1</translation>
+      <translation>Klaidos kodas: %1</translation>
     </message>
   </context>
   <context>
     <name>ServerStatusItemDelegate::ServerStatusWidget</name>
     <message>
       <source>Skipped</source>
-      <translation type="unfinished">Skipped</translation>
+      <translation>Praleista</translation>
     </message>
     <message>
       <source>Waiting for server to respond...</source>
-      <translation type="unfinished">Waiting for server to respond...</translation>
+      <translation>Laukiama serverio atsakymo...</translation>
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>Įdiegtas</translation>
     </message>
     <message>
       <source>Installing...</source>
-      <translation type="unfinished">Installing...</translation>
+      <translation>Diegiama...</translation>
     </message>
     <message>
       <source>Downloaded</source>
-      <translation type="unfinished">Downloaded</translation>
+      <translation>Atsisiųsta</translation>
     </message>
   </context>
   <context>
     <name>ShowreelTextFactory</name>
     <message>
       <source>Start Showreel</source>
-      <translation type="unfinished">Start Showreel</translation>
+      <translation>Pradėti demonstraciją</translation>
     </message>
   </context>
   <context>
     <name>SimpleMotionSearchWidget::Private</name>
     <message>
       <source>Select area on the video to filter results</source>
-      <translation type="unfinished">Select area on the video to filter results</translation>
+      <translation>Pasirinkite vaizdo įrašo sritį, kad filtruotumėte rezultatus</translation>
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>Pasirinktoje srityje</translation>
     </message>
   </context>
   <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
-      <translation type="unfinished">Lowest</translation>
+      <translation>Mažiausia</translation>
     </message>
     <message>
       <source>Low</source>
@@ -6000,86 +6001,86 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Preset</source>
-      <translation type="unfinished">Preset</translation>
+      <translation>Išankstiniai nustatymai</translation>
     </message>
     <message>
       <source>Undefined</source>
-      <translation type="unfinished">Undefined</translation>
+      <translation>Undefined</translation>
     </message>
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation type="unfinished">Lst</translation>
+      <translation>Lst</translation>
     </message>
     <message>
       <source>Lo</source>
       <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation type="unfinished">Lo</translation>
+      <translation>Lo</translation>
     </message>
     <message>
       <source>Me</source>
       <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation type="unfinished">Me</translation>
+      <translation>Me</translation>
     </message>
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation type="unfinished">Hi</translation>
+      <translation>Hi</translation>
     </message>
     <message>
       <source>Bst</source>
       <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation type="unfinished">Bst</translation>
+      <translation>Geriausias</translation>
     </message>
     <message>
       <source>Ps</source>
       <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation type="unfinished">Ps</translation>
+      <translation>Ps.</translation>
     </message>
   </context>
   <context>
     <name>Strings</name>
     <message numerus="yes">
       <source>%n Layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n Layouts</numerusform>
-        <numerusform>%n Layouts</numerusform>
-        <numerusform>%n Layouts</numerusform>
-        <numerusform>%n Layouts</numerusform>
+      <translation>
+        <numerusform>%n Išdėstymai</numerusform>
+        <numerusform>Pridėti išdėstymą</numerusform>
+        <numerusform>Pridėti išdėstymą</numerusform>
+        <numerusform>Pridėti išdėstymą</numerusform>
       </translation>
     </message>
     <message>
       <source>Source Server</source>
-      <translation type="unfinished">Source Server</translation>
+      <translation>IMAP serveris</translation>
     </message>
     <message numerus="yes">
       <source>Source Server and %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>Source Server and %n Servers</numerusform>
-        <numerusform>Source Server and %n Servers</numerusform>
-        <numerusform>Source Server and %n Servers</numerusform>
-        <numerusform>Source Server and %n Servers</numerusform>
+      <translation>
+        <numerusform>Šaltinio serveris ir %n serveriai</numerusform>
+        <numerusform>Šaltinio serveris ir %n serveriai</numerusform>
+        <numerusform>Šaltinio serveris ir %n serveriai</numerusform>
+        <numerusform>Šaltinio serveris ir %n serveriai</numerusform>
       </translation>
     </message>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>Pridėti vartotojus</translation>
     </message>
     <message>
       <source>Any Device</source>
-      <translation type="unfinished">Any Device</translation>
+      <translation>Bet koks įrenginys</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation type="unfinished">Any Camera</translation>
+      <translation>Bet kokia kamera</translation>
     </message>
     <message>
       <source>Any Server</source>
-      <translation type="unfinished">Any Server</translation>
+      <translation>Visi serveriai</translation>
     </message>
     <message>
       <source>Any User</source>
-      <translation type="unfinished">Any User</translation>
+      <translation>Bet kuris vartotojas (Automatic Translation)</translation>
     </message>
     <message>
       <source>Error</source>
@@ -6095,7 +6096,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Undefined</source>
-      <translation type="unfinished">Undefined</translation>
+      <translation>Undefined</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -6103,29 +6104,29 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation type="unfinished">
-        <numerusform>%n Servers</numerusform>
-        <numerusform>%n Servers</numerusform>
-        <numerusform>%n Servers</numerusform>
-        <numerusform>%n Servers</numerusform>
+      <translation>
+        <numerusform>Visi serveriai</numerusform>
+        <numerusform>Visi serveriai</numerusform>
+        <numerusform>Serveriai</numerusform>
+        <numerusform>Serveriai</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>Nėra vartotojų</numerusform>
+        <numerusform>Nėra vartotojų</numerusform>
+        <numerusform>Nėra vartotojų</numerusform>
+        <numerusform>Nėra vartotojų</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Groups</source>
-      <translation type="unfinished">
-        <numerusform>%n Groups</numerusform>
-        <numerusform>%n Groups</numerusform>
-        <numerusform>%n Groups</numerusform>
-        <numerusform>%n Groups</numerusform>
+      <translation>
+        <numerusform>%n Grupės</numerusform>
+        <numerusform>%n Grupės</numerusform>
+        <numerusform>%n Grupės</numerusform>
+        <numerusform>%n Grupės</numerusform>
       </translation>
     </message>
     <message>
@@ -6134,129 +6135,129 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Source camera</source>
-      <translation type="unfinished">Source camera</translation>
+      <translation>Šaltinio kamera</translation>
     </message>
     <message>
       <source>Is listed</source>
-      <translation type="unfinished">Is listed</translation>
+      <translation>Yra įtrauktas į sąrašą</translation>
     </message>
     <message>
       <source>Is not listed</source>
-      <translation type="unfinished">Is not listed</translation>
+      <translation>Nėra sąraše</translation>
     </message>
     <message>
       <source>In</source>
-      <translation type="unfinished">In</translation>
+      <translation>Į</translation>
     </message>
     <message numerus="yes">
       <source>%n removed devices</source>
-      <translation type="unfinished">
-        <numerusform>%n removed devices</numerusform>
-        <numerusform>%n removed devices</numerusform>
-        <numerusform>%n removed devices</numerusform>
-        <numerusform>%n removed devices</numerusform>
+      <translation>
+        <numerusform>%n pašalinti įrenginiai</numerusform>
+        <numerusform>%n pašalinti įrenginiai</numerusform>
+        <numerusform>%n pašalinti įrenginiai</numerusform>
+        <numerusform>%n pašalinti įrenginiai</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n removed cameras</numerusform>
-        <numerusform>%n removed cameras</numerusform>
-        <numerusform>%n removed cameras</numerusform>
-        <numerusform>%n removed cameras</numerusform>
+      <translation>
+        <numerusform>%n pašalintos kameros</numerusform>
+        <numerusform>%n pašalintos kameros</numerusform>
+        <numerusform>%n pašalintos kameros</numerusform>
+        <numerusform>%n pašalintos kameros</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed servers</source>
-      <translation type="unfinished">
-        <numerusform>%n removed servers</numerusform>
-        <numerusform>%n removed servers</numerusform>
-        <numerusform>%n removed servers</numerusform>
-        <numerusform>%n removed servers</numerusform>
+      <translation>
+        <numerusform>%n pašalino serverius</numerusform>
+        <numerusform>%n pašalino serverius</numerusform>
+        <numerusform>%n pašalino serverius</numerusform>
+        <numerusform>%n pašalino serverius</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n removed layouts</numerusform>
-        <numerusform>%n removed layouts</numerusform>
-        <numerusform>%n removed layouts</numerusform>
-        <numerusform>%n removed layouts</numerusform>
+      <translation>
+        <numerusform>%n pašalinti maketai</numerusform>
+        <numerusform>%n pašalinti maketai</numerusform>
+        <numerusform>%n pašalinti maketai</numerusform>
+        <numerusform>%n pašalinti maketai</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n subjects more</source>
-      <translation type="unfinished">
-        <numerusform>%n subjects more</numerusform>
-        <numerusform>%n subjects more</numerusform>
-        <numerusform>%n subjects more</numerusform>
-        <numerusform>%n subjects more</numerusform>
+      <translation>
+        <numerusform>%n daugiau dalykų</numerusform>
+        <numerusform>%n daugiau dalykų</numerusform>
+        <numerusform>%n daugiau dalykų</numerusform>
+        <numerusform>%n daugiau dalykų</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices more</source>
-      <translation type="unfinished">
-        <numerusform>%n devices more</numerusform>
-        <numerusform>%n devices more</numerusform>
-        <numerusform>%n devices more</numerusform>
-        <numerusform>%n devices more</numerusform>
+      <translation>
+        <numerusform>%n daugiau įrenginių</numerusform>
+        <numerusform>%n daugiau įrenginių</numerusform>
+        <numerusform>%n daugiau įrenginių</numerusform>
+        <numerusform>%n daugiau įrenginių</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras more</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras more</numerusform>
-        <numerusform>%n cameras more</numerusform>
-        <numerusform>%n cameras more</numerusform>
-        <numerusform>%n cameras more</numerusform>
+      <translation>
+        <numerusform>%n daugiau kamerų</numerusform>
+        <numerusform>%n daugiau kamerų</numerusform>
+        <numerusform>%n daugiau kamerų</numerusform>
+        <numerusform>%n daugiau kamerų</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers more</source>
-      <translation type="unfinished">
-        <numerusform>%n servers more</numerusform>
-        <numerusform>%n servers more</numerusform>
-        <numerusform>%n servers more</numerusform>
-        <numerusform>%n servers more</numerusform>
+      <translation>
+        <numerusform>%n daugiau serverių</numerusform>
+        <numerusform>%n daugiau serverių</numerusform>
+        <numerusform>%n daugiau serverių</numerusform>
+        <numerusform>%n daugiau serverių</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n layouts more</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts more</numerusform>
-        <numerusform>%n layouts more</numerusform>
-        <numerusform>%n layouts more</numerusform>
-        <numerusform>%n layouts more</numerusform>
+      <translation>
+        <numerusform>%n daugiau maketų</numerusform>
+        <numerusform>%n daugiau maketų</numerusform>
+        <numerusform>%n daugiau maketų</numerusform>
+        <numerusform>%n daugiau maketų</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">
-        <numerusform>%n removed subjects</numerusform>
-        <numerusform>%n removed subjects</numerusform>
-        <numerusform>%n removed subjects</numerusform>
-        <numerusform>%n removed subjects</numerusform>
+      <translation>
+        <numerusform>%n pašalintos temos</numerusform>
+        <numerusform>%n pašalintos temos</numerusform>
+        <numerusform>%n pašalintos temos</numerusform>
+        <numerusform>%n pašalintos temos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
+      <translation>
+        <numerusform>Šaltinis ir %n daugiau kamerų</numerusform>
+        <numerusform>Šaltinis ir %n daugiau kamerų</numerusform>
+        <numerusform>Šaltinis ir %n daugiau kamerų</numerusform>
+        <numerusform>Šaltinis ir %n daugiau kamerų</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n additional</source>
       <comment>Numerus: placeholder for explicitly added items</comment>
-      <translation type="unfinished">
-        <numerusform>%n additional</numerusform>
-        <numerusform>%n additional</numerusform>
-        <numerusform>%n additional</numerusform>
-        <numerusform>%n additional</numerusform>
+      <translation>
+        <numerusform>%n papildomas</numerusform>
+        <numerusform>%n papildomas</numerusform>
+        <numerusform>%n papildomas</numerusform>
+        <numerusform>%n papildomas</numerusform>
       </translation>
     </message>
   </context>
@@ -6264,19 +6265,19 @@ If you intended to move analytics data to another storage location, please conta
     <name>TierUsageStrings</name>
     <message>
       <source>Number of servers per Site</source>
-      <translation type="unfinished">Number of servers per Site</translation>
+      <translation>Serverių skaičius vienoje svetainėje</translation>
     </message>
     <message>
       <source>Number of devices per server</source>
-      <translation type="unfinished">Number of devices per server</translation>
+      <translation>Įrenginių skaičius viename serveryje</translation>
     </message>
     <message>
       <source>Number of items on layout</source>
-      <translation type="unfinished">Number of items on layout</translation>
+      <translation>Elementų skaičius makete</translation>
     </message>
     <message>
       <source>Number of days of archive</source>
-      <translation type="unfinished">Number of days of archive</translation>
+      <translation>Archyvo dienų skaičius</translation>
     </message>
     <message>
       <source>LDAP</source>
@@ -6288,28 +6289,28 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cross-Site features</source>
-      <translation type="unfinished">Cross-Site features</translation>
+      <translation>Skirtingos svetainės funkcijos</translation>
     </message>
   </context>
   <context>
     <name>UpdateStrings</name>
     <message>
       <source>This Linux platform is no longer supported</source>
-      <translation type="unfinished">This Linux platform is no longer supported</translation>
+      <translation>Ši „Linux“ platforma nebepalaikoma</translation>
     </message>
     <message>
       <source>This OS version is no longer supported</source>
-      <translation type="unfinished">This OS version is no longer supported</translation>
+      <translation>Ši OS versija nebepalaikoma</translation>
     </message>
     <message>
       <source>This %1 version is no longer supported</source>
       <comment>%1 is OS name, e.g. Windows</comment>
-      <translation type="unfinished">This %1 version is no longer supported</translation>
+      <translation>Ši %1 versija nebepalaikoma</translation>
     </message>
     <message>
       <source>%1 %2 is no longer supported</source>
       <comment>%1 %2 are OS name and version, e.g. Windows 7</comment>
-      <translation type="unfinished">%1 %2 is no longer supported</translation>
+      <translation>%1 %2 nebepalaikoma</translation>
     </message>
   </context>
   <context>
@@ -6320,54 +6321,54 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
+      <translation>Nerasta jokių grupių</translation>
     </message>
     <message>
       <source>Change search criteria or create a new group</source>
-      <translation type="unfinished">Change search criteria or create a new group</translation>
+      <translation>Pakeiskite paieškos kriterijus arba sukurkite naują grupę</translation>
     </message>
     <message>
       <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
-      <translation type="unfinished">Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
+      <translation>Kelios grupės turi tą patį pavadinimą, o tai gali sukelti painiavą. Siekiant išlaikyti aiškią ir tvarkingą struktūrą, siūlome kiekvienai grupei suteikti unikalius pavadinimus.</translation>
     </message>
     <message numerus="yes">
       <source>%n existing LDAP groups are not found in the LDAP database.</source>
-      <translation type="unfinished">
-        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
-        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
-        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
-        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
+      <translation>
+        <numerusform>%n esamų LDAP grupių LDAP duomenų bazėje nerasta.</numerusform>
+        <numerusform>%n esamų LDAP grupių LDAP duomenų bazėje nerasta.</numerusform>
+        <numerusform>%n esamų LDAP grupių LDAP duomenų bazėje nerasta.</numerusform>
+        <numerusform>%n esamų LDAP grupių LDAP duomenų bazėje nerasta.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n groups</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n groups</numerusform>
-        <numerusform>Delete %n groups</numerusform>
-        <numerusform>Delete %n groups</numerusform>
-        <numerusform>Delete %n groups</numerusform>
+      <translation>
+        <numerusform>Ištrinti %n grupes</numerusform>
+        <numerusform>Ištrinti %n grupes</numerusform>
+        <numerusform>Ištrinti %n grupes</numerusform>
+        <numerusform>Ištrinti %n grupes</numerusform>
       </translation>
     </message>
     <message>
       <source>Failed to delete group &quot;%1&quot;.</source>
-      <translation type="unfinished">Failed to delete group &quot;%1&quot;.</translation>
+      <translation>Nepavyko ištrinti grupės &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Failed to delete group.</source>
-      <translation type="unfinished">Failed to delete group.</translation>
+      <translation>Nepavyko ištrinti grupės</translation>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n groups.</source>
-      <translation type="unfinished">
-        <numerusform>Failed to delete %n groups.</numerusform>
-        <numerusform>Failed to delete %n groups.</numerusform>
-        <numerusform>Failed to delete %n groups.</numerusform>
-        <numerusform>Failed to delete %n groups.</numerusform>
+      <translation>
+        <numerusform>Nepavyko ištrinti serverio.</numerusform>
+        <numerusform>Nepavyko ištrinti serverio.</numerusform>
+        <numerusform>Nepavyko ištrinti serverio.</numerusform>
+        <numerusform>Nepavyko ištrinti serverio.</numerusform>
       </translation>
     </message>
     <message>
       <source>Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</source>
-      <translation type="unfinished">Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</translation>
+      <translation>Kai kurios grupės viena kitą turi ir kaip tėvinius, ir antrinius narius arba yra tokios žiedinės nuorodų grandinės dalis. Dėl to gali būti neteisingai apskaičiuotos teisės.</translation>
     </message>
   </context>
   <context>
@@ -6378,19 +6379,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>Visi vartotojai šioje grupėje</translation>
     </message>
     <message>
       <source>Users with Digest Authentication</source>
-      <translation type="unfinished">Users with Digest Authentication</translation>
+      <translation>Vartotojai, turintys santraukos autentifikavimą</translation>
     </message>
     <message>
       <source>No users found</source>
-      <translation type="unfinished">No users found</translation>
+      <translation>No user found</translation>
     </message>
     <message>
       <source>Change search criteria or create a new user</source>
-      <translation type="unfinished">Change search criteria or create a new user</translation>
+      <translation>Pakeiskite paieškos kriterijus arba sukurkite naują vartotoją</translation>
     </message>
     <message>
       <source>Edit</source>
@@ -6398,62 +6399,62 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</source>
-      <translation type="unfinished">Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</translation>
+      <translation>Keli vartotojai naudoja tuos pačius prisijungimo duomenis, todėl prisijungimas nepavyksta. Norėdami išspręsti šią problemą, atnaujinkite paveiktų vartotojų prisijungimo duomenis arba išjunkite / ištrinkite pasikartojančius duomenis.</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n users</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n users</numerusform>
-        <numerusform>Delete %n users</numerusform>
-        <numerusform>Delete %n users</numerusform>
-        <numerusform>Delete %n users</numerusform>
+      <translation>
+        <numerusform>Ištrinti vartotoją?</numerusform>
+        <numerusform>Ištrinti vartotoją?</numerusform>
+        <numerusform>Ištrinti vartotoją?</numerusform>
+        <numerusform>Ištrinti vartotoją?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>LDAP server is offline. %n users are not able to log in.</source>
-      <translation type="unfinished">
-        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
-        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
-        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
-        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
+      <translation>
+        <numerusform>LDAP serveris neprisijungęs. %n vartotojai negali prisijungti.</numerusform>
+        <numerusform>LDAP serveris neprisijungęs. %n vartotojai negali prisijungti.</numerusform>
+        <numerusform>LDAP serveris neprisijungęs. %n vartotojai negali prisijungti.</numerusform>
+        <numerusform>LDAP serveris neprisijungęs. %n vartotojai negali prisijungti.</numerusform>
       </translation>
     </message>
     <message>
       <source>Failed to delete user &quot;%1&quot;.</source>
-      <translation type="unfinished">Failed to delete user &quot;%1&quot;.</translation>
+      <translation>Nepavyko ištrinti naudotojo &quot;%1&quot;.</translation>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n users.</source>
-      <translation type="unfinished">
-        <numerusform>Failed to delete %n users.</numerusform>
-        <numerusform>Failed to delete %n users.</numerusform>
-        <numerusform>Failed to delete %n users.</numerusform>
-        <numerusform>Failed to delete %n users.</numerusform>
+      <translation>
+        <numerusform>Nepavyko ištrinti serverio.</numerusform>
+        <numerusform>Nepavyko ištrinti serverio.</numerusform>
+        <numerusform>Nepavyko ištrinti serverio.</numerusform>
+        <numerusform>Nepavyko ištrinti serverio.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n existing LDAP users are not found in the LDAP database</source>
-      <translation type="unfinished">
-        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
-        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
-        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
-        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
+      <translation>
+        <numerusform>%n esamų LDAP vartotojų LDAP duomenų bazėje nerasta</numerusform>
+        <numerusform>%n esamų LDAP vartotojų LDAP duomenų bazėje nerasta</numerusform>
+        <numerusform>%n esamų LDAP vartotojų LDAP duomenų bazėje nerasta</numerusform>
+        <numerusform>%n esamų LDAP vartotojų LDAP duomenų bazėje nerasta</numerusform>
       </translation>
     </message>
     <message>
       <source>LDAP Users</source>
-      <translation type="unfinished">LDAP Users</translation>
+      <translation>LDAP vartotojai</translation>
     </message>
   </context>
   <context>
     <name>Videowall</name>
     <message>
       <source>There is another video wall with the same name</source>
-      <translation type="unfinished">There is another video wall with the same name</translation>
+      <translation>Yra dar viena vaizdo siena tuo pačiu pavadinimu</translation>
     </message>
     <message>
       <source>Close %1 before starting Video Wall?</source>
-      <translation type="unfinished">Close %1 before starting Video Wall?</translation>
+      <translation>Uždaryti %1 prieš paleidžiant vaizdo sieną?</translation>
     </message>
     <message>
       <source>Close</source>
@@ -6465,11 +6466,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
-      <translation type="unfinished">Local files cannot be placed on Video Wall Screen attached to another computer</translation>
+      <translation>Vietinių failų negalima patalpinti vaizdo sienos ekrane, prijungtame prie kito kompiuterio.</translation>
     </message>
     <message>
       <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
-      <translation type="unfinished">To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</translation>
+      <translation>Norėdami rodyti vietinius failus vaizdo sienoje, pridėkite juos naudodami kompiuterį, kuriame talpinama vaizdo siena.</translation>
     </message>
   </context>
   <context>
@@ -6480,15 +6481,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Reset all rules to defaults?</source>
-      <translation type="unfinished">Reset all rules to defaults?</translation>
+      <translation>Atkurti visų taisyklių numatytąsias reikšmes?</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n rules?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n rules?</numerusform>
-        <numerusform>Delete %n rules?</numerusform>
-        <numerusform>Delete %n rules?</numerusform>
-        <numerusform>Delete %n rules?</numerusform>
+      <translation>
+        <numerusform>Ištrinti %n taisykles?</numerusform>
+        <numerusform>Ištrinti %n taisykles?</numerusform>
+        <numerusform>Ištrinti %n taisykles?</numerusform>
+        <numerusform>Ištrinti %n taisykles?</numerusform>
       </translation>
     </message>
   </context>
@@ -6496,17 +6497,17 @@ If you intended to move analytics data to another storage location, please conta
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
-      <translation type="unfinished">Cannot write file</translation>
+      <translation>Nepavyksta įrašyti failo</translation>
     </message>
     <message>
       <source>%1 filename length is more than %2 characters.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
+      <translation>%1 failo pavadinimo ilgis yra ilgesnis nei %2 simbolių.</translation>
     </message>
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 is in use by another export.</translation>
+      <translation>%1 jau naudojamas kito eksporto.</translation>
     </message>
     <message>
       <source>Saving layout</source>
@@ -6514,27 +6515,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Exporting video</source>
-      <translation type="unfinished">Exporting video</translation>
+      <translation>Eksportuoti vaizdo įrašą</translation>
     </message>
     <message>
       <source>Stop Saving</source>
-      <translation type="unfinished">Stop Saving</translation>
+      <translation>Nustoti bendrinti</translation>
     </message>
     <message>
       <source>Stop Export</source>
-      <translation type="unfinished">Stop Export</translation>
+      <translation>Sustabdyti eksportą</translation>
     </message>
     <message>
       <source>Minimize</source>
-      <translation type="unfinished">Minimize</translation>
+      <translation>Minimizuoti</translation>
     </message>
     <message>
       <source>Video transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Video transcoding is required. Export session restarted.</translation>
+      <translation>Reikalingas vaizdo įrašo perkodavimas. Eksportavimo sesija paleista iš naujo.</translation>
     </message>
     <message>
       <source>Audio transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Audio transcoding is required. Export session restarted.</translation>
+      <translation>Reikalingas garso perkodavimas. Eksportavimo sesija paleista iš naujo.</translation>
     </message>
   </context>
   <context>
@@ -6549,86 +6550,86 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unsaved changes:</source>
-      <translation type="unfinished">Unsaved changes:</translation>
+      <translation>Neišsaugoti pakeitimai:</translation>
     </message>
     <message>
       <source>Save changes before exit?</source>
-      <translation type="unfinished">Save changes before exit?</translation>
+      <translation>Išsaugoti pakeitimus prieš išeinant?</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AbstractSearchWidgetPrivate</name>
     <message>
       <source>Hide information</source>
-      <translation type="unfinished">Hide information</translation>
+      <translation>Pridėti informaciją</translation>
     </message>
     <message>
       <source>Show information</source>
-      <translation type="unfinished">Show information</translation>
+      <translation>Rodyti informaciją</translation>
     </message>
     <message>
       <source>Hide thumbnails</source>
-      <translation type="unfinished">Hide thumbnails</translation>
+      <translation>Slėpti miniatiūras</translation>
     </message>
     <message>
       <source>Show thumbnails</source>
-      <translation type="unfinished">Show thumbnails</translation>
+      <translation>Rodyti miniatiūras</translation>
     </message>
     <message>
       <source>Last day</source>
-      <translation type="unfinished">Last day</translation>
+      <translation>Vakar</translation>
     </message>
     <message>
       <source>Last 7 days</source>
-      <translation type="unfinished">Last 7 days</translation>
+      <translation>Pastarosios 7 dienos</translation>
     </message>
     <message>
       <source>Last 30 days</source>
-      <translation type="unfinished">Last 30 days</translation>
+      <translation>Paskutinės 30 dienų</translation>
     </message>
     <message>
       <source>Selected on Timeline</source>
-      <translation type="unfinished">Selected on Timeline</translation>
+      <translation>Pasirinkta laiko juostoje</translation>
     </message>
     <message>
       <source>Any time</source>
-      <translation type="unfinished">Any time</translation>
+      <translation>Bet kada</translation>
     </message>
     <message>
       <source>Devices on layout</source>
-      <translation type="unfinished">Devices on layout</translation>
+      <translation>Įrenginiai išdėstyme</translation>
     </message>
     <message>
       <source>Cameras on layout</source>
-      <translation type="unfinished">Cameras on layout</translation>
+      <translation>Kameros išdėstyme</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Pasirinktas įrenginys</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation type="unfinished">Selected camera</translation>
+      <translation>Pasirinkta kamera</translation>
     </message>
     <message>
       <source>Choose devices...</source>
-      <translation type="unfinished">Choose devices...</translation>
+      <translation>Pasirinkite įrenginius...</translation>
     </message>
     <message>
       <source>Choose cameras...</source>
-      <translation type="unfinished">Choose cameras...</translation>
+      <translation>Pasirinkite kameras...</translation>
     </message>
     <message>
       <source>Any device</source>
-      <translation type="unfinished">Any device</translation>
+      <translation>Bet kuris prietaisas</translation>
     </message>
     <message>
       <source>Any camera</source>
-      <translation type="unfinished">Any camera</translation>
+      <translation>Bet kokia kamera</translation>
     </message>
     <message>
       <source>Selected media</source>
-      <translation type="unfinished">Selected media</translation>
+      <translation>Pasirinkta medija</translation>
     </message>
     <message>
       <source>none</source>
@@ -6637,136 +6638,136 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
+      <translation>
+        <numerusform>%n pasirinkti įrenginiai</numerusform>
+        <numerusform>%n pasirinkti įrenginiai</numerusform>
+        <numerusform>%n pasirinkti įrenginiai</numerusform>
+        <numerusform>%n pasirinkti įrenginiai</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n chosen cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen cameras</numerusform>
-        <numerusform>%n chosen cameras</numerusform>
-        <numerusform>%n chosen cameras</numerusform>
-        <numerusform>%n chosen cameras</numerusform>
+      <translation>
+        <numerusform>%n pasirinktos kameros</numerusform>
+        <numerusform>%n pasirinktos kameros</numerusform>
+        <numerusform>%n pasirinktos kameros</numerusform>
+        <numerusform>%n pasirinktos kameros</numerusform>
       </translation>
     </message>
     <message>
       <source>Chosen device</source>
-      <translation type="unfinished">Chosen device</translation>
+      <translation>Pasirinktas įrenginys</translation>
     </message>
     <message>
       <source>Chosen camera</source>
-      <translation type="unfinished">Chosen camera</translation>
+      <translation>Pasirinkta kamera</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AccessRightsList</name>
     <message>
       <source>View Archive</source>
-      <translation type="unfinished">View Archive</translation>
+      <translation>Peržiūrėti archyvą</translation>
     </message>
     <message>
       <source>Export Archive</source>
-      <translation type="unfinished">Export Archive</translation>
+      <translation>Eksportuoti archyvą</translation>
     </message>
     <message>
       <source>View Bookmarks</source>
-      <translation type="unfinished">View Bookmarks</translation>
+      <translation>View Bookmarks (Automatic Copy)</translation>
     </message>
     <message>
       <source>Manage Bookmarks</source>
-      <translation type="unfinished">Manage Bookmarks</translation>
+      <translation>Tvarkyti žymes</translation>
     </message>
     <message>
       <source>Depending on the resource type it either allows user to modify device settings or to control video wall.</source>
-      <translation type="unfinished">Depending on the resource type it either allows user to modify device settings or to control video wall.</translation>
+      <translation>Priklausomai nuo ištekliaus tipo, vartotojas gali keisti įrenginio nustatymus arba valdyti vaizdo sieną.</translation>
     </message>
     <message>
       <source>Allows users to access a resource and view live footage from a camera.</source>
-      <translation type="unfinished">Allows users to access a resource and view live footage from a camera.</translation>
+      <translation>Leidžia vartotojams pasiekti išteklius ir peržiūrėti tiesioginę kameros transliaciją.</translation>
     </message>
     <message>
       <source>Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</source>
-      <translation type="unfinished">Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</translation>
+      <translation>Leidžia vartotojui valdyti PTZ, naudoti dvipusį garsą, švelnius paleidiklius ir įvesties/išvesties mygtukus.</translation>
     </message>
     <message>
       <source>View Live.</source>
-      <translation type="unfinished">View Live.</translation>
+      <translation>Žiūrėti tiesiogiai.</translation>
     </message>
     <message>
       <source>User Input.</source>
-      <translation type="unfinished">User Input.</translation>
+      <translation>Vartotojo įvestis.</translation>
     </message>
     <message>
       <source>Edit Settings.</source>
-      <translation type="unfinished">Edit Settings.</translation>
+      <translation>Svetainės nustatymai.</translation>
     </message>
     <message>
       <source>Play Audio</source>
-      <translation type="unfinished">Play Audio</translation>
+      <translation>Dvipusis garsas</translation>
     </message>
     <message>
       <source>Allows users to access an audio stream from a device. Used in combination with View Live and/or View Archive.</source>
-      <translation type="unfinished">Allows users to access an audio stream from a device. Used in combination with View Live and/or View Archive.</translation>
+      <translation>Leidžia vartotojams pasiekti garso srautą iš įrenginio. Naudojama kartu su „Peržiūrėti tiesiogiai“ ir (arba) „Peržiūrėti archyvą“.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AccessibleMediaViewHeaderWidget</name>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation type="unfinished">All Cameras &amp; Resources</translation>
+      <translation>Ieškoti fotoaparatų ir išteklių</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AdvancedSystemSettingsWidget</name>
     <message>
       <source>Backup and Restore</source>
-      <translation type="unfinished">Backup and Restore</translation>
+      <translation>Atsarginės kopijos ir atkūrimas</translation>
     </message>
     <message>
       <source>Logs Management</source>
-      <translation type="unfinished">Logs Management</translation>
+      <translation>Sąrašų valdymas</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AlarmLayoutHandler</name>
     <message>
       <source>Alarms</source>
-      <translation type="unfinished">Alarms</translation>
+      <translation>Žadintuvai</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
     <message>
       <source>Add To List</source>
-      <translation type="unfinished">Add To List</translation>
+      <translation>Įtraukti į sąrašą</translation>
     </message>
     <message>
       <source>Create New List...</source>
-      <translation type="unfinished">Create New List...</translation>
+      <translation>Kurti naują...</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchWidget</name>
     <message>
       <source>No objects</source>
-      <translation type="unfinished">No objects</translation>
+      <translation>Nėra objektų</translation>
     </message>
     <message numerus="yes">
       <source>%n objects</source>
-      <translation type="unfinished">
-        <numerusform>%n objects</numerusform>
-        <numerusform>%n objects</numerusform>
-        <numerusform>%n objects</numerusform>
-        <numerusform>%n objects</numerusform>
+      <translation>
+        <numerusform>%n objektai</numerusform>
+        <numerusform>%n objektai</numerusform>
+        <numerusform>%n objektai</numerusform>
+        <numerusform>%n objektai</numerusform>
       </translation>
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Pabandykite pakeisti filtrus arba sukonfigūruoti objektų aptikimą kameros įskiepio nustatymuose.</translation>
     </message>
   </context>
   <context>
@@ -6784,113 +6785,113 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AudioRedirectPickerWidget</name>
     <message>
       <source>Select Device...</source>
-      <translation type="unfinished">Select Device...</translation>
+      <translation>Pasirinkite įrenginį...</translation>
     </message>
     <message>
       <source>Use audio stream from</source>
-      <translation type="unfinished">Use audio stream from</translation>
+      <translation>Naudoti garso srautą iš</translation>
     </message>
     <message>
       <source>Transmit audio stream to</source>
-      <translation type="unfinished">Transmit audio stream to</translation>
+      <translation>Perduoti garso srautą į</translation>
     </message>
     <message>
       <source>This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</source>
-      <translation type="unfinished">This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</translation>
+      <translation>Šis įrenginys neturi garso įvesties arba yra netinkamai sukonfigūruotas. Pasirinkite kitą įrenginį kaip garso šaltinį.</translation>
     </message>
     <message>
       <source>This camera does not have an audio input, or it is not configured correctly. Select another camera as an audio source.</source>
-      <translation type="unfinished">This camera does not have an audio input, or it is not configured correctly. Select another camera as an audio source.</translation>
+      <translation>Ši kamera neturi garso įvesties arba ji netinkamai sukonfigūruota. Pasirinkite kitą kamerą kaip garso šaltinį.</translation>
     </message>
     <message>
       <source>This device does not have an audio output, or it is not configured correctly. Select another device for audio playback.</source>
-      <translation type="unfinished">This device does not have an audio output, or it is not configured correctly. Select another device for audio playback.</translation>
+      <translation>Šis įrenginys neturi garso išvesties arba yra netinkamai sukonfigūruotas. Pasirinkite kitą įrenginį garso atkūrimui.</translation>
     </message>
     <message>
       <source>This camera does not have an audio output, or it is not configured correctly. Select another camera for audio playback.</source>
-      <translation type="unfinished">This camera does not have an audio output, or it is not configured correctly. Select another camera for audio playback.</translation>
+      <translation>Ši kamera neturi garso išvesties arba ji netinkamai sukonfigūruota. Garso atkūrimui pasirinkite kitą kamerą.</translation>
     </message>
     <message>
       <source>Use this device for audio output</source>
-      <translation type="unfinished">Use this device for audio output</translation>
+      <translation>Naudokite šį įrenginį garso išvesčiai</translation>
     </message>
     <message>
       <source>Use this camera for audio output</source>
-      <translation type="unfinished">Use this camera for audio output</translation>
+      <translation>Naudokite šią kamerą garso išvesčiai</translation>
     </message>
     <message>
       <source>Use audio stream from another device</source>
-      <translation type="unfinished">Use audio stream from another device</translation>
+      <translation>Naudokite garso srautą iš kito įrenginio</translation>
     </message>
     <message>
       <source>Use audio stream from another camera</source>
-      <translation type="unfinished">Use audio stream from another camera</translation>
+      <translation>Naudoti garso srautą iš kitos kameros</translation>
     </message>
     <message>
       <source>Transmit audio stream to another device</source>
-      <translation type="unfinished">Transmit audio stream to another device</translation>
+      <translation>Perduoti garso srautą į kitą įrenginį</translation>
     </message>
     <message>
       <source>Transmit audio stream to another camera</source>
-      <translation type="unfinished">Transmit audio stream to another camera</translation>
+      <translation>Perduoti garso srautą į kitą kamerą</translation>
     </message>
     <message>
       <source>Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</translation>
+      <translation>Pasirinktas įrenginys&apos;neturi garso įvesties arba jis&apos;nėra sukonfigūruotas. Garso srautas negalimas.</translation>
     </message>
     <message>
       <source>Selected device doesn&apos;t have audio output or it&apos;s not configured. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device doesn&apos;t have audio output or it&apos;s not configured. Audio stream is not available.</translation>
+      <translation>Pasirinktas įrenginys&apos;neturi garso išvesties arba jis&apos;nėra sukonfigūruotas. Garso srautas negalimas.</translation>
     </message>
     <message>
       <source>The selected device doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>
-      <translation type="unfinished">The selected device doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</translation>
+      <translation>Pasirinktas įrenginys&apos;neturi garso įvesties arba yra netinkamai sukonfigūruotas. Garso srautas nepasiekiamas.</translation>
     </message>
     <message>
       <source>The selected camera doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>
-      <translation type="unfinished">The selected camera doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</translation>
+      <translation>Pasirinkta kamera&apos;neturi garso įvesties arba ji netinkamai sukonfigūruota. Garso srautas nepasiekiamas.</translation>
     </message>
     <message>
       <source>The selected device does not have an audio output, or it is not configured correctly. 2-way audio is not available.</source>
-      <translation type="unfinished">The selected device does not have an audio output, or it is not configured correctly. 2-way audio is not available.</translation>
+      <translation>Pasirinktas įrenginys neturi garso išvesties arba yra netinkamai sukonfigūruotas. Dvipusis garsas negalimas.</translation>
     </message>
     <message>
       <source>The selected camera does not have an audio output, or it is not configured correctly. 2-way audio is not available.</source>
-      <translation type="unfinished">The selected camera does not have an audio output, or it is not configured correctly. 2-way audio is not available.</translation>
+      <translation>Pasirinkta kamera neturi garso išvesties arba ji netinkamai sukonfigūruota. Dvipusis garsas negalimas.</translation>
     </message>
     <message>
       <source>Use audio stream from this device</source>
-      <translation type="unfinished">Use audio stream from this device</translation>
+      <translation>Naudoti garso srautą iš šio įrenginio</translation>
     </message>
     <message>
       <source>Use audio stream from this camera</source>
-      <translation type="unfinished">Use audio stream from this camera</translation>
+      <translation>Naudoti garso srautą iš šios kameros</translation>
     </message>
     <message>
       <source>%1 is connected to another server. Audio stream is not available</source>
-      <translation type="unfinished">%1 is connected to another server. Audio stream is not available</translation>
+      <translation>%1 prisijungė prie kito serverio. Garso transliacija negalima.</translation>
     </message>
     <message>
       <source>Selected device is connected to another server. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device is connected to another server. Audio stream is not available.</translation>
+      <translation>Pasirinktas įrenginys prijungtas prie kito serverio. Garso srautas negalimas.</translation>
     </message>
     <message>
       <source>Selected camera is connected to another server. Audio stream is not available.</source>
-      <translation type="unfinished">Selected camera is connected to another server. Audio stream is not available.</translation>
+      <translation>Pasirinkta kamera prijungta prie kito serverio. Garso srautas negalimas.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupBandwidthSettingsWidget</name>
     <message>
       <source>Select an area on the schedule to apply chosen settings.</source>
-      <translation type="unfinished">Select an area on the schedule to apply chosen settings.</translation>
+      <translation>Pasirinkite grafiko sritį, kad pritaikytumėte pasirinktus nustatymus.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupSettingsDecoratorModel</name>
     <message>
       <source>The camera has neither recorded footage nor recording scheduled</source>
-      <translation type="unfinished">The camera has neither recorded footage nor recording scheduled</translation>
+      <translation>Kamera neturi nei įrašytos medžiagos, nei suplanuoto įrašymo</translation>
     </message>
     <message>
       <source>Motion detection is disabled</source>
@@ -6898,7 +6899,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No analytics plugins</source>
-      <translation type="unfinished">No analytics plugins</translation>
+      <translation>Nėra analizės įskiepių</translation>
     </message>
     <message>
       <source>Cameras</source>
@@ -6906,7 +6907,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>What to backup</source>
-      <translation type="unfinished">What to backup</translation>
+      <translation>Ką reikia atsarginę kopiją kurti</translation>
     </message>
     <message>
       <source>Quality</source>
@@ -6914,15 +6915,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cannot be modified for new added cameras</source>
-      <translation type="unfinished">Cannot be modified for new added cameras</translation>
+      <translation>Negalima modifikuoti naujai pridėtoms kameroms</translation>
     </message>
     <message>
       <source>This device provides only one data stream</source>
-      <translation type="unfinished">This device provides only one data stream</translation>
+      <translation>Šis įrenginys teikia tik vieną duomenų srautą</translation>
     </message>
     <message>
       <source>Stream setting is not applicable to this device type</source>
-      <translation type="unfinished">Stream setting is not applicable to this device type</translation>
+      <translation>Srauto nustatymas netaikomas šiam įrenginio tipui</translation>
     </message>
     <message>
       <source>Not supported</source>
@@ -6930,49 +6931,49 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Backup is not supported for this device</source>
-      <translation type="unfinished">Backup is not supported for this device</translation>
+      <translation>Atsarginių kopijų kūrimas šiame įrenginyje nepalaikomas</translation>
     </message>
     <message>
       <source>Nothing to backup</source>
-      <translation type="unfinished">Nothing to backup</translation>
+      <translation>Nėra ko atsarginės kopijos</translation>
     </message>
     <message>
       <source>Insufficient services</source>
-      <translation type="unfinished">Insufficient services</translation>
+      <translation>Nepakankamos paslaugos</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services are required</source>
-      <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services are required</numerusform>
-        <numerusform>%n suitable cloud storage services are required</numerusform>
-        <numerusform>%n suitable cloud storage services are required</numerusform>
-        <numerusform>%n suitable cloud storage services are required</numerusform>
+      <translation>
+        <numerusform>%n Reikalingos tinkamos debesies saugyklos paslaugos</numerusform>
+        <numerusform>%n Reikalingos tinkamos debesies saugyklos paslaugos</numerusform>
+        <numerusform>%n Reikalingos tinkamos debesies saugyklos paslaugos</numerusform>
+        <numerusform>%n Reikalingos tinkamos debesies saugyklos paslaugos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Megapixels</source>
-      <translation type="unfinished">
-        <numerusform>%n Megapixels</numerusform>
-        <numerusform>%n Megapixels</numerusform>
-        <numerusform>%n Megapixels</numerusform>
-        <numerusform>%n Megapixels</numerusform>
+      <translation>
+        <numerusform>%n Megapikseliai</numerusform>
+        <numerusform>%n Megapikseliai</numerusform>
+        <numerusform>%n Megapikseliai</numerusform>
+        <numerusform>%n Megapikseliai</numerusform>
       </translation>
     </message>
     <message>
       <source>Unknown resolution</source>
-      <translation type="unfinished">Unknown resolution</translation>
+      <translation>Nežinoma raiška</translation>
     </message>
     <message>
       <source>No suitable cloud storage services available</source>
-      <translation type="unfinished">No suitable cloud storage services available</translation>
+      <translation>Nėra tinkamų debesies saugyklos paslaugų</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services available</source>
-      <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services available</numerusform>
-        <numerusform>%n suitable cloud storage services available</numerusform>
-        <numerusform>%n suitable cloud storage services available</numerusform>
-        <numerusform>%n suitable cloud storage services available</numerusform>
+      <translation>
+        <numerusform>%n tinkamos debesies saugyklos paslaugos prieinamos</numerusform>
+        <numerusform>%n tinkamos debesies saugyklos paslaugos prieinamos</numerusform>
+        <numerusform>%n tinkamos debesies saugyklos paslaugos prieinamos</numerusform>
+        <numerusform>%n tinkamos debesies saugyklos paslaugos prieinamos</numerusform>
       </translation>
     </message>
     <message>
@@ -6981,24 +6982,24 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Setting was changed</source>
-      <translation type="unfinished">Setting was changed</translation>
+      <translation>Nustatymas buvo pakeistas</translation>
     </message>
     <message>
       <source>&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</source>
-      <translation type="unfinished">&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</translation>
+      <translation>&quot;Visų archyvų&quot; parinktis pakeista į &quot;Judesiai, objektai, žymės&quot; , nes buvo įjungtas atsarginis kopijavimas debesies saugykloje</translation>
     </message>
     <message>
       <source>Site is currently suspended</source>
-      <translation type="unfinished">Site is currently suspended</translation>
+      <translation>Svetainė šiuo metu sustabdyta</translation>
     </message>
     <message numerus="yes">
       <source>%n MP</source>
       <comment>Numerus: MP for Megapixels</comment>
-      <translation type="unfinished">
-        <numerusform>%n MP</numerusform>
-        <numerusform>%n MP</numerusform>
-        <numerusform>%n MP</numerusform>
-        <numerusform>%n MP</numerusform>
+      <translation>
+        <numerusform>%n Parlamento narys</numerusform>
+        <numerusform>%n Parlamento narys</numerusform>
+        <numerusform>%n Parlamento narys</numerusform>
+        <numerusform>%n Parlamento narys</numerusform>
       </translation>
     </message>
   </context>
@@ -7006,11 +7007,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::BackupSettingsPickerWidget</name>
     <message>
       <source>Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</source>
-      <translation type="unfinished">Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</translation>
+      <translation>Norėdami pasirinkti kelis įrenginius paketiniam redagavimui, naudokite %1 arba %2 . Norėdami pasirinkti visus įrenginius, naudokite %3.</translation>
     </message>
     <message>
       <source>What to backup</source>
-      <translation type="unfinished">What to backup</translation>
+      <translation>Ką reikia atsarginę kopiją kurti</translation>
     </message>
     <message>
       <source>Quality</source>
@@ -7018,11 +7019,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Set for %n selected devices</source>
-      <translation type="unfinished">
-        <numerusform>Set for %n selected devices</numerusform>
-        <numerusform>Set for %n selected devices</numerusform>
-        <numerusform>Set for %n selected devices</numerusform>
-        <numerusform>Set for %n selected devices</numerusform>
+      <translation>
+        <numerusform>Nustatyti %n pasirinktiems įrenginiams</numerusform>
+        <numerusform>Nustatyti %n pasirinktiems įrenginiams</numerusform>
+        <numerusform>Nustatyti %n pasirinktiems įrenginiams</numerusform>
+        <numerusform>Nustatyti %n pasirinktiems įrenginiams</numerusform>
       </translation>
     </message>
   </context>
@@ -7030,20 +7031,20 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::BackupSettingsViewWidget</name>
     <message>
       <source>There are more cameras being backed up than available services. Please disable backup for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
-      <translation type="unfinished">There are more cameras being backed up than available services. Please disable backup for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</translation>
+      <translation>Šią integraciją naudoja daugiau kamerų nei yra galimų paslaugų. Išjunkite kai kurių kamerų integraciją arba pridėkite daugiau tinkamų paslaugų. Priešingu atveju tai bus padaryta automatiškai %1</translation>
     </message>
     <message>
       <source>%1 more suitable cloud storage services are required to activate back up for all selected devices</source>
       <comment>%1 is the number of cameras for which there are not enough licenses in the cloud storage.</comment>
-      <translation type="unfinished">%1 more suitable cloud storage services are required to activate back up for all selected devices</translation>
+      <translation>%1 Norint suaktyvinti atsarginių kopijų kūrimą visuose pasirinktuose įrenginiuose, reikia tinkamesnių debesies saugyklos paslaugų</translation>
     </message>
     <message>
       <source>But you can still use a common switch to enable backups for those cameras for which this is possible</source>
-      <translation type="unfinished">But you can still use a common switch to enable backups for those cameras for which this is possible</translation>
+      <translation>Tačiau vis tiek galite naudoti bendrą jungiklį, kad įjungtumėte atsargines kopijas toms kameroms, kurioms tai įmanoma.</translation>
     </message>
     <message>
       <source>Backup will be turned off for newly added cameras on all servers at the site</source>
-      <translation type="unfinished">Backup will be turned off for newly added cameras on all servers at the site</translation>
+      <translation>Visuose svetainės serveriuose naujai pridėtoms kameroms bus išjungtas atsarginis kopijavimas.</translation>
     </message>
     <message numerus="yes">
       <source>Backup will not be activated for %n devices:</source>
@@ -7072,25 +7073,25 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Bandwidth Limit</source>
-      <translation type="unfinished">Bandwidth Limit</translation>
+      <translation>Pralaidumo riba</translation>
     </message>
     <message>
       <source>New added cameras</source>
-      <translation type="unfinished">New added cameras</translation>
+      <translation>Susijusios kameros</translation>
     </message>
     <message>
       <source>Storage Management</source>
-      <translation type="unfinished">Storage Management</translation>
+      <translation>Saugyklos valdymas</translation>
     </message>
     <message>
       <source>To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</source>
       <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
-      <translation type="unfinished">To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</translation>
+      <translation>Norėdami įjungti atsarginę kopiją, pakeiskite &quot;pagrindinę&quot; į &quot;atsarginę kopiją&quot; iš kai kurių saugyklų %1.</translation>
     </message>
     <message>
       <source>To enable backup add more drives to use them as backup storage in %1</source>
       <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
-      <translation type="unfinished">To enable backup add more drives to use them as backup storage in %1</translation>
+      <translation>Norėdami įjungti atsarginių kopijų kūrimo funkciją, pridėkite daugiau diskų, kad galėtumėte juos naudoti kaip atsarginių kopijų saugyklą %1</translation>
     </message>
     <message>
       <source>Server is offline</source>
@@ -7098,38 +7099,38 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Backup settings are not available</source>
-      <translation type="unfinished">Backup settings are not available</translation>
+      <translation>Įrašymo nustatymai negalimi</translation>
     </message>
     <message>
       <source>Applies to all servers</source>
-      <translation type="unfinished">Applies to all servers</translation>
+      <translation>Taikoma visiems serveriams</translation>
     </message>
     <message>
       <source>Site shut down</source>
-      <translation type="unfinished">Site shut down</translation>
+      <translation>Svetainė uždaryta</translation>
     </message>
     <message>
       <source>To perform backup to a cloud storage, the site should be in active state. %1</source>
-      <translation type="unfinished">To perform backup to a cloud storage, the site should be in active state. %1</translation>
+      <translation>Norint sukurti atsarginę kopiją debesies saugykloje, svetainė turi būti aktyvios būsenos. %1</translation>
     </message>
     <message>
       <source>Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
-      <translation type="unfinished">Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</translation>
+      <translation>Atsarginių kopijų kūrimas debesyje tęsiasi, tačiau svetainė šiuo metu sustabdyta. Ji turi būti aktyvi, kad būtų galima keisti įrenginio nustatymus &quot;Ką kurti atsargines kopijas&quot; ir &quot;Kokybė&quot; arba įjungti atsarginių kopijų kūrimą debesyje. Taip pat galite ją išjungti. %1</translation>
     </message>
     <message>
       <source>The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</source>
-      <translation type="unfinished">The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</translation>
+      <translation>Atsarginėms kopijoms pasirinktų įrenginių skaičius viršija galimų paslaugų skaičių. Pridėkite papildomų paslaugų arba sumažinkite atsarginėms kopijoms sukonfigūruotų įrenginių skaičių. %1 svetainė automatiškai apribos atsarginių kopijų kūrimui naudojamų įrenginių skaičių, kad jis atitiktų galimų paslaugų skaičių.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupStatusWidget</name>
     <message>
       <source>Backup process will ignore existing footage. Only further recording will be backed up.</source>
-      <translation type="unfinished">Backup process will ignore existing footage. Only further recording will be backed up.</translation>
+      <translation>Atsarginių kopijų kūrimo procesas ignoruos esamą filmuotą medžiagą. Bus kuriamos tik tolesnių įrašų atsarginės kopijos.</translation>
     </message>
     <message>
       <source>Skip backup for existing footage?</source>
-      <translation type="unfinished">Skip backup for existing footage?</translation>
+      <translation>Praleisti esamos filmuotos medžiagos atsarginę kopiją?</translation>
     </message>
     <message>
       <source>This action cannot be undone.</source>
@@ -7137,103 +7138,103 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Applies only to the cameras connected to current server.</source>
-      <translation type="unfinished">Applies only to the cameras connected to current server.</translation>
+      <translation>Taikoma tik prie dabartinio serverio prijungtoms kameroms.</translation>
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Backup is enabled for %n devices</numerusform>
-        <numerusform>Backup is enabled for %n devices</numerusform>
-        <numerusform>Backup is enabled for %n devices</numerusform>
-        <numerusform>Backup is enabled for %n devices</numerusform>
+      <translation>
+        <numerusform>Atsarginių kopijų kūrimas įjungtas %n įrenginiuose</numerusform>
+        <numerusform>Atsarginių kopijų kūrimas įjungtas %n įrenginiuose</numerusform>
+        <numerusform>Atsarginių kopijų kūrimas įjungtas %n įrenginiuose</numerusform>
+        <numerusform>Atsarginių kopijų kūrimas įjungtas %n įrenginiuose</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Backup is enabled for %n cameras</numerusform>
-        <numerusform>Backup is enabled for %n cameras</numerusform>
-        <numerusform>Backup is enabled for %n cameras</numerusform>
-        <numerusform>Backup is enabled for %n cameras</numerusform>
+      <translation>
+        <numerusform>Atsarginių kopijų kūrimas įjungtas %n kameroms</numerusform>
+        <numerusform>Atsarginių kopijų kūrimas įjungtas %n kameroms</numerusform>
+        <numerusform>Atsarginių kopijų kūrimas įjungtas %n kameroms</numerusform>
+        <numerusform>Atsarginių kopijų kūrimas įjungtas %n kameroms</numerusform>
       </translation>
     </message>
     <message>
       <source>The progress will be displayed once the backup process starts</source>
-      <translation type="unfinished">The progress will be displayed once the backup process starts</translation>
+      <translation>Eiga bus rodoma, kai prasidės atsarginės kopijos kūrimo procesas</translation>
     </message>
     <message>
       <source>Footage from these cameras is backed up through to %1 %2</source>
       <comment>%1 and %2 will be replaced respectively by the date and time in the site format.</comment>
-      <translation type="unfinished">Footage from these cameras is backed up through to %1 %2</translation>
+      <translation>Šių kamerų vaizdo įrašai yra kopijuojami į %1 %2</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BookmarkSearchWidget</name>
     <message>
       <source>No bookmarks</source>
-      <translation type="unfinished">No bookmarks</translation>
+      <translation>Žymių nėra</translation>
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
-      <translation type="unfinished">
-        <numerusform>%n bookmarks</numerusform>
-        <numerusform>%n bookmarks</numerusform>
-        <numerusform>%n bookmarks</numerusform>
-        <numerusform>%n bookmarks</numerusform>
+      <translation>
+        <numerusform>Žymių nėra</numerusform>
+        <numerusform>Žymių nėra</numerusform>
+        <numerusform>Žymių nėra</numerusform>
+        <numerusform>Žymių nėra</numerusform>
       </translation>
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation type="unfinished">Select a time span on the timeline and right-click the highlighted section to create a bookmark</translation>
+      <translation>Laiko juostoje pasirinkite laiko tarpą ir dešiniuoju pelės mygtuku spustelėkite paryškintą dalį, kad sukurtumėte žymę.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CallNotificationsListModel::Private</name>
     <message>
       <source>Calling...</source>
-      <translation type="unfinished">Calling...</translation>
+      <translation>Calling...</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation type="unfinished">Open</translation>
+      <translation>Atidaryti</translation>
     </message>
     <message>
       <source>Missed call</source>
-      <translation type="unfinished">Missed call</translation>
+      <translation>Praleistas skambutis</translation>
     </message>
     <message>
       <source>Call Request</source>
-      <translation type="unfinished">Call Request</translation>
+      <translation>Skambučio užklausa</translation>
     </message>
     <message>
       <source>Call Request Missed</source>
-      <translation type="unfinished">Call Request Missed</translation>
+      <translation>Praleistas skambučio prašymas</translation>
     </message>
     <message>
       <source>Source: %1</source>
-      <translation type="unfinished">Source: %1</translation>
+      <translation>Šaltinis: %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraAdvancedParamsWidget</name>
     <message>
       <source>Loading values...</source>
-      <translation type="unfinished">Loading values...</translation>
+      <translation>Įrenginių įkėlimas...</translation>
     </message>
     <message>
       <source>Applying changes...</source>
-      <translation type="unfinished">Applying changes...</translation>
+      <translation>Taikyti pakeitimus...</translation>
     </message>
     <message>
       <source>Force Motion Detection</source>
-      <translation type="unfinished">Force Motion Detection</translation>
+      <translation>Įjungti judesio aptikimą</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraButtonManager</name>
     <message>
       <source>Disabled by schedule</source>
-      <translation type="unfinished">Disabled by schedule</translation>
+      <translation>Išjungta pagal tvarkaraštį</translation>
     </message>
   </context>
   <context>
@@ -7256,56 +7257,56 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
-      <translation type="unfinished">Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</translation>
+      <translation>Padeda išspręsti kai kurių fotoaparatų vaizdo kokybės problemas; kitų atveju tai žymiai padidins bitų spartą.</translation>
     </message>
     <message>
       <source>Custom number that can be assigned to a camera for quick identification and access</source>
-      <translation type="unfinished">Custom number that can be assigned to a camera for quick identification and access</translation>
+      <translation>Pasirinktinis numeris, kurį galima priskirti kamerai, kad būtų galima greitai ją identifikuoti ir pasiekti</translation>
     </message>
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras:</source>
-      <translation type="unfinished">
-        <numerusform>This ID is already used on the following %n cameras:</numerusform>
-        <numerusform>This ID is already used on the following %n cameras:</numerusform>
-        <numerusform>This ID is already used on the following %n cameras:</numerusform>
-        <numerusform>This ID is already used on the following %n cameras:</numerusform>
+      <translation>
+        <numerusform>Šis ID jau naudojamas šiose %n kamerose:</numerusform>
+        <numerusform>Šis ID jau naudojamas šiose %n kamerose:</numerusform>
+        <numerusform>Šis ID jau naudojamas šiose %n kamerose:</numerusform>
+        <numerusform>Šis ID jau naudojamas šiose %n kamerose:</numerusform>
       </translation>
     </message>
     <message>
       <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
-      <translation type="unfinished">Server will not change any cameras settings, it will receive and use camera stream as-is.</translation>
+      <translation>Serveris nekeis jokių kamerų nustatymų, jis priims ir naudos kamerų srautą tokį, koks jis yra.</translation>
     </message>
     <message>
       <source>Multicast</source>
-      <translation type="unfinished">Multicast</translation>
+      <translation>Daugiaadresis perdavimas</translation>
     </message>
     <message>
       <source>Use if supported</source>
-      <translation type="unfinished">Use if supported</translation>
+      <translation>Naudoti, jei palaikoma</translation>
     </message>
     <message>
       <source>Never</source>
-      <translation type="unfinished">Never</translation>
+      <translation>Niekada</translation>
     </message>
     <message>
       <source>Force Motion Detection</source>
-      <translation type="unfinished">Force Motion Detection</translation>
+      <translation>Įjungti judesio aptikimą</translation>
     </message>
     <message>
       <source>Pan</source>
-      <translation type="unfinished">Pan</translation>
+      <translation>Panorama</translation>
     </message>
     <message>
       <source>Pan &amp; Tilt</source>
-      <translation type="unfinished">Pan &amp; Tilt</translation>
+      <translation>Pakreipkite ir pasukite</translation>
     </message>
     <message>
       <source>Server will not push time settings to the camera.</source>
-      <translation type="unfinished">Server will not push time settings to the camera.</translation>
+      <translation>Serveris neperduos laiko nustatymų į kamerą.</translation>
     </message>
     <message>
       <source>default</source>
-      <translation type="unfinished">default</translation>
+      <translation>Numatytas</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -7318,42 +7319,42 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant</source>
-      <translation type="unfinished">Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant</translation>
+      <translation>Įrašymo tvarkaraščio kokybės ir kadrų dažnio (FPS) nustatymai taps nereikšmingi.</translation>
     </message>
     <message>
       <source>Do not change these settings unless you are absolutely sure of their potential impact on performance</source>
-      <translation type="unfinished">Do not change these settings unless you are absolutely sure of their potential impact on performance</translation>
+      <translation>Nekeiskite šių nustatymų, nebent esate visiškai tikri dėl jų galimo poveikio našumui</translation>
     </message>
     <message>
       <source>To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</source>
-      <translation type="unfinished">To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</translation>
+      <translation>Norint išvengti negrįžtamų archyvo pakeitimų, rekomenduojama išjungti &quot;Išsaugoti kameros laiko nustatymus&quot; prieš įjungiant &quot;Automatiškai importuoti vaizdo įrašą&quot;.</translation>
     </message>
     <message>
       <source>Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</source>
-      <translation type="unfinished">Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</translation>
+      <translation>Įjungus šį nustatymą, archyve gali būti negrįžtamų pakeitimų. Nerekomenduojama jo įjungti, kai aktyvus &quot;Automatinis vaizdo įrašo importavimas&quot;</translation>
     </message>
     <message>
       <source>Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</source>
-      <translation type="unfinished">Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</translation>
+      <translation>Automatiškai bus importuoti tik tie kameros arba serverio neprisijungus pasiekiami laikotarpiai, kurie buvo įjungus šią parinktį. Atkreipkite dėmesį: jei išjungsite šią parinktį, visi dar neimportuoti neprisijungus pasiekiami laikotarpiai bus prarasti ir jų vėliau atkurti nebus galima.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraHotspotItem</name>
     <message>
       <source>Open Camera</source>
-      <translation type="unfinished">Open Camera</translation>
+      <translation>Atidaryti fotoaparatą</translation>
     </message>
     <message>
       <source>Open Camera in new Tab</source>
-      <translation type="unfinished">Open Camera in new Tab</translation>
+      <translation>Atidaryti kamerą naujame skirtuke</translation>
     </message>
     <message>
       <source>Open Camera in place</source>
-      <translation type="unfinished">Open Camera in place</translation>
+      <translation>Atidarykite kamerą vietoje</translation>
     </message>
     <message>
       <source>Open Layout in new Tab</source>
-      <translation type="unfinished">Open Layout in new Tab</translation>
+      <translation>Atidaryti maketą naujame skirtuke</translation>
     </message>
   </context>
   <context>
@@ -7364,11 +7365,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Pointed</source>
-      <translation type="unfinished">Pointed</translation>
+      <translation>Smailus</translation>
     </message>
     <message>
       <source>Place Hotspot</source>
-      <translation type="unfinished">Place Hotspot</translation>
+      <translation>Vietos viešosios prieigos taškas</translation>
     </message>
     <message>
       <source>NO DATA</source>
@@ -7380,7 +7381,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select Target...</source>
-      <translation type="unfinished">Select Target...</translation>
+      <translation>Pasirinkti vietą...</translation>
     </message>
   </context>
   <context>
@@ -7391,61 +7392,61 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Color</source>
-      <translation type="unfinished">Color</translation>
+      <translation>Spalva</translation>
     </message>
     <message>
       <source>Pointed</source>
-      <translation type="unfinished">Pointed</translation>
+      <translation>Smailus</translation>
     </message>
     <message>
       <source>Target resource does not exist</source>
-      <translation type="unfinished">Target resource does not exist</translation>
+      <translation>Tikslinis išteklius neegzistuoja</translation>
     </message>
     <message>
       <source>Select Camera or Layout...</source>
-      <translation type="unfinished">Select Camera or Layout...</translation>
+      <translation>Pasirinkite kamerą makete...</translation>
     </message>
     <message>
       <source>Target</source>
-      <translation type="unfinished">Target</translation>
+      <translation>Tikslas</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraHotspotsSettingsWidget</name>
     <message>
       <source>Select Hotspot Target</source>
-      <translation type="unfinished">Select Hotspot Target</translation>
+      <translation>Pasirinkite karštosios zonos taikinį</translation>
     </message>
     <message>
       <source>Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</source>
-      <translation type="unfinished">Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</translation>
+      <translation>Aptiktas įrenginys su panoraminio vaizdo, pakreipimo ir (arba) priartinimo funkcijomis. Bet koks matymo lauko pakeitimas naudojant iš anksto nustatytus parametrus arba judinant gali lemti, kad aktyvioji zona nebebus aktuali.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraInfoWidget</name>
     <message>
       <source>Device Rules</source>
-      <translation type="unfinished">Device Rules</translation>
+      <translation>Įrenginio taisyklės</translation>
     </message>
     <message>
       <source>Camera Rules</source>
-      <translation type="unfinished">Camera Rules</translation>
+      <translation>Kameros taisyklės</translation>
     </message>
     <message>
       <source>I/O Module Rules</source>
-      <translation type="unfinished">I/O Module Rules</translation>
+      <translation>Įvesties/išvesties modulio taisyklės</translation>
     </message>
     <message>
       <source>More Info</source>
-      <translation type="unfinished">More Info</translation>
+      <translation>Daugiau informacijos</translation>
     </message>
     <message>
       <source>Less Info</source>
-      <translation type="unfinished">Less Info</translation>
+      <translation>Mažiau Informacijos</translation>
     </message>
     <message>
       <source>Use this link to add the camera to another site</source>
-      <translation type="unfinished">Use this link to add the camera to another site</translation>
+      <translation>Norėdami pridėti kamerą prie kitos svetainės, naudokite šią nuorodą</translation>
     </message>
   </context>
   <context>
@@ -7475,23 +7476,23 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraMotionSettingsWidget</name>
     <message>
       <source>Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation type="unfinished">Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
+      <translation>Kameros analizė veiks tik tada, kai bus žiūrima į kamerą. Įjunkite įrašymą, kad jis veiktų visą laiką.</translation>
     </message>
     <message>
       <source>Maximum number of motion detection rectangles for current camera is reached</source>
-      <translation type="unfinished">Maximum number of motion detection rectangles for current camera is reached</translation>
+      <translation>Pasiektas maksimalus judesio aptikimo stačiakampių skaičius dabartinei kamerai</translation>
     </message>
     <message>
       <source>Maximum number of ignore motion rectangles for current camera is reached</source>
-      <translation type="unfinished">Maximum number of ignore motion rectangles for current camera is reached</translation>
+      <translation>Pasiektas maksimalus dabartinės kameros ignoruojamų judesių stačiakampių skaičius</translation>
     </message>
     <message>
       <source>Maximum number of detect motion rectangles for current camera is reached</source>
-      <translation type="unfinished">Maximum number of detect motion rectangles for current camera is reached</translation>
+      <translation>Pasiektas maksimalus dabartinės kameros judesio aptikimo stačiakampių skaičius</translation>
     </message>
     <message>
       <source>Reset motion regions to default?</source>
-      <translation type="unfinished">Reset motion regions to default?</translation>
+      <translation>Atkurti judesio sričių numatytąsias reikšmes?</translation>
     </message>
     <message>
       <source>This action cannot be undone.</source>
@@ -7507,34 +7508,34 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Force Motion Detection</source>
-      <translation type="unfinished">Force Motion Detection</translation>
+      <translation>Įjungti judesio aptikimą</translation>
     </message>
     <message>
       <source>Select areas on the preview to set chosen sensitivity for</source>
-      <translation type="unfinished">Select areas on the preview to set chosen sensitivity for</translation>
+      <translation>Peržiūros lange pasirinkite sritis, kurioms norite nustatyti jautrumą</translation>
     </message>
     <message>
       <source>Choose a motion detection sensitivity and select some areas on the preview to set it for</source>
-      <translation type="unfinished">Choose a motion detection sensitivity and select some areas on the preview to set it for</translation>
+      <translation>Pasirinkite judesio aptikimo jautrumą ir peržiūros lange pasirinkite tam tikras sritis, kurioms jį norite nustatyti.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraReplacementDialog</name>
     <message>
       <source>Failed to replace camera</source>
-      <translation type="unfinished">Failed to replace camera</translation>
+      <translation>Nepavyko pakeisti kameros</translation>
     </message>
     <message>
       <source>Abort camera replacement?</source>
-      <translation type="unfinished">Abort camera replacement?</translation>
+      <translation>Nutraukti kameros keitimą?</translation>
     </message>
     <message>
       <source>Will be transferred partially:</source>
-      <translation type="unfinished">Will be transferred partially:</translation>
+      <translation>Bus perkelta iš dalies:</translation>
     </message>
     <message>
       <source>Will not be transferred:</source>
-      <translation type="unfinished">Will not be transferred:</translation>
+      <translation>Nebus perkeliama:</translation>
     </message>
     <message>
       <source>Next</source>
@@ -7546,106 +7547,106 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Camera for Replacement</source>
-      <translation type="unfinished">Camera for Replacement</translation>
+      <translation>Kamera pakeitimui</translation>
     </message>
     <message>
       <source>Data for Transfer</source>
-      <translation type="unfinished">Data for Transfer</translation>
+      <translation>Perkeliami duomenys</translation>
     </message>
     <message>
       <source>Camera replaced!</source>
-      <translation type="unfinished">Camera replaced!</translation>
+      <translation>Kamera pašalinta!</translation>
     </message>
     <message>
       <source>The Camera Replacement operation is not possible as the server is unavailable.</source>
-      <translation type="unfinished">The Camera Replacement operation is not possible as the server is unavailable.</translation>
+      <translation>Kameros pakeitimo operacija neįmanoma, nes serveris nepasiekiamas.</translation>
     </message>
     <message>
       <source>%1 will be removed from the site and replaced by the selected camera</source>
       <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation type="unfinished">%1 will be removed from the site and replaced by the selected camera</translation>
+      <translation>%1 bus pašalintas iš svetainės ir pakeistas pasirinkta kamera</translation>
     </message>
     <message>
       <source>Checking if the data from the camera can be transferred to the new one.</source>
-      <translation type="unfinished">Checking if the data from the camera can be transferred to the new one.</translation>
+      <translation>Tikrinama, ar duomenis iš kameros galima perkelti į naują.</translation>
     </message>
     <message>
       <source>Some data and settings may not be supported for the new camera</source>
-      <translation type="unfinished">Some data and settings may not be supported for the new camera</translation>
+      <translation>Kai kurie duomenys ir nustatymai gali būti nepalaikomi naujoje kameroje</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraScheduleWidget</name>
     <message>
       <source>Recording Schedule</source>
-      <translation type="unfinished">Recording Schedule</translation>
+      <translation>Įrašymo grafikas</translation>
     </message>
     <message>
       <source>based on server time</source>
-      <translation type="unfinished">based on server time</translation>
+      <translation>remiantis serverio laiku</translation>
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
-      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
+      <translation>Ilgas išankstinio įrašymo laikas padidins RAM panaudojimą serveryje</translation>
     </message>
     <message>
       <source>Select areas on the schedule to apply chosen parameters to</source>
-      <translation type="unfinished">Select areas on the schedule to apply chosen parameters to</translation>
+      <translation>Pasirinkite tvarkaraštyje sritis, kurioms norite taikyti pasirinktus parametrus</translation>
     </message>
     <message>
       <source>Set recording parameters and select areas on the schedule grid to apply them to</source>
-      <translation type="unfinished">Set recording parameters and select areas on the schedule grid to apply them to</translation>
+      <translation>Nustatykite įrašymo parametrus ir pasirinkite sritis tvarkaraščio tinklelyje, kurioms juos taikyti</translation>
     </message>
     <message>
       <source>High minimum value can lead to archive length decrease on other devices</source>
-      <translation type="unfinished">High minimum value can lead to archive length decrease on other devices</translation>
+      <translation>Dėl didelės minimalios vertės archyvo ilgis kituose įrenginiuose gali sumažėti</translation>
     </message>
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras</source>
-      <translation type="unfinished">High minimum value can lead to archive length decrease on other cameras</translation>
+      <translation>Didelė minimali vertė gali sumažinti archyvo ilgį kituose fotoaparatuose</translation>
     </message>
     <message>
       <source>Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</translation>
+      <translation>Įrašymas tęsiamas, tačiau svetainė šiuo metu sustabdyta. Norint pakeisti įrenginio įrašymo nustatymus arba įjungti įrašymą, ji turi būti aktyvi. Norėdami gauti pagalbos, susisiekite su savo kanalo partneriu.</translation>
     </message>
     <message>
       <source>Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</translation>
+      <translation>Atsarginių kopijų kūrimas debesyje buvo sustabdytas, nes svetainė buvo uždaryta. Norint sukurti atsarginę kopiją debesies saugykloje, ji turi būti aktyvi. Dėl pagalbos kreipkitės į savo kanalo partnerį.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
     <message>
       <source>Show all devices</source>
-      <translation type="unfinished">Show all devices</translation>
+      <translation>Rodyti visus įrenginius</translation>
     </message>
     <message>
       <source>Show all cameras</source>
-      <translation type="unfinished">Show all cameras</translation>
+      <translation>Rodyti visas kameras</translation>
     </message>
     <message>
       <source>Select Devices</source>
-      <translation type="unfinished">Select Devices</translation>
+      <translation>Pasirinkite įrenginius</translation>
     </message>
     <message>
       <source>Select Cameras</source>
-      <translation type="unfinished">Select Cameras</translation>
+      <translation>Pasirinkite kameras</translation>
     </message>
     <message>
       <source>Select Device</source>
-      <translation type="unfinished">Select Device</translation>
+      <translation>Pasirinkite įrenginį</translation>
     </message>
     <message>
       <source>Select Camera</source>
-      <translation type="unfinished">Select Camera</translation>
+      <translation>Pasirinkite kamerą</translation>
     </message>
     <message>
       <source>No cameras available</source>
-      <translation type="unfinished">No cameras available</translation>
+      <translation>Nėra vaizdo</translation>
     </message>
     <message>
       <source>Source camera</source>
-      <translation type="unfinished">Source camera</translation>
+      <translation>Šaltinio kamera</translation>
     </message>
   </context>
   <context>
@@ -7660,7 +7661,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>I/O Ports</source>
-      <translation type="unfinished">I/O Ports</translation>
+      <translation>Įvesties / išvesties prievadai</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -7668,54 +7669,54 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Advanced</source>
-      <translation type="unfinished">Advanced</translation>
+      <translation>Papildomi nustatymai</translation>
     </message>
     <message>
       <source>Web Page</source>
-      <translation type="unfinished">Web Page</translation>
+      <translation>Tinklalapiai</translation>
     </message>
     <message>
       <source>Expert</source>
-      <translation type="unfinished">Expert</translation>
+      <translation>Ekspertas</translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n devices are not saved:</source>
-      <translation type="unfinished">
-        <numerusform>Changes to the following %n devices are not saved:</numerusform>
-        <numerusform>Changes to the following %n devices are not saved:</numerusform>
-        <numerusform>Changes to the following %n devices are not saved:</numerusform>
-        <numerusform>Changes to the following %n devices are not saved:</numerusform>
+      <translation>
+        <numerusform>Šių %n įrenginių pakeitimai neišsaugomi:</numerusform>
+        <numerusform>Šių %n įrenginių pakeitimai neišsaugomi:</numerusform>
+        <numerusform>Šių %n įrenginių pakeitimai neišsaugomi:</numerusform>
+        <numerusform>Šių %n įrenginių pakeitimai neišsaugomi:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n cameras are not saved:</source>
-      <translation type="unfinished">
-        <numerusform>Changes to the following %n cameras are not saved:</numerusform>
-        <numerusform>Changes to the following %n cameras are not saved:</numerusform>
-        <numerusform>Changes to the following %n cameras are not saved:</numerusform>
-        <numerusform>Changes to the following %n cameras are not saved:</numerusform>
+      <translation>
+        <numerusform>Šių %n kamerų pakeitimai neišsaugomi:</numerusform>
+        <numerusform>Šių %n kamerų pakeitimai neišsaugomi:</numerusform>
+        <numerusform>Šių %n kamerų pakeitimai neišsaugomi:</numerusform>
+        <numerusform>Šių %n kamerų pakeitimai neišsaugomi:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n I/O Modules are not saved:</source>
-      <translation type="unfinished">
-        <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
-        <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
-        <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
-        <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
+      <translation>
+        <numerusform>Šių %n įvesties/išvesties modulių pakeitimai neišsaugomi:</numerusform>
+        <numerusform>Šių %n įvesties/išvesties modulių pakeitimai neišsaugomi:</numerusform>
+        <numerusform>Šių %n įvesties/išvesties modulių pakeitimai neišsaugomi:</numerusform>
+        <numerusform>Šių %n įvesties/išvesties modulių pakeitimai neišsaugomi:</numerusform>
       </translation>
     </message>
     <message>
       <source>Apply changes before switching to another camera?</source>
-      <translation type="unfinished">Apply changes before switching to another camera?</translation>
+      <translation>Pritaikyti pakeitimus prieš perjungiant į kitą serverį?</translation>
     </message>
     <message>
       <source>Device Settings</source>
-      <translation type="unfinished">Device Settings</translation>
+      <translation>Įrenginio nustatymai</translation>
     </message>
     <message>
       <source>Devices Settings</source>
-      <translation type="unfinished">Devices Settings</translation>
+      <translation>Įrenginių nustatymai</translation>
     </message>
     <message>
       <source>Camera Settings</source>
@@ -7723,15 +7724,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cameras Settings</source>
-      <translation type="unfinished">Cameras Settings</translation>
+      <translation>Kamerų nustatymai</translation>
     </message>
     <message>
       <source>I/O Module Settings</source>
-      <translation type="unfinished">I/O Module Settings</translation>
+      <translation>Įvesties / išvesties modulio nustatymai</translation>
     </message>
     <message>
       <source>I/O Modules Settings</source>
-      <translation type="unfinished">I/O Modules Settings</translation>
+      <translation>Įvesties/išvesties modulių nustatymai</translation>
     </message>
     <message>
       <source>Dewarping</source>
@@ -7739,31 +7740,31 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Change invalid schedule to &quot;Record Always&quot;</source>
-      <translation type="unfinished">Change invalid schedule to &quot;Record Always&quot;</translation>
+      <translation>Pakeiskite neteisingą tvarkaraštį į &quot;Įrašyti visada&quot;</translation>
     </message>
     <message>
       <source>Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</source>
-      <translation type="unfinished">Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</translation>
+      <translation>Kai kuriems įrašymo tvarkaraščio langeliams nustatytas netinkamas įrašymo režimas: %1. Valandomis, kurioms nustatytas netinkamas įrašymo režimas, kamera įrašys &quot;„Visada įrašinėti“&quot; režimu.</translation>
     </message>
     <message>
       <source>Motion Only</source>
-      <translation type="unfinished">Motion Only</translation>
+      <translation>Tik judesys</translation>
     </message>
     <message>
       <source>Objects Only</source>
-      <translation type="unfinished">Objects Only</translation>
+      <translation>Tik objektai</translation>
     </message>
     <message>
       <source>Motion &amp; Objects Only</source>
-      <translation type="unfinished">Motion &amp; Objects Only</translation>
+      <translation>Tik judesys ir objektai</translation>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Judesys + maža raiška</translation>
     </message>
     <message>
       <source>Objects + Lo-Res</source>
-      <translation type="unfinished">Objects + Lo-Res</translation>
+      <translation>Objektai + maža raiška</translation>
     </message>
     <message>
       <source>Motion &amp; Objects + Lo-Res</source>
@@ -7771,11 +7772,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Pluginai</translation>
     </message>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>Karštieji taškai</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -7886,7 +7887,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Learn more</source>
-      <translation type="unfinished">Learn more</translation>
+      <translation>Sužinokite daugiau</translation>
     </message>
   </context>
   <context>
@@ -7925,7 +7926,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Internal error.</source>
-      <translation type="unfinished">Internal error.</translation>
+      <translation>Vidinė klaida.</translation>
     </message>
     <message>
       <source>Not enough space on disk to install the client update.</source>
@@ -7957,7 +7958,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Copy</source>
       <comment>to Clipboard</comment>
-      <translation type="unfinished">Copy</translation>
+      <translation>Kopijuoti</translation>
     </message>
     <message>
       <source>Copy to Clipboard</source>
@@ -7966,7 +7967,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Paste</source>
       <comment>from Clipboard</comment>
-      <translation type="unfinished">Paste</translation>
+      <translation>Įklijuoti</translation>
     </message>
     <message>
       <source>Paste from Clipboard</source>
@@ -7975,7 +7976,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Copied</source>
       <comment>to Clipboard</comment>
-      <translation type="unfinished">Copied</translation>
+      <translation>Nukopijuota</translation>
     </message>
     <message>
       <source>Pasted</source>
@@ -8063,7 +8064,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ConnectToCloudTool</name>
     <message>
       <source>Internal error. Please try again later.</source>
-      <translation type="unfinished">Internal error. Please try again later.</translation>
+      <translation>Vidinė klaida, pamėginkite dar kartą vėliau.</translation>
     </message>
     <message>
       <source>None of your Servers has connection to %1.</source>
@@ -8087,12 +8088,12 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1</translation>
+      <translation>Prijungti svetainę prie %1</translation>
     </message>
     <message>
       <source>Connect Site to %1?</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1?</translation>
+      <translation>Prijungti svetainę prie %1?</translation>
     </message>
     <message>
       <source>Enter your account password to connect Site to %1</source>
@@ -8135,7 +8136,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Merge</source>
       <comment>Merge Server to the current Site (dialog button text)</comment>
-      <translation type="unfinished">Merge</translation>
+      <translation>Sujungti</translation>
     </message>
   </context>
   <context>
@@ -8299,7 +8300,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Finished</source>
-      <translation type="unfinished">Finished</translation>
+      <translation>Baigta</translation>
     </message>
     <message>
       <source>Aborted</source>
@@ -8364,7 +8365,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Invalid password</source>
-      <translation type="unfinished">Invalid password</translation>
+      <translation>Neteisingas slaptažodis</translation>
     </message>
   </context>
   <context>
@@ -8386,15 +8387,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation type="unfinished">Copy Selection to Clipboard</translation>
+      <translation>Kopijuoti pasirinkimą į iškarpinę</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation type="unfinished">Export Selection to File...</translation>
+      <translation>Eksportuoti pasirinkimą į failą...</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Pažymėti visus</translation>
     </message>
     <message>
       <source>Clear Filter</source>
@@ -8402,7 +8403,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No events</source>
-      <translation type="unfinished">No events</translation>
+      <translation>Nėra įvykių</translation>
     </message>
     <message>
       <source>Any Action</source>
@@ -8430,7 +8431,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Export selected events to file</source>
-      <translation type="unfinished">Export selected events to file</translation>
+      <translation>Eksportuoti pasirinktus įvykius į failą</translation>
     </message>
     <message>
       <source>Server cannot answer in reasonable time. Consider narrowing period or filter.</source>
@@ -8477,7 +8478,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Target</source>
-      <translation type="unfinished">Target</translation>
+      <translation>Tikslas</translation>
     </message>
     <message>
       <source>Open event video</source>
@@ -8497,7 +8498,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Notifications</source>
       <comment>Notifications tab title</comment>
-      <translation type="unfinished">Notifications</translation>
+      <translation>Pranešimai</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -8512,7 +8513,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Events</source>
       <comment>Events tab title</comment>
-      <translation type="unfinished">Events</translation>
+      <translation>Įvykiai</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -8524,7 +8525,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::EventRibbon::Private</name>
     <message>
       <source>INFORMATION REQUIRED</source>
-      <translation type="unfinished">INFORMATION REQUIRED</translation>
+      <translation>REIKALINGA INFORMACIJA</translation>
     </message>
   </context>
   <context>
@@ -8561,31 +8562,31 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>File write error.</source>
-      <translation type="unfinished">File write error.</translation>
+      <translation>Failo rašymo klaida.</translation>
     </message>
     <message>
       <source>No data exported.</source>
-      <translation type="unfinished">No data exported.</translation>
+      <translation>Duomenys neeksportuoti.</translation>
     </message>
     <message>
       <source>Internal error</source>
-      <translation type="unfinished">Internal error</translation>
+      <translation>Vidinė klaida</translation>
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>Reikalingas vaizdo transkodavimas.</translation>
     </message>
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
-      <translation type="unfinished">Archive is unavailable now. Please try again later.</translation>
+      <translation>Archyvas šiuo metu nepasiekiamas. Bandykite dar kartą vėliau.</translation>
     </message>
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
-      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+      <translation>Atrakinkite šią archyvo dalį, kad eksportuotumėte jos turinį.</translation>
     </message>
     <message>
       <source>Audio transcoding required.</source>
-      <translation type="unfinished">Audio transcoding required.</translation>
+      <translation>Reikalingas garso transkodavimas.</translation>
     </message>
   </context>
   <context>
@@ -8636,7 +8637,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Text</source>
-      <translation type="unfinished">Text</translation>
+      <translation>Tekstas</translation>
     </message>
     <message>
       <source>Reset Speed</source>
@@ -8742,7 +8743,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failover</source>
-      <translation type="unfinished">Failover</translation>
+      <translation>Perėjimas per atsarginę kopiją</translation>
     </message>
     <message>
       <source>Max devices on this server:</source>
@@ -8777,7 +8778,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::FilenamePanel</name>
     <message>
       <source>Folder</source>
-      <translation type="unfinished">Folder</translation>
+      <translation>Aplankai</translation>
     </message>
     <message>
       <source>Name</source>
@@ -8785,11 +8786,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Name cannot be empty.</source>
-      <translation type="unfinished">Name cannot be empty.</translation>
+      <translation>prisijungimas negali būti tuščias.</translation>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Pasirinkti aplankalą...</translation>
     </message>
   </context>
   <context>
@@ -8863,7 +8864,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Inherits %1 permission from</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Inherits %1 permission from</translation>
+      <translation>Paveldi %1 leidimą iš</translation>
     </message>
     <message>
       <source>View video without redaction</source>
@@ -8896,11 +8897,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>New Group</source>
-      <translation type="unfinished">New Group</translation>
+      <translation>Nauja Grupė</translation>
     </message>
     <message>
       <source>New Group %1</source>
-      <translation type="unfinished">New Group %1</translation>
+      <translation>Nauja grupė %1</translation>
     </message>
     <message>
       <source>Save changes</source>
@@ -8951,7 +8952,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
       <source>Click on the icon to read more</source>
-      <translation type="unfinished">Click on the icon to read more</translation>
+      <translation>Norėdami sužinoti daugiau, spustelėkite piktogramą</translation>
     </message>
   </context>
   <context>
@@ -9029,7 +9030,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::LabelSelectionManager</name>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Kopijuoti</translation>
     </message>
     <message>
       <source>Copy Link Location</source>
@@ -9040,7 +9041,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::LayoutActionHandler</name>
     <message>
       <source>Save Layout As</source>
-      <translation type="unfinished">Save Layout As</translation>
+      <translation>Išsaugoti išdėstymą</translation>
     </message>
     <message>
       <source>Enter Layout Name:</source>
@@ -9048,7 +9049,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Save Layout As Cloud</source>
-      <translation type="unfinished">Save Layout As Cloud</translation>
+      <translation>Išsaugoti maketą kaip debesį</translation>
     </message>
     <message>
       <source>New Layout</source>
@@ -9151,7 +9152,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Connection failed</source>
-      <translation type="unfinished">Connection failed</translation>
+      <translation>Nepavyko užmegzti ryšio</translation>
     </message>
     <message>
       <source>Remove existing LDAP users and groups?</source>
@@ -9163,7 +9164,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Taip</translation>
     </message>
     <message>
       <source>Apply Settings</source>
@@ -9195,7 +9196,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cannot connect to LDAP server</source>
-      <translation type="unfinished">Cannot connect to LDAP server</translation>
+      <translation>Nepavyksta prisijungti prie LDAP serverio</translation>
     </message>
     <message>
       <source>All LDAP users and groups will be deleted.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</source>
@@ -9206,11 +9207,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::LicenseManagerWidget</name>
     <message numerus="yes">
       <source>%n channels.</source>
-      <translation type="unfinished">
-        <numerusform>%n channels.</numerusform>
-        <numerusform>%n channels.</numerusform>
-        <numerusform>%n channels.</numerusform>
-        <numerusform>%n channels.</numerusform>
+      <translation>
+        <numerusform>kanalai.</numerusform>
+        <numerusform>kanalai.</numerusform>
+        <numerusform>kanalai.</numerusform>
+        <numerusform>kanalai.</numerusform>
       </translation>
     </message>
     <message>
@@ -9332,7 +9333,7 @@ Remember to return the Logging Level to its default setting after you have colle
     <name>nx::vms::client::desktop::LoginDialog</name>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>Prisijungti prie svetainės...</translation>
     </message>
     <message>
       <source>Version %1</source>
@@ -9458,7 +9459,7 @@ Site performance is degraded.</translation>
     <name>nx::vms::client::desktop::LogsManagementWidget</name>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Pasirinkti aplankalą...</translation>
     </message>
     <message>
       <source>Downloading...</source>
@@ -9483,11 +9484,11 @@ Site performance is degraded.</translation>
     <message numerus="yes">
       <source>%n selected:</source>
       <comment>Numerus: %n is a number of selected rows</comment>
-      <translation type="unfinished">
-        <numerusform>%n selected:</numerusform>
-        <numerusform>%n selected:</numerusform>
-        <numerusform>%n selected:</numerusform>
-        <numerusform>%n selected:</numerusform>
+      <translation>
+        <numerusform>Pažymėta %n</numerusform>
+        <numerusform>Pažymėta %n</numerusform>
+        <numerusform>Pažymėta %n</numerusform>
+        <numerusform>Pažymėta %n</numerusform>
       </translation>
     </message>
     <message>
@@ -9526,23 +9527,23 @@ Site performance is degraded.</translation>
     <name>nx::vms::client::desktop::LookupListEntriesModel</name>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Taip</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Ne</translation>
     </message>
     <message>
       <source>Present</source>
-      <translation type="unfinished">Present</translation>
+      <translation>Dabartis</translation>
     </message>
     <message>
       <source>Absent</source>
-      <translation type="unfinished">Absent</translation>
+      <translation>Nėra</translation>
     </message>
     <message>
       <source>Any %1</source>
-      <translation type="unfinished">Any %1</translation>
+      <translation>Bet koks %1</translation>
     </message>
   </context>
   <context>
@@ -9614,7 +9615,7 @@ Site performance is degraded.</translation>
     <name>nx::vms::client::desktop::MediaFileSettingsDialog</name>
     <message>
       <source>File Settings</source>
-      <translation type="unfinished">File Settings</translation>
+      <translation>Svetainės nustatymai</translation>
     </message>
   </context>
   <context>
@@ -9673,7 +9674,7 @@ Site performance is degraded.</translation>
     <message>
       <source>Merge</source>
       <comment>Merge two Sites together (dialog button text)</comment>
-      <translation type="unfinished">Merge</translation>
+      <translation>Sujungti</translation>
     </message>
     <message>
       <source>Merging Sites...</source>
@@ -9740,7 +9741,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>Neatpažinta klaida.</translation>
     </message>
     <message>
       <source>New Site</source>
@@ -10020,7 +10021,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Atsisiųsti ir įdiegti</translation>
     </message>
     <message>
       <source>Browse for Another File...</source>
@@ -10100,7 +10101,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
-      <translation type="unfinished">You are using a custom client. Please contact %1 to get the update instructions.</translation>
+      <translation>Naudojate pasirinktinį klientą. Norėdami gauti atnaujinimo instrukcijas, susisiekite su %1.</translation>
     </message>
     <message>
       <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
@@ -10184,7 +10185,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Finished</source>
-      <translation type="unfinished">Finished</translation>
+      <translation>Baigta</translation>
     </message>
     <message>
       <source>Aborted</source>
@@ -10278,7 +10279,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>Pripažinti</translation>
     </message>
   </context>
   <context>
@@ -10294,7 +10295,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>No new notifications</source>
-      <translation type="unfinished">No new notifications</translation>
+      <translation>Nėra naujų pranešimų</translation>
     </message>
     <message>
       <source>Current Site</source>
@@ -10342,7 +10343,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message>
       <source>Cannot connect to %1</source>
       <comment>%1 is the cloud name like Nx Cloud</comment>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>Nepavyksta prisijungti prie %1</translation>
     </message>
   </context>
   <context>
@@ -10394,7 +10395,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>Įdiegtas</translation>
     </message>
     <message>
       <source>Waiting for peer data</source>
@@ -10430,7 +10431,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>Neatpažinta klaida.</translation>
     </message>
     <message>
       <source>Unexpected error code.</source>
@@ -10454,7 +10455,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
-      <translation type="unfinished">This OS version is no longer supported.</translation>
+      <translation>Ši OS versija nebepalaikoma.</translation>
     </message>
     <message>
       <source>Update installation failed.</source>
@@ -10509,7 +10510,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
+      <translation>Vartojimas</translation>
     </message>
     <message>
       <source>Status</source>
@@ -10556,7 +10557,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Web Page</source>
-      <translation type="unfinished">Web Page</translation>
+      <translation>Tinklalapiai</translation>
     </message>
     <message>
       <source>Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</source>
@@ -10564,7 +10565,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</translation>
+      <translation>Viso turinio perdavimas per tarpinį serverį šio tinklalapio vartotojams atveria bet kurią serverio&apos;tinkle esančią paslaugą ar įrenginį</translation>
     </message>
     <message>
       <source>The web page can interact with the Desktop Client and request access to the user session</source>
@@ -10592,7 +10593,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>New Web Page</source>
-      <translation type="unfinished">New Web Page</translation>
+      <translation>Naujas tinklalapis</translation>
     </message>
     <message>
       <source>Edit Web Page</source>
@@ -10608,7 +10609,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>New Integration</source>
-      <translation type="unfinished">New Integration</translation>
+      <translation>Visos integracijos</translation>
     </message>
     <message>
       <source>Edit Integration</source>
@@ -10628,7 +10629,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Learn more...</source>
-      <translation type="unfinished">Learn more...</translation>
+      <translation>Sužinokite daugiau...</translation>
     </message>
     <message>
       <source>Auto-refresh integration</source>
@@ -10690,7 +10691,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Pasirinkti aplankalą...</translation>
     </message>
   </context>
   <context>
@@ -10698,7 +10699,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message>
       <source>%1 layout</source>
       <comment>%1 will be substituted with a layout name</comment>
-      <translation type="unfinished">%1 layout</translation>
+      <translation>naujas išdėstymas</translation>
     </message>
     <message>
       <source>%1 video wall</source>
@@ -10791,11 +10792,11 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
-      <translation type="unfinished">
-        <numerusform>%n bookmarks</numerusform>
-        <numerusform>%n bookmarks</numerusform>
-        <numerusform>%n bookmarks</numerusform>
-        <numerusform>%n bookmarks</numerusform>
+      <translation>
+        <numerusform>Žymių nėra</numerusform>
+        <numerusform>Žymių nėra</numerusform>
+        <numerusform>Žymių nėra</numerusform>
+        <numerusform>Žymių nėra</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -10809,11 +10810,11 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message numerus="yes">
       <source>%n objects</source>
-      <translation type="unfinished">
-        <numerusform>%n objects</numerusform>
-        <numerusform>%n objects</numerusform>
-        <numerusform>%n objects</numerusform>
-        <numerusform>%n objects</numerusform>
+      <translation>
+        <numerusform>%n objektai</numerusform>
+        <numerusform>%n objektai</numerusform>
+        <numerusform>%n objektai</numerusform>
+        <numerusform>%n objektai</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -10882,7 +10883,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
-      <translation type="unfinished">Motion, Objects</translation>
+      <translation>Judesys, objektai</translation>
     </message>
     <message>
       <source>Motion, Objects
@@ -10892,7 +10893,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Objects Only</source>
-      <translation type="unfinished">Objects Only</translation>
+      <translation>Tik objektai</translation>
     </message>
     <message>
       <source>Objects
@@ -10902,7 +10903,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion Only</source>
-      <translation type="unfinished">Motion Only</translation>
+      <translation>Tik judesys</translation>
     </message>
     <message>
       <source>Motion
@@ -11068,7 +11069,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Learn more.</source>
-      <translation type="unfinished">Learn more.</translation>
+      <translation>Sužinokite daugiau.</translation>
     </message>
     <message numerus="yes">
       <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
@@ -11124,7 +11125,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <name>nx::vms::client::desktop::SelectAnalyticsObjectTypesButton</name>
     <message>
       <source>No objects</source>
-      <translation type="unfinished">No objects</translation>
+      <translation>Nėra objektų</translation>
     </message>
     <message numerus="yes">
       <source>%n objects selected</source>
@@ -11171,7 +11172,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Pin</source>
-      <translation type="unfinished">Pin</translation>
+      <translation>Pin</translation>
     </message>
     <message>
       <source>The certificate is auto-generated and pinned to %1</source>
@@ -11260,16 +11261,16 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::ServerSelectionDialog</name>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>PTZ kameros</numerusform>
+        <numerusform>PTZ kameros</numerusform>
+        <numerusform>PTZ kameros</numerusform>
+        <numerusform>PTZ kameros</numerusform>
       </translation>
     </message>
     <message>
       <source>There are no suitable servers</source>
-      <translation type="unfinished">There are no suitable servers</translation>
+      <translation>Nėra tinkamų serverių</translation>
     </message>
   </context>
   <context>
@@ -11312,7 +11313,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>unknown error</source>
-      <translation type="unfinished">unknown error</translation>
+      <translation>neatpažinta klaida</translation>
     </message>
     <message>
       <source>Not loaded</source>
@@ -11336,7 +11337,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>internal error</source>
-      <translation type="unfinished">internal error</translation>
+      <translation>vidinė klaida</translation>
     </message>
     <message>
       <source>unknown status</source>
@@ -11351,7 +11352,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Network error.</source>
-      <translation type="unfinished">Network error.</translation>
+      <translation>Tinklo klaida.</translation>
     </message>
     <message>
       <source>Server error.</source>
@@ -11397,11 +11398,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Nežinoma klaida</translation>
     </message>
     <message>
       <source>Access Link</source>
-      <translation type="unfinished">Access Link</translation>
+      <translation>Prieigos nuoroda</translation>
     </message>
     <message>
       <source>Invalid Link</source>
@@ -11478,7 +11479,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
       <source>No motion detected</source>
-      <translation type="unfinished">No motion detected</translation>
+      <translation>Judejimas neaptiktas</translation>
     </message>
     <message numerus="yes">
       <source>%n motion events</source>
@@ -11491,7 +11492,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation type="unfinished">Try changing the filters or enable motion recording</translation>
+      <translation>Pabandykite pakeisti filtrus arba įjungti judesio įrašymą</translation>
     </message>
   </context>
   <context>
@@ -11550,29 +11551,29 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Įrašymas %n kanalais buvo sustabdytas dėl per didelio ryšio apkrovimo.</numerusform>
+        <numerusform>Įrašymas %n kanalais buvo sustabdytas dėl per didelio ryšio apkrovimo.</numerusform>
+        <numerusform>Įrašymas %n kanalais buvo sustabdytas dėl per didelio ryšio apkrovimo.</numerusform>
+        <numerusform>Įrašymas %n kanalais buvo sustabdytas dėl per didelio ryšio apkrovimo.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Debesų saugyklos atsarginių kopijų kūrimas %n kanaluose buvo sustabdytas dėl per didelio paslaugos naudojimo.</numerusform>
+        <numerusform>Debesų saugyklos atsarginių kopijų kūrimas %n kanaluose buvo sustabdytas dėl per didelio paslaugos naudojimo.</numerusform>
+        <numerusform>Debesų saugyklos atsarginių kopijų kūrimas %n kanaluose buvo sustabdytas dėl per didelio paslaugos naudojimo.</numerusform>
+        <numerusform>Debesų saugyklos atsarginių kopijų kūrimas %n kanaluose buvo sustabdytas dėl per didelio paslaugos naudojimo.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Mokamos integracijos paslaugos naudojimas %n kanaluose buvo sustabdytas dėl per didelio paslaugos naudojimo.</numerusform>
+        <numerusform>Mokamos integracijos paslaugos naudojimas %n kanaluose buvo sustabdytas dėl per didelio paslaugos naudojimo.</numerusform>
+        <numerusform>Mokamos integracijos paslaugos naudojimas %n kanaluose buvo sustabdytas dėl per didelio paslaugos naudojimo.</numerusform>
+        <numerusform>Mokamos integracijos paslaugos naudojimas %n kanaluose buvo sustabdytas dėl per didelio paslaugos naudojimo.</numerusform>
       </translation>
     </message>
   </context>
@@ -11625,19 +11626,19 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Start time</source>
-      <translation type="unfinished">Start time</translation>
+      <translation>Pradžios laikas</translation>
     </message>
     <message>
       <source>Length</source>
-      <translation type="unfinished">Length</translation>
+      <translation>Trukmė</translation>
     </message>
     <message>
       <source>Created</source>
-      <translation type="unfinished">Created</translation>
+      <translation>Sukurti</translation>
     </message>
     <message>
       <source>Creator</source>
-      <translation type="unfinished">Creator</translation>
+      <translation>Creator</translation>
     </message>
     <message>
       <source>Tags</source>
@@ -11649,7 +11650,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Open</source>
-      <translation type="unfinished">Open</translation>
+      <translation>Atidaryti</translation>
     </message>
     <message>
       <source>Open in New Tab</source>
@@ -11738,11 +11739,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::TimestampOverlaySettingsWidget</name>
     <message>
       <source>Long</source>
-      <translation type="unfinished">Long</translation>
+      <translation>Ilgas</translation>
     </message>
     <message>
       <source>Short</source>
-      <translation type="unfinished">Short</translation>
+      <translation>Trumpas</translation>
     </message>
   </context>
   <context>
@@ -11757,7 +11758,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Network error</source>
-      <translation type="unfinished">Network error</translation>
+      <translation>Tinklo klaida</translation>
     </message>
   </context>
   <context>
@@ -11827,7 +11828,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupės</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -11858,7 +11859,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Internal error</source>
-      <translation type="unfinished">Internal error</translation>
+      <translation>Vidinė klaida</translation>
     </message>
     <message>
       <source>Connection failure</source>
@@ -11922,7 +11923,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupės</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -11965,7 +11966,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupės</translation>
     </message>
     <message>
       <source>LDAP</source>
@@ -11976,7 +11977,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::UserSettingsDialog</name>
     <message>
       <source>To modify your password please enter the existing one.</source>
-      <translation type="unfinished">To modify your password please enter the existing one.</translation>
+      <translation>Norėdami pakeisti slaptažodį, įveskite esamą.</translation>
     </message>
     <message>
       <source>%1 user with specified email already exists.</source>
@@ -12013,15 +12014,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Invalid current password</source>
-      <translation type="unfinished">Invalid current password</translation>
+      <translation>Blogas dabartinis slaptažodis</translation>
     </message>
     <message>
       <source>Email cannot be empty</source>
-      <translation type="unfinished">Email cannot be empty</translation>
+      <translation>El. paštas negali būti tuščias.</translation>
     </message>
     <message>
       <source>Login cannot be empty</source>
-      <translation type="unfinished">Login cannot be empty</translation>
+      <translation>prisijungimas negali būti tuščias</translation>
     </message>
     <message>
       <source>Only letters, numbers and symbols %1 are allowed</source>
@@ -12037,7 +12038,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Terminate</source>
-      <translation type="unfinished">Terminate</translation>
+      <translation>Nutraukti</translation>
     </message>
     <message>
       <source>Terminate access link</source>
@@ -12053,7 +12054,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>New Link - %1</source>
-      <translation type="unfinished">New Link - %1</translation>
+      <translation>Nauja nuoroda - %1</translation>
     </message>
     <message>
       <source>Access link has been successfully created!</source>
@@ -12074,7 +12075,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>Naujas Vartotojas</translation>
     </message>
     <message>
       <source>User %1 has been successfully created!</source>
@@ -12082,12 +12083,12 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Obtaining Link...</source>
-      <translation type="unfinished">Obtaining Link...</translation>
+      <translation>Gaunama nuoroda...</translation>
     </message>
     <message>
       <source>Ensure that this computer is able to connect to the %1</source>
       <comment>%1 is the cloud name</comment>
-      <translation type="unfinished">Ensure that this computer is able to connect to the %1</translation>
+      <translation>Įsitikinkite, kad šis kompiuteris gali prisijungti prie %1</translation>
     </message>
     <message>
       <source>in %1</source>
@@ -12146,7 +12147,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>Sustabdyti įkėlimą?</translation>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
@@ -12376,11 +12377,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::VmsEventSearchWidget</name>
     <message>
       <source>No events</source>
-      <translation type="unfinished">No events</translation>
+      <translation>Nėra įvykių</translation>
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+      <translation>Pabandykite pakeisti filtrus arba sukurti įvykio taisyklę</translation>
     </message>
     <message numerus="yes">
       <source>%n events</source>
@@ -12404,11 +12405,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Integration</source>
-      <translation type="unfinished">Integration</translation>
+      <translation>Integracija</translation>
     </message>
     <message>
       <source>Web Page</source>
-      <translation type="unfinished">Web Page</translation>
+      <translation>Tinklalapiai</translation>
     </message>
     <message>
       <source>You try to open the
@@ -12479,7 +12480,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Hide</source>
-      <translation type="unfinished">Hide</translation>
+      <translation>Paslėpti</translation>
     </message>
     <message>
       <source>Unable to connect to the site because it has become offline</source>
@@ -12494,7 +12495,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Export failed</source>
-      <translation type="unfinished">Export failed</translation>
+      <translation>Eksportuoti nepavyko</translation>
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
@@ -12530,11 +12531,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
-      <translation type="unfinished">
-        <numerusform>%n bookmarks</numerusform>
-        <numerusform>%n bookmarks</numerusform>
-        <numerusform>%n bookmarks</numerusform>
-        <numerusform>%n bookmarks</numerusform>
+      <translation>
+        <numerusform>Žymių nėra</numerusform>
+        <numerusform>Žymių nėra</numerusform>
+        <numerusform>Žymių nėra</numerusform>
+        <numerusform>Žymių nėra</numerusform>
       </translation>
     </message>
   </context>
@@ -12550,7 +12551,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Updates</source>
-      <translation type="unfinished">Updates</translation>
+      <translation>Atnaujinimai</translation>
     </message>
     <message>
       <source>Release Notes...</source>
@@ -12581,7 +12582,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Objekto tipas</translation>
     </message>
   </context>
   <context>
@@ -12619,7 +12620,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::detail::BaseInputField</name>
     <message>
       <source>multiple values</source>
-      <translation type="unfinished">multiple values</translation>
+      <translation>Keletas reikšmių</translation>
     </message>
   </context>
   <context>
@@ -12645,7 +12646,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Showreels</source>
-      <translation type="unfinished">Showreels</translation>
+      <translation>Rodyti filmus</translation>
     </message>
     <message>
       <source>Web Pages</source>
@@ -12657,11 +12658,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Local Files</source>
-      <translation type="unfinished">Local Files</translation>
+      <translation>Vietiniai failai</translation>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation type="unfinished">All Cameras &amp; Resources</translation>
+      <translation>Ieškoti fotoaparatų ir išteklių</translation>
     </message>
     <message>
       <source>All Shared Layouts</source>
@@ -12677,11 +12678,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Health Monitors</source>
-      <translation type="unfinished">Health Monitors</translation>
+      <translation>Sveikatos monitorius</translation>
     </message>
     <message>
       <source>Video Walls</source>
-      <translation type="unfinished">Video Walls</translation>
+      <translation>Vaizdo siena</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -12689,7 +12690,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
-      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+      <translation>Tinklalapiai ir integracijos</translation>
     </message>
     <message>
       <source>Other Sites</source>
@@ -12700,11 +12701,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::entity_resource_tree::resource_grouping::ResourceGroupingStrings</name>
     <message>
       <source>New Group</source>
-      <translation type="unfinished">New Group</translation>
+      <translation>Nauja Grupė</translation>
     </message>
     <message>
       <source>New Group %1</source>
-      <translation type="unfinished">New Group %1</translation>
+      <translation>Nauja grupė %1</translation>
     </message>
   </context>
   <context>
@@ -12739,7 +12740,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Enabled</source>
-      <translation type="unfinished">Enabled</translation>
+      <translation>Įjungti</translation>
     </message>
     <message>
       <source>In progress...</source>
@@ -12768,11 +12769,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Focus Near</source>
-      <translation type="unfinished">Focus Near</translation>
+      <translation>Fokusuoti šalia</translation>
     </message>
     <message>
       <source>Focus Far</source>
-      <translation type="unfinished">Focus Far</translation>
+      <translation>Fokusuoti toli</translation>
     </message>
     <message>
       <source>Autofocus</source>
@@ -12784,7 +12785,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Set to Fullscreen</source>
-      <translation type="unfinished">Set to Fullscreen</translation>
+      <translation>Nustatyti viso ekrano režimą</translation>
     </message>
     <message>
       <source>Next Camera on Layout</source>
@@ -12796,7 +12797,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Open Layout</source>
-      <translation type="unfinished">Open Layout</translation>
+      <translation>Atidaryti maketą</translation>
     </message>
     <message>
       <source>Modifier</source>
@@ -12927,7 +12928,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>Karštieji taškai</translation>
     </message>
     <message>
       <source>Toolbar</source>
@@ -12961,7 +12962,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Start Showreel</source>
-      <translation type="unfinished">Start Showreel</translation>
+      <translation>Pradėti demonstraciją</translation>
     </message>
   </context>
   <context>
@@ -13001,7 +13002,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::EditVmsRuleDialog</name>
     <message>
       <source>Schedule</source>
-      <translation type="unfinished">Schedule</translation>
+      <translation>Planuotojas</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -13025,7 +13026,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Enabled</source>
-      <translation type="unfinished">Enabled</translation>
+      <translation>Įjungti</translation>
     </message>
     <message>
       <source>Add Title or Comment</source>
@@ -13136,7 +13137,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Target</source>
-      <translation type="unfinished">Target</translation>
+      <translation>Tikslas</translation>
     </message>
     <message>
       <source>Comment</source>
@@ -13152,16 +13153,16 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation type="unfinished">
-        <numerusform>%n Servers</numerusform>
-        <numerusform>%n Servers</numerusform>
-        <numerusform>%n Servers</numerusform>
-        <numerusform>%n Servers</numerusform>
+      <translation>
+        <numerusform>Visi serveriai</numerusform>
+        <numerusform>Serveriai</numerusform>
+        <numerusform>Serveriai</numerusform>
+        <numerusform>Serveriai</numerusform>
       </translation>
     </message>
     <message>
       <source>Source camera</source>
-      <translation type="unfinished">Source camera</translation>
+      <translation>Šaltinio kamera</translation>
     </message>
     <message>
       <source>No target</source>
@@ -13169,16 +13170,16 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
+      <translation>
+        <numerusform>%n išdėstymai</numerusform>
+        <numerusform>%n išdėstymai</numerusform>
+        <numerusform>%n išdėstymai</numerusform>
+        <numerusform>%n išdėstymai</numerusform>
       </translation>
     </message>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>Pridėti vartotojus</translation>
     </message>
     <message>
       <source>Source Server and %1</source>
@@ -13186,19 +13187,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Any Device</source>
-      <translation type="unfinished">Any Device</translation>
+      <translation>Bet koks įrenginys</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation type="unfinished">Any Camera</translation>
+      <translation>Bet kokia kamera</translation>
     </message>
     <message>
       <source>Any Server</source>
-      <translation type="unfinished">Any Server</translation>
+      <translation>Visi serveriai</translation>
     </message>
     <message>
       <source>Select at least one layout</source>
-      <translation type="unfinished">Select at least one layout</translation>
+      <translation>Pasirinkite bent vieną išdėstymą</translation>
     </message>
     <message>
       <source>Select at least one User</source>
@@ -13211,11 +13212,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
+      <translation>
+        <numerusform>Šaltinis ir %n daugiau kamerų</numerusform>
+        <numerusform>Šaltinis ir %n daugiau kamerų</numerusform>
+        <numerusform>Šaltinis ir %n daugiau kamerų</numerusform>
+        <numerusform>Šaltinis ir %n daugiau kamerų</numerusform>
       </translation>
     </message>
   </context>
@@ -13325,7 +13326,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::VolumePicker</name>
     <message>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>Testuoti</translation>
     </message>
   </context>
   <context>
@@ -13382,7 +13383,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ui::SubjectSelectionDialog</name>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>Visi vartotojai šioje grupėje</translation>
     </message>
     <message>
       <source>Users</source>
@@ -13458,11 +13459,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::GroupListDelegate</name>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>Nėra vartotojų</numerusform>
+        <numerusform>Nėra vartotojų</numerusform>
+        <numerusform>Nėra vartotojų</numerusform>
+        <numerusform>Nėra vartotojų</numerusform>
       </translation>
     </message>
   </context>
@@ -13669,7 +13670,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Pasirinkti aplankalą...</translation>
     </message>
     <message>
       <source>There are no suitable cameras for replacement on the Server &quot;%1&quot;</source>
@@ -13706,7 +13707,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation type="unfinished">Failed to overwrite file</translation>
+      <translation>Nepavyko perrašyti failo</translation>
     </message>
     <message>
       <source>Failed to save file</source>
@@ -13722,7 +13723,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation type="unfinished">Open Containing Folder</translation>
+      <translation>Atidaryti talpinantį aplanką</translation>
     </message>
     <message>
       <source>Stop file downloading?</source>
@@ -13768,7 +13769,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>To Start</source>
-      <translation type="unfinished">To Start</translation>
+      <translation>Norėdami pradėti</translation>
     </message>
     <message>
       <source>Next Chunk</source>
@@ -13776,7 +13777,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>To End</source>
-      <translation type="unfinished">To End</translation>
+      <translation>Iki pabaigos</translation>
     </message>
     <message>
       <source>Rewind is not available for VMAX</source>
