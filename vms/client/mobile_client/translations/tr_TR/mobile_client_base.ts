@@ -107,7 +107,7 @@
     <name>nx::vms::client::mobile::timeline::BookmarkData</name>
     <message>
       <source>Bookmark</source>
-      <translation>Yer İmi</translation>
+      <translation>Yer İşareti</translation>
     </message>
     <message>
       <source>Bookmarks (%1)</source>
