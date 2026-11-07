@@ -104,7 +104,7 @@
     <name>QQuickWebEngineView</name>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Sustabdyti</translation>
     </message>
     <message>
       <source>Reload and Bypass Cache</source>
@@ -120,7 +120,7 @@
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>Perjungti garso išjungimą</translation>
     </message>
     <message>
       <source>Close Page</source>
@@ -183,7 +183,7 @@
     <name>QWebEnginePage</name>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Sustabdyti</translation>
     </message>
     <message>
       <source>Reload and Bypass Cache</source>
@@ -195,7 +195,7 @@
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>Perjungti garso išjungimą</translation>
     </message>
     <message>
       <source>Close Page</source>
@@ -263,7 +263,7 @@
     </message>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>Ar tikrai norite išeiti iš šio puslapio? Jūsų atlikti pakeitimai gali būti neišsaugoti.</translation>
     </message>
     <message>
       <source>&amp;Back</source>
@@ -271,7 +271,7 @@
     </message>
     <message>
       <source>&amp;Forward</source>
-      <translation type="unfinished">&amp;Forward</translation>
+      <translation>&amp;Persiųsti</translation>
     </message>
     <message>
       <source>&amp;Reload</source>
@@ -290,7 +290,7 @@
     </message>
     <message>
       <source>Forward</source>
-      <translation type="unfinished">Forward</translation>
+      <translation>Persiųsti</translation>
     </message>
     <message>
       <source>Reload</source>
@@ -298,23 +298,23 @@
     </message>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>Iškirpti</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Kopijuoti</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Įklijuoti</translation>
     </message>
     <message>
       <source>Undo</source>
-      <translation type="unfinished">Undo</translation>
+      <translation>Anuliuoti</translation>
     </message>
     <message>
       <source>Redo</source>
-      <translation type="unfinished">Redo</translation>
+      <translation>Atlikti iš naujo</translation>
     </message>
     <message>
       <source>Select all</source>
