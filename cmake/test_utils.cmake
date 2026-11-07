@@ -54,12 +54,19 @@ function(nx_add_test target) # [NO_GTEST] [NO_QT] [NO_NX_UTILS] ...
         list(REMOVE_DUPLICATES CMAKE_INSTALL_RPATH)
     endif()
 
+    if(WINDOWS)
+        # Breakpad symbols are only needed for the released binaries; test crash dumps are
+        # symbolized from the PDB files.
+        set(no_debug_symbols_processing NO_DEBUG_SYMBOLS_PROCESSING)
+    endif()
+
     nx_add_target(${target}
         EXECUTABLE
         FORCE_INCLUDE
             ${force_include_header}
         NO_RC_FILE
         NO_MOC
+        ${no_debug_symbols_processing}
         ${additional_private_libs}
         ${additional_test_support_private_libs}
         FOLDER ${folder}

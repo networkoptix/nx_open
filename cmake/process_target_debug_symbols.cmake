@@ -84,7 +84,7 @@ function(nx_process_windows_target_debug_symbols target)
     endif()
 
     set(DUMP_SYMS "${CONAN_BREAKPAD-TOOLS_ROOT}/bin/dump_syms.exe")
-    set(DUMP_SYMS_COMMAND COMMAND
+    set(DUMP_SYMS_COMMAND COMMAND ${nx_run_with_timeout}
         "${PYTHON_EXECUTABLE}" "${CONAN_BREAKPAD-TOOLS_ROOT}/generate_breakpad_symbols.py" --dump-syms-path "${DUMP_SYMS}" --build-dir "${PROJECT_BINARY_DIR}" --symbols-dir "${breakpadSymbolsOutputDir}" --binary "$<TARGET_FILE:${target}>" --skip-deps --verbose)
 
     add_custom_command(TARGET ${target} POST_BUILD

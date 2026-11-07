@@ -55,6 +55,7 @@ function(nx_add_target name type)
         MACOS_ARG_MAX_WORKAROUND
         NO_API_MACROS
         ROOT_FOLDER #< One of the the most important projects, placed in the root of targets list.
+        NO_DEBUG_SYMBOLS_PROCESSING
     )
     set(oneValueArgs LIBRARY_TYPE RC_FILE FOLDER SOURCE_DIR)
     set(multiValueArgs
@@ -172,7 +173,9 @@ function(nx_add_target name type)
         endif()
     endif()
 
-    nx_process_target_debug_symbols(${name})
+    if(NOT NX_NO_DEBUG_SYMBOLS_PROCESSING)
+        nx_process_target_debug_symbols(${name})
+    endif()
 
     if((NX_NO_WERROR AND NX_WERROR) OR
         (NX_NO_WERROR AND NOT "${NX_WERROR_IF}" STREQUAL "") OR
