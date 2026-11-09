@@ -700,7 +700,8 @@ QnResourceList EventLogModel::resourcesForPlayback(const QModelIndex& index) con
     if (!hasVideoLink(systemContext(), data))
         return {};
 
-    return resourcePool()->getResourcesByIds(getResourceIds(data.event(systemContext())));
+    return resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+        getDeviceIds(data.event(systemContext())));
 }
 
 int EventLogModel::columnCount(const QModelIndex& parent) const
