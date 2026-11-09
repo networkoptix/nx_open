@@ -933,9 +933,6 @@ struct SystemUsersBatchItem
 
     /**%apidoc Roles to be assigned. Empty array is used for revoking access. */
     std::vector<std::string> roleIds;
-
-    /**%apidoc Custom attributes to assign. */
-    std::map<std::string, std::string> attributes;
 };
 
 /**

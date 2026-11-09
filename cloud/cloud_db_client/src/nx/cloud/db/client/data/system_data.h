@@ -182,7 +182,7 @@ NX_REFLECTION_INSTRUMENT(SystemOfferPatch, (comment)(status))
 
 NX_REFLECTION_INSTRUMENT(Attribute, (name)(value))
 
-NX_REFLECTION_INSTRUMENT(SystemUsersBatchItem, (users)(systems)(roleIds)(attributes))
+NX_REFLECTION_INSTRUMENT(SystemUsersBatchItem, (users)(systems)(roleIds))
 
 NX_REFLECTION_INSTRUMENT(CreateBatchRequest, (items))
 
