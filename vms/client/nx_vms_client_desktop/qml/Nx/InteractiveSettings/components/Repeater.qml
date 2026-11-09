@@ -31,6 +31,9 @@ Item
 
     property bool filled: false
 
+    // The signal is looked up by Settings._connectSignals().
+    signal valueEdited()
+
     function updateFilled()
     {
         const lastFilled = lastFilledItemIndex()
@@ -81,7 +84,11 @@ Item
 
                 --visibleItemsCount
                 let itemToReset = column.layoutItems[visibleItemsCount]
+                const previousValues = JSON.stringify(Settings.getValues(itemToReset))
                 Settings.resetValues(itemToReset)
+
+                if (JSON.stringify(Settings.getValues(itemToReset)) !== previousValues)
+                    control.valueEdited()
             }
         }
     }
