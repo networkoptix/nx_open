@@ -104,6 +104,7 @@ void initApplication(const QnStartupParameters& startupParams)
 
     // Set up application parameters so that QSettings know where to look for settings.
     QApplication::setOrganizationName(nx::branding::company());
+    // On Linux, also the X11 WM_CLASS. StartupWMClass in the launcher .desktop must match it.
     QApplication::setApplicationName(nx::branding::desktopClientInternalName());
     QApplication::setApplicationDisplayName(nx::branding::desktopClientDisplayName());
 
@@ -511,10 +512,6 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
 
     qApp->installEventFilter(UserActionsLogger::instance());
 
-    #if defined(Q_OS_LINUX)
-        qputenv("RESOURCE_NAME", nx::branding::brand().toUtf8());
-    #endif
-
     // Dealing with EULA in videowall mode can make people frown.
     if (!qnRuntime->isVideoWallMode())
     {
@@ -534,10 +531,6 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
     QScopedPointer<MainWindow> mainWindow(
         new MainWindow(windowContext.get(), /*parent*/ nullptr, calculateWindowFlags()));
     mainWindow->setAttribute(Qt::WA_QuitOnClose);
-
-    #if defined(Q_OS_LINUX)
-        qunsetenv("RESOURCE_NAME");
-    #endif
 
     nx::media::DecoderRegistrar::registerDecoders({});
 
