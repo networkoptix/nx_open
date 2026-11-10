@@ -6829,16 +6829,16 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message numerus="yes">
       <source>Backup will not be activated for %n devices:</source>
-      <translation type="unfinished">
-        <numerusform>Backup will not be activated for %n devices:</numerusform>
-        <numerusform>Backup will not be activated for %n devices:</numerusform>
+      <translation>
+        <numerusform>Die Sicherung wird für %n Gerät nicht aktiviert:</numerusform>
+        <numerusform>Die Sicherung wird für %n Geräte nicht aktiviert:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services are required to activate backup for them.</source>
-      <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
-        <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
+      <translation>
+        <numerusform>%n geeignete Cloud-Speicherdienste sind erforderlich, um die Datensicherung zu aktivieren.</numerusform>
+        <numerusform>%n geeigneter Cloud-Speicherdienst ist erforderlich, um die Datensicherung zu aktivieren.</numerusform>
       </translation>
     </message>
   </context>
@@ -7223,17 +7223,17 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message numerus="yes">
       <source>Use Services</source>
       <comment>Numerus form depends on the devices count</comment>
-      <translation type="unfinished">
-        <numerusform>Use Services</numerusform>
-        <numerusform>Use Services</numerusform>
+      <translation>
+        <numerusform>Dienst verwenden</numerusform>
+        <numerusform>Dienste verwenden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use Licenses</source>
       <comment>Numerus form depends on the devices count</comment>
-      <translation type="unfinished">
-        <numerusform>Use Licenses</numerusform>
-        <numerusform>Use Licenses</numerusform>
+      <translation>
+        <numerusform>Lizenz verwenden</numerusform>
+        <numerusform>Lizenzen verwenden</numerusform>
       </translation>
     </message>
   </context>
@@ -7634,7 +7634,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</source>
-      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</translation>
+      <translation>Der Zugriff von Vertriebs-Partner-Benutzern&apos; wird auf Organisationsebene verwaltet und ist in der Benutzerverwaltung der Site nicht sichtbar.</translation>
     </message>
     <message>
       <source>Learn more</source>
@@ -9469,11 +9469,11 @@ Site performance is degraded.</translation>
     <message>
       <source>The discovered Site %1 has an incompatible version %2.</source>
       <comment>%1 is name of Site, %2 is version information</comment>
-      <translation type="unfinished">The discovered Site %1 has an incompatible version %2.</translation>
+      <translation>Die entdeckte Site %1 hat eine inkompatible Version %2.</translation>
     </message>
     <message>
       <source>Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</source>
-      <translation type="unfinished">Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</translation>
+      <translation>Die ausgewählte Site verwendet eine ältere Softwareversion, die mit der aktuellen Site inkompatibel ist. Aktualisieren Sie die ausgewählte Site auf die neueste Version, um sie mit der aktuellen Site zusammenzuführen.</translation>
     </message>
     <message>
       <source>You are about to merge Sites with Starter licenses.</source>
@@ -12060,10 +12060,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
 but this integration presented an untrusted certificate auth.
 We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
       <comment>%1 is the integration address</comment>
-      <translation type="unfinished">You try to open the
+      <translation>Sie versuchen, die Integration
 %1
-but this integration presented an untrusted certificate auth.
-We recommend you not to open this integration. If you understand the risks, you can open the integration.</translation>
+zu öffnen, aber diese Integration meldet eine nicht vertrauenswürdige Zertifikatsauthentifizierung.
+Wir empfehlen Ihnen, diese Integration nicht zu öffnen. Wenn Sie die Risiken verstehen, können Sie die Integration öffnen.</translation>
     </message>
     <message>
       <source>You try to open the
@@ -12716,15 +12716,15 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     <name>nx::vms::client::desktop::rules::IntegrationActionParametersPickerWidget</name>
     <message>
       <source>No settings model</source>
-      <translation type="unfinished">No settings model</translation>
+      <translation>Kein Einstellungsmodell</translation>
     </message>
     <message>
       <source>No parameters</source>
-      <translation type="unfinished">No parameters</translation>
+      <translation>Keine Parameter</translation>
     </message>
     <message>
       <source>Parameters set</source>
-      <translation type="unfinished">Parameters set</translation>
+      <translation>Parameter eingestellt</translation>
     </message>
   </context>
   <context>
@@ -12898,7 +12898,7 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     </message>
     <message>
       <source>Keywords separated by space</source>
-      <translation>Passwörter, die durch Leerzeichen getrennt sind</translation>
+      <translation>Durch Leerzeichen getrennte Schlüsselwörter</translation>
     </message>
     <message>
       <source>From</source>
