@@ -2,8 +2,8 @@
 
 #include "desktop_file_linux.h"
 
-#include <QtCore/QFile>
 #include <QtCore/QDir>
+#include <QtCore/QFile>
 #include <QtCore/QStandardPaths>
 
 #include <nx/branding.h>
@@ -37,14 +37,18 @@ bool createDesktopFile(const QString& filePath,
     result += "\nIcon=" + icon;
     result += "\nExec=\"" + applicationBinaryPath + "\" %u";
     result += "\nStartupNotify=true";
-    result += "\nStartupWMClass=" + nx::branding::brand();
     result += "\nTerminal=false";
 
     if (!version.isNull())
         result += "\nVersion=" + version.toString();
 
-    if (!protocol.isEmpty())
+    if (protocol.isEmpty())
     {
+        result += "\nStartupWMClass=" + nx::branding::desktopClientInternalName();
+    }
+    else
+    {
+        // No StartupWMClass: GNOME could attach Client windows to this hidden entry.
         result += "\nNoDisplay=true";
         result += "\nMimeType=x-scheme-handler/" + protocol;
     }

@@ -6,4 +6,4 @@ Icon=vmsclient-@customization@.png
 Terminal=false
 Type=Application
 StartupNotify=true
-StartupWMClass=@customization.brand@
+StartupWMClass=@desktopClientInternalName@

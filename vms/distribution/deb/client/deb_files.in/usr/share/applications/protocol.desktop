@@ -6,6 +6,5 @@ Icon=vmsclient-@customization@.png
 Terminal=false
 Type=Application
 StartupNotify=true
-StartupWMClass=@customization.brand@
 NoDisplay=true
 MimeType=x-scheme-handler/@customization.uriProtocol@
