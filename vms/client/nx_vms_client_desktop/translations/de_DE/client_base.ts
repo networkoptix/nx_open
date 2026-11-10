@@ -6881,16 +6881,16 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message numerus="yes">
       <source>Backup will not be activated for %n devices:</source>
-      <translation type="unfinished">
-        <numerusform>Backup will not be activated for %n devices:</numerusform>
-        <numerusform>Backup will not be activated for %n devices:</numerusform>
+      <translation>
+        <numerusform>Die Sicherung wird für %n Gerät nicht aktiviert:</numerusform>
+        <numerusform>Die Sicherung wird für %n Geräte nicht aktiviert:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services are required to activate backup for them.</source>
-      <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
-        <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
+      <translation>
+        <numerusform>%n geeignete Cloud-Speicherdienste sind erforderlich, um die Datensicherung zu aktivieren.</numerusform>
+        <numerusform>%n geeigneter Cloud-Speicherdienst ist erforderlich, um die Datensicherung zu aktivieren.</numerusform>
       </translation>
     </message>
   </context>
@@ -7321,17 +7321,17 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message numerus="yes">
       <source>Use Services</source>
       <comment>Numerus form depends on the devices count</comment>
-      <translation type="unfinished">
-        <numerusform>Use Services</numerusform>
-        <numerusform>Use Services</numerusform>
+      <translation>
+        <numerusform>Dienst verwenden</numerusform>
+        <numerusform>Dienste verwenden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use Licenses</source>
       <comment>Numerus form depends on the devices count</comment>
-      <translation type="unfinished">
-        <numerusform>Use Licenses</numerusform>
-        <numerusform>Use Licenses</numerusform>
+      <translation>
+        <numerusform>Lizenz verwenden</numerusform>
+        <numerusform>Lizenzen verwenden</numerusform>
       </translation>
     </message>
   </context>
@@ -7732,7 +7732,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</source>
-      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</translation>
+      <translation>Der Zugriff von Vertriebs-Partner-Benutzern&apos; wird auf Organisationsebene verwaltet und ist in der Benutzerverwaltung der Site nicht sichtbar.</translation>
     </message>
     <message>
       <source>Learn more</source>
