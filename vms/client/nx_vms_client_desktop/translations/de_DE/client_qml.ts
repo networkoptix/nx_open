@@ -1741,9 +1741,9 @@ Select an Integration to begin configuring its parameters.</translation>
     <message numerus="yes">
       <source>%n more</source>
       <comment>Numerus: %n is the number of remaining groups</comment>
-      <translation type="unfinished">
-        <numerusform>%n more</numerusform>
-        <numerusform>%n more</numerusform>
+      <translation>
+        <numerusform>%n mehr</numerusform>
+        <numerusform>%n mehr</numerusform>
       </translation>
     </message>
   </context>
