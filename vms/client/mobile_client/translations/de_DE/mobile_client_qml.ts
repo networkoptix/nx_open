@@ -39,7 +39,7 @@
     </message>
     <message>
       <source>User Manual</source>
-      <translation type="unfinished">User Manual</translation>
+      <translation>Benutzerhandbuch</translation>
     </message>
   </context>
   <context>
