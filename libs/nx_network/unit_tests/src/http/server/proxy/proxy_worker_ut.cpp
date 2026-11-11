@@ -2,8 +2,11 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/network/http/test_http_server.h>
+#include <nx/network/http/global_context.h>
 #include <nx/network/http/server/proxy/proxy_worker.h>
+#include <nx/network/http/test_http_server.h>
+#include <nx/network/http/writable_message_body.h>
+#include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
 
 namespace nx::network::http::server::proxy::test {
@@ -34,6 +37,18 @@ protected:
         initializeProxyWorker(kEmptyResourcePath);
     }
 
+    void givenTargetRespondingBeforeRequestBody()
+    {
+        m_httpServer.server().redirectAllRequestsTo(m_httpServer.serverAddress());
+    }
+
+    void whenProxyingRequestWithBodyNotReceivedYet()
+    {
+        // Nothing is written to the body, so the request is never fully sent.
+        initializeProxyWorker(kEmptyResourcePath,
+            std::make_unique<WritableMessageBody>("text/plain", /*contentLength*/ 1));
+    }
+
     void thenMessageBodyEndIsReported()
     {
         m_messageBodyEndReported.get_future().wait();
@@ -46,6 +61,22 @@ protected:
         ASSERT_EQ(nx::network::http::StatusCode::noContent, response.statusLine.statusCode);
         ASSERT_FALSE(response.headers.contains("Content-Type"));
         ASSERT_EQ(nullptr, m_messageBodySource);
+    }
+
+    void thenRedirectHasBeenDelivered()
+    {
+        const auto response = m_proxiedResponse.get_future().get();
+        ASSERT_EQ(StatusCode::movedPermanently, response.statusLine.statusCode);
+    }
+
+    bool isConnectionToTargetCached()
+    {
+        std::promise<bool> cached;
+        SocketGlobals::httpGlobalContext().connectionCache.take(
+            {m_httpServer.serverAddress(), /*isTls*/ false},
+            [&cached](std::unique_ptr<AbstractStreamSocket> connection)
+            { cached.set_value(connection != nullptr); });
+        return cached.get_future().get();
     }
 
 private:
@@ -87,27 +118,34 @@ private:
         }
     }
 
-    void initializeProxyWorker(const std::string& path)
+    void initializeProxyWorker(const std::string& path,
+        std::unique_ptr<AbstractMsgBodySourceWithCache> requestBody = nullptr)
     {
         nx::network::http::Request translatedRequest;
-        translatedRequest.requestLine.method = nx::network::http::Method::get;
+        translatedRequest.requestLine.method =
+            requestBody ? nx::network::http::Method::post : nx::network::http::Method::get;
         translatedRequest.requestLine.url = path;
         translatedRequest.requestLine.version = nx::network::http::http_1_1;
         translatedRequest.headers.emplace(
             "Host",
             m_httpServer.serverAddress().toString());
+        if (requestBody)
+        {
+            translatedRequest.headers.emplace("Content-Type", requestBody->mimeType());
+            translatedRequest.headers.emplace(
+                "Content-Length", std::to_string(*requestBody->contentLength()));
+        }
 
         auto tcpSocket = std::make_unique<nx::network::TCPSocket>(AF_INET);
         ASSERT_TRUE(tcpSocket->connect(m_httpServer.serverAddress(), nx::network::kNoTimeout))
             << SystemError::getLastOSErrorText();
         ASSERT_TRUE(tcpSocket->setNonBlockingMode(true));
 
-        m_requestProxyWorker = std::make_unique<proxy::ProxyWorker>(
-            "not_used_in_streaming_mode",
+        m_requestProxyWorker = std::make_unique<proxy::ProxyWorker>(m_httpServer.serverAddress(),
             http::kUrlSchemeName,
-            true,
+            /*isSslConnectionRequired*/ false,
             std::move(translatedRequest),
-            nullptr,
+            std::move(requestBody),
             std::move(tcpSocket));
 
         m_requestProxyWorker->start(
@@ -152,6 +190,21 @@ TEST_F(HttpProxyWorker, proxying_request_without_message_body)
 {
     whenProxyingRequestToEmptyResource();
     thenEmptyResponseHasBeenDelivered();
+}
+
+TEST_F(HttpProxyWorker, connection_is_reused_after_request_has_been_sent)
+{
+    whenProxyingRequestToEmptyResource();
+    thenEmptyResponseHasBeenDelivered();
+    ASSERT_TRUE(isConnectionToTargetCached());
+}
+
+TEST_F(HttpProxyWorker, connection_is_not_reused_when_target_responded_before_request_body)
+{
+    givenTargetRespondingBeforeRequestBody();
+    whenProxyingRequestWithBodyNotReceivedYet();
+    thenRedirectHasBeenDelivered();
+    ASSERT_FALSE(isConnectionToTargetCached());
 }
 
 } // namespace nx::network::http::server::proxy::test
