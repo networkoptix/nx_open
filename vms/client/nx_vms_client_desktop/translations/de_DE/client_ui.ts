@@ -1932,7 +1932,7 @@ and click on the &quot;Search&quot; button</translation>
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>Site Administration</source>
-      <translation type="unfinished">Site Administration</translation>
+      <translation>Site-Administration</translation>
     </message>
   </context>
   <context>

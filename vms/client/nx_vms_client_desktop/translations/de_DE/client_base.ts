@@ -1565,7 +1565,7 @@ Lizenzschlüssel: %2</translation>
     <name>OauthLoginDialog</name>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Mit Site verbinden</translation>
     </message>
   </context>
   <context>
@@ -3087,7 +3087,7 @@ Lizenzschlüssel: %2</translation>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Ordner auswählen...</translation>
     </message>
     <message>
       <source>Notifications filters are moved to the right panel</source>
@@ -3150,7 +3150,7 @@ Lizenzschlüssel: %2</translation>
     </message>
     <message>
       <source>Open Integrations</source>
-      <translation type="unfinished">Open Integrations</translation>
+      <translation>Integration öffnen</translation>
     </message>
   </context>
   <context>
@@ -5133,9 +5133,9 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message numerus="yes">
       <source>+ %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>+ %n more</numerusform>
-        <numerusform>+ %n more</numerusform>
+      <translation>
+        <numerusform>+ %n mehr</numerusform>
+        <numerusform>+ %n mehr</numerusform>
       </translation>
     </message>
   </context>
@@ -8108,7 +8108,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Site Administration</source>
-      <translation type="unfinished">Site Administration</translation>
+      <translation>Site-Administration</translation>
     </message>
     <message>
       <source>Maximum number of Devices for the Site is reached</source>
@@ -8540,7 +8540,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Ordner auswählen...</translation>
     </message>
   </context>
   <context>
@@ -9189,7 +9189,7 @@ Site performance is degraded.</translation>
     <name>nx::vms::client::desktop::LogsManagementWidget</name>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Ordner auswählen...</translation>
     </message>
     <message>
       <source>Downloading...</source>
@@ -10325,7 +10325,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>New Integration</source>
-      <translation type="unfinished">New Integration</translation>
+      <translation>Neue Integration</translation>
     </message>
     <message>
       <source>Edit Integration</source>
@@ -10405,7 +10405,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Ordner auswählen...</translation>
     </message>
   </context>
   <context>
@@ -12069,7 +12069,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Integration</source>
-      <translation type="unfinished">Integration</translation>
+      <translation>Integration</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -13292,7 +13292,7 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Ordner auswählen...</translation>
     </message>
     <message>
       <source>There are no suitable cameras for replacement on the Server &quot;%1&quot;</source>
