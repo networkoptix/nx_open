@@ -1419,7 +1419,7 @@
     </message>
     <message>
       <source>Integration</source>
-      <translation type="unfinished">Integration</translation>
+      <translation>Integration</translation>
     </message>
     <message>
       <source>Cloud storage</source>
