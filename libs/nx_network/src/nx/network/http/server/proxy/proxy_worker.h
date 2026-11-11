@@ -71,6 +71,7 @@ private:
     static std::atomic<int> m_proxyingIdSequence;
     Request m_translatedRequest;
     std::unique_ptr<AbstractMsgBodySourceWithCache> m_requestBody;
+    bool m_requestSent = false;
     nx::network::debug::ObjectInstanceCounter<ProxyWorker> m_instanceCounter;
 
     void onConnectionClosed(SystemError::ErrorCode closeReason);
