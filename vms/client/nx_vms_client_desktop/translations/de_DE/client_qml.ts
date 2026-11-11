@@ -1221,7 +1221,7 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     <name>ImportFromDeviceDialog</name>
     <message>
       <source>Import From Devices</source>
-      <translation type="unfinished">Import From Devices</translation>
+      <translation>Von Geräten importieren</translation>
     </message>
   </context>
   <context>
@@ -1339,7 +1339,7 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     <name>IntegrationsTab</name>
     <message>
       <source>This plugin has no settings at the Site level.</source>
-      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+      <translation>Dieses Plugin hat keine Einstellungen auf der Site-Ebene.</translation>
     </message>
     <message>
       <source>Check Camera Settings to configure this plugin.</source>
@@ -2946,7 +2946,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>Benachrichtigungssprache</translation>
     </message>
   </context>
   <context>
@@ -3086,7 +3086,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>Benachrichtigungssprache</translation>
     </message>
     <message>
       <source>Interface Language</source>
