@@ -80,6 +80,7 @@ void ProxyWorker::start(ProxyCompletionHander handler)
                 {
                     NX_VERBOSE(this, "Proxy %1. Sending message completed with result %2",
                         m_proxyingId, SystemError::toString(resultCode));
+                    m_requestSent = resultCode == SystemError::noError;
                 });
 
             m_targetHostPipeline->startReadingConnection();
@@ -161,7 +162,8 @@ void ProxyWorker::startMessageBodyStreaming(Message message)
     RequestResult requestResult(
         static_cast<StatusCode::Value>(message.response->statusLine.statusCode),
         std::move(msgBody));
-    if (!isConnectionShouldBeClosed(*message.response))
+    // A target that answered early (e.g. with a redirect) still waits for the rest of the request.
+    if (m_requestSent && !isConnectionShouldBeClosed(*message.response))
     {
         requestResult.connectionEvents.onResponseHasBeenSent =
             [targetHost = m_targetHost, isSslConnectionRequired = m_isSslConnectionRequired](
@@ -247,7 +249,7 @@ void ProxyWorker::onMessageEnd()
     if (statusCode == StatusCode::switchingProtocols)
         prepareConnectionBridging(&requestResult);
 
-    if (m_targetHostPipeline->socket()
+    if (m_requestSent && m_targetHostPipeline->socket()
         && !isConnectionShouldBeClosed(*m_responseMessage.response))
     {
         ConnectionCache::ConnectionInfo ci{m_targetHost, m_isSslConnectionRequired};
