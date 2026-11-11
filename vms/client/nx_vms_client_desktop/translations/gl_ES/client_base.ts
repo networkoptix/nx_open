@@ -9574,7 +9574,7 @@ O rendemento do sitio web está degradado.</translation>
     </message>
     <message>
       <source>View Release Notes</source>
-      <translation type="unfinished">View Release Notes</translation>
+      <translation>Ver Notas da versión</translation>
     </message>
     <message>
       <source>You are about to merge Sites with Starter licenses.</source>
@@ -12187,23 +12187,23 @@ Non fixes este certificado se non modificaches o Certificado SSL do servidor %2.
       <source>%1
 This integration presented an untrusted certificate. It is not recommended to open this integration unless the risks are understood and accepted.</source>
       <comment>%1 is the integration address</comment>
-      <translation type="unfinished">%1
-This integration presented an untrusted certificate. It is not recommended to open this integration unless the risks are understood and accepted.</translation>
+      <translation>%1
+Esta integración presentou un certificado non fiable. Non se recomenda abrir esta integración a menos que se comprendan e acepten os riscos.</translation>
     </message>
     <message>
       <source>%1
 This web page presented an untrusted certificate. It is not recommended to open this web page unless the risks are understood and accepted.</source>
       <comment>%1 is the web page address</comment>
-      <translation type="unfinished">%1
-This web page presented an untrusted certificate. It is not recommended to open this web page unless the risks are understood and accepted.</translation>
+      <translation>%1
+Esta páxina web presentou un certificado non fiable. Non se recomenda abrir esta páxina web a menos que se comprendan e acepten os riscos.</translation>
     </message>
     <message>
       <source>Open Integration</source>
-      <translation type="unfinished">Open Integration</translation>
+      <translation>Abrir integración</translation>
     </message>
     <message>
       <source>Open Web Page</source>
-      <translation type="unfinished">Open Web Page</translation>
+      <translation>Abrir páxina web</translation>
     </message>
   </context>
   <context>

@@ -5,7 +5,7 @@
     <name>AddLookupListEntryDialog</name>
     <message>
       <source>Add Entry</source>
-      <translation type="unfinished">Add Entry</translation>
+      <translation>Eintrag hinzufügen</translation>
     </message>
     <message>
       <source>Add</source>
@@ -24,7 +24,7 @@
     </message>
     <message>
       <source>Login Attribute</source>
-      <translation type="unfinished">Login Attribute</translation>
+      <translation>Anmelde-Attribut</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -32,23 +32,23 @@
     </message>
     <message>
       <source>Membership</source>
-      <translation type="unfinished">Membership</translation>
+      <translation>Mitgliedschaft</translation>
     </message>
     <message>
       <source>Search Timeout</source>
-      <translation type="unfinished">Search Timeout</translation>
+      <translation>Such-Timeout</translation>
     </message>
     <message>
       <source>To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</source>
-      <translation type="unfinished">To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</translation>
+      <translation>Um die Digest-Authentifizierung für LDAP-Benutzer zu aktivieren, die bereits in der VMS-Datenbank hinzugefügt wurden, müssen Sie sie direkt in den Einstellungen dieser Benutzer aktivieren&apos;.</translation>
     </message>
     <message>
       <source>To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</source>
-      <translation type="unfinished">To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</translation>
+      <translation>Um die Digest-Authentifizierung für LDAP-Benutzer zu deaktivieren, die bereits in der VMS-Datenbank hinzugefügt wurden, müssen Sie sie direkt in den Einstellungen dieser Benutzer deaktivieren&apos;.</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication for imported users</source>
-      <translation type="unfinished">Allow insecure (digest) authentication for imported users</translation>
+      <translation>Unsichere (Digest-) Authentifizierung für importierte Benutzer zulassen</translation>
     </message>
     <message>
       <source>General</source>
@@ -56,31 +56,31 @@
     </message>
     <message>
       <source>Synchronize Users</source>
-      <translation type="unfinished">Synchronize Users</translation>
+      <translation>Benutzer synchronisieren</translation>
     </message>
     <message>
       <source>Sync Interval</source>
-      <translation type="unfinished">Sync Interval</translation>
+      <translation>Synchronisierungsintervall</translation>
     </message>
     <message>
       <source>Group Members Attribute</source>
-      <translation type="unfinished">Group Members Attribute</translation>
+      <translation>Gruppenmitglieder-Attribut</translation>
     </message>
     <message>
       <source>Proxy LDAP requests via server</source>
-      <translation type="unfinished">Proxy LDAP requests via server</translation>
+      <translation>Proxy LDAP-Anfragen über Server</translation>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>Benachrichtigungssprache</translation>
     </message>
     <message>
       <source>User ID Attribute</source>
-      <translation type="unfinished">User ID Attribute</translation>
+      <translation>Benutzer-ID Attribut</translation>
     </message>
     <message>
       <source>Group ID Attribute</source>
-      <translation type="unfinished">Group ID Attribute</translation>
+      <translation>Gruppen-ID Attribut</translation>
     </message>
   </context>
   <context>
@@ -131,23 +131,23 @@
     </message>
     <message>
       <source>Offline client updates</source>
-      <translation type="unfinished">Offline client updates</translation>
+      <translation>Offline-Client-Updates</translation>
     </message>
     <message>
       <source>Offline updates are enabled and files are stored on servers.</source>
-      <translation type="unfinished">Offline updates are enabled and files are stored on servers.</translation>
+      <translation>Offline-Updates sind aktiviert und Dateien werden auf Servern gespeichert.</translation>
     </message>
     <message>
       <source>Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</source>
-      <translation type="unfinished">Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</translation>
+      <translation>Durch Aktivieren dieser Option können zusätzliche Dateien auf Server heruntergeladen werden, die zur Aktualisierung verbundener Clients auch ohne Internetzugang verwendet werden können.</translation>
     </message>
     <message>
       <source>This will delete all update files on servers.</source>
-      <translation type="unfinished">This will delete all update files on servers.</translation>
+      <translation>Dadurch werden alle Update-Dateien auf den Servern gelöscht.</translation>
     </message>
     <message>
       <source>Proceed anyway?</source>
-      <translation type="unfinished">Proceed anyway?</translation>
+      <translation>Trotzdem fortfahren?</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -176,7 +176,7 @@
     <name>AnalyticsObjectAttributesSelector</name>
     <message>
       <source>Select / Deselect All</source>
-      <translation type="unfinished">Select / Deselect All</translation>
+      <translation>Alles auswählen/abwählen</translation>
     </message>
   </context>
   <context>
@@ -229,7 +229,7 @@
     </message>
     <message>
       <source>To the top</source>
-      <translation type="unfinished">To the top</translation>
+      <translation>Nach oben</translation>
     </message>
     <message>
       <source>No objects</source>
@@ -249,19 +249,19 @@
     </message>
     <message>
       <source>Tile Settings</source>
-      <translation type="unfinished">Tile Settings</translation>
+      <translation>Kachel Einstellungen</translation>
     </message>
     <message>
       <source>Table Settings</source>
-      <translation type="unfinished">Table Settings</translation>
+      <translation>Tabellen-Einstellungen</translation>
     </message>
     <message>
       <source>Switch to table view</source>
-      <translation type="unfinished">Switch to table view</translation>
+      <translation>Zur Tabellenansicht wechseln</translation>
     </message>
     <message>
       <source>Switch to card view</source>
-      <translation type="unfinished">Switch to card view</translation>
+      <translation>Zur Kartenansicht wechseln</translation>
     </message>
   </context>
   <context>
@@ -280,11 +280,11 @@
     </message>
     <message>
       <source>Check Site Administration settings to configure this plugin.</source>
-      <translation type="unfinished">Check Site Administration settings to configure this plugin.</translation>
+      <translation>Überprüfen Sie die Site-Administrationseinstellungen, um dieses Plugin zu konfigurieren.</translation>
     </message>
     <message>
       <source>This plugin has no settings at the Site level.</source>
-      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+      <translation>Dieses Plugin hat keine Einstellungen auf der Site-Ebene.</translation>
     </message>
   </context>
   <context>
@@ -295,7 +295,7 @@
     </message>
     <message>
       <source>API Integrations</source>
-      <translation type="unfinished">API Integrations</translation>
+      <translation>API Integrationen</translation>
     </message>
   </context>
   <context>
@@ -303,15 +303,15 @@
     <message>
       <source>Integrations allow the seamless utilization of video analytics on various devices from the VMS.
 Select an Integration to begin configuring its parameters.</source>
-      <translation type="unfinished">Integrations allow the seamless utilization of video analytics on various devices from the VMS.
-Select an Integration to begin configuring its parameters.</translation>
+      <translation>Integrationen ermöglichen die nahtlose Nutzung von Videoanalysen auf verschiedenen Geräten des VMS.
+Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu beginnen.</translation>
     </message>
   </context>
   <context>
     <name>ApiIntegrations</name>
     <message>
       <source>API Integrations</source>
-      <translation type="unfinished">API Integrations</translation>
+      <translation>API Integrationen</translation>
     </message>
     <message>
       <source>API Integrations interact with %1 Server via REST API and exchange metadata</source>
@@ -319,15 +319,15 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>New requests</source>
-      <translation type="unfinished">New requests</translation>
+      <translation>Neue Anfragen</translation>
     </message>
     <message>
       <source>API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</source>
-      <translation type="unfinished">API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</translation>
+      <translation>Die API-Integration kann nach Überprüfung des vom Integrationsanbieter erhaltenen Codes aktiviert werden. Neue Anfragen können deaktiviert werden, um unerwünschte Interaktionen zu verhindern.</translation>
     </message>
     <message>
       <source>Enable %1?</source>
-      <translation type="unfinished">Enable %1?</translation>
+      <translation>%1 aktivieren?</translation>
     </message>
     <message>
       <source>This Integration will be able to:
@@ -335,23 +335,23 @@ Select an Integration to begin configuring its parameters.</translation>
  • get access to archive
  • process video streams
  • exchange metadata over the network</source>
-      <translation type="unfinished">This Integration will be able to:
- • change settings on cameras
- • get access to archive
- • process video streams
- • exchange metadata over the network</translation>
+      <translation>Diese Integration ermöglicht Folgendes:
+ • Ändern der Kameraeinstellungen
+ • Zugriff auf das Archiv
+ • Verarbeiten von Videostreams
+ • Austausch von Metadaten über das Netzwerk</translation>
     </message>
     <message>
       <source>Enable Integration</source>
-      <translation type="unfinished">Enable Integration</translation>
+      <translation>Integration aktivieren</translation>
     </message>
     <message>
       <source>Remove %1?</source>
-      <translation type="unfinished">Remove %1?</translation>
+      <translation>%1 entfernen?</translation>
     </message>
     <message>
       <source>This will remove Integration request</source>
-      <translation type="unfinished">This will remove Integration request</translation>
+      <translation>Dadurch wird die Integrationsanfrage entfernt</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -359,14 +359,14 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Remove Request</source>
-      <translation type="unfinished">Remove Request</translation>
+      <translation>Anfrage entfernen</translation>
     </message>
   </context>
   <context>
     <name>AuthCode</name>
     <message>
       <source>Wrong pairing code</source>
-      <translation type="unfinished">Wrong pairing code</translation>
+      <translation>Falscher Pairing-Code</translation>
     </message>
     <message>
       <source>Paste</source>
@@ -377,7 +377,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>AutoTextField</name>
     <message>
       <source>This field cannot be empty</source>
-      <translation type="unfinished">This field cannot be empty</translation>
+      <translation>Dieses Feld darf nicht leer bleiben</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -388,9 +388,9 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>BatchUserEditDialog</name>
     <message numerus="yes">
       <source>Batch Edit - %n Users</source>
-      <translation type="unfinished">
-        <numerusform>Batch Edit - %n Users</numerusform>
-        <numerusform>Batch Edit - %n Users</numerusform>
+      <translation>
+        <numerusform>Batch-Bearbeitung - %n Benutzer</numerusform>
+        <numerusform>Batch-Bearbeitung - %n Benutzer</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -403,7 +403,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>User status</source>
       <comment>Whether users are enabled or disabled</comment>
-      <translation type="unfinished">User status</translation>
+      <translation>Benutzerstatus</translation>
     </message>
     <message>
       <source>Enabled</source>
@@ -415,11 +415,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Insecure (digest) authentication</source>
-      <translation type="unfinished">Insecure (digest) authentication</translation>
+      <translation>Unsichere (Digest-) Authentifizierung</translation>
     </message>
     <message>
       <source>keep current value</source>
-      <translation type="unfinished">keep current value</translation>
+      <translation>Aktuellen Wert beibehalten</translation>
     </message>
   </context>
   <context>
@@ -455,7 +455,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>Buttons</name>
     <message>
       <source>Press each button several times and write the names of these buttons in the table below.</source>
-      <translation type="unfinished">Press each button several times and write the names of these buttons in the table below.</translation>
+      <translation>Drücken Sie jede Taste mehrmals und tragen Sie die Namen dieser Tasten in die untenstehende Tabelle ein.</translation>
     </message>
   </context>
   <context>
@@ -543,7 +543,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Shut Down</source>
-      <translation type="unfinished">Shut Down</translation>
+      <translation>Herunterfahren</translation>
     </message>
     <message>
       <source>New</source>
@@ -1214,7 +1214,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>ImportFromDeviceDialog</name>
     <message>
       <source>Import From Devices</source>
-      <translation type="unfinished">Import From Devices</translation>
+      <translation>Von Geräten importieren</translation>
     </message>
   </context>
   <context>
@@ -1332,7 +1332,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>IntegrationsTab</name>
     <message>
       <source>This plugin has no settings at the Site level.</source>
-      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+      <translation>Dieses Plugin hat keine Einstellungen auf der Site-Ebene.</translation>
     </message>
     <message>
       <source>Check Camera Settings to configure this plugin.</source>
@@ -2944,7 +2944,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>Benachrichtigungssprache</translation>
     </message>
   </context>
   <context>
@@ -3084,7 +3084,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>Benachrichtigungssprache</translation>
     </message>
     <message>
       <source>Interface Language</source>
