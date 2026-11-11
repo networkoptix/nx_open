@@ -1063,7 +1063,7 @@
     <name>SiteConnectionSheet</name>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Mit Site verbinden</translation>
     </message>
     <message>
       <source>Log in as</source>
