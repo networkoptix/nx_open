@@ -257,7 +257,11 @@ void GetPostTunnelServerWorker<ApplicationData...>::openDownStream(
     const auto it = m_tunnels.find(tunnelSeq);
     if (it == m_tunnels.end())
     {
-        NX_ASSERT(false, "%1. Missing tunnel context for %2", tunnelSeq, connection->lastRequestSource());
+        // The tunnel setup timer has closed the tunnel while the GET response was being sent.
+        NX_DEBUG(this,
+            "%1. Tunnel is already closed. Connection from %2",
+            tunnelSeq,
+            connection->lastRequestSource());
         return;
     }
 
