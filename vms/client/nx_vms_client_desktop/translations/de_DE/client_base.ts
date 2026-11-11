@@ -5,23 +5,23 @@
     <name>ActionDurationPickerWidget</name>
     <message>
       <source>For the duration of event</source>
-      <translation type="unfinished">For the duration of event</translation>
+      <translation>Für die Dauer des Ereignisses</translation>
     </message>
     <message>
       <source>Of fixed duration</source>
-      <translation type="unfinished">Of fixed duration</translation>
+      <translation>Von fester Dauer</translation>
     </message>
     <message>
       <source>Event occurs</source>
-      <translation type="unfinished">Event occurs</translation>
+      <translation>Ereignis tritt auf</translation>
     </message>
     <message>
       <source>Event starts</source>
-      <translation type="unfinished">Event starts</translation>
+      <translation>Ereignis-start</translation>
     </message>
     <message>
       <source>Event stops</source>
-      <translation type="unfinished">Event stops</translation>
+      <translation>Ereignis-stop</translation>
     </message>
     <message>
       <source>Duration</source>
@@ -92,7 +92,7 @@
     <name>CellWidget</name>
     <message>
       <source>Canceled</source>
-      <translation type="unfinished">Canceled</translation>
+      <translation>Abgebrochen</translation>
     </message>
     <message>
       <source>Added</source>
@@ -979,7 +979,7 @@
     </message>
     <message>
       <source>Device...</source>
-      <translation type="unfinished">Device...</translation>
+      <translation>Gerät...</translation>
     </message>
     <message>
       <source>Add User...</source>
@@ -987,11 +987,11 @@
     </message>
     <message>
       <source>Integration...</source>
-      <translation type="unfinished">Integration...</translation>
+      <translation>Integration...</translation>
     </message>
     <message>
       <source>New Integration...</source>
-      <translation type="unfinished">New Integration...</translation>
+      <translation>Neue Integration...</translation>
     </message>
     <message>
       <source>New Web Page...</source>
@@ -999,19 +999,19 @@
     </message>
     <message>
       <source>Add Showreel...</source>
-      <translation type="unfinished">Add Showreel...</translation>
+      <translation>Showreel hinzufügen...</translation>
     </message>
     <message>
       <source>Add Virtual Camera...</source>
-      <translation type="unfinished">Add Virtual Camera...</translation>
+      <translation>Virtuelle Kamera hinzufügen...</translation>
     </message>
     <message>
       <source>Integration Settings...</source>
-      <translation type="unfinished">Integration Settings...</translation>
+      <translation>Integrationseinstellungen...</translation>
     </message>
     <message>
       <source>Proxied Integration...</source>
-      <translation type="unfinished">Proxied Integration...</translation>
+      <translation>Proxied Integration...</translation>
     </message>
     <message>
       <source>Proxied Web Page...</source>
@@ -1019,39 +1019,39 @@
     </message>
     <message>
       <source>Show Proxied Resources</source>
-      <translation type="unfinished">Show Proxied Resources</translation>
+      <translation>Proxied-Ressourcen anzeigen</translation>
     </message>
     <message>
       <source>Import From Devices...</source>
-      <translation type="unfinished">Import From Devices...</translation>
+      <translation>Von Geräten importieren...</translation>
     </message>
     <message>
       <source>User Manual...</source>
-      <translation type="unfinished">User Manual...</translation>
+      <translation>Benutzerhandbuch...</translation>
     </message>
     <message>
       <source>Convert to Shared Layout</source>
-      <translation type="unfinished">Convert to Shared Layout</translation>
+      <translation>In gemeinsames Layout konvertieren</translation>
     </message>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Mit Site verbinden</translation>
     </message>
     <message>
       <source>Site Administration...</source>
-      <translation type="unfinished">Site Administration...</translation>
+      <translation>Site-Administration...</translation>
     </message>
     <message>
       <source>Site Update...</source>
-      <translation type="unfinished">Site Update...</translation>
+      <translation>Site-Update...</translation>
     </message>
     <message>
       <source>Lists Management...</source>
-      <translation type="unfinished">Lists Management...</translation>
+      <translation>Listenverwaltung...</translation>
     </message>
     <message>
       <source>Open Integrations...</source>
-      <translation type="unfinished">Open Integrations...</translation>
+      <translation>Integration öffnen...</translation>
     </message>
     <message>
       <source>Merge Sites...</source>
@@ -1060,7 +1060,7 @@
     <message>
       <source>Open in</source>
       <comment>The &quot;Open in&quot; menu, which has a submenu</comment>
-      <translation type="unfinished">Open in</translation>
+      <translation>Öffnen in</translation>
     </message>
     <message>
       <source>New Tab</source>
@@ -1075,7 +1075,7 @@
     <message>
       <source>Dedicated Window</source>
       <comment>The &quot;Open in&quot; submenu item</comment>
-      <translation type="unfinished">Dedicated Window</translation>
+      <translation>Dediziertes Fenster</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -1083,11 +1083,11 @@
     </message>
     <message>
       <source>JavaScript API...</source>
-      <translation type="unfinished">JavaScript API...</translation>
+      <translation>JavaScript-API...</translation>
     </message>
     <message>
       <source>Merge to Currently Connected Site...</source>
-      <translation type="unfinished">Merge to Currently Connected Site...</translation>
+      <translation>Zusammenführen mit der aktuell verbundenen Site...</translation>
     </message>
     <message>
       <source>Cell Aspect Ratio</source>
@@ -1107,7 +1107,7 @@
     </message>
     <message>
       <source>New Welcome Screen</source>
-      <translation type="unfinished">New Welcome Screen</translation>
+      <translation>Neuer Willkommensbildschirm</translation>
     </message>
     <message>
       <source>Monitor in New Tab</source>
@@ -1132,9 +1132,9 @@
     <message numerus="yes">
       <source>Mute Items</source>
       <comment>Numerus form depends on the amount of items</comment>
-      <translation type="unfinished">
-        <numerusform>Mute Items</numerusform>
-        <numerusform>Mute Items</numerusform>
+      <translation>
+        <numerusform>Elemente stummschalten</numerusform>
+        <numerusform>Elemente stummschalten</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1552,7 +1552,7 @@ Lizenzschlüssel: %2</translation>
     <name>OauthLoginDialog</name>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Mit Site verbinden</translation>
     </message>
   </context>
   <context>
@@ -1902,23 +1902,23 @@ Lizenzschlüssel: %2</translation>
     </message>
     <message>
       <source>RHI device ID</source>
-      <translation type="unfinished">RHI device ID</translation>
+      <translation>RHI-Geräte-ID</translation>
     </message>
     <message>
       <source>RHI vendor ID</source>
-      <translation type="unfinished">RHI vendor ID</translation>
+      <translation>RHI-Anbieter-ID</translation>
     </message>
     <message>
       <source>RHI max texture size</source>
-      <translation type="unfinished">RHI max texture size</translation>
+      <translation>RHI maximale Texturgröße</translation>
     </message>
     <message>
       <source>Graphics API</source>
-      <translation type="unfinished">Graphics API</translation>
+      <translation>Grafik-API</translation>
     </message>
     <message>
       <source>Unable to get GPU information for %1</source>
-      <translation type="unfinished">Unable to get GPU information for %1</translation>
+      <translation>GPU-Informationen für %1 konnten nicht abgerufen werden</translation>
     </message>
     <message>
       <source>Platform</source>
@@ -1926,7 +1926,7 @@ Lizenzschlüssel: %2</translation>
     </message>
     <message>
       <source>Developer Build</source>
-      <translation type="unfinished">Developer Build</translation>
+      <translation>Entwickler-Build</translation>
     </message>
   </context>
   <context>
@@ -2011,46 +2011,46 @@ Lizenzschlüssel: %2</translation>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Ordner auswählen...</translation>
     </message>
     <message>
       <source>Failed to save logs to the selected folder</source>
-      <translation type="unfinished">Failed to save logs to the selected folder</translation>
+      <translation>Die Protokolle konnten nicht im ausgewählten Ordner gespeichert werden</translation>
     </message>
     <message>
       <source>Download complete!</source>
-      <translation type="unfinished">Download complete!</translation>
+      <translation>Download abgeschlossen!</translation>
     </message>
     <message>
       <source>Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</source>
-      <translation type="unfinished">Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</translation>
+      <translation>Hinweis: Die Bildverbesserung ist nicht verfügbar, wenn die Hardware-Videodekodierung aktiviert ist.</translation>
     </message>
     <message>
       <source>Cannot clear WebEngine cache</source>
-      <translation type="unfinished">Cannot clear WebEngine cache</translation>
+      <translation>WebEngine-Cache kann nicht geleert werden</translation>
     </message>
     <message>
       <source>Please close all web pages and try again.</source>
-      <translation type="unfinished">Please close all web pages and try again.</translation>
+      <translation>Bitte schließen Sie alle Webseiten und versuchen Sie es erneut.</translation>
     </message>
     <message>
       <source>The files may be locked by another process.</source>
-      <translation type="unfinished">The files may be locked by another process.</translation>
+      <translation>Die Dateien könnten von einem anderen Prozess gesperrt sein.</translation>
     </message>
     <message>
       <source>WebEngine cache partially cleared</source>
-      <translation type="unfinished">WebEngine cache partially cleared</translation>
+      <translation>WebEngine-Cache teilweise geleert</translation>
     </message>
     <message>
       <source>Some files may be locked by another process.</source>
-      <translation type="unfinished">Some files may be locked by another process.</translation>
+      <translation>Einige Dateien sind möglicherweise durch einen anderen Prozess gesperrt.</translation>
     </message>
   </context>
   <context>
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>Site shut down. To attach to a Video Wall, the Site should be in active state. %1</source>
-      <translation type="unfinished">Site shut down. To attach to a Video Wall, the Site should be in active state. %1</translation>
+      <translation>Die Site ist offline. Um eine Verbindung zu einer Videowall herzustellen, muss die Site aktiv sein. %1</translation>
     </message>
   </context>
   <context>
@@ -2073,7 +2073,7 @@ Lizenzschlüssel: %2</translation>
     </message>
     <message>
       <source>internal</source>
-      <translation type="unfinished">internal</translation>
+      <translation>intern</translation>
     </message>
   </context>
   <context>
@@ -2152,26 +2152,26 @@ Lizenzschlüssel: %2</translation>
     </message>
     <message>
       <source>This server is removed from Site</source>
-      <translation type="unfinished">This server is removed from Site</translation>
+      <translation>Dieser Server wurde von der Site entfernt</translation>
     </message>
     <message>
       <source>This user is removed from Site</source>
-      <translation type="unfinished">This user is removed from Site</translation>
+      <translation>Dieser Benutzer wurde von der Site entfernt</translation>
     </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>
       <comment>Numerus form depends on the number of devices</comment>
-      <translation type="unfinished">
-        <numerusform>These devices are removed from Site</numerusform>
-        <numerusform>These devices are removed from Site</numerusform>
+      <translation>
+        <numerusform>Diese Geräte werden von der Site entfernt</numerusform>
+        <numerusform>Diese Geräte werden von der Site entfernt</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from Site</source>
       <comment>Numerus form depends on the number of cameras</comment>
-      <translation type="unfinished">
-        <numerusform>These cameras are removed from Site</numerusform>
-        <numerusform>These cameras are removed from Site</numerusform>
+      <translation>
+        <numerusform>Diese Kameras werden von der Site entfernt</numerusform>
+        <numerusform>Diese Kameras werden von der Site entfernt</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -2362,33 +2362,33 @@ Lizenzschlüssel: %2</translation>
     </message>
     <message>
       <source>Site name changed</source>
-      <translation type="unfinished">Site name changed</translation>
+      <translation>Name der Site geändert</translation>
     </message>
     <message>
       <source>Site merge</source>
-      <translation type="unfinished">Site merge</translation>
+      <translation>Site-Zusammenführung</translation>
     </message>
     <message>
       <source>Server proxy connection</source>
-      <translation type="unfinished">Server proxy connection</translation>
+      <translation>Server-Proxy-Verbindung</translation>
     </message>
     <message>
       <source>Site has been updated to version %1</source>
-      <translation type="unfinished">Site has been updated to version %1</translation>
+      <translation>Die Site wurde auf Version %1 aktualisiert</translation>
     </message>
     <message>
       <source>%1 - %2, Duration: %3, Target: %4</source>
       <comment>%1 is start time of proxy connection, %2 is end time of proxy connection, %3 is proxy connection duration, %4 is proxy connection target address</comment>
-      <translation type="unfinished">%1 - %2, Duration: %3, Target: %4</translation>
+      <translation>%1 - %2, Dauer: %3, Ziel: %4</translation>
     </message>
     <message>
       <source>Start time: %1, Target: %2</source>
       <comment>%1 is start time of proxy connection, %2 is proxy connection target address</comment>
-      <translation type="unfinished">Start time: %1, Target: %2</translation>
+      <translation>Startzeit: %1, Ziel: %2</translation>
     </message>
     <message>
       <source>User IP</source>
-      <translation type="unfinished">User IP</translation>
+      <translation>Benutzer-IP</translation>
     </message>
     <message>
       <source>Device</source>
@@ -2400,11 +2400,11 @@ Lizenzschlüssel: %2</translation>
     </message>
     <message>
       <source>Device IP</source>
-      <translation type="unfinished">Device IP</translation>
+      <translation>Geräte-IP</translation>
     </message>
     <message>
       <source>Camera IP</source>
-      <translation type="unfinished">Camera IP</translation>
+      <translation>Kamera-IP</translation>
     </message>
     <message>
       <source>Server</source>
@@ -2412,7 +2412,7 @@ Lizenzschlüssel: %2</translation>
     </message>
     <message>
       <source>This action was performed by a plugin.</source>
-      <translation type="unfinished">This action was performed by a plugin.</translation>
+      <translation>Diese Aktion wurde von einem Plugin ausgeführt.</translation>
     </message>
   </context>
   <context>
@@ -2708,37 +2708,37 @@ Lizenzschlüssel: %2</translation>
     <message>
       <source>Disconnect Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Disconnect Site from %1</translation>
+      <translation>Site von %1 trennen</translation>
     </message>
     <message>
       <source>Connect Site to %1...</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1...</translation>
+      <translation>Site mit %1 verbinden ...</translation>
     </message>
     <message>
       <source>There is currently no connection between your site and %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">There is currently no connection between your site and %1.</translation>
+      <translation>Es besteht derzeit keine Verbindung zwischen Ihrer Site und %1.</translation>
     </message>
     <message>
       <source>Enter your account password to disconnect Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to disconnect Site from %1</translation>
+      <translation>Geben Sie Ihr Passwort ein, um die Site von %1 zu trennen</translation>
     </message>
     <message>
       <source>Cannot disconnect the Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot disconnect the Site from %1</translation>
+      <translation>Kann die Site nicht von %1 trennen</translation>
     </message>
     <message>
       <source>Site disconnected from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Site disconnected from %1</translation>
+      <translation>Site getrennt von %1</translation>
     </message>
     <message>
       <source>Disconnect site from %1?</source>
       <comment>%1 is the cloud name, like Nx Cloud</comment>
-      <translation type="unfinished">Disconnect site from %1?</translation>
+      <translation>Site von %1 trennen?</translation>
     </message>
     <message>
       <source>Recording will stop and all Service Subscriptions will be removed</source>
@@ -2747,11 +2747,11 @@ Lizenzschlüssel: %2</translation>
     <message>
       <source>All %1 users will be removed from the site</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">All %1 users will be removed from the site</translation>
+      <translation>Alle %1 Benutzer werden von der Site entfernt</translation>
     </message>
     <message>
       <source>You will be logged out of the site. The site will be accessible only via local network</source>
-      <translation type="unfinished">You will be logged out of the site. The site will be accessible only via local network</translation>
+      <translation>Sie werden von der Site abgemeldet. Die Site ist nur noch über das lokale Netzwerk erreichbar</translation>
     </message>
     <message>
       <source>The site will be accessible only via local network</source>
@@ -3074,7 +3074,7 @@ Lizenzschlüssel: %2</translation>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Ordner auswählen...</translation>
     </message>
     <message>
       <source>Notifications filters are moved to the right panel</source>
@@ -3137,7 +3137,7 @@ Lizenzschlüssel: %2</translation>
     </message>
     <message>
       <source>Open Integrations</source>
-      <translation type="unfinished">Open Integrations</translation>
+      <translation>Integration öffnen</translation>
     </message>
   </context>
   <context>
@@ -5120,9 +5120,9 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message numerus="yes">
       <source>+ %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>+ %n more</numerusform>
-        <numerusform>+ %n more</numerusform>
+      <translation>
+        <numerusform>+ %n mehr</numerusform>
+        <numerusform>+ %n mehr</numerusform>
       </translation>
     </message>
   </context>
@@ -8095,7 +8095,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Site Administration</source>
-      <translation type="unfinished">Site Administration</translation>
+      <translation>Site-Administration</translation>
     </message>
     <message>
       <source>Maximum number of Devices for the Site is reached</source>
@@ -8527,7 +8527,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Ordner auswählen...</translation>
     </message>
   </context>
   <context>
@@ -9176,7 +9176,7 @@ Site performance is degraded.</translation>
     <name>nx::vms::client::desktop::LogsManagementWidget</name>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Ordner auswählen...</translation>
     </message>
     <message>
       <source>Downloading...</source>
@@ -10312,7 +10312,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>New Integration</source>
-      <translation type="unfinished">New Integration</translation>
+      <translation>Neue Integration</translation>
     </message>
     <message>
       <source>Edit Integration</source>
@@ -10392,7 +10392,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Ordner auswählen...</translation>
     </message>
   </context>
   <context>
@@ -12048,7 +12048,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Integration</source>
-      <translation type="unfinished">Integration</translation>
+      <translation>Integration</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -13279,7 +13279,7 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Ordner auswählen...</translation>
     </message>
     <message>
       <source>There are no suitable cameras for replacement on the Server &quot;%1&quot;</source>
