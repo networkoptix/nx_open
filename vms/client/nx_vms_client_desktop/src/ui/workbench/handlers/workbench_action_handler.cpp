@@ -94,6 +94,7 @@
 #include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/network/cloud_url_validator.h>
+#include <nx/vms/client/desktop/network/ping_utils.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
@@ -2565,9 +2566,16 @@ void ActionHandler::at_pingAction_triggered()
     if (nx::network::SocketGlobals::addressResolver().isCloudHostname(host))
         return;
 
+    if (!isPingableHost(host))
+    {
+        NX_WARNING(this, "Ping is not started for the invalid host %1", host);
+        return;
+    }
+
     if (nx::build_info::isWindows())
     {
-        nx::utils::startProcessDetached("cmd", {"/C", "ping", host, "-t"});
+        // Run ping without cmd, so that characters like "&" in the host cannot inject commands.
+        nx::utils::startProcessDetached("ping", {host, "-t"});
     }
     else if (nx::build_info::isLinux())
     {
