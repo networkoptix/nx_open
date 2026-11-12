@@ -7,6 +7,8 @@
 
 #include <QtQml/QtQml>
 
+#include <nx/analytics/signaling_metadata_consumer.h>
+#include <nx/utils/pending_operation.h>
 #include <nx/vms/client/core/media/consuming_motion_metadata_provider.h>
 #include <nx/vms/client/core/media/media_player.h>
 #include <nx/vms/client/core/motion/motion_grid.h>
@@ -19,23 +21,38 @@ namespace nx::vms::client::core {
 class MediaPlayerMotionProvider::Private
 {
 public:
+    MediaPlayerMotionProvider* const q;
     MediaPlayer* mediaPlayer = nullptr;
 
     /** Recreated for every resource, so the metadata cached for another resource is dropped. */
     std::unique_ptr<ConsumingMotionMetadataProvider> metadataProvider;
 
+    /**
+     * Added to the media player while there is one, and passes the received metadata to the
+     * current metadata provider. It is the same for all resources, so a resource change replaces
+     * only the metadata provider and does not change what the player requests.
+     */
+    const QSharedPointer<nx::analytics::SignalingMetadataConsumer> metadataConsumer{
+        new nx::analytics::SignalingMetadataConsumer(MetadataType::Motion)};
+
+    /** The motion mask may change with the received metadata even when the position doesn't. */
+    nx::utils::PendingOperation motionMaskChangeNotification{
+        [this]() { emit q->motionMaskChanged(); }, /*intervalMs*/ 0};
+
+    explicit Private(MediaPlayerMotionProvider* q): q(q) {}
+
     void resetMetadataProvider()
     {
-        if (metadataProvider && mediaPlayer)
-            mediaPlayer->removeMetadataConsumer(metadataProvider->metadataConsumer());
+        metadataProvider.reset(mediaPlayer ? new ConsumingMotionMetadataProvider() : nullptr);
+    }
 
-        metadataProvider.reset();
+    void handleMetadata(const QnConstAbstractCompressedMetadataPtr& metadata)
+    {
+        if (!metadataProvider)
+            return;
 
-        if (mediaPlayer)
-        {
-            metadataProvider = std::make_unique<ConsumingMotionMetadataProvider>();
-            mediaPlayer->addMetadataConsumer(metadataProvider->metadataConsumer());
-        }
+        metadataProvider->metadataConsumer()->processMetadata(metadata);
+        motionMaskChangeNotification.requestOperation();
     }
 };
 
@@ -44,13 +61,22 @@ public:
 
 MediaPlayerMotionProvider::MediaPlayerMotionProvider(QObject* parent):
     QObject(parent),
-    d(new Private())
+    d(new Private(this))
 {
+    // Once per event loop iteration, however many requests were made in it.
+    d->motionMaskChangeNotification.setFlags(nx::utils::PendingOperation::NoFlags);
+
+    connect(d->metadataConsumer.get(),
+        &nx::analytics::SignalingMetadataConsumer::metadataReceived,
+        this,
+        [this](const QnConstAbstractCompressedMetadataPtr& metadata)
+        { d->handleMetadata(metadata); });
 }
 
 MediaPlayerMotionProvider::~MediaPlayerMotionProvider()
 {
-    setMediaPlayer(nullptr);
+    if (d->mediaPlayer)
+        d->mediaPlayer->removeMetadataConsumer(d->metadataConsumer);
 }
 
 MediaPlayer* MediaPlayerMotionProvider::mediaPlayer() const
@@ -65,10 +91,7 @@ void MediaPlayerMotionProvider::setMediaPlayer(MediaPlayer* value)
 
     if (d->mediaPlayer)
     {
-        if (d->metadataProvider)
-            d->mediaPlayer->removeMetadataConsumer(d->metadataProvider->metadataConsumer());
-
-        d->metadataProvider.reset();
+        d->mediaPlayer->removeMetadataConsumer(d->metadataConsumer);
         d->mediaPlayer->disconnect(this);
     }
 
@@ -97,6 +120,8 @@ void MediaPlayerMotionProvider::setMediaPlayer(MediaPlayer* value)
             &MediaPlayer::positionChanged,
             this,
             &MediaPlayerMotionProvider::motionMaskChanged);
+
+        d->mediaPlayer->addMetadataConsumer(d->metadataConsumer);
     }
 
     d->resetMetadataProvider();
@@ -126,10 +151,7 @@ QByteArray MediaPlayerMotionProvider::motionMask(int channel) const
 QSharedPointer<nx::analytics::AbstractMetadataConsumer> MediaPlayerMotionProvider::
     metadataConsumer() const
 {
-    if (!d->metadataProvider)
-        return {};
-
-    return d->metadataProvider->metadataConsumer();
+    return d->mediaPlayer ? d->metadataConsumer : nullptr;
 }
 
 void MediaPlayerMotionProvider::registerQmlType()

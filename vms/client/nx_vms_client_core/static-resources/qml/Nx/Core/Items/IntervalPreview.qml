@@ -66,6 +66,8 @@ Item
 
     readonly property bool isReady: loader.previewState === EventSearch.PreviewState.ready
 
+    property Component channelOverlayComponent: null
+
     signal clicked
     function play(position)
     {
@@ -141,6 +143,7 @@ Item
                     forcedAspectRatio: control.aspectRatio
                     videoQuality: MediaPlayer.LowVideoQuality
                     audioEnabled: control.audioEnabled
+                    channelOverlayComponent: control.channelOverlayComponent
                     visible: control.isReady
                     color: control.color
 

@@ -22,6 +22,7 @@
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/analytics/object_display_settings.h>
+#include <nx/vms/client/core/analytics/object_tracker.h>
 #include <nx/vms/client/core/media/abstract_analytics_metadata_provider.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/utils/geometry.h>
@@ -37,18 +38,16 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
-#include <utils/math/linear_combination.h>
 
 namespace nx::vms::client::desktop {
 
 using namespace std::chrono;
 using namespace nx::common::metadata;
 using nx::vms::client::core::Geometry;
+using nx::vms::client::core::analytics::ObjectSnapshot;
+using nx::vms::client::core::analytics::ObjectTracker;
 
 namespace {
-
-// Peek objects up to 2 seconds in the future and into the past.
-static constexpr microseconds kMetadataWindowSize = 2s;
 
 milliseconds toMs(microseconds value)
 {
@@ -61,28 +60,16 @@ bool isValidFigureRectangle(const QRectF& rect)
     return rect.width() >= 0 && rect.height() >= 0;
 };
 
-struct ObjectInfo
+/** Presentation of an analytics object, recalculated when its track gets a new packet. */
+struct ObjectAppearance
 {
-    nx::Uuid trackId;
-    nx::Uuid analyticsEngineId;
     QColor color;
-    QRectF rectangle;
-    microseconds startTimestamp = 0us;
-    microseconds endTimestamp = 0us;
     QString description;
-
-    QRectF futureRectangle;
-    microseconds futureRectangleTimestamp = 0us;
-
-    ObjectMetadata rawData;
-
-    /** Debug representation. */
-    QString toString() const;
 };
 
-QString ObjectInfo::toString() const
+QString objectDebugString(const nx::Uuid& trackId, const ObjectAppearance& appearance)
 {
-    auto singleLineDescription = description;
+    auto singleLineDescription = appearance.description;
     singleLineDescription.replace('\n', ' ');
     return QString("Object [%1] %2").arg(trackId.toSimpleString()).arg(singleLineDescription);
 }
@@ -106,32 +93,30 @@ bool isPointFigure(const Attributes& attributes)
     return !!attributeValue(attributes, kShowPointAttributeName);
 }
 
-figure::FigurePtr figureFromObjectData(
-    const ObjectInfo& info,
+figure::FigurePtr figureFromObjectData(const QColor& color,
+    const Attributes& attributes,
     const QRectF& boundingRect,
     const QRectF& zoomRect)
 {
     if (!isValidFigureRectangle(boundingRect))
         return {};
 
-    auto figure =
-        [info, boundingRect]()
+    auto figure = [&color, &attributes, boundingRect]()
+    {
+        static constexpr QRectF kWidgetBounds(0.0, 0.0, 1.0, 1.0);
+        const auto& rect = Geometry::movedInto(boundingRect, kWidgetBounds);
+        const auto& topLeft = rect.topLeft();
+        if (isPointFigure(attributes))
+            return figure::make<figure::Point>(topLeft, color);
+
+        if (rect.isValid() || rect.isEmpty())
         {
-            static constexpr QRectF kWidgetBounds(0.0, 0.0, 1.0, 1.0);
-            const auto& rect = Geometry::movedInto(boundingRect, kWidgetBounds);
-            const auto& attributes = info.rawData.attributes;
-            const auto& topLeft = rect.topLeft();
-            if (isPointFigure(attributes))
-                return figure::make<figure::Point>(topLeft, info.color);
+            const figure::Points points{topLeft, rect.bottomRight()};
+            return figure::make<figure::Box>(points, color);
+        }
 
-            if (rect.isValid() || rect.isEmpty())
-            {
-                const figure::Points points{topLeft, rect.bottomRight()};
-                return figure::make<figure::Box>(points, info.color);
-            }
-
-            return figure::Dummy::create();
-        }();
+        return figure::Dummy::create();
+    }();
 
     if (!zoomRect.isValid())
         return figure;
@@ -143,72 +128,6 @@ figure::FigurePtr figureFromObjectData(
 
     return figure;
 }
-
-/**
- * Path element inside Track. When constructing this structure make sure that the provided
- * ObjectMetadata always exists for the whole lifetime of the Track.
- */
-struct TrackElement
-{
-    TrackElement(const ObjectMetadata* metadata, microseconds timestamp):
-        metadata(metadata), timestamp(timestamp) {}
-
-    const ObjectMetadata* metadata;
-    microseconds timestamp = 0us;
-
-    bool operator<(const TrackElement& other) const
-    {
-        return timestamp < other.timestamp;
-    }
-
-    bool operator<(const microseconds& other) const
-    {
-        return timestamp < other;
-    }
-};
-
-/**
- * Track describes behavior of the object sequence, united by the track id. Path is never empty!
- * Path is sorted by the timestamps. It is used to smooth rectangle movement through the video
- * frames.
- */
-struct Track
-{
-    nx::Uuid analyticsEngineId;
-    std::optional<microseconds> minimalDuration;
-    std::vector<TrackElement> path; //< Cannot be empty.
-
-    microseconds startTimestamp() const
-    {
-         return path.front().timestamp;
-    }
-
-    /**
-     * If we have minimal duration in the first track packet, we will used it to determine when to
-     * hide the frame. Otherwise we will use approximate value. Anyway, frame must be displayed all
-     * the time we are receiving the track packets.
-     */
-    microseconds endTimestamp() const
-    {
-        const auto approximatedTimestamp = path.back().timestamp + kMinimalObjectDuration;
-        return minimalDuration
-            ? std::max(startTimestamp() + *minimalDuration, approximatedTimestamp)
-            : approximatedTimestamp;
-    }
-
-    /**
-     * Trim track by start time, leaving the only one path element, located before or on the
-     * selected time.
-     */
-    void trimByStartTime(milliseconds startTime)
-    {
-        auto iter = std::lower_bound(path.begin(), path.end(), startTime);
-        if (iter == path.end() || (iter != path.begin() && toMs(iter->timestamp) > startTime))
-            --iter;
-        path.erase(path.begin(), iter);
-        NX_ASSERT(!path.empty());
-    }
-};
 
 QString objectDescription(const core::analytics::AttributeList& attributes)
 {
@@ -228,28 +147,6 @@ QString objectDescription(const core::analytics::AttributeList& attributes)
     return result;
 }
 
-QRectF interpolatedRectangle(
-    const QRectF& rectangle,
-    microseconds rectangleTimestamp,
-    const QRectF& futureRectangle,
-    microseconds futureRectangleTimestamp,
-    microseconds timestamp)
-{
-    if (!isValidFigureRectangle(rectangle))
-        return futureRectangle;
-
-    if (!isValidFigureRectangle(futureRectangle))
-        return rectangle;
-
-    if (futureRectangleTimestamp <= rectangleTimestamp)
-        return rectangle;
-
-    const auto factor = (qreal) (timestamp - rectangleTimestamp).count()
-        / (qreal) (futureRectangleTimestamp - rectangleTimestamp).count();
-
-    return linearCombine(1 - factor, rectangle, factor, futureRectangle);
-}
-
 QString approximateDebugTime(microseconds value)
 {
     const auto valueMs = toMs(value);
@@ -263,22 +160,15 @@ class WidgetAnalyticsController::Private: public SystemContextAware
 {
 public:
     static AnalyticsOverlayWidget::AreaInfo areaInfoFromObject(
-        const ObjectInfo& objectInfo);
+        const nx::Uuid& trackId, const ObjectAppearance& appearance);
 
     Private(WidgetAnalyticsController* parent);
 
     QnLayoutResourcePtr layoutResource() const;
 
-    ObjectInfo& addOrUpdateObject(const nx::Uuid& analyticsEngineId, const ObjectMetadata& object);
+    const ObjectAppearance& updateAppearance(const ObjectSnapshot& object);
 
-    /** Remove areas which are not supposed to be displayed on the current frame. */
-    void removeObjectAreas(milliseconds timestamp);
-
-    void updateObjectAreas(microseconds timestamp);
-
-    std::vector<Track> fetchTracks(
-        const std::list<ObjectMetadataPacketPtr>& objectMetadataPackets,
-        microseconds timestamp) const;
+    void updateObjectAreas(milliseconds timestamp);
 
 public:
     QnMediaResourceWidget* mediaResourceWidget = nullptr;
@@ -286,24 +176,25 @@ public:
 
     core::AbstractAnalyticsMetadataProviderPtr metadataProvider;
     QPointer<AnalyticsOverlayWidget> analyticsWidget;
-    QHash<nx::Uuid, ObjectInfo> objectInfoByTrackId;
+    ObjectTracker tracker;
+    QHash<nx::Uuid, ObjectAppearance> appearanceByTrackId;
 
     std::unique_ptr<nx::analytics::MetadataLogger> logger;
 
     Filter filter;
-    microseconds lastTimestamp{};
+    milliseconds lastTimestamp{};
     QSet<nx::Uuid> relevantCameraIds;
 
     const nx::analytics::taxonomy::ObjectTypeDictionary objectTypeDictionary;
 };
 
 AnalyticsOverlayWidget::AreaInfo WidgetAnalyticsController::Private::areaInfoFromObject(
-    const ObjectInfo& objectInfo)
+    const nx::Uuid& trackId, const ObjectAppearance& appearance)
 {
     AnalyticsOverlayWidget::AreaInfo areaInfo;
-    areaInfo.id = objectInfo.trackId;
-    areaInfo.text = objectInfo.description;
-    areaInfo.hoverText = objectInfo.description;
+    areaInfo.id = trackId;
+    areaInfo.text = appearance.description;
+    areaInfo.hoverText = appearance.description;
     return areaInfo;
 }
 
@@ -318,18 +209,14 @@ QnLayoutResourcePtr WidgetAnalyticsController::Private::layoutResource() const
     return mediaResourceWidget->layoutResource();
 }
 
-ObjectInfo& WidgetAnalyticsController::Private::addOrUpdateObject(
-    const nx::Uuid& analyticsEngineId,
-    const ObjectMetadata& objectMetadata)
+const ObjectAppearance& WidgetAnalyticsController::Private::updateAppearance(
+    const ObjectSnapshot& object)
 {
     const auto settings = appContext()->objectDisplaySettings();
+    const ObjectMetadata& objectMetadata = object.metadata;
 
-    auto& objectInfo = objectInfoByTrackId[objectMetadata.trackId];
-    objectInfo.trackId = objectMetadata.trackId;
-    objectInfo.analyticsEngineId = analyticsEngineId;
-    objectInfo.color = settings->objectColor(objectMetadata);
-
-    objectInfo.rectangle = objectMetadata.boundingBox;
+    auto& appearance = appearanceByTrackId[object.trackId];
+    appearance.color = settings->objectColor(objectMetadata);
 
     const auto watcher = systemContext()->analyticsTaxonomyStateWatcher();
     const auto state = NX_ASSERT(watcher) ? watcher->state() : nullptr;
@@ -340,69 +227,46 @@ ObjectInfo& WidgetAnalyticsController::Private::addOrUpdateObject(
     const QString description = objectDescription(systemContext()->analyticsAttributeHelper()->
         preprocessAttributes(QString::fromStdString(objectMetadata.typeId), visibleAttributes));
 
-    objectInfo.description = title;
+    appearance.description = title;
     if (!title.isEmpty() && !description.isEmpty())
-        objectInfo.description += "\n";
+        appearance.description += "\n";
 
-    objectInfo.description += description;
-    objectInfo.rawData = objectMetadata;
-    return objectInfo;
+    appearance.description += description;
+    return appearance;
 }
 
-void WidgetAnalyticsController::Private::removeObjectAreas(milliseconds timestamp)
+void WidgetAnalyticsController::Private::updateObjectAreas(milliseconds timestamp)
 {
-    for (auto it = objectInfoByTrackId.begin(); it != objectInfoByTrackId.end(); /*-*/)
+    for (const auto& object: tracker.objects())
     {
-        if (timestamp < toMs(it->startTimestamp)
-            || timestamp > toMs(it->endTimestamp))
-        {
-            NX_VERBOSE(this, "Cleanup object %1 as it does not fit into timestamp window", *it);
-            analyticsWidget->removeArea(it->trackId);
-            it = objectInfoByTrackId.erase(it);
-        }
-        else
-        {
-            ++it;
-        }
-    }
-}
-
-void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestamp)
-{
-    for (const auto& objectInfo: objectInfoByTrackId)
-    {
+        const auto& appearance = appearanceByTrackId[object.trackId];
         const auto deviceId = mediaResourceWidget->resource()->getId();
         const bool checkBounds = relevantCameraIds.empty()
             || relevantCameraIds.contains(deviceId);
 
-        if (!filter.acceptsMetadata(
-            deviceId,
-            objectInfo.analyticsEngineId,
-            objectInfo.rawData,
-            objectTypeDictionary,checkBounds))
+        if (!filter.acceptsMetadata(deviceId,
+                object.analyticsEngineId,
+                object.metadata,
+                objectTypeDictionary,
+                checkBounds))
         {
-            NX_VERBOSE(this, "Object %1 filtered out", objectInfo);
-            analyticsWidget->removeArea(objectInfo.trackId);
+            NX_VERBOSE(
+                this, "Object %1 filtered out", objectDebugString(object.trackId, appearance));
+            analyticsWidget->removeArea(object.trackId);
             continue;
         }
 
-        auto areaInfo = areaInfoFromObject(objectInfo);
-        auto figureRectangle = interpolatedRectangle(
-            objectInfo.rectangle,
-            objectInfo.startTimestamp,
-            objectInfo.futureRectangle,
-            objectInfo.futureRectangleTimestamp,
-            timestamp);
+        auto areaInfo = areaInfoFromObject(object.trackId, appearance);
+        auto figureRectangle = object.interpolatedRectangle(timestamp);
 
         auto pixSetting = systemContext()->globalSettings()->pixelationSettings();
         if (!accessController()->hasGlobalPermissions(GlobalPermission::viewUnredactedVideo)
-            && (pixSetting.contains(QString::fromStdString(objectInfo.rawData.typeId))))
+            && (pixSetting.contains(QString::fromStdString(object.metadata.typeId))))
         {
             const auto watcher = systemContext()->analyticsTaxonomyStateWatcher();
             const auto state = NX_ASSERT(watcher) ? watcher->state() : nullptr;
-            const auto objectType = state
-                ? state->objectTypeById(objectInfo.rawData.typeId)
-                : nullptr;
+            const auto objectType =
+                state ? state->objectTypeById(object.metadata.typeId) : nullptr;
             const QString title = objectType
                 ? QString::fromStdString(objectType->name())
                 : QString();
@@ -410,13 +274,14 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
             areaInfo.hoverText = title;
         }
         const auto zoomRect = mediaResourceWidget->zoomRect();
-        const auto figure = figureFromObjectData(objectInfo, figureRectangle, zoomRect);
+        const auto figure = figureFromObjectData(
+            appearance.color, object.metadata.attributes, figureRectangle, zoomRect);
         if (!figure || !figure->isValid())
         {
             NX_VERBOSE(this,
                 "Object info has invalid rectangle data or does not fit to the widget: %1",
-                objectInfo);
-            analyticsWidget->removeArea(objectInfo.trackId);
+                objectDebugString(object.trackId, appearance));
+            analyticsWidget->removeArea(object.trackId);
             continue;
         }
 
@@ -436,63 +301,18 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
                     }
                 };
 
-            addInfoRow("trackId", "Track ID", objectInfo.trackId);
-            addInfoRow("delay", "Delay", (timestamp - objectInfo.startTimestamp).count() / 1000);
+            addInfoRow("trackId", "Track ID", object.trackId);
+            addInfoRow("delay", "Delay", (timestamp - object.startTimestamp).count());
             addInfoRow("actual_ts", "Timestamp", timestamp.count());
             addInfoRow("actual_rect", "Interpolated", figureRectangle);
-            addInfoRow("object_ts", "Original TS", objectInfo.startTimestamp.count());
-            addInfoRow("object_rect", "Original Rect", objectInfo.rectangle);
-            addInfoRow("future_ts", "Future TS", objectInfo.futureRectangleTimestamp.count());
-            addInfoRow("future_rect", "Future Rect", objectInfo.futureRectangle);
+            addInfoRow("object_ts", "Original TS", object.startTimestamp.count());
+            addInfoRow("object_rect", "Original Rect", object.metadata.boundingBox);
+            addInfoRow("future_ts", "Future TS", object.futureRectangleTimestamp.count());
+            addInfoRow("future_rect", "Future Rect", object.futureRectangle);
         }
 
         analyticsWidget->addOrUpdateArea(areaInfo, figure);
     }
-}
-
-std::vector<Track> WidgetAnalyticsController::Private::fetchTracks(
-    const std::list<ObjectMetadataPacketPtr>& objectMetadataPackets,
-    microseconds timestamp) const
-{
-    // Left only objects which are to be displayed right now, store tracks for others.
-    QHash<nx::Uuid, Track> objectTrackByTrackId;
-    for (const auto& objectPacket: objectMetadataPackets)
-    {
-        if (logger)
-            logger->pushObjectMetadata(*objectPacket);
-
-        const auto timestamp = microseconds(objectPacket->timestampUs);
-        const bool packetHasDuration = objectPacket->durationUs > 0;
-
-        // Each track will start from the actual object and be sorted by timestamps.
-        for (const auto& objectMetadata: objectPacket->objectMetadataList)
-        {
-            Track& track = objectTrackByTrackId[objectMetadata.trackId];
-            track.analyticsEngineId = objectPacket->analyticsEngineId;
-            if (packetHasDuration)
-                track.minimalDuration = microseconds(objectPacket->durationUs);
-
-            track.path.emplace_back(&objectMetadata, timestamp);
-            NX_ASSERT_HEAVY_CONDITION(std::is_sorted(track.path.cbegin(), track.path.cend()));
-        }
-    }
-
-    // TODO: Use milliseconds in all metadata calculations.
-    const auto timestampMs = toMs(timestamp);
-
-    std::vector<Track> result;
-    for (auto track: objectTrackByTrackId)
-    {
-        // Skip tracks which end before the current frame.
-        if (toMs(track.endTimestamp()) <= timestampMs)
-            continue;
-
-        track.trimByStartTime(timestampMs);
-
-        if (toMs(track.path.cbegin()->timestamp) <= timestampMs)
-            result.push_back(track);
-    }
-    return result;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -528,63 +348,59 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
 
     // Peek some future metatada packets to prolong existing areas' lifetime at least until the
     // latest track id appearance.
-    const std::list<ObjectMetadataPacketPtr> objectMetadataPackets = d->metadataProvider->metadataRange(
-        timestamp - kMetadataWindowSize,
-        timestamp + kMetadataWindowSize,
-        channel);
+    const std::list<ObjectMetadataPacketPtr> objectMetadataPackets =
+        d->metadataProvider->metadataRange(timestamp - ObjectTracker::kMetadataWindowSize,
+            timestamp + ObjectTracker::kMetadataWindowSize,
+            channel);
 
-    // Each Track contains a raw pointer inside an ObjectMetadataPacketPtr, so the lifetime of
-    // objectMetadataPackets should always be greater than the lifetime of tracks.
-    const std::vector<Track> tracks = d->fetchTracks(objectMetadataPackets, timestamp);
+    if (d->logger)
+    {
+        for (const auto& objectPacket: objectMetadataPackets)
+            d->logger->pushObjectMetadata(*objectPacket);
+    }
+
+    const auto timestampMs = toMs(timestamp);
+    const auto result = d->tracker.update(objectMetadataPackets, timestampMs);
 
     NX_VERBOSE(this,
         "Updating analytics objects; current timestamp %1\n"
         "Found %2 tracks for resource %3",
         approximateDebugTime(timestamp),
-        tracks.size(),
+        result.updated.size(),
         d->mediaResourceWidget->resource()->getId());
 
     // Process each object from the actual metadata packets.
-    for (const auto& track: tracks)
+    for (const auto& trackId: result.updated)
     {
-        auto& objectInfo = d->addOrUpdateObject(track.analyticsEngineId, *track.path[0].metadata);
-        objectInfo.startTimestamp = track.startTimestamp();
-        objectInfo.endTimestamp = track.endTimestamp();
+        const ObjectSnapshot& object = *d->tracker.objects().constFind(trackId);
+        const auto& appearance = d->updateAppearance(object);
 
-        // Make forecast for the rectangle movement to smooth it between analytics packets.
-        if (track.path.size() > 1)
-        {
-            const auto& nextElement = track.path[1];
-            objectInfo.futureRectangleTimestamp = nextElement.timestamp;
-            objectInfo.futureRectangle = nextElement.metadata->boundingBox;
-        }
-        else
-        {
-            objectInfo.futureRectangleTimestamp = objectInfo.startTimestamp;
-        }
-
-        NX_VERBOSE(this, "Added object\n%1\nat %2\nDuration: %3 - %4",
-            objectInfo,
-            objectInfo.rectangle,
-            approximateDebugTime(objectInfo.startTimestamp),
-            approximateDebugTime(objectInfo.endTimestamp));
+        NX_VERBOSE(this,
+            "Added object\n%1\nat %2\nDuration: %3 - %4",
+            objectDebugString(trackId, appearance),
+            object.metadata.boundingBox,
+            approximateDebugTime(object.startTimestamp),
+            approximateDebugTime(object.endTimestamp));
     }
 
     // Cleanup areas which should not be visible right now.
-    d->removeObjectAreas(toMs(timestamp));
+    for (const auto& trackId: result.removed)
+    {
+        d->appearanceByTrackId.remove(trackId);
+        d->analyticsWidget->removeArea(trackId);
+    }
 
-    NX_VERBOSE(this,
-        "%1 objects are currently available from RTSP stream",
-        d->objectInfoByTrackId.size());
+    NX_VERBOSE(
+        this, "%1 objects are currently available from RTSP stream", d->tracker.objects().size());
 
-    d->lastTimestamp = timestamp;
-    d->updateObjectAreas(timestamp);
+    d->lastTimestamp = timestampMs;
+    d->updateObjectAreas(timestampMs);
 }
 
 void WidgetAnalyticsController::clearAreas()
 {
-    for (auto& objectInfo: d->objectInfoByTrackId)
-        d->analyticsWidget->removeArea(objectInfo.trackId);
+    for (const auto& object: d->tracker.objects())
+        d->analyticsWidget->removeArea(object.trackId);
 }
 
 void WidgetAnalyticsController::setAnalyticsMetadataProvider(
@@ -615,7 +431,7 @@ void WidgetAnalyticsController::setFilter(const Filter& value)
     for (const auto& id: value.deviceIds)
         d->relevantCameraIds.insert(id);
 
-    if (d->lastTimestamp != 0us)
+    if (d->lastTimestamp != 0ms)
         d->updateObjectAreas(d->lastTimestamp);
 }
 

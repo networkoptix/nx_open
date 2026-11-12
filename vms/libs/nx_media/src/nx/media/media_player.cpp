@@ -293,7 +293,8 @@ public:
 
     void log(const QString& message) const;
     void clearCurrentFrame();
-    void configureMetadataForReader();
+    /** @return Whether metadata of new types is requested. */
+    bool configureMetadataForReader();
     void updateAudio();
 
     /** Push empty video frame to output. */
@@ -455,7 +456,9 @@ void Player::Private::at_gotVideoFrame()
         }
         else
         {
-            log("at_gotVideoFrame(): EOF reached.");
+            // The reader keeps sending EOF packets while staying at the end.
+            if (mediaStatus != MediaStatus::EndOfMedia)
+                log("at_gotVideoFrame(): EOF reached.");
             setMediaStatus(MediaStatus::EndOfMedia);
         }
 
@@ -981,10 +984,10 @@ void Player::Private::clearCurrentFrame()
     videoFrameToRender.reset();
 }
 
-void Player::Private::configureMetadataForReader()
+bool Player::Private::configureMetadataForReader()
 {
     if (!archiveReader)
-        return;
+        return false;
 
     using namespace nx::vms::api;
     bool hasMotionConsumer = !m_metadataConsumerByType.value(MetadataType::Motion).isEmpty();
@@ -993,7 +996,12 @@ void Player::Private::configureMetadataForReader()
     StreamDataFilters filter = StreamDataFilter::media;
     filter.setFlag(StreamDataFilter::motion, hasMotionConsumer);
     filter.setFlag(StreamDataFilter::objects, hasAnalyticsConsumer);
-    archiveReader->setStreamDataFilter(filter);
+
+    const StreamDataFilters previousFilter = archiveReader->streamDataFilter();
+    if (!archiveReader->setStreamDataFilter(filter))
+        return false;
+
+    return (filter & ~previousFilter).toInt() != 0;
 }
 
 void Player::Private::updateAudio()
@@ -1605,7 +1613,17 @@ bool Player::addMetadataConsumer(const nx::analytics::AbstractMetadataConsumerPt
         return false;
 
     consumers.push_back(metadataConsumer);
-    d->configureMetadataForReader();
+
+    // The data already received from the server lacks the newly requested metadata. In the
+    // archive it is requested again from the current position. The current frame is kept, but
+    // the loading status is set as on a seek, since new frames may take a while to arrive.
+    if (d->configureMetadataForReader() && d->dataConsumer && !d->liveMode)
+    {
+        const qint64 positionUsec = msecToUsec(position());
+        d->archiveReader->jumpTo(positionUsec, positionUsec);
+        d->setMediaStatus(MediaStatus::Loading);
+    }
+
     return true;
 }
 

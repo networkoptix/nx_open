@@ -94,12 +94,34 @@ Item
 
         title: detailsItem.title
 
+        interval.channelOverlayComponent: d.showAnalytics ? objectBoxesOverlayComponent : null
+
         onNext: detailsItem.nextClicked()
         onPrevious: detailsItem.previousClicked()
         onShowOnCamera:
         {
             detailsItem.showOnCameraRequested(
                 interval.resource, detailsItem.objectData?.startTimeMs ?? 0)
+        }
+    }
+
+    MediaPlayerAnalyticsProvider
+    {
+        id: mediaPlayerAnalyticsProvider
+
+        mediaPlayer: preview.interval.player
+        active: d.showAnalytics
+    }
+
+    Component
+    {
+        id: objectBoxesOverlayComponent
+
+        ObjectBoxesOverlay
+        {
+            analyticsProvider: mediaPlayerAnalyticsProvider
+            mediaPlayer: preview.interval.player
+            filterTrackId: detailsItem.objectData?.id ?? NxGlobals.uuid("")
         }
     }
 
@@ -282,6 +304,9 @@ Item
     QtObject
     {
         id: d
+
+        readonly property bool showAnalytics: appContext.settings.showObjectBoxes
+            && detailsItem.objectsType === Timeline.ObjectsLoader.ObjectsType.analytics
 
         readonly property bool isPortraitLayout:
         {

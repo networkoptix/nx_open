@@ -226,6 +226,18 @@ BaseSettingsPage
             }
         }
 
+        LabeledSwitch
+        {
+            id: showObjectBoxesSwitch
+
+            width: parent.width
+            text: "Show object boxes"
+            checkState: appContext.settings.showObjectBoxes ? Qt.Checked : Qt.Unchecked
+
+            onCheckStateChanged:
+                appContext.settings.showObjectBoxes = checkState != Qt.Unchecked
+        }
+
         Row
         {
             spacing: 8

@@ -5,6 +5,7 @@
 
 #include <gtest/gtest.h>
 
+#include <QtCore/QCoreApplication>
 #include <QtTest/QSignalSpy>
 
 #include <nx/analytics/abstract_metadata_consumer.h>
@@ -40,6 +41,11 @@ protected:
             provider.get(), &MediaPlayerMotionProvider::motionMaskChanged);
         mediaPlayerChangedSpy = std::make_unique<QSignalSpy>(
             provider.get(), &MediaPlayerMotionProvider::mediaPlayerChanged);
+
+        QObject::connect(provider.get(),
+            &MediaPlayerMotionProvider::motionMaskChanged,
+            provider.get(),
+            [this]() { motionMaskWhenNotified = provider->motionMask(/*channel*/ 0); });
     }
 
     virtual void TearDown() override
@@ -65,6 +71,14 @@ protected:
     {
         motionMaskChangedSpy->clear();
         mediaPlayerChangedSpy->clear();
+    }
+
+    void givenMotionReceived(int channel = 0) { whenMotionReceived(channel); }
+
+    void givenMotionReceivedAndNotified()
+    {
+        whenMotionReceived();
+        whenEventsAreProcessed();
     }
 
     void whenMediaPlayerSet() { givenMediaPlayer(); }
@@ -108,6 +122,10 @@ protected:
 
     void whenPositionChanged() { emit player->positionChanged(); }
 
+    void whenEventsAreProcessed() { QCoreApplication::processEvents(); }
+
+    void whenProviderDestroyed() { provider.reset(); }
+
     void whenPreviousMediaPlayerResourceChanged()
     {
         emit player->resourceChanged();
@@ -131,6 +149,17 @@ protected:
 
     void thenMotionMaskChangeNotNotified() { ASSERT_EQ(motionMaskChangedSpy->count(), 0); }
 
+    void thenMotionMaskChangeNotifiedTimes(int count)
+    {
+        ASSERT_EQ(motionMaskChangedSpy->count(), count);
+    }
+
+    void thenMotionMaskWhenNotifiedWasReceivedMotion()
+    {
+        ASSERT_NE(receivedMotion, QByteArray(kMotionMaskSizeBytes, 0));
+        ASSERT_EQ(motionMaskWhenNotified, receivedMotion);
+    }
+
     void thenMediaPlayerChangeNotified() { ASSERT_EQ(mediaPlayerChangedSpy->count(), 1); }
 
     void thenMediaPlayerChangeNotNotified() { ASSERT_EQ(mediaPlayerChangedSpy->count(), 0); }
@@ -144,6 +173,7 @@ protected:
     std::unique_ptr<QSignalSpy> motionMaskChangedSpy;
     std::unique_ptr<QSignalSpy> mediaPlayerChangedSpy;
     QByteArray receivedMotion;
+    QByteArray motionMaskWhenNotified;
 };
 
 TEST_F(MediaPlayerMotionProviderTest, hasNoMediaPlayerInitially)
@@ -282,6 +312,68 @@ TEST_F(MediaPlayerMotionProviderTest, motionIsReceivedAfterResourceChange)
     givenResourceChanged();
     whenMotionReceived();
     thenMotionMaskIsReceivedMotion();
+}
+
+// Notification about received motion, e.g. while paused, when the position doesn't change.
+
+TEST_F(MediaPlayerMotionProviderTest, receivedMotionIsNotifiedAfterItIsProvided)
+{
+    givenMediaPlayer();
+    givenSignalsReset();
+    givenMotionReceived();
+    whenEventsAreProcessed();
+    thenMotionMaskChangeNotified();
+    thenMotionMaskWhenNotifiedWasReceivedMotion();
+}
+
+TEST_F(MediaPlayerMotionProviderTest, receivedMotionIsNotNotifiedImmediately)
+{
+    givenMediaPlayer();
+    givenSignalsReset();
+    whenMotionReceived();
+    thenMotionMaskChangeNotNotified();
+}
+
+TEST_F(MediaPlayerMotionProviderTest, motionReceivedTogetherIsNotifiedOnce)
+{
+    givenMediaPlayer();
+    givenSignalsReset();
+    givenMotionReceived(/*channel*/ 0);
+    givenMotionReceived(/*channel*/ 0);
+    givenMotionReceived(/*channel*/ 1);
+    whenEventsAreProcessed();
+    thenMotionMaskChangeNotified();
+}
+
+TEST_F(MediaPlayerMotionProviderTest, motionReceivedSeparatelyIsNotifiedSeparately)
+{
+    givenMediaPlayer();
+    givenSignalsReset();
+    givenMotionReceivedAndNotified();
+    givenMotionReceived();
+    whenEventsAreProcessed();
+    thenMotionMaskChangeNotifiedTimes(2);
+}
+
+TEST_F(MediaPlayerMotionProviderTest, motionOfNewResourceIsNotified)
+{
+    givenMediaPlayer();
+    givenMotionReceivedAndNotified();
+    givenResourceChanged();
+    givenSignalsReset();
+    givenMotionReceived();
+    whenEventsAreProcessed();
+    thenMotionMaskChangeNotified();
+    thenMotionMaskWhenNotifiedWasReceivedMotion();
+}
+
+TEST_F(MediaPlayerMotionProviderTest, providerDestroyedBeforeNotificationIsSafe)
+{
+    givenMediaPlayer();
+    givenMotionReceived();
+    whenProviderDestroyed();
+    whenEventsAreProcessed();
+    // Nothing to check: there is no provider to notify, and the test must not crash.
 }
 
 } // namespace nx::vms::client::core::test

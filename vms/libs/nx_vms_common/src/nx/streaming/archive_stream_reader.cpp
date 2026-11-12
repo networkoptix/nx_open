@@ -297,6 +297,11 @@ bool QnArchiveStreamReader::init()
     };
 
     m_delegate->setQuality(quality, true, resolution);
+
+    // Seek and speed commands may open the stream, so the filter is set before them.
+    m_prevStreamDataFilter = streamDataFilter;
+    m_delegate->setStreamDataFilter(streamDataFilter);
+
     bool isSpeedCommandProcessed = false;
     // It is optimization: open and jump at same time
     if (jumpTime != qint64(AV_NOPTS_VALUE))
@@ -312,8 +317,6 @@ bool QnArchiveStreamReader::init()
         }
     }
 
-    m_prevStreamDataFilter = streamDataFilter;
-    m_delegate->setStreamDataFilter(streamDataFilter);
     bool opened = m_delegate->open(resource(), m_archiveIntegrityWatcher);
 
     if (jumpTime != qint64(AV_NOPTS_VALUE))

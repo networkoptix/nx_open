@@ -22,7 +22,9 @@
 #include <nx/vms/api/types/resource_types.h>
 #include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
+#include <nx/vms/client/core/analytics/analytics_object_boxes_model.h>
 #include <nx/vms/client/core/analytics/analytics_taxonomy_manager.h>
+#include <nx/vms/client/core/analytics/media_player_analytics_provider.h>
 #include <nx/vms/client/core/animation/kinetic_animation.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/bookmarks/bookmark_constants.h>
@@ -113,6 +115,7 @@ void initializeMetatypesInternal()
     nx::vms::rules::Metatypes::initialize();
 
     qRegisterMetaType<LayoutResourcePtr>();
+    qRegisterMetaType<AbstractAnalyticsMetadataProviderPtr>();
 
     QnJsonSerializer::registerSerializer<EncodedCredentials>();
 
@@ -189,6 +192,8 @@ void registerQmlTypesInternal()
     QuickItemMouseTracker::registerQmlType();
     CameraMotionHelper::registerQmlType();
     MediaPlayerMotionProvider::registerQmlType();
+    MediaPlayerAnalyticsProvider::registerQmlType();
+    AnalyticsObjectBoxesModel::registerQmlType();
     ModelItemFlagsWatcher::registerQmlType();
     MotionMaskItem::registerQmlType();
     PropertiesSync::registerQmlTypes();

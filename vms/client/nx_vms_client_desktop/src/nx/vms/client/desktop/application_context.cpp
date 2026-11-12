@@ -45,7 +45,6 @@
 #include <nx/vms/api/protocol_version.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/analytics/analytics_metadata_provider_factory.h>
-#include <nx/vms/client/core/analytics/object_display_settings.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/core/cross_system/cloud_layouts_manager.h>
 #include <nx/vms/client/core/ini.h>
@@ -346,7 +345,6 @@ struct ApplicationContext::Private
     // Settings modules.
     std::unique_ptr<LocalSettings> localSettings;
     std::unique_ptr<QnClientRuntimeSettings> runtimeSettings;
-    std::unique_ptr<core::ObjectDisplaySettings> objectDisplaySettings;
     std::unique_ptr<ScreenRecordingSettings> screenRecordingSettings;
     std::unique_ptr<ShowOnceSettings> showOnceSettings;
     std::unique_ptr<MessageBarSettings> messageBarSettings;
@@ -425,7 +423,6 @@ struct ApplicationContext::Private
             }
         #endif
 
-        objectDisplaySettings = std::make_unique<core::ObjectDisplaySettings>();
         screenRecordingSettings = std::make_unique<ScreenRecordingSettings>();
         showOnceSettings = std::make_unique<ShowOnceSettings>();
         messageBarSettings = std::make_unique<MessageBarSettings>();
@@ -974,11 +971,6 @@ ShowOnceSettings* ApplicationContext::showOnceSettings() const
 MessageBarSettings* ApplicationContext::messageBarSettings() const
 {
     return d->messageBarSettings.get();
-}
-
-core::ObjectDisplaySettings* ApplicationContext::objectDisplaySettings() const
-{
-    return d->objectDisplaySettings.get();
 }
 
 ClientStateHandler* ApplicationContext::clientStateHandler() const

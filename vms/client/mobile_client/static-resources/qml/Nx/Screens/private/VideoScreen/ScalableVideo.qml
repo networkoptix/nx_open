@@ -21,6 +21,7 @@ ScalableContentHolder
         && (!fisheyeMode || interactor.scalePower < 0.001)
 
     property bool showMotion: false
+    property bool showAnalytics: false
 
     property alias mediaPlayer: videoContent.mediaPlayer
     property alias resourceHelper: videoContent.resourceHelper
@@ -198,6 +199,8 @@ ScalableContentHolder
 
         onSourceSizeChanged: fitToBounds()
 
+        videoOutput.channelOverlay: d.showAnalytics ? objectBoxesOverlayComponent : null
+
         RoundedMask
         {
             id: motionDisplay
@@ -228,6 +231,26 @@ ScalableContentHolder
             maskTextureProvider: MotionMaskItem
             {
                 id: motionMaskItem
+            }
+        }
+
+        MediaPlayerAnalyticsProvider
+        {
+            id: mediaPlayerAnalyticsProvider
+
+            mediaPlayer: videoContent.mediaPlayer
+            active: d.showAnalytics
+        }
+
+        Component
+        {
+            id: objectBoxesOverlayComponent
+
+            ObjectBoxesOverlay
+            {
+                analyticsProvider: mediaPlayerAnalyticsProvider
+                mediaPlayer: videoContent.mediaPlayer
+                filterRect: roiController.customRoi
             }
         }
 
@@ -297,6 +320,9 @@ ScalableContentHolder
     NxObject
     {
         id: d
+
+        // Boxes are drawn on the raw frame, so they would be misplaced on a dewarped image.
+        readonly property bool showAnalytics: control.showAnalytics && !control.fisheyeMode
 
         property bool showRoiHint: roiController.motionSearchMode
             && roiController.enabled

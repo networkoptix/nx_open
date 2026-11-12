@@ -19,6 +19,7 @@
 #include <nx/utils/external_resources.h>
 #include <nx/utils/i18n/translation_manager.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
+#include <nx/vms/client/core/analytics/object_display_settings.h>
 #include <nx/vms/client/core/common/utils/private/thread_pool_manager_p.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
@@ -212,6 +213,7 @@ struct ApplicationContext::Private
     std::unique_ptr<VoiceSpectrumAnalyzer> voiceSpectrumAnalyzer;
     std::unique_ptr<Skin> skin;
     std::unique_ptr<ColorTheme> colorTheme;
+    std::unique_ptr<ObjectDisplaySettings> objectDisplaySettings;
     std::unique_ptr<ResourceIconCache> iconCache;
     std::vector<QPointer<SystemContext>> systemContexts;
     std::unique_ptr<UnifiedResourcePool> unifiedResourcePool;
@@ -260,6 +262,7 @@ ApplicationContext::ApplicationContext(
 
     d->initializeSettings();
     d->colorTheme = std::make_unique<ColorTheme>();
+    d->objectDisplaySettings = std::make_unique<ObjectDisplaySettings>();
 
     if (features.flags.testFlag(FeatureFlag::qml))
     {
@@ -509,6 +512,11 @@ Skin* ApplicationContext::skin() const
 ColorTheme* ApplicationContext::colorTheme() const
 {
     return d->colorTheme.get();
+}
+
+ObjectDisplaySettings* ApplicationContext::objectDisplaySettings() const
+{
+    return d->objectDisplaySettings.get();
 }
 
 UnifiedResourcePool* ApplicationContext::unifiedResourcePool() const

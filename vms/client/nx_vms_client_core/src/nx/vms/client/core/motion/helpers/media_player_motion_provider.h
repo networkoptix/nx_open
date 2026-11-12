@@ -37,10 +37,14 @@ public:
 
 signals:
     void mediaPlayerChanged();
+    /**
+     * Emitted on position, resource and media player changes, and when motion metadata is
+     * received (once per event loop iteration, however many packets were received in it).
+     */
     void motionMaskChanged();
 
 protected:
-    /** Consumer of the current resource motion metadata, null w/o a media player. For tests. */
+    /** Consumer added to the media player, null without a media player. For tests. */
     QSharedPointer<nx::analytics::AbstractMetadataConsumer> metadataConsumer() const;
 
 private:

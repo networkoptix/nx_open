@@ -23,8 +23,6 @@ namespace nx::speech_synthesizer{ class TextToWaveServer; }
 
 namespace nx::vms::client::core {
 
-class ObjectDisplaySettings;
-
 namespace analytics { class AnalyticsMetadataProviderFactory; };
 
 } // namespace nx::vms::client::core
@@ -197,11 +195,6 @@ public:
 
     ShowOnceSettings* showOnceSettings() const;
     MessageBarSettings* messageBarSettings() const;
-
-    /**
-     * Map of analytics objects colors by object type. Persistently stored on a PC.
-     */
-    core::ObjectDisplaySettings* objectDisplaySettings() const;
 
     core::analytics::AnalyticsMetadataProviderFactory* analyticsMetadataProviderFactory() const;
 

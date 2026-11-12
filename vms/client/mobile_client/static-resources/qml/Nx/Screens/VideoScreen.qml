@@ -593,6 +593,11 @@ Page
         showMotion: !d.ptzMode
             && modernVideoScreen.selectedObjectsType === Timeline.ObjectsLoader.ObjectsType.motion
 
+        showAnalytics: appContext.settings.showObjectBoxes
+            && !d.ptzMode
+            && modernVideoScreen.selectedObjectsType
+                === Timeline.ObjectsLoader.ObjectsType.analytics
+
         roiController
         {
             // At this point we're using a legacy ROI design and a legacy ROI drawing mechanism

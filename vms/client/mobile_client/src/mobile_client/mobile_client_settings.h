@@ -74,6 +74,8 @@ public:
         SidePanelWidth,
         ContentAreaMinWidth,
 
+        ShowObjectBoxes,
+
         VariableCount
     };
 
@@ -166,6 +168,8 @@ private:
             bool,
             supportMetaOrganizations, setSupportMetaOrganizations,
             SupportMetaOrganizations, false)
+
+        QN_DECLARE_RW_PROPERTY(bool, showObjectBoxes, setShowObjectBoxes, ShowObjectBoxes, false)
 
         QN_DECLARE_RW_PROPERTY(
             bool,

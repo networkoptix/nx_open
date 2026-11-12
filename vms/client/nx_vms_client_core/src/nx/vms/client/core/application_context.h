@@ -32,6 +32,7 @@ class CloudStatusWatcher;
 class FontConfig;
 class LocalNetworkInterfacesManager;
 class NetworkModule;
+class ObjectDisplaySettings;
 class Skin;
 class Settings;
 class SystemFinder;
@@ -139,6 +140,11 @@ public:
     Skin* skin() const;
 
     ColorTheme* colorTheme() const;
+
+    /**
+     * Map of analytics objects colors by object type. Persistently stored on the device.
+     */
+    ObjectDisplaySettings* objectDisplaySettings() const;
 
     /**
      * Unified interface to access all available Resource Pools.
