@@ -2,6 +2,10 @@
 
 #include "media_player_channel_adapter.h"
 
+#include <QtCore/QSignalBlocker>
+#include <QtMultimedia/QVideoFrame>
+#include <QtMultimedia/QVideoSink>
+
 #include "media_player.h"
 
 namespace nx::vms::client::core {
@@ -67,13 +71,29 @@ void MediaPlayerChannelAdapter::setMediaPlayer(MediaPlayer* mediaPlayer)
     emit mediaPlayerChanged(m_mediaPlayer);
 }
 
+void MediaPlayerChannelAdapter::redisplayCurrentFrame()
+{
+    if (!m_videoSurface)
+        return;
+
+    const QVideoFrame frame = m_videoSurface->videoFrame();
+    if (!frame.isValid())
+        return;
+
+    // The sink ignores a frame equal to its current one, so it has to be reset first. Its signals
+    // are blocked meanwhile: a video output would clear itself on the empty frame and reset its
+    // source rect, which in turn resets the zoom of the scalable video items.
+    {
+        const QSignalBlocker blocker(m_videoSurface);
+        m_videoSurface->setVideoFrame({});
+    }
+    m_videoSurface->setVideoFrame(frame);
+}
+
 void MediaPlayerChannelAdapter::unsetVideoSurface()
 {
     if (m_mediaPlayer && m_videoSurface && m_channel >= 0)
-    {
         m_mediaPlayer->unsetVideoSurface(m_videoSurface, m_channel);
-        m_videoSurface = nullptr;
-    }
 }
 
 void MediaPlayerChannelAdapter::applyVideoSurface()

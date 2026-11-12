@@ -13,7 +13,7 @@ namespace nx::vms::client::core {
 
 class MediaPlayer;
 
-class MediaPlayerChannelAdapter: public QObject
+class NX_VMS_CLIENT_CORE_API MediaPlayerChannelAdapter: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QVideoSink* videoSurface READ videoSurface WRITE setVideoSurface
@@ -35,6 +35,14 @@ public:
     MediaPlayer* mediaPlayer() const;
     void setMediaPlayer(MediaPlayer* mediaPlayer);
 
+    /**
+     * Delivers the frame currently held by the video surface to its listeners again, so a video
+     * output which has lost its rendered frame (QQuickVideoOutput keeps it only in its scene
+     * graph node, which is destroyed when the item is removed from the window) shows it again.
+     * Listeners never receive an empty frame meanwhile.
+     */
+    Q_INVOKABLE void redisplayCurrentFrame();
+
 signals:
     void videoSurfaceChanged(QVideoSink* videoSurface);
     void channelChanged(int channel);
@@ -45,7 +53,7 @@ private:
     void applyVideoSurface();
 
 private:
-    QVideoSink* m_videoSurface = nullptr;
+    QPointer<QVideoSink> m_videoSurface;
     int m_channel = -1;
     QPointer<MediaPlayer> m_mediaPlayer;
 };

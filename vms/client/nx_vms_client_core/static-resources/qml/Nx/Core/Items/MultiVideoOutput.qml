@@ -61,9 +61,27 @@ MultiVideoLayout
 
         MediaPlayerChannelAdapter
         {
+            id: channelAdapter
+
             mediaPlayer: layout.mediaPlayer
             channel: index
             videoSurface: videoOutput.videoSink
+        }
+
+        // VideoOutput keeps the rendered frame only in its scene graph node, which is destroyed
+        // when the item leaves the window (e.g. LayoutItemProxy unparents its target while being
+        // hidden). A paused player doesn't deliver new frames, so the current one is delivered
+        // again on return. VideoOutput doesn't emit windowChanged itself, so the layout's signal
+        // is used: an item receives the window after all its children, so the output is ready.
+        Connections
+        {
+            target: layout
+
+            function onWindowChanged(window)
+            {
+                if (window)
+                    channelAdapter.redisplayCurrentFrame()
+            }
         }
 
         onSourceRectChanged:
