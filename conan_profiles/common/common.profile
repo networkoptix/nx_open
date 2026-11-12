@@ -40,6 +40,7 @@ opencv*/*:with_tiff=False
 opencv*/*:with_wayland=False
 opencv*/*:with_webp=False
 opencv-static/*:with_jpeg=libjpeg-turbo
+opencv-static/*:with_protobuf=True
 opencv/*:shared=True
 opencv/*:with_cuda=False
 opencv/*:with_jpeg=False

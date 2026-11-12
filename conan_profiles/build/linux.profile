@@ -21,7 +21,7 @@ cpython/*:with_bz2 = False
 cpython/*:with_lzma = False
 
 [tool_requires]
-!(gcc-toolchain/*|crosstool-ng/*|qt-host/*): gcc-toolchain/13.3
+!(gcc-toolchain/*|sdk-gcc/*|crosstool-ng/*|qt-host/*): gcc-toolchain/13.3
 
 [buildenv]
 LDFLAGS+=-static-libstdc++ -static-libgcc
