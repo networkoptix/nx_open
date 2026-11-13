@@ -54,6 +54,7 @@ public:
         PathFromRootRole,
         TabSectionRole,
         HasExpandableChildrenRole,
+        CanLogInToOrgRole,
 
         RolesCount
     };

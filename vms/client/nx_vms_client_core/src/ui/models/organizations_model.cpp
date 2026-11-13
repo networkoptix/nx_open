@@ -169,6 +169,24 @@ struct TreeNode
         return parentNode() && parentNode()->hasOrganizationRole(id);
     }
 
+    bool canLogInToOrg() const
+    {
+        if (type != OrganizationsModel::Organization || state != api::SaasState::active)
+            return false;
+
+        // Own roles include the role granted by the channel partner access level.
+        const bool hasSufficientRole = std::ranges::any_of(orgOwnRoleIds,
+            [](const nx::Uuid& id) { return id != kOrganizationSystemHealthViewerId; });
+
+        if (hasSufficientRole)
+            return true;
+
+        // Without own roles, the user can access only some contents, e.g. a folder. Under a
+        // channel partner, it may be a channel partner user without access.
+        return orgOwnRoleIds.empty()
+            && !(parent && parent->type == OrganizationsModel::ChannelPartner);
+    }
+
     bool hasChildren() const
     {
         return !children.empty();
@@ -1157,6 +1175,8 @@ QVariant OrganizationsModel::data(const QModelIndex& index, int role) const
             return !node->accessible;
         case HasExpandableChildrenRole:
             return node->hasExpandableChildren();
+        case CanLogInToOrgRole:
+            return node->canLogInToOrg();
         default:
             if (node->type == OrganizationsModel::System && d->sitesModel)
             {
@@ -1296,7 +1316,8 @@ QHash<int, QByteArray> OrganizationsModel::roleNames() const
         {IsAccessDeniedRole, "isAccessDenied"},
         {IsAdministratorRole, "isAdministrator"},
         {PathFromRootRole, "pathFromRoot"},
-        {HasExpandableChildrenRole, "hasExpandableChildren"}
+        {HasExpandableChildrenRole, "hasExpandableChildren"},
+        {CanLogInToOrgRole, "canLogInToOrg"},
     };
 
     auto roles = QnSystemsModel::kRoleNames;

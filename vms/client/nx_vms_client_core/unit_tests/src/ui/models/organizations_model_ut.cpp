@@ -1,10 +1,14 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <optional>
+
 #include <gtest/gtest.h>
 
 #include <QtTest/QAbstractItemModelTester>
 #include <QtTest/QSignalSpy>
 
+#include <nx/reflect/enum_instrument.h>
+#include <nx/reflect/string_conversion.h>
 #include <nx/vms/client/core/common/models/linearization_list_model.h>
 #include <nx/vms/client/core/network/cloud_api.h>
 #include <nx/vms/client/core/system_finder/private/cloud_system_description.h>
@@ -21,7 +25,10 @@ namespace test {
 
 namespace {
 
+using SaasState = nx::vms::api::SaasState;
 using SystemStatus = nx::cloud::db::api::SystemStatus;
+
+constexpr auto kAllSaasStates = nx::reflect::enumeration::allEnumValues<SaasState>();
 
 SystemInOrganization makeSystem(const std::string& name, SystemStatus status)
 {
@@ -97,6 +104,23 @@ bool isModelIndex(const QModelIndex& index)
     return index.model()->index(index.row(), index.column(), parent) == index;
 }
 
+bool canLogInToOrg(Organization org, const std::optional<ChannelPartner>& partner = {})
+{
+    OrganizationsModel model;
+    nx::Uuid parentId;
+
+    if (partner)
+    {
+        parentId = partner->id;
+        org.channelPartner = partner->id;
+        model.setChannelPartners({.count = 1, .results = {*partner}});
+    }
+
+    model.setOrganizations({.count = 1, .results = {org}}, parentId);
+
+    return model.indexFromNodeId(org.id).data(OrganizationsModel::CanLogInToOrgRole).toBool();
+}
+
 } // namespace
 
 // ------------------------------------------------------------------------------------------------
@@ -119,6 +143,9 @@ public:
 
     // A single organization with no folders, and an empty systems model.
     void givenOrganization();
+
+    // A single active organization, which is not under a channel partner.
+    void givenStandaloneOrganization(const std::vector<nx::Uuid>& roles);
 
     void givenSystemsModel();
     void givenSystemInSystemsModel(const SystemInOrganization& system, bool isPending);
@@ -161,6 +188,7 @@ public:
     void thenChildSystemsAre(nx::Uuid parentId, const std::vector<nx::Uuid>& systemIds);
     void thenSystemIds(nx::Uuid systemId, nx::Uuid orgId);
     void thenIsFromSites(nx::Uuid id, bool isFromSites);
+    void thenCanLogInToOrg(nx::Uuid id, bool canLogIn);
     void thenOrgSystemIsShown(const SystemInOrganization& system, bool isShown);
     void thenOrgSystemCount(nx::Uuid orgId, int count);
     void thenSitesNodeIsFirst();
@@ -496,6 +524,23 @@ void OrganizationsModelTest::givenOrganization()
     givenSystemsModel();
 }
 
+void OrganizationsModelTest::givenStandaloneOrganization(const std::vector<nx::Uuid>& roles)
+{
+    orgsList = {
+        .count = 1,
+        .results = {
+            {
+                .id = org1Id,
+                .name = "Org1",
+                .effectiveState = SaasState::active,
+                .ownRolesIds = roles,
+            }
+        }
+    };
+
+    model.setOrganizations(orgsList, /*parentId*/ {});
+}
+
 void OrganizationsModelTest::givenSystemsModel()
 {
     controller.reset(new TestSystemsController());
@@ -657,6 +702,13 @@ void OrganizationsModelTest::thenPathFromRoot(nx::Uuid id, const QString& path)
 {
     EXPECT_EQ(path,
         model.indexFromNodeId(id).data(OrganizationsModel::PathFromRootRole).toString());
+}
+
+void OrganizationsModelTest::thenCanLogInToOrg(nx::Uuid id, bool canLogIn)
+{
+    const auto index = model.indexFromNodeId(id);
+    ASSERT_TRUE(index.isValid());
+    EXPECT_EQ(canLogIn, index.data(OrganizationsModel::CanLogInToOrgRole).toBool());
 }
 
 void OrganizationsModelTest::thenHasChildren(nx::Uuid id, bool hasChildren)
@@ -1558,6 +1610,146 @@ TEST_F(OrganizationsModelTest, pendingSystemIsShownOnUpdateAfterDiscovery)
     whenOrgSystemsUpdated(org1Id, {system});
     thenOrgSystemIsShown(system, true);
     thenOrgSystemCount(org1Id, 1);
+}
+
+// ------------------------------------------------------------------------------------------------
+// Log in to organization availability
+
+TEST_F(OrganizationsModelTest, canLogInToOrgAsChannelPartnerUser)
+{
+    struct Case
+    {
+        std::string name;
+        std::vector<nx::Uuid> roles;
+        bool canLogIn = false;
+    };
+
+    // Own roles include the role granted by the channel partner access level.
+    const std::vector<Case> cases = {
+        {"access level administrators", {kOrganizationAdministratorId}, true},
+        {"access level health viewers", {kOrganizationSystemHealthViewerId}, false},
+        {"no access level or not an administrator or manager", {}, false},
+    };
+
+    const ChannelPartner partner = {.id = cp1Id, .name = "ChannelPartner1"};
+
+    for (const auto& testCase: cases)
+    {
+        for (const auto state: kAllSaasStates)
+        {
+            SCOPED_TRACE(testCase.name + ", " + nx::reflect::toString(state));
+
+            const Organization org = {
+                .id = org1Id,
+                .name = "Org1",
+                .effectiveState = state,
+                .ownRolesIds = testCase.roles,
+            };
+
+            const bool expected = testCase.canLogIn && state == SaasState::active;
+            EXPECT_EQ(expected, canLogInToOrg(org, partner));
+        }
+    }
+}
+
+TEST_F(OrganizationsModelTest, canLogInToOrgAsOrganizationUser)
+{
+    struct Case
+    {
+        std::string name;
+        std::vector<nx::Uuid> roles;
+        bool canLogIn = false;
+    };
+
+    const std::vector<Case> cases = {
+        {"administrators", {kOrganizationAdministratorId}, true},
+        {"system administrators", {kOrganizationSystemAdministratorId}, true},
+        {"power users", {kOrganizationPowerUserId}, true},
+        {"advanced viewers", {kOrganizationAdvancedViewerId}, true},
+        {"viewers", {kOrganizationViewerId}, true},
+        {"live viewers", {kOrganizationLiveViewerId}, true},
+        {"custom group", {nx::Uuid::createUuid()}, true},
+        {"health viewers", {kOrganizationSystemHealthViewerId}, false},
+        {
+            "health viewers and live viewers",
+            {kOrganizationSystemHealthViewerId, kOrganizationLiveViewerId},
+            true
+        },
+    };
+
+    // Placement under the channel partner doesn't matter for an organization user.
+    const ChannelPartner partner = {.id = cp1Id, .name = "ChannelPartner1"};
+
+    for (const auto& testCase: cases)
+    {
+        for (const auto state: kAllSaasStates)
+        {
+            SCOPED_TRACE(testCase.name + ", " + nx::reflect::toString(state));
+
+            const Organization org = {
+                .id = org1Id,
+                .name = "Org1",
+                .effectiveState = state,
+                .ownRolesIds = testCase.roles,
+            };
+
+            const bool expected = testCase.canLogIn && state == SaasState::active;
+            EXPECT_EQ(expected, canLogInToOrg(org));
+            EXPECT_EQ(expected, canLogInToOrg(org, partner));
+        }
+    }
+}
+
+TEST_F(OrganizationsModelTest, canLogInToOrgWithAccessToOrganizationContentsOnly)
+{
+    for (const auto state: kAllSaasStates)
+    {
+        SCOPED_TRACE(nx::reflect::toString(state));
+
+        const Organization org = {.id = org1Id, .name = "Org1", .effectiveState = state};
+
+        EXPECT_EQ(state == SaasState::active, canLogInToOrg(org));
+    }
+}
+
+TEST_F(OrganizationsModelTest, canLogInToOrgIsFalseForOtherNodes)
+{
+    givenTestStructure();
+
+    for (const auto& id: {cp1Id, group1Id, subGroup1Id, system1Id})
+        thenCanLogInToOrg(id, false);
+
+    EXPECT_FALSE(model.sitesRoot().data(OrganizationsModel::CanLogInToOrgRole).toBool());
+}
+
+TEST_F(OrganizationsModelTest, canLogInToOrgFollowsOrganizationState)
+{
+    givenStandaloneOrganization({kOrganizationViewerId});
+    thenCanLogInToOrg(org1Id, true);
+
+    givenModelSignalsRecorded();
+    orgsList.results[0].effectiveState = SaasState::suspended;
+    whenOrganizationsUpdated(orgsList, /*parentId*/ {});
+    thenDataChangedOnce(org1Id);
+    thenCanLogInToOrg(org1Id, false);
+
+    givenModelSignalsRecorded();
+    orgsList.results[0].effectiveState = SaasState::active;
+    whenOrganizationsUpdated(orgsList, /*parentId*/ {});
+    thenDataChangedOnce(org1Id);
+    thenCanLogInToOrg(org1Id, true);
+}
+
+TEST_F(OrganizationsModelTest, canLogInToOrgFollowsOrganizationRoles)
+{
+    givenStandaloneOrganization({kOrganizationSystemHealthViewerId});
+    thenCanLogInToOrg(org1Id, false);
+
+    givenModelSignalsRecorded();
+    orgsList.results[0].ownRolesIds.push_back(kOrganizationViewerId);
+    whenOrganizationsUpdated(orgsList, /*parentId*/ {});
+    thenDataChangedOnce(org1Id);
+    thenCanLogInToOrg(org1Id, true);
 }
 
 // ------------------------------------------------------------------------------------------------
