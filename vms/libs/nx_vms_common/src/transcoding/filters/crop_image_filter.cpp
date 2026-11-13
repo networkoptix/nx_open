@@ -64,8 +64,8 @@ CLVideoDecoderOutputPtr QnCropImageFilter::updateImage(const CLVideoDecoderOutpu
         result->copyFrom(frame.get());
         result->crop_left = m_rect.left();
         result->crop_top = m_rect.top();
-        result->crop_right = frame->width - m_rect.right();
-        result->crop_bottom = frame->height - m_rect.bottom();
+        result->crop_right = frame->width - m_rect.x() - m_rect.width();
+        result->crop_bottom = frame->height - m_rect.y() - m_rect.height();
         if (const auto status = av_frame_apply_cropping(result.get(), 0); status < 0)
         {
             NX_WARNING(this, "Failed to crop frame, Ffmpeg error %1",
