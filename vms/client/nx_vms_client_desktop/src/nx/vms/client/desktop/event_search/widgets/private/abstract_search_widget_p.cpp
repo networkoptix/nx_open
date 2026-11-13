@@ -217,13 +217,32 @@ AbstractSearchWidgetPrivate::AbstractSearchWidgetPrivate(
     setupCameraSelection();
     setupCameraDisplaying();
 
-    installEventHandler(q, {QEvent::Show, QEvent::Hide}, this,
+    installEventHandler(q,
+        {QEvent::Show, QEvent::Hide},
+        this,
         [this, q]()
         {
             const bool hidden = !q->isVisible();
-            m_mainModel->setLivePaused(hidden);
             if (hidden)
+            {
+                if (!m_mainModel->livePaused())
+                {
+                    m_wasLiveBeforeHide = m_mainModel->isLive()
+                        && ui->ribbon->scrollBar()->value() == ui->ribbon->scrollBar()->minimum();
+                }
+
+                m_mainModel->setLivePaused(true);
                 return;
+            }
+
+            m_mainModel->setLivePaused(false);
+
+            // Some models (e.g. analytics) leave live mode while it is paused. Return to it if
+            // the user was watching live data when the widget got hidden.
+            if (m_wasLiveBeforeHide && !m_mainModel->isLive())
+                goToLive();
+
+            m_wasLiveBeforeHide = false;
 
             q->setFocus();
             requestFetchIfNeeded(/*afterShow*/ true);

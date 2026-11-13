@@ -157,6 +157,7 @@ private:
     Controls m_relevantControls = Control::defaults;
     bool m_skipFetchOnScrollChange = false;
     bool m_afterShow = false;
+    bool m_wasLiveBeforeHide = false; //< Model was live and ribbon was at the top.
 };
 
 } // namespace nx::vms::client::desktop
