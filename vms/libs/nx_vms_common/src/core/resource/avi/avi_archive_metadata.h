@@ -20,7 +20,7 @@ struct AVFormatContext;
  */
 struct NX_VMS_COMMON_API QnAviArchiveMetadata
 {
-    NX_REFLECTION_ENUM_CLASS(Format,
+    NX_REFLECTION_ENUM_CLASS_IN_CLASS(Format,
         avi,
         mp4,
         custom //< Allows to setup any fields

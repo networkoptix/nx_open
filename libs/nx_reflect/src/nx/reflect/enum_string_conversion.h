@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <array>
 #include <charconv>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -188,6 +189,23 @@ bool fromString(std::string_view str, Enum* value)
 
     *value = it->value;
     return true;
+}
+
+/** Unlike fromString, takes only the exact name of an item: no other letter case, no number. */
+template<typename Enum>
+std::optional<Enum> fromStringStrict(std::string_view str)
+{
+    static constexpr auto items = visitAllItems<Enum>(
+        [](auto&&... items) { return std::array<Item<Enum>, sizeof...(items)>{items...}; });
+
+    const auto name = detail::fromStdStringView(str);
+    for (const auto& item: items)
+    {
+        if (item.name == name)
+            return item.value;
+    }
+
+    return std::nullopt;
 }
 
 } // namespace nx::reflect::enumeration

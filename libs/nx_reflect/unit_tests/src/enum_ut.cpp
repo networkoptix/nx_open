@@ -182,6 +182,85 @@ TEST(Enum, numericDeserialization)
     EXPECT_EQ(static_cast<NumericEnum>(11), value);
 }
 
+enum class CaseTwins
+{
+    lower,
+    upper
+};
+
+template<typename Visitor>
+constexpr auto nxReflectVisitAllEnumItems(CaseTwins*, Visitor&& visitor)
+{
+    using Item = nx::reflect::enumeration::Item<CaseTwins>;
+    return visitor(Item{CaseTwins::lower, "twin"}, Item{CaseTwins::upper, "TWIN"});
+}
+
+// The values are shuffled to tell the order of declaration from the order of values.
+enum class SameNames
+{
+    first = 2,
+    second = 3,
+    third = 1
+};
+
+template<typename Visitor>
+constexpr auto nxReflectVisitAllEnumItems(SameNames*, Visitor&& visitor)
+{
+    using Item = nx::reflect::enumeration::Item<SameNames>;
+    return visitor(Item{SameNames::first, "same"},
+        Item{SameNames::second, "same"},
+        Item{SameNames::third, "same"});
+}
+
+enum class NumberLikeName
+{
+    one = 10
+};
+
+template<typename Visitor>
+constexpr auto nxReflectVisitAllEnumItems(NumberLikeName*, Visitor&& visitor)
+{
+    using Item = nx::reflect::enumeration::Item<NumberLikeName>;
+    return visitor(Item{NumberLikeName::one, "1"});
+}
+
+TEST(Enum, fromStringStrict)
+{
+    using nx::reflect::enumeration::fromStringStrict;
+
+    EXPECT_EQ(fromStringStrict<NumericEnum>("y"), std::optional(NumericEnum::y));
+
+    // Nothing but the exact name.
+    EXPECT_EQ(fromStringStrict<NumericEnum>("Y"), std::nullopt);
+    EXPECT_EQ(fromStringStrict<NumericEnum>("10"), std::nullopt);
+    EXPECT_EQ(fromStringStrict<NumericEnum>("xy"), std::nullopt);
+    EXPECT_EQ(fromStringStrict<TrailingUnderscores>("defaul"), std::nullopt);
+    EXPECT_EQ(fromStringStrict<NumericEnum>(" y"), std::nullopt);
+    EXPECT_EQ(fromStringStrict<NumericEnum>("y "), std::nullopt);
+    EXPECT_EQ(fromStringStrict<NumericEnum>("y\0"sv), std::nullopt);
+    EXPECT_EQ(fromStringStrict<NumericEnum>(""), std::nullopt);
+
+    // The name of an item, not the spelling of the enumerator.
+    EXPECT_EQ(fromStringStrict<TrailingUnderscores>("default"),
+        std::optional(TrailingUnderscores::default_));
+    EXPECT_EQ(fromStringStrict<TrailingUnderscores>("default_"), std::nullopt);
+
+    // Every name of a value.
+    EXPECT_EQ(fromStringStrict<MultipleNames>("three"), std::optional(MultipleNames::three));
+    EXPECT_EQ(fromStringStrict<MultipleNames>("THREE"), std::optional(MultipleNames::three));
+    EXPECT_EQ(fromStringStrict<SameValues>("z"), std::optional(SameValues::x));
+
+    // Names differing only by case are different names.
+    EXPECT_EQ(fromStringStrict<CaseTwins>("twin"), std::optional(CaseTwins::lower));
+    EXPECT_EQ(fromStringStrict<CaseTwins>("TWIN"), std::optional(CaseTwins::upper));
+
+    // Of the items with the same name the first declared one wins.
+    EXPECT_EQ(fromStringStrict<SameNames>("same"), std::optional(SameNames::first));
+
+    // A name that reads as a number is still a name.
+    EXPECT_EQ(fromStringStrict<NumberLikeName>("1"), std::optional(NumberLikeName::one));
+}
+
 struct StructWithEnum
 {
     NX_REFLECTION_ENUM_CLASS_IN_CLASS(SimpleEnum, one, two, three)

@@ -7,6 +7,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/media/stream_event.h>
+#include <nx/reflect/enum_instrument.h>
 #include <nx/utils/url.h>
 
 //!Holds types related to performing camera availability diagnostics
@@ -27,6 +28,13 @@ enum Value
     mediaStreamIntegrity,
     end
 };
+
+NX_REFLECTION_INSTRUMENT_ENUM(Value,
+    none,
+    mediaServerAvailability,
+    cameraAvailability,
+    mediaStreamAvailability,
+    mediaStreamIntegrity)
 
 NX_VMS_COMMON_API QString toString(Value val);
 NX_VMS_COMMON_API Value fromString(const QString& str);

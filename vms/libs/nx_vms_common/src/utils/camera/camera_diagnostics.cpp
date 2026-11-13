@@ -6,6 +6,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
+#include <nx/reflect/enum_string_conversion.h>
 #include <nx/utils/log/assert.h>
 
 class QnCameraDiagnosticsErrorCodeStrings
@@ -286,38 +287,14 @@ namespace CameraDiagnostics {
 
 namespace Step {
 
-// TODO: #sivanov Use reflection.
 QString toString(Value val)
 {
-    switch (val)
-    {
-        case none:
-            return "none";
-        case mediaServerAvailability:
-            return "mediaServerAvailability";
-        case cameraAvailability:
-            return "cameraAvailability";
-        case mediaStreamAvailability:
-            return "mediaStreamAvailability";
-        case mediaStreamIntegrity:
-            return "mediaStreamIntegrity";
-        default:
-            return "unknown";
-    }
+    return QString::fromStdString(nx::reflect::enumeration::toString(val));
 }
 
 Value fromString(const QString& str)
 {
-    if (str == "mediaServerAvailability")
-        return mediaServerAvailability;
-    else if (str == "cameraAvailability")
-        return cameraAvailability;
-    else if (str == "mediaStreamAvailability")
-        return mediaStreamAvailability;
-    else if (str == "mediaStreamIntegrity")
-        return mediaStreamIntegrity;
-    else
-        return none;
+    return nx::reflect::enumeration::fromStringStrict<Value>(str.toStdString()).value_or(none);
 }
 
 } // namespace Step
