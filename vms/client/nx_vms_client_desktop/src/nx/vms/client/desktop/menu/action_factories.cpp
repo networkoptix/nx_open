@@ -17,10 +17,13 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/ptz/helpers.h>
 #include <nx/vms/client/core/ptz/hotkey_resource_property_adaptor.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
+#include <nx/vms/client/desktop/analytics/analytics_actions_helper.h>
+#include <nx/vms/client/desktop/analytics/hovered_analytics_object.h>
 #include <nx/vms/client/desktop/common/widgets/webview_controller.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
@@ -208,6 +211,38 @@ Factory::ActionList PtzPresetsToursFactory::newActions(const Parameters& paramet
     }
 
     return result;
+}
+
+AnalyticsObjectActionsFactory::AnalyticsObjectActionsFactory(Manager* parent): Factory(parent)
+{
+}
+
+Factory::ActionList AnalyticsObjectActionsFactory::newActions(
+    const Parameters& parameters, QObject* parent)
+{
+    const auto widget = parameters.widget<QnMediaResourceWidget>();
+    if (!widget)
+        return {};
+
+    const auto object = widget->hoveredAnalyticsObject();
+    const auto camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
+    if (!object || !camera)
+        return {};
+
+    return AnalyticsActionsHelper::createObjectActions(camera,
+        object->objectTypeId,
+        nx::utils::guarded(this,
+            [this, object = *object, camera](
+                nx::Uuid engineId, const nx::vms::api::analytics::ActionTypeDescriptor& actionType)
+            {
+                AnalyticsActionsHelper::executeObjectAction(windowContext(),
+                    engineId,
+                    actionType,
+                    object.trackId,
+                    camera,
+                    object.timestamp);
+            }),
+        parent);
 }
 
 EdgeNodeFactory::EdgeNodeFactory(Manager* parent):

@@ -43,6 +43,14 @@ public:
     virtual ActionList newActions(const Parameters& parameters, QObject* parent) override;
 };
 
+class AnalyticsObjectActionsFactory: public Factory
+{
+    Q_OBJECT
+public:
+    AnalyticsObjectActionsFactory(Manager* parent);
+    virtual ActionList newActions(const Parameters& parameters, QObject* parent) override;
+};
+
 class EdgeNodeFactory: public Factory
 {
     Q_OBJECT

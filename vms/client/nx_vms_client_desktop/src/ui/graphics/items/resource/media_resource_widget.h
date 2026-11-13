@@ -4,6 +4,7 @@
 
 #include <array>
 #include <functional>
+#include <optional>
 
 #include <QtCore/QByteArray>
 #include <QtCore/QHash>
@@ -56,6 +57,7 @@ class EncryptedArchivePasswordDialog;
 class CameraHotspotsOverlayWidget;
 class CameraButtonManager;
 class BlurMask;
+struct HoveredAnalyticsObject;
 
 } // namespace nx::vms::client::desktop
 
@@ -216,6 +218,9 @@ public:
     void setAnalyticsObjectsVisibleForcefully(bool visible, bool animate = true);
 
     bool isAnalyticsModeEnabled() const;
+
+    /** Analytics object whose bounding box is under the cursor, if any. */
+    std::optional<nx::vms::client::desktop::HoveredAnalyticsObject> hoveredAnalyticsObject() const;
 
     bool canDisplayHotspots() const;
 

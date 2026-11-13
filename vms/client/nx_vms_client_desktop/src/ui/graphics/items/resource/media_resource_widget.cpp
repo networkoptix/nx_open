@@ -66,6 +66,7 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/analytics/hovered_analytics_object.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/audio_dispatcher.h>
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
@@ -3471,6 +3472,14 @@ void QnMediaResourceWidget::setHotspotsVisible(bool visible)
         return;
 
     item()->setDisplayHotspots(visible);
+}
+
+std::optional<HoveredAnalyticsObject> QnMediaResourceWidget::hoveredAnalyticsObject() const
+{
+    if (!d->analyticsController)
+        return std::nullopt;
+
+    return d->analyticsController->hoveredObject();
 }
 
 void QnMediaResourceWidget::setAnalyticsModeEnabled(bool enabled, bool animate)

@@ -34,6 +34,9 @@ public:
         const figure::FigurePtr& figure);
     void removeArea(const nx::Uuid& areaId);
 
+    /** Id of the area under the cursor, null if none. */
+    nx::Uuid highlightedAreaId() const;
+
     void setZoomRect(const QRectF& valueRect);
 
     virtual void paint(

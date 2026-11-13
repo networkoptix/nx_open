@@ -26,6 +26,7 @@
 #include <nx/vms/client/core/media/abstract_analytics_metadata_provider.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/analytics/hovered_analytics_object.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -401,6 +402,23 @@ void WidgetAnalyticsController::clearAreas()
 {
     for (const auto& object: d->tracker.objects())
         d->analyticsWidget->removeArea(object.trackId);
+}
+
+std::optional<HoveredAnalyticsObject> WidgetAnalyticsController::hoveredObject() const
+{
+    if (!d->analyticsWidget)
+        return std::nullopt;
+
+    const auto trackId = d->analyticsWidget->highlightedAreaId();
+    if (trackId.isNull())
+        return std::nullopt;
+
+    const auto& objects = d->tracker.objects();
+    const auto it = objects.constFind(trackId);
+    if (it == objects.constEnd())
+        return std::nullopt;
+
+    return HoveredAnalyticsObject{it->trackId, it->metadata.typeId, d->lastTimestamp};
 }
 
 void WidgetAnalyticsController::setAnalyticsMetadataProvider(

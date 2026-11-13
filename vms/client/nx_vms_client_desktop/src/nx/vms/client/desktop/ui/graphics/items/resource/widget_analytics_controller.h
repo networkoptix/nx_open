@@ -3,6 +3,7 @@
 #pragma once
 
 #include <chrono>
+#include <optional>
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/core/media/analytics_fwd.h>
@@ -15,6 +16,7 @@ namespace nx::analytics::db { struct Filter; }
 namespace nx::vms::client::desktop {
 
 class AnalyticsOverlayWidget;
+struct HoveredAnalyticsObject;
 
 class WidgetAnalyticsController: public SystemContextAware
 {
@@ -26,6 +28,9 @@ public:
 
     void updateAreas(std::chrono::microseconds timestamp, int channel);
     void clearAreas();
+
+    /** Object whose area is under the cursor, if any. */
+    std::optional<HoveredAnalyticsObject> hoveredObject() const;
 
     void setAnalyticsMetadataProvider(const core::AbstractAnalyticsMetadataProviderPtr& provider);
     void setAnalyticsOverlayWidget(AnalyticsOverlayWidget* widget);

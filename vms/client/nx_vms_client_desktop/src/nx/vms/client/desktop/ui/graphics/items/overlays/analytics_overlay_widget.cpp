@@ -298,6 +298,11 @@ void AnalyticsOverlayWidget::removeArea(const nx::Uuid& areaId)
     }
 }
 
+nx::Uuid AnalyticsOverlayWidget::highlightedAreaId() const
+{
+    return d->highlightedAreaId;
+}
+
 void AnalyticsOverlayWidget::setZoomRect(const QRectF& value)
 {
     if (d->zoomRect == value)

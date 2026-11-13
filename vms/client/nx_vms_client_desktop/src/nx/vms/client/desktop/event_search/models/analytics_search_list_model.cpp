@@ -7,12 +7,13 @@
 #include <analytics/db/analytics_db_types.h>
 #include <client/client_globals.h>
 #include <core/resource/camera_resource.h>
-#include <nx/analytics/action_type_descriptor_manager.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/math/math.h>
+#include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/client/core/bookmarks/bookmark_utils.h>
 #include <nx/vms/client/core/common/utils/text_utils.h>
 #include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/desktop/analytics/analytics_actions_helper.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
@@ -66,28 +67,17 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::contextMenu(
     if (!cameraResource)
         return {};
 
-    const nx::analytics::ActionTypeDescriptorManager descriptorManager(systemContext()->resourcePool(), systemContext()->runtimeInfoManager());
-    const auto actionByEngine = descriptorManager.availableObjectActionTypeDescriptors(
-        track.objectTypeId,
-        cameraResource);
-
     QSharedPointer<QMenu> menu(new QMenu());
-    for (const auto& [engineId, actionById]: actionByEngine)
-    {
-        if (!menu->isEmpty())
-            menu->addSeparator();
-
-        for (const auto& [actionId, actionDescriptor]: actionById)
-        {
-            const auto name = QString::fromStdString(actionDescriptor.name);
-            menu->addAction<std::function<void()>>(name, nx::utils::guarded(this,
-                [this, engineId = engineId, actionId = actionDescriptor.id, track, cameraResource]()
-                {
-                    emit this->pluginActionRequested(engineId, QString::fromStdString(actionId),
-                        track, cameraResource);
-                }));
-        }
-    }
+    menu->addActions(AnalyticsActionsHelper::createObjectActions(cameraResource,
+        track.objectTypeId,
+        nx::utils::guarded(this,
+            [this, track, cameraResource](
+                nx::Uuid engineId, const nx::vms::api::analytics::ActionTypeDescriptor& actionType)
+            {
+                emit this->pluginActionRequested(
+                    engineId, QString::fromStdString(actionType.id), track, cameraResource);
+            }),
+        menu.get()));
 
     menu->addSeparator();
 

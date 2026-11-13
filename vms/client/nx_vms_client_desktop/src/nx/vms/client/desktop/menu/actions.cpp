@@ -388,6 +388,16 @@ void initialize(Manager* manager, Action* root)
 
     /* Context menu actions. */
 
+    // Opens the item menu; hidden when there is no object with actions under the cursor or when
+    // the user cannot view the footage (as in the Objects panel).
+    factory()
+        .flags(Scene | SingleTarget)
+        .childFactory(new AnalyticsObjectActionsFactory(manager))
+        .text(ContextMenu::tr("Object Actions"))
+        .requiredTargetPermissions(Qn::ViewFootagePermission);
+
+    factory().flags(Scene).separator();
+
     factory(FitInViewAction)
         .flags(Scene | NoTarget)
         .text(ContextMenu::tr("Fit in View"))
