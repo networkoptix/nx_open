@@ -30,7 +30,7 @@
 #include <nx/vms/client/desktop/event_search/synchronizers/bookmark_search_synchronizer.h>
 #include <nx/vms/client/desktop/event_search/synchronizers/motion_search_synchronizer.h>
 #include <nx/vms/client/desktop/event_search/utils/call_alarm_manager.h>
-#include <nx/vms/client/desktop/event_search/utils/event_preview_cameras.h>
+#include <nx/vms/client/desktop/event_search/utils/event_preview.h>
 #include <nx/vms/client/desktop/event_search/widgets/analytics_search_widget.h>
 #include <nx/vms/client/desktop/event_search/widgets/bookmark_search_widget.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
@@ -569,6 +569,7 @@ void EventPanel::Private::showContextMenu(const QPoint& pos)
 void EventPanel::Private::at_eventTileHovered(const QModelIndex& index, EventTile* tile)
 {
     hoveredTilePositionWatcher.reset();
+    m_tooltipCounterConnections.reset();
 
     if (!tile || !index.isValid() || (Qt::NoButton != QApplication::mouseButtons()))
     {
@@ -576,12 +577,15 @@ void EventPanel::Private::at_eventTileHovered(const QModelIndex& index, EventTil
         return;
     }
 
-    auto multiImageProvider = this->multiImageProvider(index, tooltipCameras(index, tile));
+    const auto previews = tooltipPreviews(index, tile);
+    auto multiImageProvider = this->multiImageProvider(index, previews.cameras);
 
     auto text = tile->toolTip();
 
-    // No other snapshots: show the tile snapshot enlarged, with the highlight.
-    const bool useTileSnapshot = !multiImageProvider && !tile->obfuscationEnabled();
+    // Tiles without own tooltip text (Objects, Bookmarks, Motion) show their snapshot enlarged.
+    // Notification tooltips never repeat the tile snapshot.
+    const bool useTileSnapshot =
+        !multiImageProvider && !tile->obfuscationEnabled() && text.isEmpty();
     const auto imageProvider = multiImageProvider
         ? multiImageProvider.get()
         : (useTileSnapshot ? tile->imageProvider() : nullptr);
@@ -612,9 +616,12 @@ void EventPanel::Private::at_eventTileHovered(const QModelIndex& index, EventTil
 
     if (multiImageProvider)
     {
+        setupTooltipCounters(multiImageProvider.get(), previews);
         multiImageProvider->loadAsync();
-        multiImageProvider.release()->setParent(m_tooltip.get());
     }
+
+    // The tooltip has switched to the new provider, the previous one is not needed anymore.
+    m_tooltipImageProvider = std::move(multiImageProvider);
 
     hoveredTilePositionWatcher.reset(
         installEventHandler(m_lastHoveredTile, {QEvent::Resize, QEvent::Move}, this,
@@ -631,7 +638,7 @@ void EventPanel::Private::at_eventTileHovered(const QModelIndex& index, EventTil
             }));
 }
 
-QnVirtualCameraResourceList EventPanel::Private::tooltipCameras(
+EventPanel::Private::TooltipPreviews EventPanel::Private::tooltipPreviews(
     const QModelIndex& index, const EventTile* tile) const
 {
     // Unredacted video may be forbidden.
@@ -648,7 +655,8 @@ QnVirtualCameraResourceList EventPanel::Private::tooltipCameras(
     // With previews turned off, the tile camera snapshot is shown only in the tooltip.
     const auto snapshot = tile->previewEnabled() ? tileSnapshot(index) : TileSnapshot::none;
 
-    return tooltipPreviewCameras(cameras, tileCamera, snapshot);
+    return {.cameras = tooltipPreviewCameras(cameras, tileCamera, snapshot),
+        .previewCount = static_cast<int>(cameras.size())};
 }
 
 std::unique_ptr<MultiImageProvider> EventPanel::Private::multiImageProvider(
@@ -688,6 +696,45 @@ std::unique_ptr<MultiImageProvider> EventPanel::Private::multiImageProvider(
 
     return std::make_unique<MultiImageProvider>(
         std::move(providers), Qt::Vertical, kMultiThumbnailSpacing);
+}
+
+void EventPanel::Private::setupTooltipCounters(
+    MultiImageProvider* provider, const TooltipPreviews& previews)
+{
+    if (previews.previewCount < 2)
+        return;
+
+    // The tooltip previews are the last ones of all preview cameras.
+    const int firstNumber = previews.previewCount - static_cast<int>(previews.cameras.size()) + 1;
+
+    // The counters are drawn by the tooltip over the scaled image, so they look like the tile one.
+    m_tooltipCounterConnections << connect(provider,
+        &MultiImageProvider::imageChanged,
+        m_tooltip.get(),
+        [this, provider, firstNumber, count = previews.previewCount](const QImage& image)
+        {
+            if (image.isNull())
+                return;
+
+            const QSizeF imageSize = image.size();
+            const auto imageRects = provider->imageRects();
+            QList<ThumbnailTooltip::ImageLabel> labels;
+            for (const auto& [imageIndex, rect]: imageRects.asKeyValueRange())
+            {
+                // The rect is in pixels of the merged image, but the tooltip shows the image
+                // scaled. Normalize it to fractions of the image size: (0, 0, 1, 1) is the whole
+                // image, so the tooltip can scale the rect together with the image.
+                const QRectF relativeRect(rect.x() / imageSize.width(),
+                    rect.y() / imageSize.height(),
+                    rect.width() / imageSize.width(),
+                    rect.height() / imageSize.height());
+
+                labels.push_back(
+                    {relativeRect, previewCounterText(firstNumber + imageIndex, count)});
+            }
+
+            m_tooltip->setImageLabels(labels);
+        });
 }
 
 } // namespace nx::vms::client::desktop

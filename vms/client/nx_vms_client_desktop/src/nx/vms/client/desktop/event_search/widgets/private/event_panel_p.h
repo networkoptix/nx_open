@@ -55,10 +55,20 @@ private:
     void showContextMenu(const QPoint& pos);
     void setTabCurrent(QWidget* tab, bool current);
     void at_eventTileHovered(const QModelIndex& index, EventTile* tile);
+
+    struct TooltipPreviews
+    {
+        /** Cameras whose previews the tooltip shows. */
+        QnVirtualCameraResourceList cameras;
+
+        /** Number of the event previews the user can see, including the tile one. */
+        int previewCount = 0;
+    };
+
     std::unique_ptr<MultiImageProvider> multiImageProvider(
         const QModelIndex& index, const QnVirtualCameraResourceList& cameras) const;
-    QnVirtualCameraResourceList tooltipCameras(
-        const QModelIndex& index, const EventTile* tile) const;
+    TooltipPreviews tooltipPreviews(const QModelIndex& index, const EventTile* tile) const;
+    void setupTooltipCounters(MultiImageProvider* provider, const TooltipPreviews& previews);
 
 private:
     class StateDelegate;
@@ -91,9 +101,13 @@ private:
 
     std::unique_ptr<ThumbnailTooltip> m_tooltip;
 
+    // Snapshots of the current tooltip. Declared after the tooltip, so it is destroyed before.
+    std::unique_ptr<MultiImageProvider> m_tooltipImageProvider;
+
     // Required to correctly display tooltip.
     EventTile* m_lastHoveredTile = nullptr;
     std::unique_ptr<QObject> hoveredTilePositionWatcher;
+    nx::utils::ScopedConnections m_tooltipCounterConnections;
 
     nx::utils::ScopedConnections m_connections; //< Connections that should be guarded.
 };

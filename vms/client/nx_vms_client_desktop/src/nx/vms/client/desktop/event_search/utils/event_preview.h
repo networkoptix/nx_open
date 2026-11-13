@@ -4,6 +4,8 @@
 
 #include <chrono>
 
+#include <QtCore/QString>
+
 #include <core/resource/resource_fwd.h>
 
 class QModelIndex;
@@ -47,12 +49,15 @@ NX_VMS_CLIENT_DESKTOP_API TileSnapshot tileSnapshot(const QModelIndex& index);
 
 /**
  * Snapshots for the tooltip of a tile. The tile camera is skipped only if the tile already shows
- * its full frame. If the tile camera is the only one, the list is empty: the tooltip shows the
- * tile snapshot enlarged instead.
+ * its full frame, so the list is empty if it is the only camera. With a crop on the tile, the
+ * tooltip shows the full frame of the tile camera instead of repeating the crop.
  */
 NX_VMS_CLIENT_DESKTOP_API QnVirtualCameraResourceList tooltipPreviewCameras(
     const QnVirtualCameraResourceList& previewCameras,
     const QnVirtualCameraResourcePtr& tileCamera,
     TileSnapshot tileSnapshot);
+
+/** Text of the "N/M" snapshot counter, e.g. "2/3". */
+NX_VMS_CLIENT_DESKTOP_API QString previewCounterText(int number, int count);
 
 } // namespace nx::vms::client::desktop

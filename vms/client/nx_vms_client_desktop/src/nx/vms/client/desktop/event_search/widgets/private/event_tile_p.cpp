@@ -18,6 +18,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/command_action.h>
 #include <nx/vms/client/desktop/common/widgets/close_button.h>
+#include <nx/vms/client/desktop/event_search/utils/event_preview.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
@@ -41,12 +42,16 @@ static constexpr int kTileTitleLineLimit = 2;
 static constexpr int kTileDescriptionLineLimit = 5;
 static constexpr auto kRelativeTimestampUpdateTime = 30s;
 
+// Style of the "N/M" snapshot counter on the preview. The tooltip draws the same counter in QML
+// (ThumbnailTooltip.qml), keep them in sync.
+static constexpr int kPreviewCounterHeight = 20;
 static constexpr int kPreviewCounterFontPixelSize = 10;
 static constexpr auto kPreviewCounterFontWeight = QFont::Medium;
+static constexpr qreal kPreviewCounterLetterSpacing = 0.4;
 static constexpr int kPreviewCounterRoundingRadius = 2;
-static constexpr std::uint8_t kPreviewCounterBackgroundAlpha = 204; //< 80% opacity.
-static const QMargins kPreviewCounterContentsMargins(4, 0, 4, 0);
-static const QMargins kPreviewCounterAnchorMargins(0, 0, 4, 4);
+static constexpr int kPreviewCounterHorizontalPadding = 4;
+static constexpr int kPreviewCounterInset = 4; //< From the right and bottom edges of the preview.
+static constexpr std::uint8_t kPreviewCounterBackgroundAlpha = 230; //< 90% opacity.
 
 } // namespace
 
@@ -417,21 +422,29 @@ void EventTile::Private::setupPreviewCounter()
     // The label is a child of the preview, so it moves and hides with it.
     const auto previewCounterLabel = q->ui->previewCounterLabel;
     previewCounterLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
-    previewCounterLabel->setRoundingRadius(kPreviewCounterRoundingRadius, false);
-    previewCounterLabel->setContentsMargins(kPreviewCounterContentsMargins);
-    previewCounterLabel->setBackgroundColor(
-        core::colorTheme()->color("dark1", kPreviewCounterBackgroundAlpha));
-    previewCounterLabel->setStyleSheet(
-        QStringLiteral("QLabel { color: %1; }").arg(core::colorTheme()->color("light4").name()));
+    previewCounterLabel->setFixedHeight(kPreviewCounterHeight);
 
-    QFont font(previewCounterLabel->font());
+    // A rounded background without a border, the same as the tooltip counters.
+    const QColor textColor = core::colorTheme()->color("light4");
+    const QColor backgroundColor =
+        core::colorTheme()->color("dark6", kPreviewCounterBackgroundAlpha);
+    previewCounterLabel->setStyleSheet(QStringLiteral(
+        "QLabel { color: %1; background-color: %2; border: none; border-radius: %3px; "
+        "padding: 0px %4px; }")
+            .arg(textColor.name(), backgroundColor.name(QColor::HexArgb))
+            .arg(kPreviewCounterRoundingRadius)
+            .arg(kPreviewCounterHorizontalPadding));
+
+    QFont font;
     font.setPixelSize(kPreviewCounterFontPixelSize);
     font.setWeight(kPreviewCounterFontWeight);
+    font.setLetterSpacing(QFont::AbsoluteSpacing, kPreviewCounterLetterSpacing);
     previewCounterLabel->setFont(font);
     previewCounterLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
 
-    anchorWidgetToParent(
-        previewCounterLabel, Qt::RightEdge | Qt::BottomEdge, kPreviewCounterAnchorMargins);
+    anchorWidgetToParent(previewCounterLabel,
+        Qt::RightEdge | Qt::BottomEdge,
+        QMargins(0, 0, kPreviewCounterInset, kPreviewCounterInset));
 
     previewCounterLabel->hide();
 }
@@ -448,7 +461,7 @@ void EventTile::Private::updatePreviewCounter()
     }
 
     // The tile always shows the first snapshot.
-    previewCounterLabel->setText(QString("1/%1").arg(previewCount));
+    previewCounterLabel->setText(previewCounterText(1, previewCount));
     previewCounterLabel->adjustSize();
     previewCounterLabel->show();
     previewCounterLabel->raise();

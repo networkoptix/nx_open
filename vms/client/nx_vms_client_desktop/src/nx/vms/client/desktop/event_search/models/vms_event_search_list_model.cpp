@@ -23,7 +23,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/event_search/models/private/event_model_data.h>
 #include <nx/vms/client/desktop/event_search/utils/event_data.h>
-#include <nx/vms/client/desktop/event_search/utils/event_preview_cameras.h>
+#include <nx/vms/client/desktop/event_search/utils/event_preview.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/rules/helpers/help_id.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>

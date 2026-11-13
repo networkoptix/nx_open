@@ -179,25 +179,25 @@
                <height>120</height>
               </size>
              </property>
-             <widget class="nx::vms::client::desktop::RoundPanelLabel" name="previewCounterLabel">
+             <widget class="QLabel" name="previewCounterLabel">
               <property name="geometry">
                <rect>
                 <x>0</x>
                 <y>0</y>
                 <width>28</width>
-                <height>16</height>
+                <height>20</height>
                </rect>
               </property>
               <property name="minimumSize">
                <size>
                 <width>0</width>
-                <height>16</height>
+                <height>20</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
                 <width>16777215</width>
-                <height>16</height>
+                <height>20</height>
                </size>
               </property>
               <property name="text">
@@ -557,11 +557,6 @@
    <extends>QWidget</extends>
    <header location="global">nx/vms/client/desktop/common/widgets/name_value_table.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>nx::vms::client::desktop::RoundPanelLabel</class>
-   <extends>QLabel</extends>
-   <header location="global">nx/vms/client/desktop/common/widgets/round_panel_label.h</header>
   </customwidget>
   <customwidget>
    <class>nx::vms::client::desktop::CloseButton</class>

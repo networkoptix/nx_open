@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QList>
+#include <QtCore/QRectF>
 #include <QtCore/QStringList>
 
 #include <nx/utils/impl_ptr.h>
@@ -24,6 +26,18 @@ public:
 
     void setImageProvider(core::ImageProvider* value);
     void setHighlightRect(const QRectF& rect);
+
+    /** Text label printed above the image in specified rect, e.g. a counter over one snapshot. */
+    struct ImageLabel
+    {
+        /** Rectangle part of image where label is located */
+        QRectF rect;
+
+        QString text;
+    };
+
+    /** Replaces the labels over the image. They are cleared when the image provider changes. */
+    void setImageLabels(const QList<ImageLabel>& labels);
 
     const core::analytics::AttributeList& attributes() const;
     void setAttributes(const core::analytics::AttributeList& value);

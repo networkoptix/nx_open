@@ -11,7 +11,7 @@
 #include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/client_core_globals.h>
-#include <nx/vms/client/desktop/event_search/utils/event_preview_cameras.h>
+#include <nx/vms/client/desktop/event_search/utils/event_preview.h>
 #include <nx/vms/client/desktop/test_support/test_context.h>
 #include <nx/vms/common/resource/camera_resource_stub.h>
 
@@ -27,7 +27,7 @@ static constexpr microseconds kArchive = 1h;
 
 } // namespace
 
-class EventPreviewCamerasTest: public ContextBasedTest
+class EventPreviewTest: public ContextBasedTest
 {
 protected:
     virtual void SetUp() override
@@ -65,7 +65,7 @@ protected:
     QnVirtualCameraResourcePtr hiddenCamera;
 };
 
-TEST_F(EventPreviewCamerasTest, previewAccessDependsOnPreviewTime)
+TEST_F(EventPreviewTest, previewAccessDependsOnPreviewTime)
 {
     loginWithPerCameraAccess();
 
@@ -79,7 +79,7 @@ TEST_F(EventPreviewCamerasTest, previewAccessDependsOnPreviewTime)
     EXPECT_FALSE(isPreviewAccessible(hiddenCamera, kArchive));
 }
 
-TEST_F(EventPreviewCamerasTest, fakeCameraIsNeverAccessible)
+TEST_F(EventPreviewTest, fakeCameraIsNeverAccessible)
 {
     loginWithPerCameraAccess();
 
@@ -87,7 +87,7 @@ TEST_F(EventPreviewCamerasTest, fakeCameraIsNeverAccessible)
     EXPECT_FALSE(isPreviewAccessible(archiveCamera, kLive));
 }
 
-TEST_F(EventPreviewCamerasTest, crossSystemCameraIsAlwaysAccessible)
+TEST_F(EventPreviewTest, crossSystemCameraIsAlwaysAccessible)
 {
     loginWithPerCameraAccess();
 
@@ -97,7 +97,7 @@ TEST_F(EventPreviewCamerasTest, crossSystemCameraIsAlwaysAccessible)
     EXPECT_TRUE(isPreviewAccessible(crossSystemCamera, kArchive));
 }
 
-TEST_F(EventPreviewCamerasTest, previewCamerasAreFilteredWithTileCameraFirst)
+TEST_F(EventPreviewTest, previewCamerasAreFilteredWithTileCameraFirst)
 {
     loginWithPerCameraAccess();
 
@@ -110,7 +110,7 @@ TEST_F(EventPreviewCamerasTest, previewCamerasAreFilteredWithTileCameraFirst)
         QnVirtualCameraResourceList({archiveCamera}));
 }
 
-TEST_F(EventPreviewCamerasTest, previewCamerasDontNeedAccessibleTileCamera)
+TEST_F(EventPreviewTest, previewCamerasDontNeedAccessibleTileCamera)
 {
     loginWithPerCameraAccess();
 
@@ -121,7 +121,7 @@ TEST_F(EventPreviewCamerasTest, previewCamerasDontNeedAccessibleTileCamera)
     EXPECT_EQ(previewCameras(cameras, {}, kLive), cameras);
 }
 
-TEST_F(EventPreviewCamerasTest, previewCountNeedsTileCameraFirst)
+TEST_F(EventPreviewTest, previewCountNeedsTileCameraFirst)
 {
     const QnVirtualCameraResourceList cameras{liveCamera, archiveCamera};
 
@@ -131,7 +131,7 @@ TEST_F(EventPreviewCamerasTest, previewCountNeedsTileCameraFirst)
     EXPECT_EQ(previewCount({}, liveCamera), 0);
 }
 
-TEST_F(EventPreviewCamerasTest, tooltipSkipsFullFrameTileSnapshot)
+TEST_F(EventPreviewTest, tooltipSkipsFullFrameTileSnapshot)
 {
     const QnVirtualCameraResourceList cameras{liveCamera, archiveCamera, hiddenCamera};
 
@@ -139,14 +139,16 @@ TEST_F(EventPreviewCamerasTest, tooltipSkipsFullFrameTileSnapshot)
         QnVirtualCameraResourceList({archiveCamera, hiddenCamera}));
 }
 
-TEST_F(EventPreviewCamerasTest, tooltipKeepsPartialTileSnapshot)
+TEST_F(EventPreviewTest, tooltipKeepsPartialTileSnapshot)
 {
     const QnVirtualCameraResourceList cameras{liveCamera, archiveCamera};
 
     EXPECT_EQ(tooltipPreviewCameras(cameras, liveCamera, TileSnapshot::partial), cameras);
+    EXPECT_EQ(tooltipPreviewCameras({liveCamera}, liveCamera, TileSnapshot::partial),
+        QnVirtualCameraResourceList({liveCamera}));
 }
 
-TEST_F(EventPreviewCamerasTest, tooltipKeepsTileCameraWithoutTileSnapshot)
+TEST_F(EventPreviewTest, tooltipKeepsTileCameraWithoutTileSnapshot)
 {
     const QnVirtualCameraResourceList cameras{liveCamera, archiveCamera};
 
@@ -155,7 +157,7 @@ TEST_F(EventPreviewCamerasTest, tooltipKeepsTileCameraWithoutTileSnapshot)
         QnVirtualCameraResourceList({liveCamera}));
 }
 
-TEST_F(EventPreviewCamerasTest, tooltipKeepsAllIfTileCameraIsNotFirst)
+TEST_F(EventPreviewTest, tooltipKeepsAllIfTileCameraIsNotFirst)
 {
     const QnVirtualCameraResourceList cameras{archiveCamera, hiddenCamera};
 
@@ -165,14 +167,18 @@ TEST_F(EventPreviewCamerasTest, tooltipKeepsAllIfTileCameraIsNotFirst)
         QnVirtualCameraResourceList({archiveCamera}));
 }
 
-TEST_F(EventPreviewCamerasTest, tooltipHasNoSnapshotsForSingleTileCamera)
+TEST_F(EventPreviewTest, tooltipHasNoSnapshotsForSingleFullFrameTileCamera)
 {
     EXPECT_TRUE(tooltipPreviewCameras({liveCamera}, liveCamera, TileSnapshot::fullFrame).empty());
-    EXPECT_TRUE(tooltipPreviewCameras({liveCamera}, liveCamera, TileSnapshot::partial).empty());
     EXPECT_TRUE(tooltipPreviewCameras({}, liveCamera, TileSnapshot::fullFrame).empty());
 }
 
-TEST_F(EventPreviewCamerasTest, tileSnapshotKind)
+TEST_F(EventPreviewTest, previewCounterText)
+{
+    EXPECT_EQ(previewCounterText(2, 3), "2/3");
+}
+
+TEST_F(EventPreviewTest, tileSnapshotKind)
 {
     QStandardItemModel model;
     const auto addItem = [&model](int role, const QVariant& value)
@@ -194,7 +200,7 @@ TEST_F(EventPreviewCamerasTest, tileSnapshotKind)
     EXPECT_EQ(tileSnapshot(addItem(Qn::ShowVideoPreviewRole, true)), TileSnapshot::none);
 }
 
-TEST_F(EventPreviewCamerasTest, previewCameraIsFirstAccessibleOne)
+TEST_F(EventPreviewTest, previewCameraIsFirstAccessibleOne)
 {
     loginWithPerCameraAccess();
 
@@ -204,7 +210,7 @@ TEST_F(EventPreviewCamerasTest, previewCameraIsFirstAccessibleOne)
     EXPECT_EQ(selectPreviewCamera(cameras, kArchive), archiveCamera);
 }
 
-TEST_F(EventPreviewCamerasTest, noPreviewCameraIfNoneIsVisible)
+TEST_F(EventPreviewTest, noPreviewCameraIfNoneIsVisible)
 {
     loginWithPerCameraAccess();
 

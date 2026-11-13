@@ -7,7 +7,7 @@
 #include <core/resource/camera_resource.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/access/access_controller.h>
-#include <nx/vms/client/desktop/event_search/utils/event_preview_cameras.h>
+#include <nx/vms/client/desktop/event_search/utils/event_preview.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 

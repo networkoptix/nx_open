@@ -37,6 +37,7 @@ struct ThumbnailTooltip::Private
     const QmlProperty<QUrl> previewSource{q->widget(), "previewSource"};
     const QmlProperty<int> previewState{q->widget(), "previewState"};
     const QmlProperty<QVariantList> attributes{q->widget(), "attributes"};
+    const QmlProperty<QVariantList> imageLabels{q->widget(), "imageLabels"};
 
     QString previewImageId;
     core::analytics::AttributeList sourceAttributes;
@@ -161,6 +162,7 @@ void ThumbnailTooltip::setImageProvider(ImageProvider* value)
 
     d->providerConnections.reset();
     d->imageProvider = value;
+    setImageLabels({});
 
     const auto updatePreview =
         [this]()
@@ -187,6 +189,15 @@ void ThumbnailTooltip::setImageProvider(ImageProvider* value)
 
     d->providerConnections << connect(d->imageProvider.data(), &QObject::destroyed,
         this, updatePreview);
+}
+
+void ThumbnailTooltip::setImageLabels(const QList<ImageLabel>& labels)
+{
+    QVariantList value;
+    for (const auto& label: labels)
+        value.push_back(QVariantMap{{"rect", label.rect}, {"text", label.text}});
+
+    d->imageLabels = value;
 }
 
 void ThumbnailTooltip::setHighlightRect(const QRectF& rect)

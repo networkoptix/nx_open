@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "event_preview_cameras.h"
+#include "event_preview.h"
 
 #include <QtCore/QModelIndex>
 #include <QtCore/QRectF>
@@ -87,16 +87,16 @@ QnVirtualCameraResourceList tooltipPreviewCameras(
     const bool tileCameraIsFirst =
         tileSnapshot != TileSnapshot::none && tileCamera && previewCameras.value(0) == tileCamera;
 
-    if (!tileCameraIsFirst)
-        return previewCameras;
-
-    if (previewCameras.size() < 2)
-        return {};
-
-    if (tileSnapshot == TileSnapshot::partial)
+    // A crop doesn't show the full frame, so the tooltip shows it even for a single camera.
+    if (!tileCameraIsFirst || tileSnapshot == TileSnapshot::partial)
         return previewCameras;
 
     return QnVirtualCameraResourceList(previewCameras.begin() + 1, previewCameras.end());
+}
+
+QString previewCounterText(int number, int count)
+{
+    return QString("%1/%2").arg(number).arg(count);
 }
 
 } // namespace nx::vms::client::desktop

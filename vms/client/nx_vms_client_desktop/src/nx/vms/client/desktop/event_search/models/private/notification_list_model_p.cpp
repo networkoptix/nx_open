@@ -14,7 +14,7 @@
 #include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/event_search/utils/event_data.h>
-#include <nx/vms/client/desktop/event_search/utils/event_preview_cameras.h>
+#include <nx/vms/client/desktop/event_search/utils/event_preview.h>
 #include <nx/vms/client/desktop/help/rules_help.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>

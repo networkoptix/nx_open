@@ -31,13 +31,19 @@ public:
     virtual QSize sizeHint() const override;
     virtual core::ThumbnailStatus status() const override;
 
+    /** Rects of the loaded images in the merged image, by provider index. */
+    QMap<int, QRect> imageRects() const;
+
 protected:
     virtual void doLoadAsync() override;
 
 private:
+    void updateImage();
+
     const Providers m_providers;
     const Qt::Orientation m_orientation = Qt::Vertical;
     const int m_spacing = 0;
+    QMap<int, QImage> m_images; //< Loaded images by provider index.
     QMap<int, QRect> m_imageRects;
     QImage m_image;
 };
