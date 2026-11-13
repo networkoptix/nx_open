@@ -2,8 +2,6 @@
 
 #include "resource_type.h"
 
-#include <QtCore/QDebug>
-
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/user_data.h>
@@ -64,7 +62,7 @@ void QnResourceType::addAdditionalParent(const nx::Uuid& parent)
 {
     if (parent.isNull())
     {
-        qWarning() << "Adding NULL parentId";
+        NX_WARNING(this, "Adding a null parent id");
         return;
     }
 

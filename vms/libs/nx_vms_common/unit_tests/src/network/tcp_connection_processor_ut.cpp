@@ -6,7 +6,6 @@
 #include <gtest/gtest.h>
 
 #include <QtCore/QDateTime>
-#include <QtCore/QDebug>
 #include <QtCore/QElapsedTimer>
 #include <QtNetwork/QHostAddress>
 

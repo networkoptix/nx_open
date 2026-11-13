@@ -5,9 +5,8 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 
-#include <QDebug>
-
 #include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 
 #include "audiodevice.h"
 #include "utils/common/sleep.h"
@@ -246,7 +245,7 @@ qint64 Sound::playTimeElapsedUsec()
 
     qint64 softResultUs = m_queuedDurationUs - m_timer.elapsedUS();
 #ifdef SOFT_PLAYTIME_ELAPSED_DEBUG
-    qWarning() << "soft to hard jitter:" << (softResultUs - openalResultUs) / 1000.0 << "ms";
+    NX_WARNING(this, "Soft to hard jitter: %1 ms", (softResultUs - openalResultUs) / 1000.0);
 #endif
 
     if (qAbs(softResultUs - openalResultUs) > maxAudioJitterUs())
@@ -375,9 +374,9 @@ bool Sound::internalPlay(const void* data, uint size)
 bool Sound::outError(int err, const char* strerr)
 {
     if (strerr)
-        qDebug("%s%d%s%s", "OpenAL error, code: ", err, " description: ", strerr);
+        NX_DEBUG(NX_SCOPE_TAG, "OpenAL error, code %1, description %2", err, strerr);
     else
-        qDebug("%s%d", "OpenAL error, code: ", err);
+        NX_DEBUG(NX_SCOPE_TAG, "OpenAL error, code %1", err);
     return strerr != NULL;
 }
 

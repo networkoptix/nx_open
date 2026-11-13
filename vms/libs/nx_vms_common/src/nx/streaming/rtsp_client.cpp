@@ -29,8 +29,8 @@ extern "C" {
 #include <nx/streaming/rtsp_client.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/std_string_utils.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/utils/std_string_utils.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/auth/time_based_nonce_provider.h>
 #include <rtsp/srtp_encryptor.h>
@@ -301,8 +301,9 @@ void QnRtspIoDevice::processRtcpData()
             {
                 if (!m_udpSockets.rtcpSocket->setDestAddr(senderEndpoint))
                 {
-                    qWarning() << "QnRtspIoDevice::processRtcpData(): setDestAddr() failed: "
-                               << SystemError::getLastOSErrorText().c_str();
+                    NX_WARNING(this,
+                        "Cannot set the RTCP destination address: %1",
+                        SystemError::getLastOSErrorText());
                 }
             }
             if (m_srtpDecryptor)
@@ -334,8 +335,9 @@ void QnRtspIoDevice::processRtcpData()
             auto remoteEndpoint = nx::network::SocketAddress(m_hostAddress, m_remoteRtcpPort);
             if (!m_udpSockets.rtcpSocket->setDestAddr(remoteEndpoint))
             {
-                qWarning() << "RTPIODevice::processRtcpData(): setDestAddr() failed: "
-                           << SystemError::getLastOSErrorText().c_str();
+                NX_WARNING(this,
+                    "Cannot set the RTCP destination address: %1",
+                    SystemError::getLastOSErrorText());
             }
             sendRtcpReport();
 

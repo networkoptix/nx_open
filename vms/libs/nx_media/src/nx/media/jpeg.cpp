@@ -2,14 +2,15 @@
 
 #include "jpeg.h"
 
+#include <nx/utils/log/log.h>
+
 #if defined(Q_OS_IOS) || defined(Q_OS_ANDROID)
-#define USE_LIBJPEG
+    #define USE_LIBJPEG
 #endif
 
 #ifdef USE_LIBJPEG
-#include <jpeglib.h>
-#include <setjmp.h>
-#include <QtCore/QDebug>
+    #include <jpeglib.h>
+    #include <setjmp.h>
 #endif
 
 #ifdef USE_LIBJPEG
@@ -33,7 +34,7 @@ namespace
 
         char message[JMSG_LENGTH_MAX];
         (*cinfo->err->format_message)(cinfo, message);
-        qWarning() << message;
+        NX_WARNING(NX_SCOPE_TAG, "Cannot decode the JPEG image: %1", message);
 
         longjmp(err->setjmp_buffer, 1);
     }

@@ -8,8 +8,10 @@
 
 #include "messaging.h"
 
-#include <QtCore/QElapsedTimer>
 #include <QDateTime>
+#include <QtCore/QElapsedTimer>
+
+#include <nx/utils/log/log.h>
 
 static const quint32 LIFETIME = 1 * 60 * 60;
 static const int RESPONSE_WAIT = 1000;
@@ -91,8 +93,9 @@ bool Router::parseMapResponse(const QByteArray& response, Mapping& mapping)
     if (header.opcode != Opcode::MAP) return false;
     if (header.resultCode != ResultCode::SUCCESS)
     {
-        qDebug() << "Router::parseMapResponse: resultCode ="
-                 << static_cast<int>(header.resultCode);
+        NX_DEBUG(NX_SCOPE_TAG,
+            "Cannot map the port, result code %1",
+            static_cast<int>(header.resultCode));
         return true;
     }
 

@@ -1126,8 +1126,9 @@ void MessageBus::sendTransactionImpl(
         }
         break;
     default:
-        qWarning() << "Client has requested data in an unsupported format"
-            << connection->remotePeer().dataFormat;
+        NX_WARNING(this,
+            "The client has requested data in an unsupported format %1",
+            connection->remotePeer().dataFormat);
         break;
     }
 }

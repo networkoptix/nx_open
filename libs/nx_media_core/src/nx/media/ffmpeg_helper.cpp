@@ -3,14 +3,13 @@
 #include "ffmpeg_helper.h"
 
 #include <QtCore/QBuffer>
-#include <QtCore/QDebug>
 
 #include <nx/codec/h265/extradata.h>
+#include <nx/codec/jpeg/jpeg_utils.h>
 #include <nx/codec/nal_units.h>
 #include <nx/media/audio/format.h>
 #include <nx/media/av_codec_helper.h>
 #include <nx/media/codec_parameters.h>
-#include <nx/codec/jpeg/jpeg_utils.h>
 #include <nx/media/h264_utils.h>
 #include <nx/media/utils.h>
 #include <nx/media/video_data_packet.h>

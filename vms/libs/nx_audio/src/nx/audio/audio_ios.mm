@@ -4,8 +4,6 @@
 
 #include <AVFAudio/AVFAudio.h>
 
-#include <QDebug>
-
 namespace nx::audio {
 
 void setupAudio()

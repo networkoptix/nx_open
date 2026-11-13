@@ -129,7 +129,7 @@ HRESULT ScreenGrabber::InitD3D(HWND hWnd)
                 &d3dpp,
                 &m_pd3dDevice)))
         {
-            qWarning() << "Unable to Create Device";
+            NX_WARNING(this, "Cannot create the Direct3D device");
             return E_FAIL;
         }
         m_pSurface.resize(m_poolSize);
@@ -142,7 +142,7 @@ HRESULT ScreenGrabber::InitD3D(HWND hWnd)
                     &m_pSurface[i],
                     nullptr)))
             {
-                qWarning() << "Unable to Create Surface";
+                NX_WARNING(this, "Cannot create the Direct3D surface");
                 return E_FAIL;
             }
         }
@@ -570,7 +570,7 @@ bool ScreenGrabber::direct3DDataToFrame(void* opaque, AVFrame* pFrame)
     if (FAILED(pSurface->LockRect(
             &lockedRect, 0, D3DLOCK_NO_DIRTY_UPDATE | D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY)))
     {
-        qWarning() << "Unable to Lock Front Buffer Surface";
+        NX_WARNING(this, "Cannot lock the front buffer surface");
         return false;
     }
 

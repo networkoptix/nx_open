@@ -10,6 +10,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/reflect/json.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/url.h>
 
 namespace {
@@ -205,7 +206,7 @@ void QnEmailAddress::initSmtpPresets() const
         return;
 
     if (!QJson::deserialize(file.readAll(), &smtpServerPresetPresets))
-        qWarning() << "Smtp Presets file could not be parsed!";
+        NX_WARNING(this, "Cannot parse the SMTP presets file");
     smtpInitialized = true;
 }
 

@@ -63,7 +63,7 @@ void FfmpegAudioDecoderPrivate::initContext(
     }
     if (avcodec_open2(codecContext, codec, nullptr) < 0)
     {
-        qWarning() << "Can't open decoder for codec" << frame->compressionType;
+        NX_WARNING(this, "Cannot open the decoder for codec %1", frame->compressionType);
         avcodec_free_context(&codecContext);
     }
 

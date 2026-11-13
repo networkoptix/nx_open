@@ -7,20 +7,22 @@
 #include "multicast_http_transport.h"
 
 #ifdef Q_OS_LINUX
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/socket.h>
+    #include <errno.h>
+    #include <sys/socket.h>
+    #include <sys/types.h>
 #endif
 
 #include <QtNetwork/QNetworkInterface>
 
 #ifdef _WIN32
-#include <ws2tcpip.h>
+    #include <ws2tcpip.h>
 #endif
 
 #include <nx/network/nettools.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/system_error.h>
 
 namespace QnMulticast
 {
@@ -46,31 +48,6 @@ static char EMPTY_DATA_FILLER = '\x0';
 
 static const int INTERFACE_LIST_CHECK_INTERVAL = 1000 * 15;
 
-namespace SystemError
-{
-#ifdef _WIN32
-    typedef DWORD ErrorCode;
-#else
-    typedef int ErrorCode;
-#endif
-
-#ifdef _WIN32
-    static const ErrorCode wouldBlock = WSAEWOULDBLOCK;
-#else
-    static const ErrorCode wouldBlock = EWOULDBLOCK;
-#endif
-
-    ErrorCode getLastOSErrorCode()
-    {
-#ifdef _WIN32
-        return GetLastError();
-#else
-        //EAGAIN and EWOULDBLOCK are usually same, but not always
-        return errno == EAGAIN ? EWOULDBLOCK : errno;
-#endif
-    }
-}
-
 // --------- UDP / Multicast routines -----------------
 
 bool setRecvBufferSize(int fd, unsigned int buff_size )
@@ -87,8 +64,11 @@ static bool joinMulticastGroup(int fd, const QString &multicastGroup, const QStr
     if( setsockopt( fd, IPPROTO_IP, IP_ADD_MEMBERSHIP,
         (const char *) &multicastRequest,
         sizeof(multicastRequest)) < 0) {
-            qWarning() << "failed to join multicast group" << multicastGroup << "from IF" << multicastIF;
-            return false;
+        NX_WARNING(NX_SCOPE_TAG,
+            "Cannot join the multicast group %1 on the interface %2",
+            multicastGroup,
+            multicastIF);
+        return false;
     }
     return true;
 }
@@ -102,8 +82,11 @@ bool leaveMulticastGroup(int fd, const QString &multicastGroup, const QString& m
     if( setsockopt( fd, IPPROTO_IP, IP_DROP_MEMBERSHIP,
         (const char *) &multicastRequest,
         sizeof(multicastRequest)) < 0) {
-            qWarning() << "failed to leave multicast group" << multicastGroup << "from IF" << multicastIF;
-            return false;
+        NX_WARNING(NX_SCOPE_TAG,
+            "Cannot leave the multicast group %1 on the interface %2",
+            multicastGroup,
+            multicastIF);
+        return false;
     }
     return true;
 }
@@ -114,7 +97,7 @@ bool setMulticastIF(int fd, const QString& multicastIF)
     localInterface.s_addr = inet_addr(multicastIF.toLatin1().data());
     if( setsockopt( fd, IPPROTO_IP, IP_MULTICAST_IF, (const char *)&localInterface, sizeof( localInterface ) ) < 0 )
     {
-        qWarning() << "IP_MULTICAST_IF set failed for iface " << multicastIF;
+        NX_WARNING(NX_SCOPE_TAG, "Cannot set IP_MULTICAST_IF for the interface %1", multicastIF);
         return false;
     }
     return true;
@@ -220,7 +203,7 @@ void Transport::initSockets(const QSet<QString>& addrList)
     // receive socket is initialized once. It doesn't require to recreate it if interfaces will be changed
     m_recvSocket.reset(new QUdpSocket());
     if (!m_recvSocket->bind(QHostAddress::AnyIPv4, MULTICAST_PORT, QAbstractSocket::ReuseAddressHint))
-        qWarning() << "Failed to open Multicast Http receive socket";
+        NX_WARNING(this, "Cannot open the multicast HTTP receive socket");
     setRecvBufferSize(m_recvSocket->socketDescriptor(), SOCKET_RECV_BUFFER_SIZE);
     connect(m_recvSocket.get(), &QUdpSocket::readyRead, this, &Transport::at_socketReadyRead);
 
@@ -234,7 +217,7 @@ void Transport::initSockets(const QSet<QString>& addrList)
 
         auto sendSocket = std::shared_ptr<QUdpSocket>(new QUdpSocket());
         if (!sendSocket->bind(QHostAddress(ipv4Addr))) {
-            qWarning() << "Failed to open Multicast Http send socket";
+            NX_WARNING(this, "Cannot open the multicast HTTP send socket");
             continue;
         }
 

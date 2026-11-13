@@ -219,12 +219,6 @@ int VC1SequenceHeader::decode_sequence_header_adv()
     finterpflag = bitReader.getBit();
     bitReader.skipBit();
     psf = bitReader.getBit();
-    /*
-    if(psf) { //PsF, 6.1.13
-        qWarning() << "Progressive Segmented Frame mode: not supported (yet)";
-        return UNSUPPORTED_PARAM;
-    }
-    */
     max_b_frames = 7;
     if(bitReader.getBit()) { //Display Info - decoding is not affected by it
         int w, h, ar = 0;

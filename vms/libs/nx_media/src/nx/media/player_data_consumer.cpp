@@ -477,7 +477,7 @@ bool PlayerDataConsumer::processAudioFrame(const QnCompressedAudioDataPtr& data)
 
     if (!m_audioDecoder->decode(data, m_speed))
     {
-        qWarning() << Q_FUNC_INFO << "Can't decode audio frame. Frame is skipped.";
+        NX_WARNING(this, "Cannot decode the audio frame, skipping it");
         return true; // False result means we want to repeat this frame later.
     }
 

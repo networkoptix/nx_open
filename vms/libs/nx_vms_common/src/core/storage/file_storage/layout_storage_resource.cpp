@@ -496,18 +496,18 @@ nx::Mutex& QnLayoutFileStorageResource::streamMutex()
 // The one who requests to remove this function will become a permanent maintainer of this class.
 void QnLayoutFileStorageResource::dumpStructure()
 {
-    qDebug() << "Dumping: " << getUrl();
+    NX_DEBUG(this, "Dumping %1", getUrl());
 
     if (m_info.entries.size() == 0)
     {
-        qDebug() << "No entries in the layout file";
+        NX_DEBUG(this, "No entries in the layout file");
         return;
     }
 
     QFile file(getUrl());
     if (!file.open(QIODevice::ReadOnly))
     {
-        qDebug() << "Cannot open file: " << getUrl();
+        NX_DEBUG(this, "Cannot open the file %1", getUrl());
         return;
     }
 
@@ -517,9 +517,12 @@ void QnLayoutFileStorageResource::dumpStructure()
         file.seek(m_info.entries[i].offset);
         const int readBytes = file.read(tmpBuffer, sizeof(tmpBuffer));
         QByteArray actualFileName(tmpBuffer, readBytes);
-        qDebug() << "Entry" << i << QString(actualFileName)
-            << "size:" << Qt::hex << m_info.entries[i + 1].offset - m_info.entries[i].offset
-            << "adjusted:" << Qt::hex << m_info.entries[i + 1].offset - m_info.entries[i].offset -
-            strlen(actualFileName.data()) - 1;
+        const auto size = m_info.entries[i + 1].offset - m_info.entries[i].offset;
+        NX_DEBUG(this,
+            "Entry %1 %2 size: %3 adjusted: %4",
+            i,
+            QString(actualFileName),
+            QString::number(size, 16),
+            QString::number(size - strlen(actualFileName.data()) - 1, 16));
     }
 }

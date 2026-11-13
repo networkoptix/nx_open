@@ -2,7 +2,7 @@
 
 #include "scoped_timer.h"
 
-#include <QtCore/QDebug>
+#include <nx/utils/log/log.h>
 
 QnScopedTimer::QnScopedTimer(const QString &description, qint64 detailMs)
     : m_description(description)
@@ -41,7 +41,7 @@ void QnScopedTimer::logMessage(const char *tag, qint64 time)
         return;
 
     if (time >= 0)
-        qDebug() << "[" << tag << m_description << "]:" << time << "ms";
+        NX_DEBUG(this, "[%1 %2]: %3 ms", tag, m_description, time);
     else
-        qDebug() << "[" << tag << m_description << "]";
+        NX_DEBUG(this, "[%1 %2]", tag, m_description);
 }

@@ -6,6 +6,7 @@
 #include <core/resource/storage_resource.h>
 #include <nx/media/config.h>
 #include <nx/media/video_data_packet.h>
+#include <nx/utils/log/log.h>
 #include <nx/vms/common/application_context.h>
 #include <utils/common/synctime.h>
 
@@ -70,7 +71,7 @@ void QnSingleShotFileStreamreader::run()
     try {
         data = getNextData();
     } catch(...) {
-        qWarning() << "Application out of memory";
+        NX_WARNING(this, "Out of memory while reading the file");
     }
     if (data)
         putData(std::move(data));

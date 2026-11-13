@@ -677,8 +677,10 @@ bool QnTCPConnectionProcessor::readSingleRequest()
             }
             else
             {
-                qWarning() << "Too large HTTP client request (" << d->currentRequestSize << " bytes"
-                    ", " << maxTcpRequestSize << " allowed). Ignoring...";
+                NX_WARNING(this,
+                    "Too large HTTP client request: %1 bytes, %2 allowed, ignoring",
+                    d->currentRequestSize,
+                    maxTcpRequestSize);
                 return false;
             }
         }
