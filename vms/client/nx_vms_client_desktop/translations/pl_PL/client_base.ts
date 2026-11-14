@@ -33,6 +33,13 @@
     </message>
   </context>
   <context>
+    <name>AnalyticsActionsHelper</name>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>Nie udało się uruchomić akcji wtyczki</translation>
+    </message>
+  </context>
+  <context>
     <name>AnalyticsSearchWidget::Private</name>
     <message>
       <source>Any type</source>
@@ -514,6 +521,10 @@
     <message>
       <source>Rename</source>
       <translation>Zmień nazwę</translation>
+    </message>
+    <message>
+      <source>Object Actions</source>
+      <translation type="unfinished">Object Actions</translation>
     </message>
     <message>
       <source>Delete from Disk</source>
@@ -11737,10 +11748,6 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     <message>
       <source>No available archive</source>
       <translation>Brak dostępnego archiwum</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>Nie udało się uruchomić akcji wtyczki</translation>
     </message>
     <message>
       <source>Name</source>

@@ -33,6 +33,13 @@
     </message>
   </context>
   <context>
+    <name>AnalyticsActionsHelper</name>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>Không thể thực thi plugin</translation>
+    </message>
+  </context>
+  <context>
     <name>AnalyticsSearchWidget::Private</name>
     <message>
       <source>Any type</source>
@@ -505,6 +512,10 @@
     <message>
       <source>Rename</source>
       <translation>Đổi tên</translation>
+    </message>
+    <message>
+      <source>Object Actions</source>
+      <translation type="unfinished">Object Actions</translation>
     </message>
     <message>
       <source>Delete from Disk</source>
@@ -11244,10 +11255,6 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     <message>
       <source>No available archive</source>
       <translation>Không có lưu trữ có sẵn</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>Không thể thực thi plugin</translation>
     </message>
     <message>
       <source>Name</source>

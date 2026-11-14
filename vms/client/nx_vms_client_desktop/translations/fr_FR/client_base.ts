@@ -33,6 +33,13 @@
     </message>
   </context>
   <context>
+    <name>AnalyticsActionsHelper</name>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>Impossible d'exécuter l'action du plugin</translation>
+    </message>
+  </context>
+  <context>
     <name>AnalyticsSearchWidget::Private</name>
     <message>
       <source>Any type</source>
@@ -508,6 +515,10 @@
     <message>
       <source>Rename</source>
       <translation>Renommer</translation>
+    </message>
+    <message>
+      <source>Object Actions</source>
+      <translation type="unfinished">Object Actions</translation>
     </message>
     <message>
       <source>Delete from Disk</source>
@@ -11409,10 +11420,6 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
     <message>
       <source>No available archive</source>
       <translation>Aucune archive disponible</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>Impossible d'exécuter l'action du plugin</translation>
     </message>
     <message>
       <source>Name</source>

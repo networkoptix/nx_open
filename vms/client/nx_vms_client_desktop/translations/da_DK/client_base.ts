@@ -33,6 +33,13 @@
     </message>
   </context>
   <context>
+    <name>AnalyticsActionsHelper</name>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>Kunne ikke udføre plugin-handling</translation>
+    </message>
+  </context>
+  <context>
     <name>AnalyticsSearchWidget::Private</name>
     <message>
       <source>Any type</source>
@@ -508,6 +515,10 @@
     <message>
       <source>Rename</source>
       <translation>Omdøb</translation>
+    </message>
+    <message>
+      <source>Object Actions</source>
+      <translation type="unfinished">Object Actions</translation>
     </message>
     <message>
       <source>Delete from Disk</source>
@@ -11408,10 +11419,6 @@ Pin ikke dette certifikat, hvis du ikke har ændret %2 Serverens SSL certifikat.
     <message>
       <source>No available archive</source>
       <translation>Intet tilgængeligt arkiv</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>Kunne ikke udføre plugin-handling</translation>
     </message>
     <message>
       <source>Name</source>

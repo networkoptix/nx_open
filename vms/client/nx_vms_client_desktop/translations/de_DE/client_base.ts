@@ -33,6 +33,13 @@
     </message>
   </context>
   <context>
+    <name>AnalyticsActionsHelper</name>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>Pluginaktion konnte nicht ausgeführt werden</translation>
+    </message>
+  </context>
+  <context>
     <name>AnalyticsSearchWidget::Private</name>
     <message>
       <source>Any type</source>
@@ -508,6 +515,10 @@
     <message>
       <source>Rename</source>
       <translation>Umbenennen</translation>
+    </message>
+    <message>
+      <source>Object Actions</source>
+      <translation type="unfinished">Object Actions</translation>
     </message>
     <message>
       <source>Delete from Disk</source>
@@ -11409,10 +11420,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>No available archive</source>
       <translation>Kein verfügbares Archiv</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>Pluginaktion konnte nicht ausgeführt werden</translation>
     </message>
     <message>
       <source>Name</source>

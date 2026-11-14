@@ -33,6 +33,13 @@
     </message>
   </context>
   <context>
+    <name>AnalyticsActionsHelper</name>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>Fallou a execución da acción do complemento</translation>
+    </message>
+  </context>
+  <context>
     <name>AnalyticsSearchWidget::Private</name>
     <message>
       <source>Any type</source>
@@ -508,6 +515,10 @@
     <message>
       <source>Rename</source>
       <translation>Renomear</translation>
+    </message>
+    <message>
+      <source>Object Actions</source>
+      <translation type="unfinished">Object Actions</translation>
     </message>
     <message>
       <source>Delete from Disk</source>
@@ -11409,10 +11420,6 @@ Non fixes este certificado se non modificaches o Certificado SSL do servidor %2.
     <message>
       <source>No available archive</source>
       <translation>Non hai ningún arquivo dispoñible</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>Fallou a execución da acción do complemento</translation>
     </message>
     <message>
       <source>Name</source>

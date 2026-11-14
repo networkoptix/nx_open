@@ -33,6 +33,13 @@
     </message>
   </context>
   <context>
+    <name>AnalyticsActionsHelper</name>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>Gagal menjalankan aksi plugin</translation>
+    </message>
+  </context>
+  <context>
     <name>AnalyticsSearchWidget::Private</name>
     <message>
       <source>Any type</source>
@@ -505,6 +512,10 @@
     <message>
       <source>Rename</source>
       <translation>Ganti nama</translation>
+    </message>
+    <message>
+      <source>Object Actions</source>
+      <translation type="unfinished">Object Actions</translation>
     </message>
     <message>
       <source>Delete from Disk</source>
@@ -11244,10 +11255,6 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <message>
       <source>No available archive</source>
       <translation>Tidak ada archive yang tersedia</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>Gagal menjalankan aksi plugin</translation>
     </message>
     <message>
       <source>Name</source>

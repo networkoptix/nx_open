@@ -33,6 +33,13 @@
     </message>
   </context>
   <context>
+    <name>AnalyticsActionsHelper</name>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>플러그인 작업을 실행하는데 실패했습니다</translation>
+    </message>
+  </context>
+  <context>
     <name>AnalyticsSearchWidget::Private</name>
     <message>
       <source>Any type</source>
@@ -505,6 +512,10 @@
     <message>
       <source>Rename</source>
       <translation>이름 바꾸기</translation>
+    </message>
+    <message>
+      <source>Object Actions</source>
+      <translation type="unfinished">Object Actions</translation>
     </message>
     <message>
       <source>Delete from Disk</source>
@@ -11244,10 +11255,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>No available archive</source>
       <translation>사용 가능한 아카이브가 없습니다.</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>플러그인 작업을 실행하는데 실패했습니다</translation>
     </message>
     <message>
       <source>Name</source>
