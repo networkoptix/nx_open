@@ -33,6 +33,13 @@
     </message>
 </context>
 <context>
+    <name>AnalyticsActionsHelper</name>
+    <message>
+        <source>Failed to execute plugin action</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AnalyticsSearchWidget::Private</name>
     <message>
         <source>Any type</source>
@@ -508,6 +515,10 @@
     <message>
         <source>Rename</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Object Actions</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Delete from Disk</source>
@@ -11392,10 +11403,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::TileInteractionHandler</name>
     <message>
         <source>No available archive</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Failed to execute plugin action</source>
         <translation></translation>
     </message>
     <message>
