@@ -24,6 +24,19 @@ AdaptiveSheet
 
     signal unavailableAction()
 
+    // Whether any of the action buttons is being pressed. A binding calling it is re-evaluated on
+    // count changes: the buttons model adds and removes buttons one by one.
+    function actionInProgress()
+    {
+        for (let i = 0; i < actionButtons.count; ++i)
+        {
+            if (actionButtons.objectAt(i)?.down)
+                return true
+        }
+
+        return false
+    }
+
     title: qsTr("Actions")
 
     onResourceChanged: hintControl.hide()

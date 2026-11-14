@@ -717,7 +717,7 @@ Page
         hasActionButton: actionSheet.hasActions
         controlsVisibilityOverride:
         {
-            if (menu.opened)
+            if (menu.opened || (actionSheet.externalMode && actionSheet.actionInProgress()))
                 return FullscreenControlsOverlay.ForceControlsVisible
 
             if (calendarPanel.opened || actionSheet.opened)
