@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include <future>
+#include <map>
 #include <ranges>
 #include <string_view>
 
@@ -56,6 +57,10 @@ public:
     {
     }
 
+    // What a camera changing codec mid-stream does to the media the session reads from here.
+    void setVideoCodec(AVCodecID codec) { m_video = makeVideoParameters(codec); }
+    void setAudioCodec(AVCodecID codec) { m_audio = makeAudioParameters(codec); }
+
     bool canAcceptData() const override { return true; }
     void putData(const QnAbstractDataPacketPtr&) override {}
     void clearUnprocessedData() override {}
@@ -84,8 +89,8 @@ public:
 
 private:
     const QnVirtualCameraResourcePtr m_camera;
-    const CodecParametersConstPtr m_video;
-    const CodecParametersConstPtr m_audio;
+    CodecParametersConstPtr m_video;
+    CodecParametersConstPtr m_audio;
 };
 
 // The space-separated values of every SDP line starting with `prefix`, in order.
@@ -153,11 +158,13 @@ constexpr auto kFingerprint =
     "00:01:02:03:04:05:06:07:08:09:0A:0B:0C:0D:0E:0F:"
     "10:11:12:13:14:15:16:17:18:19:1A:1B:1C:1D:1E:1F";
 
-// An answer that carries every m-line of `mids` but takes only those of `bundledMids`. Nothing
-// but the BUNDLE group and the a=mid lines is read out of an answer, see SdpParseResult::parse(),
-// so the m-lines here say nothing else about themselves.
-std::string makeAnswer(
-    const std::vector<std::string>& mids, const std::vector<std::string>& bundledMids)
+// An answer that carries every m-line of `mids` but takes only those of `bundledMids`, with the
+// format list `formats` gives for a mid, if any. Nothing but the BUNDLE group, the a=mid lines
+// and those formats is read out of an answer, see SdpParseResult::parse(), so the m-lines here
+// say nothing else about themselves.
+std::string makeAnswer(const std::vector<std::string>& mids,
+    const std::vector<std::string>& bundledMids,
+    const std::map<std::string, std::string>& formats = {})
 {
     std::string answer = "v=0\r\no=- 0 0 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\n";
     answer += std::string(kFingerprint) + "\r\n";
@@ -168,7 +175,12 @@ std::string makeAnswer(
     answer += "\r\n";
 
     for (const auto& mid: mids)
-        answer += "m=application 9 UDP/DTLS/SCTP webrtc-datachannel\r\na=mid:" + mid + "\r\n";
+    {
+        const auto format = formats.find(mid);
+        answer += "m=application 9 UDP/DTLS/SCTP "
+            + (format == formats.end() ? "webrtc-datachannel"s : format->second)
+            + "\r\na=mid:" + mid + "\r\n";
+    }
 
     return answer;
 }
@@ -193,9 +205,17 @@ protected:
                     return std::make_shared<Device>(m_b, AV_CODEC_ID_MJPEG);
 
                 if (m_d->getId() == id)
-                    return std::make_shared<Device>(m_d, AV_CODEC_ID_VP8, AV_CODEC_ID_PCM_MULAW);
+                {
+                    auto device =
+                        std::make_shared<Device>(m_d, AV_CODEC_ID_VP8, AV_CODEC_ID_PCM_MULAW);
+                    m_lastDevice = device.get();
+                    return device;
+                }
 
-                return std::make_shared<Device>(m_c->getId() == id ? m_c : m_a, AV_CODEC_ID_VP8);
+                auto device =
+                    std::make_shared<Device>(m_c->getId() == id ? m_c : m_a, m_videoCodec);
+                m_lastDevice = device.get();
+                return device;
             },
             Session::generateLocalUfrag(),
             nx::network::SocketAddress("127.0.0.1", 7001),
@@ -220,6 +240,11 @@ protected:
     const QnVirtualCameraResourcePtr m_b = QnResourcePoolTestHelper::createCamera();
     const QnVirtualCameraResourcePtr m_c = QnResourcePoolTestHelper::createCamera();
     const QnVirtualCameraResourcePtr m_d = QnResourcePoolTestHelper::createCamera();
+    // The codec of Devices `a` and `c`, to be set before the Device is created.
+    AVCodecID m_videoCodec = AV_CODEC_ID_VP8;
+    // The last of them created, so that a test can change what its media carries. The session
+    // owns it and outlives every use of this.
+    Device* m_lastDevice = nullptr;
     std::unique_ptr<Session> m_session;
 };
 
@@ -485,10 +510,9 @@ TEST_F(WebRtcSession, BundleTagWithoutTracksIsTheDataChannel)
 
 // Given: a Device with a video and an audio track, both taken into the BUNDLE group.
 // When: the offer is built.
-// Expect: the tag alone carries the address:port of the group, every other bundled m-line is
-//     `bundle-only` on port 0 (RFC 8843 section 7.5). The candidates name the tag, so it has to
-//     be the m-line that actually holds the transport.
-TEST_F(WebRtcSession, OnlyTheBundleTagCarriesThePort)
+// Expect: the tag is the only bundled m-line that is not `bundle-only` (RFC 8843 section 7.5).
+//     The candidates name the tag, so it has to be the m-line that holds the transport.
+TEST_F(WebRtcSession, OnlyTheBundleTagIsNotBundleOnly)
 {
     ASSERT_TRUE(m_session->createProvider(m_d->getId(), std::nullopt, {}, std::nullopt));
 
@@ -575,6 +599,156 @@ TEST_F(WebRtcSession, CommandForUnknownDevice)
         ASSERT_EQ(result.wait_for(10s), std::future_status::ready);
         EXPECT_EQ(result.get(), std::pair(unknown, Consumer::nodata));
     }
+}
+
+// Given: a Device streaming H.264.
+// When: the offer is built.
+// Expect: its m-line offers every other video codec beside it, each under a payload type of its
+//     own and with feedback of its own, so that the Device can switch to one without a new
+//     offer. The audio m-line of a Device offers the other audio codecs the same way.
+TEST_F(WebRtcSession, VideoMLineOffersEveryCodec)
+{
+    m_videoCodec = AV_CODEC_ID_H264;
+    ASSERT_TRUE(m_session->createProvider(m_a->getId(), std::nullopt, {}, std::nullopt));
+
+    const std::string offer = m_session->constructSdp();
+    EXPECT_NE(offer.find(" UDP/TLS/RTP/SAVPF 96 101 102 100\r\n"), std::string::npos) << offer;
+    EXPECT_NE(offer.find("a=rtpmap:100 H265/90000\r\n"), std::string::npos) << offer;
+    EXPECT_NE(offer.find("a=rtpmap:101 VP8/90000\r\n"), std::string::npos) << offer;
+    EXPECT_NE(offer.find("a=rtpmap:102 VP9/90000\r\n"), std::string::npos) << offer;
+    EXPECT_NE(offer.find("a=rtcp-fb:96 nack\r\n"), std::string::npos) << offer;
+    EXPECT_NE(offer.find("a=rtcp-fb:100 nack\r\n"), std::string::npos) << offer;
+}
+
+// Given: a Device streaming H.264 on an m-line the client took both codecs of, which then
+//     switches to H.265.
+// When: the switch is made.
+// Expect: it goes through, and the client is told nothing: the m-line, its mid and its ssrc are
+//     the ones it already knows, and only the payload type of the packets changes.
+TEST_F(WebRtcSession, VideoCodecSwitchKeepsTheTrack)
+{
+    m_videoCodec = AV_CODEC_ID_H264;
+    ASSERT_TRUE(m_session->createProvider(m_a->getId(), std::nullopt, {}, std::nullopt));
+    const auto mids = valuesOf(m_session->constructSdp(), "a=mid:");
+    ASSERT_EQ(mids, (std::vector<std::string>{"0", "128"}));
+    ASSERT_TRUE(m_session->processSdpAnswer(makeAnswer(mids, mids, {{"0", "96 100"}})));
+
+    const Track* track = m_session->tracks()->videoTrack(m_a->getId());
+    ASSERT_TRUE(track);
+    const auto ssrc = track->ssrc;
+    const auto mid = track->mid;
+
+    ASSERT_TRUE(m_lastDevice);
+    m_lastDevice->setVideoCodec(AV_CODEC_ID_H265);
+    ASSERT_EQ(
+        m_session->switchCodec(m_a->getId(), QnAbstractMediaData::VIDEO), CodecSwitchResult::done);
+
+    EXPECT_EQ(track->ssrc, ssrc);
+    EXPECT_EQ(track->mid, mid);
+    EXPECT_EQ(track->payloadType, 100);
+}
+
+// Given: the same Device, on an m-line the client took only H.264 of -- what a browser without
+//     H.265 answers.
+// When: it switches to H.265.
+// Expect: the switch is refused. No offer of ours can hand that client a codec it cannot decode,
+//     so the caller has nothing to renegotiate and has to stop the stream.
+TEST_F(WebRtcSession, VideoCodecSwitchToACodecTheClientRefused)
+{
+    m_videoCodec = AV_CODEC_ID_H264;
+    ASSERT_TRUE(m_session->createProvider(m_a->getId(), std::nullopt, {}, std::nullopt));
+    const auto mids = valuesOf(m_session->constructSdp(), "a=mid:");
+    ASSERT_TRUE(m_session->processSdpAnswer(makeAnswer(mids, mids, {{"0", "96"}})));
+
+    ASSERT_TRUE(m_lastDevice);
+    m_lastDevice->setVideoCodec(AV_CODEC_ID_H265);
+    EXPECT_EQ(m_session->switchCodec(m_a->getId(), QnAbstractMediaData::VIDEO),
+        CodecSwitchResult::notNegotiated);
+}
+
+// Given: a Device whose audio track streams G.711 mu-law on an m-line the client took every
+//     codec of.
+// When: its audio changes to A-law.
+// Expect: the switch goes through on the same ssrc. All three audio codecs here run at the same
+//     RTP clock rate, so one stream can carry any of them.
+TEST_F(WebRtcSession, AudioCodecSwitchKeepsTheTrack)
+{
+    ASSERT_TRUE(m_session->createProvider(m_d->getId(), std::nullopt, {}, std::nullopt));
+    const auto mids = valuesOf(m_session->constructSdp(), "a=mid:");
+    ASSERT_EQ(mids, (std::vector<std::string>{"0", "1", "128"}));
+    ASSERT_TRUE(m_session->processSdpAnswer(makeAnswer(mids, mids, {{"1", "0 8 9"}})));
+
+    const Track* track = m_session->tracks()->audioTrack(m_d->getId());
+    ASSERT_TRUE(track);
+    const auto ssrc = track->ssrc;
+
+    ASSERT_TRUE(m_lastDevice);
+    m_lastDevice->setAudioCodec(AV_CODEC_ID_PCM_ALAW);
+    ASSERT_EQ(
+        m_session->switchCodec(m_d->getId(), QnAbstractMediaData::AUDIO), CodecSwitchResult::done);
+
+    EXPECT_EQ(track->ssrc, ssrc);
+    EXPECT_EQ(track->payloadType, 8);
+}
+
+// Given: a Device streaming VP8, on an m-line that offers the other video codecs beside it.
+// When: the Device switches to H.264.
+// Expect: it goes out under the payload type the offer gave H.264. Sharing one number with VP8
+//     would leave the client decoding H.264 as VP8, which it accepted under that number.
+TEST_F(WebRtcSession, VideoCodecSwitchOffVp8)
+{
+    ASSERT_TRUE(m_session->createProvider(m_a->getId(), std::nullopt, {}, std::nullopt));
+    const std::string offer = m_session->constructSdp();
+    EXPECT_NE(offer.find("a=rtpmap:101 VP8/90000"), std::string::npos) << offer;
+    EXPECT_NE(offer.find("a=rtpmap:96 H264/90000"), std::string::npos) << offer;
+
+    const auto mids = valuesOf(offer, "a=mid:");
+    ASSERT_TRUE(m_session->processSdpAnswer(makeAnswer(mids, mids, {{"0", "101 96 100 102"}})));
+
+    const Track* track = m_session->tracks()->videoTrack(m_a->getId());
+    ASSERT_TRUE(track);
+    ASSERT_EQ(track->payloadType, 101);
+    EXPECT_TRUE(m_session->isStreamedCodecNegotiated(m_a->getId()));
+
+    ASSERT_TRUE(m_lastDevice);
+    m_lastDevice->setVideoCodec(AV_CODEC_ID_H264);
+    ASSERT_EQ(
+        m_session->switchCodec(m_a->getId(), QnAbstractMediaData::VIDEO), CodecSwitchResult::done);
+    EXPECT_EQ(track->payloadType, 96);
+}
+
+// Given: an answer that takes the video track but lists only codecs the Device is not streaming,
+//     as a browser built without H.264 does to an m-line that offers it next to VP8.
+// When: the Device is asked whether what it streams was negotiated.
+// Expect: no. The m-line was accepted, so nothing stops the session, yet every packet would go
+//     out under a payload type the client never took and the receiver would drop it unread.
+TEST_F(WebRtcSession, StreamedCodecLeftOutOfTheAnswer)
+{
+    ASSERT_TRUE(m_session->createProvider(m_a->getId(), std::nullopt, {}, std::nullopt));
+
+    const auto mids = valuesOf(m_session->constructSdp(), "a=mid:");
+    ASSERT_TRUE(m_session->processSdpAnswer(makeAnswer(mids, mids, {{"0", "96 100"}})));
+
+    const Track* track = m_session->tracks()->videoTrack(m_a->getId());
+    ASSERT_TRUE(track);
+    ASSERT_EQ(track->payloadType, 101); //< VP8, the one codec the answer leaves out.
+    EXPECT_FALSE(m_session->isStreamedCodecNegotiated(m_a->getId()));
+}
+
+// Given: a Device added mid-session, which streams before the client has answered the offer
+//     that carries its m-line.
+// When: it changes codec.
+// Expect: a reconnect rather than a refusal. What that m-line takes is not known yet, and a
+//     refusal stops the Device for good.
+TEST_F(WebRtcSession, CodecSwitchBeforeTheAnswer)
+{
+    ASSERT_TRUE(m_session->createProvider(m_a->getId(), std::nullopt, {}, std::nullopt));
+    (void) m_session->constructSdp();
+
+    ASSERT_TRUE(m_lastDevice);
+    m_lastDevice->setVideoCodec(AV_CODEC_ID_H264);
+    EXPECT_EQ(m_session->switchCodec(m_a->getId(), QnAbstractMediaData::VIDEO),
+        CodecSwitchResult::failed);
 }
 
 } // namespace

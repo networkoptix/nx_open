@@ -4,7 +4,6 @@
 
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/api/data/webrtc_tracker_settings.h>
-//#include <providers/live_stream_provider.h>
 #include <rtsp/rtp_universal_encoder.h>
 #include <rtsp/rtsp_ffmpeg_encoder.h>
 
@@ -15,6 +14,22 @@ class QnMediaServerModule;
 namespace nx::webrtc {
 
 class Session;
+
+/**
+ * The payload type a codec is offered under on a WebRTC m-line, or nullopt for a codec that has
+ * no number of its own. An m-line offers every codec its Device may switch to at once, so each
+ * of them needs a payload type the others don't use -- getPayloadType() gives H.264 and H.265
+ * the same one -- and the numbers have to be unique across the whole BUNDLE group (RFC 8843
+ * section 9.1), which the static payload types of the audio codecs satisfy on their own.
+ */
+NX_WEBRTC_API std::optional<int> rtpPayloadType(AVCodecID codecId);
+
+/**
+ * The rtpmap and fmtp lines offering `codecId` on an m-line that does not stream it (yet), so
+ * without anything that would have to come from the stream itself. Empty for a codec that is
+ * not offered this way.
+ */
+NX_WEBRTC_API QStringList alternativeCodecSdp(AVCodecID codecId, int payloadType);
 
 class NX_WEBRTC_API Transcoder
 {
@@ -55,6 +70,19 @@ public:
         QnUniversalRtpEncoder* rtpEncoder,
         nx::utils::ByteArray& buffer);
     bool isEof(nx::Uuid deviceId, QnUniversalRtpEncoder* rtpEncoder) const;
+
+    /**
+     * Takes the RTP state of one encoder of `deviceId` so that the encoder replacing it can go
+     * on streaming to the same receiver, and gives it to the new one once it is built. Only for
+     * a rebuild that keeps the SSRC of the track, see Session::switchCodec().
+     * NOTE: between the two calls the Device must packetize nothing: takeContinuity() leaves
+     * the old encoder without its SRTP context.
+     */
+    QnUniversalRtpEncoder::Continuity takeContinuity(
+        nx::Uuid deviceId, QnAbstractMediaData::DataType videoOrAudio);
+    void restoreContinuity(nx::Uuid deviceId,
+        QnAbstractMediaData::DataType videoOrAudio,
+        QnUniversalRtpEncoder::Continuity continuity);
     FfmpegMuxer::PacketTimestamp getLastTimestamps() const;
     int64_t getLastTimestampMs() const { return m_lastTimestampMs; } //< Required for reconnection.
 
