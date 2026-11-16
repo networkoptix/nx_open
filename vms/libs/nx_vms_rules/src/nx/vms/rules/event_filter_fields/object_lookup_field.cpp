@@ -2,15 +2,14 @@
 
 #include "object_lookup_field.h"
 
+#include <cstdint>
+#include <memory>
+#include <optional>
 #include <ranges>
 
 #include <analytics/db/text_search_utils.h>
-#include <api/common_message_processor.h>
 #include <nx/vms/common/lookup_lists/lookup_list_manager.h>
-#include <nx/vms/common/system_context.h>
 #include <nx/vms/rules/utils/openapi_doc.h>
-#include <nx_ec/abstract_ec_connection.h>
-#include <nx_ec/managers/abstract_lookup_list_manager.h>
 
 namespace nx::vms::rules {
 
@@ -70,6 +69,31 @@ bool checkForListEntries(
 
 } // namespace
 
+/** Prepared check data. Isn't changed after it's built. */
+struct ObjectLookupField::Cache
+{
+    bool match(const Attributes& attributes, ObjectLookupCheckType checkType) const
+    {
+        if (checkType == ObjectLookupCheckType::hasAttributes)
+            return matcher && matcher->matchAttributes(attributes);
+
+        if (!list)
+            return false;
+
+        const auto hasEntry = checkForListEntries(*list, attributes);
+        return checkType == ObjectLookupCheckType::inList ? hasEntry : !hasEntry;
+    }
+
+    /** Lookup List Manager revision the list was taken at. */
+    std::uint64_t revision = 0;
+
+    /** For the hasAttributes check type. Empty if the value isn't valid. */
+    std::optional<analytics::db::TextMatcher> matcher;
+
+    /** For the list check types. Empty if there's no such list. */
+    std::optional<api::LookupListData> list;
+};
+
 ObjectLookupField::ObjectLookupField(
     common::SystemContext* context,
     const FieldDescriptor* descriptor)
@@ -77,28 +101,6 @@ ObjectLookupField::ObjectLookupField(
     EventFilterField{descriptor},
     common::SystemContextAware{context}
 {
-    const auto messageProcessor = systemContext()->messageProcessor();
-    if (!messageProcessor)
-        return;
-
-    const auto connection = messageProcessor->connection();
-    if (!connection)
-        return;
-
-    connect(
-        connection->lookupListNotificationManager().get(),
-        &ec2::AbstractLookupListNotificationManager::addedOrUpdated,
-        this,
-        [this](const nx::vms::api::LookupListData& data)
-        {
-            onListChanged(data.id);
-        });
-
-    connect(
-        connection->lookupListNotificationManager().get(),
-        &ec2::AbstractLookupListNotificationManager::removed,
-        this,
-        &ObjectLookupField::onListChanged);
 }
 
 QString ObjectLookupField::value() const
@@ -111,8 +113,8 @@ void ObjectLookupField::setValue(const QString& value)
     if (m_value == value)
         return;
 
-    m_listOrMatcher.reset();
     m_value = value;
+    invalidateCache();
     emit valueChanged();
 }
 
@@ -126,59 +128,55 @@ void ObjectLookupField::setCheckType(ObjectLookupCheckType type)
     if (m_checkType == type)
         return;
 
-    m_listOrMatcher.reset();
     m_checkType = type;
+    invalidateCache();
     emit checkTypeChanged();
 }
 
 bool ObjectLookupField::match(const QVariant& eventValue) const
 {
-    if (!m_listOrMatcher.has_value())
-    {
-        if (m_checkType == ObjectLookupCheckType::hasAttributes)
-        {
-            if (!NX_ASSERT(m_value.isEmpty()
-                || !nx::Uuid::isUuidString(m_value), "Check type and value aren't compatible"))
-            {
-                return false;
-            }
-
-            analytics::db::TextMatcher textMatcher;
-            textMatcher.parse(value());
-
-            m_listOrMatcher = textMatcher;
-        }
-        else
-        {
-            if (!NX_ASSERT(nx::Uuid::isUuidString(m_value), "Check type and value aren't compatible"))
-                return false;
-
-            m_listOrMatcher = lookupListManager()->lookupList(nx::Uuid{m_value});
-        }
-    }
-
-    const auto attributes = eventValue.value<nx::common::metadata::Attributes>();
-    if (m_checkType == ObjectLookupCheckType::hasAttributes)
-    {
-        auto matcher = std::any_cast<analytics::db::TextMatcher&>(m_listOrMatcher);
-        return matcher.matchAttributes(attributes);
-    }
-
-    const auto& lookupListData = std::any_cast<api::LookupListData&>(m_listOrMatcher);
-    if (lookupListData.id.isNull())
-        return false;
-
-    const auto hasEntry = checkForListEntries(lookupListData, attributes);
-    return m_checkType == ObjectLookupCheckType::inList ? hasEntry : !hasEntry;
+    return prepareCache()->match(eventValue.value<Attributes>(), m_checkType);
 }
 
-void ObjectLookupField::onListChanged(Uuid id)
+std::shared_ptr<ObjectLookupField::Cache> ObjectLookupField::prepareCache() const
 {
-    if (m_checkType != ObjectLookupCheckType::hasAttributes)
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
+    // The attribute filter doesn't depend on the Lookup Lists.
+    if (m_cache && m_checkType == ObjectLookupCheckType::hasAttributes)
+        return m_cache;
+
+    // Read the revision before the list, so the cached list is at least as new as the revision.
+    const auto revision = lookupListManager()->revision();
+    if (m_cache && m_cache->revision == revision)
+        return m_cache;
+
+    auto cache = std::make_shared<Cache>();
+    cache->revision = revision;
+
+    if (m_checkType == ObjectLookupCheckType::hasAttributes)
     {
-        if (NX_ASSERT(nx::Uuid::isUuidString(m_value)) && nx::Uuid{m_value} == id)
-            m_listOrMatcher.reset();
+        if (NX_ASSERT(m_value.isEmpty() || !nx::Uuid::isUuidString(m_value),
+                "Check type and value aren't compatible"))
+        {
+            cache->matcher.emplace(m_value);
+        }
     }
+    else if (NX_ASSERT(nx::Uuid::isUuidString(m_value), "Check type and value aren't compatible"))
+    {
+        auto lookupList = lookupListManager()->lookupList(nx::Uuid{m_value});
+        if (!lookupList.id.isNull())
+            cache->list = std::move(lookupList);
+    }
+
+    m_cache = cache;
+    return cache;
+}
+
+void ObjectLookupField::invalidateCache()
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    m_cache.reset();
 }
 
 QJsonObject ObjectLookupField::openApiDescriptor(const QVariantMap&)

@@ -2,15 +2,54 @@
 
 #include "text_lookup_field.h"
 
-#include <api/common_message_processor.h>
+#include <cstdint>
+#include <optional>
+
 #include <nx/vms/common/lookup_lists/lookup_list_manager.h>
-#include <nx/vms/common/system_context.h>
 #include <nx/vms/event/helpers.h>
 #include <nx/vms/rules/utils/openapi_doc.h>
-#include <nx_ec/abstract_ec_connection.h>
-#include <nx_ec/managers/abstract_lookup_list_manager.h>
 
 namespace nx::vms::rules {
+
+namespace {
+
+bool isKeywordCheck(TextLookupCheckType checkType)
+{
+    return checkType == TextLookupCheckType::containsKeywords
+        || checkType == TextLookupCheckType::doesNotContainKeywords;
+}
+
+} // namespace
+
+/** Prepared check data. Isn't changed after it's built. */
+struct TextLookupField::Cache
+{
+    bool match(const QString& text, TextLookupCheckType checkType) const
+    {
+        if (!keywords)
+            return false;
+
+        switch (checkType)
+        {
+            case TextLookupCheckType::containsKeywords:
+                return keywords->empty() || nx::vms::event::checkForKeywords(text, *keywords);
+            case TextLookupCheckType::doesNotContainKeywords:
+                return keywords->empty() || !nx::vms::event::checkForKeywords(text, *keywords);
+            case TextLookupCheckType::inList:
+                return !keywords->empty() && nx::vms::event::checkForKeywords(text, *keywords);
+            case TextLookupCheckType::notInList:
+                return keywords->empty() || !nx::vms::event::checkForKeywords(text, *keywords);
+        }
+
+        return false;
+    }
+
+    /** Lookup List Manager revision the list was taken at. */
+    std::uint64_t revision = 0;
+
+    /** The keywords, or the list entry values. Empty if there's no such generic list. */
+    std::optional<QStringList> keywords;
+};
 
 TextLookupField::TextLookupField(
     common::SystemContext* context,
@@ -19,28 +58,6 @@ TextLookupField::TextLookupField(
     EventFilterField{descriptor},
     common::SystemContextAware{context}
 {
-    const auto messageProcessor = systemContext()->messageProcessor();
-    if (!messageProcessor)
-        return;
-
-    const auto connection = messageProcessor->connection();
-    if (!connection)
-        return;
-
-    connect(
-        connection->lookupListNotificationManager().get(),
-        &ec2::AbstractLookupListNotificationManager::addedOrUpdated,
-        this,
-        [this](const nx::vms::api::LookupListData& data)
-        {
-            onLookupListChanged(data.id);
-        });
-
-    connect(
-        connection->lookupListNotificationManager().get(),
-        &ec2::AbstractLookupListNotificationManager::removed,
-        this,
-        &TextLookupField::onLookupListChanged);
 }
 
 QString TextLookupField::value() const
@@ -53,8 +70,8 @@ void TextLookupField::setValue(const QString& value)
     if (m_value == value)
         return;
 
-    m_list.reset();
     m_value = value;
+    invalidateCache();
     emit valueChanged();
 }
 
@@ -68,64 +85,58 @@ void TextLookupField::setCheckType(TextLookupCheckType type)
     if (m_checkType == type)
         return;
 
-    m_list.reset();
     m_checkType = type;
+    invalidateCache();
     emit checkTypeChanged();
 }
 
 bool TextLookupField::match(const QVariant& eventValue) const
 {
-    if (!m_list.has_value())
-    {
-        if (m_checkType == TextLookupCheckType::containsKeywords
-            || m_checkType == TextLookupCheckType::doesNotContainKeywords)
-        {
-            m_list = nx::vms::event::splitOnPureKeywords(m_value);
-        }
-        else
-        {
-            if (!NX_ASSERT(nx::Uuid::isUuidString(m_value), "Check type and value aren't compatible"))
-                return false;
-
-            const auto lookupList = lookupListManager()->lookupList(nx::Uuid{m_value});
-            if (lookupList.id.isNull())
-                return false;
-
-            if (!NX_ASSERT(lookupList.objectTypeId.isEmpty(), "Supports only generic lists"))
-                return false;
-
-            m_list = QStringList{};
-            for (const auto& entry: lookupList.entries)
-                m_list->push_back(entry.begin()->second);
-        }
-    }
-
-    switch (m_checkType)
-    {
-        case TextLookupCheckType::containsKeywords:
-            return m_list->empty()
-                || nx::vms::event::checkForKeywords(eventValue.toString(), m_list.value());
-        case TextLookupCheckType::doesNotContainKeywords:
-            return m_list->empty()
-                || !nx::vms::event::checkForKeywords(eventValue.toString(), m_list.value());
-        case TextLookupCheckType::inList:
-            return !m_list->empty()
-                && nx::vms::event::checkForKeywords(eventValue.toString(), m_list.value());
-        case TextLookupCheckType::notInList:
-            return m_list->empty()
-                || !nx::vms::event::checkForKeywords(eventValue.toString(), m_list.value());
-    }
-
-    return false;
+    return prepareCache()->match(eventValue.toString(), m_checkType);
 }
 
-void TextLookupField::onLookupListChanged(Uuid id)
+std::shared_ptr<TextLookupField::Cache> TextLookupField::prepareCache() const
 {
-    if (m_checkType == TextLookupCheckType::inList || m_checkType == TextLookupCheckType::notInList)
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
+    // The keywords don't depend on the Lookup Lists.
+    if (m_cache && isKeywordCheck(m_checkType))
+        return m_cache;
+
+    // Read the revision before the list, so the cached list is at least as new as the revision.
+    const auto revision = lookupListManager()->revision();
+    if (m_cache && m_cache->revision == revision)
+        return m_cache;
+
+    auto cache = std::make_shared<Cache>();
+    cache->revision = revision;
+
+    if (isKeywordCheck(m_checkType))
     {
-        if (NX_ASSERT(nx::Uuid::isUuidString(m_value)) && nx::Uuid{m_value} == id)
-            m_list.reset();
+        cache->keywords = nx::vms::event::splitOnPureKeywords(m_value);
     }
+    else if (NX_ASSERT(nx::Uuid::isUuidString(m_value), "Check type and value aren't compatible"))
+    {
+        const auto lookupList = lookupListManager()->lookupList(nx::Uuid{m_value});
+        if (!lookupList.id.isNull()
+            && NX_ASSERT(lookupList.objectTypeId.isEmpty(), "Supports only generic lists"))
+        {
+            QStringList values;
+            for (const auto& entry: lookupList.entries)
+                values.push_back(entry.begin()->second);
+
+            cache->keywords = std::move(values);
+        }
+    }
+
+    m_cache = cache;
+    return cache;
+}
+
+void TextLookupField::invalidateCache()
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    m_cache.reset();
 }
 
 QJsonObject TextLookupField::openApiDescriptor(const QVariantMap&)

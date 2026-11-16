@@ -2,6 +2,8 @@
 
 #include "lookup_list_manager.h"
 
+#include <atomic>
+
 #include <nx/analytics/taxonomy/abstract_state.h>
 #include <nx/analytics/taxonomy/helpers.h>
 #include <nx/utils/thread/mutex.h>
@@ -13,6 +15,11 @@ struct LookupListManager::Private
     mutable nx::Mutex mutex;
     bool initialized = false;
     nx::vms::api::LookupListDataList data;
+
+    /** Must be incremented under the mutex, after the data is changed. */
+    std::atomic<std::uint64_t> revision{0};
+
+    void incrementRevision() { revision.fetch_add(1, std::memory_order_release); }
 };
 
 LookupListManager::LookupListManager(QObject* parent):
@@ -37,6 +44,7 @@ void LookupListManager::initialize(nx::vms::api::LookupListDataList initialData)
         NX_MUTEX_LOCKER lk(&d->mutex);
         d->data = std::move(initialData);
         d->initialized = true;
+        d->incrementRevision();
     }
     emit initialized();
 }
@@ -46,6 +54,12 @@ void LookupListManager::deinitialize()
     NX_MUTEX_LOCKER lk(&d->mutex);
     d->data.clear();
     d->initialized = false;
+    d->incrementRevision();
+}
+
+std::uint64_t LookupListManager::revision() const
+{
+    return d->revision.load(std::memory_order_acquire);
 }
 
 nx::vms::api::LookupListData LookupListManager::lookupList(const nx::Uuid& id) const
@@ -84,6 +98,8 @@ void LookupListManager::addOrUpdate(nx::vms::api::LookupListData list)
             *iter = std::move(list);
         else
             d->data.push_back(std::move(list));
+
+        d->incrementRevision();
     }
 
     emit addedOrUpdated(id);
@@ -103,6 +119,7 @@ void LookupListManager::remove(const nx::Uuid& id)
             return;
 
         d->data.erase(iter);
+        d->incrementRevision();
     }
 
     emit removed(id);

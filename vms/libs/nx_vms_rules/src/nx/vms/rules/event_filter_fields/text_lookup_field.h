@@ -2,6 +2,9 @@
 
 #pragma once
 
+#include <memory>
+
+#include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/data/lookup_list_data.h>
 #include <nx/vms/common/system_context_aware.h>
 
@@ -41,11 +44,17 @@ signals:
     void checkTypeChanged();
 
 private:
+    struct Cache;
+
     QString m_value;
     TextLookupCheckType m_checkType{TextLookupCheckType::containsKeywords};
-    mutable std::optional<QStringList> m_list;
 
-    void onLookupListChanged(Uuid id);
+    mutable nx::Mutex m_mutex;
+    mutable std::shared_ptr<Cache> m_cache;
+
+private:
+    std::shared_ptr<Cache> prepareCache() const;
+    void invalidateCache();
 };
 
 } // namespace nx::vms::rules
