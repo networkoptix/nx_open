@@ -2429,6 +2429,12 @@ static void registerDeviceHandlers(
      *     "sdp": "..."
      *   }
      * }</code></pre>
+     * An m= line of an offer lists every codec its Device may switch to, each under a payload
+     * type of its own. The Server makes such a switch by changing the payload type of the RTP
+     * packets alone, keeping the m= line and its SSRC and sending no new offer, so a client has
+     * to be ready to decode every payload type it accepted. A switch to a codec the client did
+     * not accept stops the Device instead, see status <code>415</code> below.
+     * <br/>
      * ICE candidates are sent in the following form. The candidate value follows the ICE
      * candidate format from https://datatracker.ietf.org/doc/html/rfc8445.
      * <pre><code>{
@@ -2463,7 +2469,11 @@ static void registerDeviceHandlers(
      *   "stream": 1
      * }</code></pre>
      * Changes stream quality. <code>1</code> or <code>"1"</code> selects the secondary stream.
-     * Any other value selects the primary stream.
+     * Any other value selects the primary stream. The Server switches on the next key frame of
+     * the stream being switched to, and sends no new offer: the m= line, its SSRC and its
+     * payload type stay as they are, and only the resolution of the pictures changes. A payload
+     * type of its own is needed only when the two streams are encoded with different codecs,
+     * which is the codec switch described above.
      * <pre><code>{
      *   "pause": "550e8400-e29b-41d4-a716-446655440000"
      * }</code></pre>
@@ -2486,8 +2496,21 @@ static void registerDeviceHandlers(
      * <pre><code>{
      *   "deviceId": "550e8400-e29b-41d4-a716-446655440000",
      *   "timestampMs": 1674240507000,
-     *   "status": 0
+     *   "status": 200
      * }</code></pre>
+     * The <code>status</code> field carries an HTTP status code:
+     * <br/>
+     * <code>100</code> - the result is not known yet.
+     * <br/>
+     * <code>200</code> - the command succeeded.
+     * <br/>
+     * <code>301</code> - the stream can only be resumed by opening a new connection, at the
+     * position given by <code>timestampMs</code>.
+     * <br/>
+     * <code>404</code> - the Device has no Archive at the requested position.
+     * <br/>
+     * <code>415</code> - the Device changed to a codec the client took no payload type for in
+     * its answer. Its stream is over: no offer can add a codec the client cannot decode.
      * When the Archive at the playback position is encrypted with an unknown password, the
      * stream stops and the following message is sent once for the position, and again after a
      * seek:

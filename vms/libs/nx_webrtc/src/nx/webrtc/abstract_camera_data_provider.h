@@ -3,10 +3,10 @@
 #pragma once
 
 #include <audit/audit_manager_fwd.h>
+#include <core/dataconsumer/abstract_data_receptor.h>
 #include <nx/media/annexb_to_mp4.h>
 #include <nx/streaming/abstract_archive_stream_reader.h>
 #include <nx/streaming/abstract_data_consumer.h>
-#include <core/dataconsumer/abstract_data_receptor.h>
 #include <transcoding/media_transcoder.h>
 #include "media_queue.h"
 
@@ -63,8 +63,8 @@ public: // Playback.
 
     /**
      * Stops data production until the next play(), keeping no state of its own: unlike pause(),
-     * this leaves paused() and nextFrame() alone. Called while a codec-change renegotiation is
-     * in flight, when the client can't decode what is produced anyway.
+     * this leaves paused() and nextFrame() alone. Called when the client cannot decode what the
+     * Device produces any more, see Session::switchCodec().
      */
     virtual void suspend() = 0;
 

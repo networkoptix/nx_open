@@ -2,10 +2,14 @@
 
 #include "webrtc_session.h"
 
+#include <algorithm>
+#include <iterator>
+
 #include <core/resource/camera_resource.h>
 #include <nx/network/socket_global.h>
 #include <nx/sdk/helpers/uuid_helper.h>
 #include <nx/utils/crypt/linux_passwd_crypt.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/vms/common/system_context.h>
 
 #include "webrtc_ice_relay.h"
@@ -319,86 +323,136 @@ void Session::removeDevice(nx::Uuid deviceId, Consumer::StatusHandler handler)
         });
 }
 
-RenegotiationResult Session::renegotiateProvider(
-    nx::Uuid deviceId, QnAbstractMediaData::DataType dataType, int64_t resumePositionUs)
+CodecSwitchResult Session::switchCodec(
+    nx::Uuid deviceId, QnAbstractMediaData::DataType videoOrAudio)
 {
+    const bool isVideo = videoOrAudio == QnAbstractMediaData::VIDEO;
+    if (!NX_ASSERT(isVideo || videoOrAudio == QnAbstractMediaData::AUDIO)
+        || !NX_ASSERT(m_method == nx::vms::api::WebRtcMethod::srtp,
+            "A payload type means nothing to the MSE delivery method"))
+    {
+        return CodecSwitchResult::failed;
+    }
+
     auto provider = this->provider(deviceId);
     if (!provider)
     {
-        NX_DEBUG(this, "Can't renegotiate unknown provider %1", deviceId);
-        return RenegotiationResult::failed;
+        NX_DEBUG(this, "No provider of device %1 to switch the codec of", deviceId);
+        return CodecSwitchResult::failed;
     }
 
-    // MSE reports EOF permanently and can only be re-created with the session, see
-    // Transcoder::checkForMseEof().
-    if (!NX_ASSERT(m_method == nx::vms::api::WebRtcMethod::srtp,
-            "Renegotiation is not applicable to MSE"))
+    Track* track = isVideo ? m_tracks->videoTrack(deviceId) : m_tracks->audioTrack(deviceId);
+    if (!track || track->offerState != TrackState::active)
     {
-        return RenegotiationResult::failed;
+        NX_DEBUG(this, "No %1 track of device %2 is being streamed", videoOrAudio, deviceId);
+        return CodecSwitchResult::failed;
     }
 
-    Track* track = nullptr;
-    if (dataType == QnAbstractMediaData::VIDEO)
-        track = m_tracks->videoTrack(deviceId);
-    else if (dataType == QnAbstractMediaData::AUDIO)
-        track = m_tracks->audioTrack(deviceId);
-
-    if (!track)
+    const auto* oldEncoder = encoderForTrack(track);
+    if (!oldEncoder)
     {
-        NX_DEBUG(this, "No %1 track of device %2 to renegotiate", dataType, deviceId);
-        return RenegotiationResult::failed;
+        NX_DEBUG(this, "No %1 encoder of device %2 to replace", videoOrAudio, deviceId);
+        return CodecSwitchResult::failed;
+    }
+    const AVCodecID oldCodec = oldEncoder->sourceCodec();
+
+    auto continuity = m_muxer->takeContinuity(deviceId, videoOrAudio);
+
+    // The old encoder has given up the SRTP context of the stream and must not packetize
+    // anything any more -- without one it would send the stream in the clear. Nothing but the
+    // encoder built right below may take its place.
+    nx::utils::ScopeGuard dropEncoder(
+        [this, deviceId, videoOrAudio]() { m_muxer->removeEncoder(deviceId, videoOrAudio); });
+
+    // One track only, so that the other one of the Device keeps the encoder it is streaming
+    // with, RTP sequence numbers included.
+    if (!initializeMuxer(provider.get(), videoOrAudio))
+    {
+        NX_DEBUG(this, "No encoder for the new %1 codec of device %2", videoOrAudio, deviceId);
+        return CodecSwitchResult::failed;
     }
 
-    // Nothing is packetized for an m-line that is not offered as active, so a renegotiation of
-    // one can only come from a caller that made it up. createRtpEncoders() would put the m-line
-    // back in the offer as a live one, which is the one thing a refused m-line must never be.
-    if (track->offerState != TrackState::active)
+    // An encoder still built around the codec that reported EOF means the provider has not
+    // caught up with its own media yet. Every packet would rebuild it again, so hand the Device
+    // over to a reconnect instead.
+    const auto* encoder = encoderForTrack(track);
+    if (!encoder || encoder->sourceCodec() == oldCodec)
     {
         NX_DEBUG(this,
-            "Track %1 of device %2 is not offered, nothing to renegotiate",
-            track->mid,
+            "No encoder for the new %1 codec of device %2, codec %3 is still what its media "
+            "reports",
+            videoOrAudio,
+            deviceId,
+            oldCodec);
+        return CodecSwitchResult::failed;
+    }
+
+    // A Device added mid-session streams before the client has answered the offer carrying its
+    // m-line, so what that m-line takes is not known yet. An accepted one always ends up with a
+    // payload type, see processSdpAnswer(), so an empty set means no answer rather than refusal.
+    if (track->negotiatedPayloadTypes.empty())
+    {
+        NX_DEBUG(this,
+            "Device %1 changed the %2 codec before the client answered its m-line",
+            deviceId,
+            videoOrAudio);
+        return CodecSwitchResult::failed;
+    }
+
+    // What the m-line offers is the codec itself, not the number: a codec with no payload type
+    // of its own would go out under one the client reads as another codec. That is what an
+    // implicit transcode to the default codec of the delivery method would do here.
+    const auto payloadType = rtpPayloadType(encoder->sourceCodec());
+    if (!payloadType || !track->negotiatedPayloadTypes.contains(*payloadType))
+    {
+        NX_DEBUG(this,
+            "The client took no payload type for codec %1 of device %2, stop streaming it",
+            encoder->sourceCodec(),
             deviceId);
-        return RenegotiationResult::failed;
+        return CodecSwitchResult::notNegotiated;
     }
 
-    // Without this, every packet that hits the still-EOF encoder would start another round.
-    if (track->pendingAnswer)
-        return RenegotiationResult::pending;
+    // From here the new encoder owns the stream of the old one: its numbering, its timestamps
+    // and its SRTP context. Only the payload type of the packets changes.
+    m_muxer->restoreContinuity(deviceId, videoOrAudio, std::move(continuity));
+    dropEncoder.disarm();
 
-    // Nothing sent before the client applies the new SDP would be decodable anyway.
-    provider->suspend();
-    if (m_consumer)
-        m_consumer->clearQueueForDevice(deviceId);
+    NX_DEBUG(this,
+        "Device %1 switched to codec %2 on track %3, payload type %4, ssrc %5",
+        deviceId,
+        encoder->sourceCodec(),
+        track->mid,
+        *payloadType,
+        track->ssrc);
 
-    // The recreated RTP encoder restarts its sequence numbers and timestamps, so on the old SSRC
-    // it would look to the receiver like a stale continuation of the same stream rather than a
-    // new one.
-    const auto oldSsrc = track->ssrc;
-    const auto* oldEncoder = encoderForTrack(track);
-    if (!m_tracks->updateSsrc(track))
+    return CodecSwitchResult::done;
+}
+
+bool Session::isStreamedCodecNegotiated(nx::Uuid deviceId)
+{
+    if (m_method != nx::vms::api::WebRtcMethod::srtp)
+        return true;
+
+    for (const auto& [_, track]: m_tracks->tracks())
     {
-        NX_DEBUG(this, "Can't assign a new ssrc to track %1 of device %2", track->mid, deviceId);
-        return RenegotiationResult::failed;
+        if (track->deviceId != deviceId || track->offerState != TrackState::active)
+            continue;
+
+        // No answer has covered this track yet, so what it takes is not known, see switchCodec().
+        if (track->negotiatedPayloadTypes.empty())
+            continue;
+
+        if (!track->negotiatedPayloadTypes.contains(track->payloadType))
+        {
+            NX_DEBUG(this,
+                "The client did not take payload type %1 of track %2, device %3",
+                track->payloadType,
+                track->mid,
+                deviceId);
+            return false;
+        }
     }
-
-    track->pendingAnswer = true;
-    track->resumePositionUs = resumePositionUs;
-
-    // createRtpEncoders() reports success if either track got an encoder, so check this one:
-    // otherwise the offer would advertise an SSRC that the (still EOF) old encoder never emits,
-    // and the next packet would trigger another renegotiation.
-    if (!initializeMuxer(provider.get(), dataType) || encoderForTrack(track) == oldEncoder)
-    {
-        NX_DEBUG(
-            this, "No encoder for the new codec of track %1, device %2", track->mid, deviceId);
-        track->pendingAnswer = false;
-        NX_ASSERT(m_tracks->updateSsrc(track, oldSsrc), "Can't roll the ssrc back");
-        return RenegotiationResult::failed;
-    }
-
-    sendOffer();
-
-    return RenegotiationResult::offerSent;
+    return true;
 }
 
 const QnUniversalRtpEncoder* Session::encoderForTrack(const Track* track) const
@@ -410,16 +464,6 @@ const QnUniversalRtpEncoder* Session::encoderForTrack(const Track* track) const
         return m_muxer->audioEncoder(track->deviceId);
 
     return m_muxer->videoEncoder(track->deviceId);
-}
-
-bool Session::isRenegotiationPending(nx::Uuid deviceId) const
-{
-    for (const auto* track: {m_tracks->videoTrack(deviceId), m_tracks->audioTrack(deviceId)})
-    {
-        if (track && track->pendingAnswer)
-            return true;
-    }
-    return false;
 }
 
 std::shared_ptr<AbstractCameraDataProvider> Session::takeProvider(nx::Uuid deviceId)
@@ -514,8 +558,8 @@ bool Session::initializeMuxer(
     if (m_resolution && m_resolution->size.width() > 0)
         m_transcodingSettings.forcedAspectRatio = QnAspectRatio();
 
-    // A single track is (re)initialized on renegotiation, so that the other one keeps the encoder
-    // it already streams with, RTP sequence numbers included. See renegotiateProvider().
+    // A single track is rebuilt on a codec change, so that the other one keeps the encoder it
+    // already streams with, RTP sequence numbers included. See switchCodec().
     const bool doVideo = videoOrAudio != QnAbstractMediaData::AUDIO;
     const bool doAudio = videoOrAudio != QnAbstractMediaData::VIDEO;
 
@@ -827,6 +871,33 @@ bool Session::processSdpAnswer(const std::string& sdp)
         {
             ++accepted;
             ++acceptedTracks;
+
+            // Of the codecs the m-line offers, the ones the client says it can decode. Only
+            // these can be streamed on it, now or after a codec change, see switchCodec().
+            std::set<int> negotiated;
+            if (const auto answered = m_sdpParseResult.trackPayloadTypes.find(track->mid);
+                answered != m_sdpParseResult.trackPayloadTypes.end())
+            {
+                std::set_intersection(track->offeredPayloadTypes.begin(),
+                    track->offeredPayloadTypes.end(),
+                    answered->second.begin(),
+                    answered->second.end(),
+                    std::inserter(negotiated, negotiated.end()));
+            }
+
+            if (negotiated.empty())
+            {
+                // An m-line is not accepted without a format in common, so this is an answer
+                // that says one thing in its format list and another in its group attribute.
+                // Go by the latter: the codec being streamed is the one it just accepted.
+                NX_DEBUG(this,
+                    "The answer takes track %1 of device %2 but none of the codecs it offers",
+                    track->mid,
+                    track->deviceId);
+                negotiated.insert(track->payloadType);
+            }
+
+            track->negotiatedPayloadTypes = std::move(negotiated);
             continue;
         }
 
@@ -879,26 +950,6 @@ bool Session::processSdpAnswer(const std::string& sdp)
         // NOTE: the lock mirrors the one in dropProvider(), see the note there.
         NX_MUTEX_LOCKER lock(&m_mutex);
         m_tracks->freeTrack(track);
-    }
-
-    // This answer is final, there is no other round: any track renegotiated mid-session (see
-    // renegotiateProvider()) now has a client that knows its new SSRC/payload type, so its
-    // provider (suspended and purged of stale data since the offer was sent) can restart.
-    std::map<nx::Uuid, int64_t> resumePositionsUs;
-    for (auto& [_, track]: m_tracks->tracks())
-    {
-        if (!track->pendingAnswer)
-            continue;
-        track->pendingAnswer = false;
-        resumePositionsUs[track->deviceId] = track->resumePositionUs;
-    }
-
-    // Restart each renegotiated provider now that the client knows about its new SSRC/payload
-    // type, the same way an explicit seek would -- for a clean, keyframe-aligned resume.
-    if (m_consumer)
-    {
-        for (const auto& [deviceId, resumePositionUs]: resumePositionsUs)
-            m_consumer->seek(deviceId, resumePositionUs, [](nx::Uuid, Consumer::StreamStatus) {});
     }
 
     return true;

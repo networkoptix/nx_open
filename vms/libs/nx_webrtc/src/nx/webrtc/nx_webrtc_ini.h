@@ -22,6 +22,12 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(true, webrtcFixH264ProfileConstraints, "Overwrite profile level ID in the SDP to"
         "declare base and main profiles constrained, this helps streams be acceptable to Safari.");
 
+    NX_INI_STRING("42e01f",
+        webrtcAlternativeH264ProfileLevelId,
+        "The profile-level-id of the H.264 an m-line offers next to the codec it streams, so\n"
+        "that a Device may switch to it with no new offer. The default is constrained baseline\n"
+        "at level 3.1, which every WebRTC receiver decodes. An empty value leaves the parameter\n"
+        "out, which RFC 6184 section 8.1 reads as baseline at level 1.");
 };
 
 Ini& ini();
