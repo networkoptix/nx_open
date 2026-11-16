@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 #include <QtCore/QObject>
 
 #include <nx/utils/impl_ptr.h>
@@ -30,6 +32,9 @@ public:
     bool isInitialized() const;
     void initialize(nx::vms::api::LookupListDataList initialData);
     void deinitialize();
+
+    /** Incremented after every data change. Can be called from any thread. */
+    std::uint64_t revision() const;
 
     nx::vms::api::LookupListData lookupList(const nx::Uuid& id) const;
     const nx::vms::api::LookupListDataList& lookupLists() const;
