@@ -105,6 +105,8 @@ private:
     bool queueToArchive(nx::Locker<nx::Mutex>* lock);
     bool isCurrentLimitReached(nx::Locker<nx::Mutex>* lock);
     void archive(QString fileName, QString archiveName);
+    /** Renames a rotated .log.tmp back to .log, so it is zipped on the next start. */
+    void restoreRotatedLog(const QString& fileName);
     qint64 totalVolumeSize();
     qint64 bytesToRemoveByFreeSpaceLimit() const;
     qint64 calculateMaxVolumeSize();
@@ -117,8 +119,11 @@ private:
     qint64 m_currentPos = 0;
     QDateTime m_fileOpenTime;
     QLockFile m_volumeLock;
-    std::future<void> m_archive;
+    std::shared_future<void> m_archive;
     int m_archiveQueue = 0;
+
+    // Set on shutdown and never reset: rotated logs are not zipped until the next start.
+    bool m_backgroundArchivingStopped = false;
 };
 
 NX_UTILS_API QString toQString(File::Extension ext);
