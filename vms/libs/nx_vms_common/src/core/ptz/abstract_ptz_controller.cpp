@@ -42,6 +42,17 @@ bool QnAbstractPtzController::supportsPtzType(Type type) const
         && getSupportedPtzTypes().testFlag(type);
 }
 
+Types QnAbstractPtzController::getCapablePtzTypes() const
+{
+    Types result;
+    for (const auto type: kAllTypes)
+    {
+        if (getCapabilities({type}) != Ptz::Capability::none)
+            result |= type;
+    }
+    return result;
+}
+
 bool QnAbstractPtzController::getPresetLimits(nx::vms::api::PtzPresetLimits* limits) const
 {
     *limits = {};

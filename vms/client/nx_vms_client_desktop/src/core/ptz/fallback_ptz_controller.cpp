@@ -39,7 +39,10 @@ QnFallbackPtzController::~QnFallbackPtzController()
 void QnFallbackPtzController::baseChanged(DataFields fields)
 {
     if (fields.testFlag(DataField::capabilities))
-        m_mainSupportedTypes = m_mainController->getSupportedPtzTypes();
+    {
+        // A declared PTZ type may have no capabilities, e.g. fisheye without dewarping.
+        m_mainCapableTypes = m_mainController->getCapablePtzTypes();
+    }
 
     emit changed(fields);
 }
@@ -47,8 +50,7 @@ void QnFallbackPtzController::baseChanged(DataFields fields)
 const QnPtzControllerPtr& QnFallbackPtzController::baseController(
     const Options& options) const
 {
-    return m_mainSupportedTypes.testAnyFlags(options.type) ? m_mainController
-                                                           : m_fallbackController;
+    return m_mainCapableTypes.testAnyFlags(options.type) ? m_mainController : m_fallbackController;
 }
 
 QnPtzControllerPtr QnFallbackPtzController::mainController() const
@@ -63,7 +65,13 @@ QnPtzControllerPtr QnFallbackPtzController::fallbackController() const
 
 QnFallbackPtzController::Types QnFallbackPtzController::getSupportedPtzTypes() const
 {
-    return m_mainController->getSupportedPtzTypes() | m_fallbackController->getSupportedPtzTypes();
+    Types result;
+    for (const auto type: nx::vms::common::ptz::kAllTypes)
+    {
+        if (baseController({type})->supportsPtzType(type))
+            result |= type;
+    }
+    return result;
 }
 
 Ptz::Capabilities QnFallbackPtzController::getCapabilities(const Options& options) const

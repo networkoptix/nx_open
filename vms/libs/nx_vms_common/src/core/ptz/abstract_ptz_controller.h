@@ -59,6 +59,9 @@ public:
     /** Mark meaningful data invalid and forces to re-request it at some time. */
     virtual void invalidate();
 
+    /** @returns Concrete API modes for which getCapabilities() reports any capability. */
+    Types getCapablePtzTypes() const;
+
 public slots: //< Class is exposed to QML. All functions in section below are invokable
     /**
      * @returns Concrete PTZ API modes implemented by this controller. Individual operations still

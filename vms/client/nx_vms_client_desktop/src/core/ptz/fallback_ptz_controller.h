@@ -88,7 +88,7 @@ private:
     const QnPtzControllerPtr& baseController(const Options& options) const;
 
 private:
-    Types m_mainSupportedTypes;
+    Types m_mainCapableTypes;
     QnPtzControllerPtr m_mainController;
     QnPtzControllerPtr m_fallbackController;
 };

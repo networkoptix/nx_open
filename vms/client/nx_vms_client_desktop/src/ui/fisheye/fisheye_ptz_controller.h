@@ -15,7 +15,7 @@
 class QnResourceWidgetRenderer;
 class QnMediaResourceWidget;
 
-class QnFisheyePtzController: public QnBasicPtzController
+class NX_VMS_CLIENT_DESKTOP_API QnFisheyePtzController: public QnBasicPtzController
 {
     Q_OBJECT
     using base_type = QnBasicPtzController;
@@ -90,7 +90,7 @@ private:
     nx::vms::api::PtzPositionLimits m_limits;
     bool m_unlimitedPan;
 
-    qreal m_aspectRatio;
+    qreal m_aspectRatio = 1.0;
 
     AnimationMode m_animationMode;
     Vector m_speed;
