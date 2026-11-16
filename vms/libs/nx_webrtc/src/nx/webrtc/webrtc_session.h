@@ -17,11 +17,11 @@ namespace nx::webrtc {
 
 static const int kDataChannelMid = 128;
 
-enum class RenegotiationResult
+enum class CodecSwitchResult
 {
-    offerSent, //< A new offer is sent, the provider restarts once it is answered.
-    pending, //< An offer for this track is already in flight, nothing to do.
-    failed, //< Renegotiation is impossible, the caller should fall back to a reconnect.
+    done, //< The encoder now streams the new codec, on the same m-line and the same SSRC.
+    notNegotiated, //< The client did not take this codec, nothing can be sent to it any more.
+    failed, //< No encoder for the new codec; the caller should fall back to a reconnect.
 };
 
 class SessionPool;
@@ -151,22 +151,30 @@ public:
     bool removeProvider(nx::Uuid deviceId);
 
     /**
-     * Rebuilds the encoder of the `dataType` track of an already streaming provider (e.g. after
-     * its underlying media switched codec, such as a live-to-archive seek) and pushes a new SDP
-     * offer over the existing tracker connection. Unlike createProvider()/removeProvider(), this
-     * keeps the peer connection, ICE and data channel intact -- only the SDP is renegotiated.
-     * Once the answer for this offer is applied (see processSdpAnswer()), the provider is
-     * restarted at `resumePositionUs` (DATETIME_NOW for live), the same way an explicit seek
-     * would -- guaranteeing a clean, keyframe-aligned resume instead of waiting for whatever
-     * keyframe the already-running stream happens to produce next. SRTP only.
-     * @return failed if the track is unknown, the method is MSE, or no encoder could be created
-     *     for the new codec; the caller should then fall back to a reconnect.
+     * Rebuilds the `videoOrAudio` encoder of a streaming Device around the codec its media now
+     * carries -- a live-to-archive seek, a camera reconfiguration -- and leaves everything the
+     * client knows about the track untouched: the m-line, its mid and its SSRC stay as they are,
+     * and so do the sequence numbers, the timestamps and the SRTP context of the stream, which
+     * goes on as one continuous RTP stream whose packets merely carry another payload type from
+     * here on. No SDP is exchanged, which is what the m-line offering every codec at once buys
+     * (see Transcoder::createRtpEncoder()): the client has already accepted the payload type,
+     * so there is nothing left to ask it. SRTP only, MSE has no payload types.
+     *
+     * @return notNegotiated if the client left this codec out of its answer -- the only thing
+     *     left then is to tell it so, since no offer of ours can add a codec it cannot decode;
+     *     failed if the encoder could not be built at all, which leaves a reconnect.
      */
-    RenegotiationResult renegotiateProvider(
-        nx::Uuid deviceId, QnAbstractMediaData::DataType dataType, int64_t resumePositionUs);
+    CodecSwitchResult switchCodec(nx::Uuid deviceId, QnAbstractMediaData::DataType videoOrAudio);
 
-    // True while an offer sent by renegotiateProvider() for this device is not answered yet.
-    bool isRenegotiationPending(nx::Uuid deviceId) const;
+    /**
+     * Whether the client took the payload type every active track of `deviceId` streams under.
+     * An answer accepts an m-line as a whole, formats of its own and all, so it may well take
+     * the track and leave out the very codec the Device streams on it -- and a packet sent
+     * under a payload type the answer does not list is dropped by the receiver unread. A track
+     * no answer has covered yet counts as negotiated, as it does in switchCodec(). SRTP only:
+     * MSE carries a mime type instead of payload types.
+     */
+    bool isStreamedCodecNegotiated(nx::Uuid deviceId);
 
     std::string idForToStringFromPtr() const;
 
@@ -176,8 +184,8 @@ private:
     // Builds the encoders of one provider, and of a single track of it unless UNKNOWN is passed.
     // `provider` has to be in the session already: the encoders are built around the tracks that
     // addProvider() made for it. Not to be called twice for the same provider unless its encoders
-    // are meant to be rebuilt -- it re-opens the transcoder of the Device, which is what
-    // renegotiation asks for and what an ordinary caller does not.
+    // are meant to be rebuilt -- it re-opens the transcoder of the Device, which is what a codec
+    // change asks for and what an ordinary caller does not.
     bool initializeMuxer(AbstractCameraDataProvider* provider,
         QnAbstractMediaData::DataType videoOrAudio = QnAbstractMediaData::UNKNOWN);
     const QnUniversalRtpEncoder* encoderForTrack(const Track* track) const;

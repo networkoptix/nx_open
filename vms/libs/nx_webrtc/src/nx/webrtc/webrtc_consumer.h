@@ -8,7 +8,6 @@
 
 #include <nx/media/annexb_to_mp4.h>
 #include <nx/network/aio/basic_pollable.h>
-#include <nx/network/aio/timer.h>
 #include <nx/network/http/http_types.h>
 #include <nx/rtp/rtcp.h>
 #include <nx/rtp/rtp.h>
@@ -32,6 +31,9 @@ public:
         success = http::StatusCode::ok, //< Success.
         reconnect = http::StatusCode::movedPermanently, //< Only a reconnect can resume the stream.
         nodata = http::StatusCode::notFound, //< No provider for this timestamp, can't seek.
+        //< The Device changed to a codec the client did not accept in its answer, and no offer
+        //< can add one it cannot decode: its stream is over. See Session::switchCodec().
+        codecNotSupported = http::StatusCode::unsupportedMediaType,
     };
     using StatusHandler = std::function<void(nx::Uuid deviceId, StreamStatus)>;
 
@@ -77,7 +79,6 @@ private:
     void handleRtcp(uint8_t* data, int size);
     void stopUnsafe();
     void sendMediaBuffer();
-    void startRenegotiationTimeout();
 
 private:
     // Main.
@@ -85,8 +86,6 @@ private:
     // Set from the ICE thread, read in the session thread, see stopUnsafe().
     std::atomic<bool> m_needStop{false};
     nx::network::aio::BasicPollable m_pollable;
-    // Fires if the client doesn't answer a renegotiation offer, see startRenegotiationTimeout().
-    nx::network::aio::Timer m_renegotiationTimer;
     Session* m_session = nullptr;
     Streamer* m_streamer = nullptr;
     int64_t m_lastReportedTimestampUs = AV_NOPTS_VALUE;

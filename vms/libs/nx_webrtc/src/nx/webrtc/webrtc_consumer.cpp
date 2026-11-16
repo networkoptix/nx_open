@@ -16,10 +16,6 @@ namespace nx::webrtc {
 
 const int kMediaQueueSize = 512;
 
-// A renegotiation answer is one signaling round trip away, so this is only a safety net against a
-// client that ignores mid-session offers.
-constexpr std::chrono::seconds kRenegotiationTimeout(10);
-
 namespace {
 
 struct CannotDecryptMedia
@@ -35,7 +31,6 @@ NX_REFLECTION_TAG_TYPE(CannotDecryptMedia, jsonSerializeChronoDurationAsNumber)
 Consumer::Consumer(Session* session):
     m_mediaQueue(kMediaQueueSize),
     m_pollable(session->aioThread()),
-    m_renegotiationTimer(session->aioThread()),
     m_session(session),
     m_sessionId(session->id())
 {
@@ -81,7 +76,6 @@ void Consumer::stopUnsafe()
         {
             if (!m_needStop)
                 return; //< Another ICE has locked the session and restarted the stream meanwhile.
-            m_renegotiationTimer.pleaseStopSync();
             m_pollable.pleaseStopSync();
         });
 }
@@ -116,8 +110,23 @@ void Consumer::seek(nx::Uuid deviceId, int64_t timestampUs, StatusHandler handle
         {
             bool useAudioLastGop = //< TODO is it needed?
                 m_session->muxer()->method() == nx::vms::api::WebRtcMethod::mse;
-            auto doSeek = [useAudioLastGop, timestampUs](nx::Uuid id, auto provider, auto handler)
+            auto doSeek = [this, useAudioLastGop, timestampUs](
+                              nx::Uuid id, auto provider, auto handler)
             {
+                if (provider && !m_session->isStreamedCodecNegotiated(id))
+                {
+                    // The client took the track but not the codec the Device streams on it, and
+                    // no offer of ours can hand it one it cannot decode. Every packet would go
+                    // out under a payload type the receiver drops, so the Device stops here and
+                    // the client is told why, as it is when a codec change ends up outside the
+                    // answer, see Session::switchCodec().
+                    NX_WARNING(
+                        this, "The client did not take the codec device %1 streams, stop it", id);
+                    provider->suspend();
+                    handler(id, StreamStatus::codecNotSupported);
+                    return;
+                }
+
                 auto status = provider && provider->play(timestampUs, useAudioLastGop)
                     ? StreamStatus::success
                     : StreamStatus::nodata;
@@ -382,14 +391,6 @@ void Consumer::processNextData()
 
         const auto deviceId = media->deviceId;
 
-        // Data dispatched here before clearQueueForDevice() ran would be sent under the new SSRC
-        // while the client is still using the old SDP. The answer restarts the provider anyway.
-        if (m_session->isRenegotiationPending(deviceId))
-        {
-            NX_VERBOSE(this, "Skip data while renegotiating: %1", media);
-            continue;
-        }
-
         auto rtpEncoder = m_session->muxer()->setDataPacket(deviceId, media);
         if (!rtpEncoder)
         {
@@ -410,27 +411,55 @@ void Consumer::processNextData()
         // can be unsupported by browser.
         if (m_session->muxer()->isEof(deviceId, rtpEncoder))
         {
-            // A codec change is handled by renegotiating the SDP for this track on the same peer
-            // connection over the existing signaling WebSocket -- the client's generic offer
-            // handling picks up the new SDP on its own, no data channel signal needed. This
-            // packet is simply dropped: renegotiateProvider() suspends the provider and purges
-            // anything already queued for it. Once the answer is applied, the provider is
-            // restarted (same as an explicit seek) either at live, or at this packet's timestamp
-            // if it was archive. If renegotiation is impossible, fall back to a reconnect.
-            auto provider = m_session->provider(deviceId);
-            const int64_t resumePositionUs =
-                (provider && provider->isLiveMode()) ? DATETIME_NOW : media->timestamp;
-            switch (m_session->renegotiateProvider(deviceId, media->dataType, resumePositionUs))
+            // The m-line offers every codec its Device may switch to, so a codec change costs no
+            // SDP at all: the encoder is rebuilt around the new codec and goes on streaming on
+            // the same m-line, under a payload type the client has already accepted. MSE is the
+            // exception -- it has no payload types and reports EOF for good, its muxer can only
+            // be re-created with the session.
+            if (m_session->muxer()->method() != nx::vms::api::WebRtcMethod::srtp)
             {
-                case RenegotiationResult::offerSent:
-                    startRenegotiationTimeout();
-                    continue;
-                case RenegotiationResult::pending:
-                    continue;
-                case RenegotiationResult::failed:
+                NX_WARNING(this,
+                    "Device %1 changed codec, which the MSE delivery method cannot follow, "
+                    "ask the client to reconnect",
+                    deviceId);
+                m_streamer->handleStreamStatus(deviceId, StreamStatus::reconnect);
+                return;
+            }
+
+            switch (m_session->switchCodec(deviceId, media->dataType))
+            {
+                case CodecSwitchResult::done:
+                    // This packet is the first one of the new codec, and a key frame: it is what
+                    // the client needs to start decoding, so packetize it after all.
+                    rtpEncoder = m_session->muxer()->setDataPacket(deviceId, media);
+                    if (!rtpEncoder)
+                        continue;
+
+                    mediaBuffers.clear();
+                    while (!m_needStop && m_session->muxer()->getNextPacket(rtpEncoder, buffer))
+                    {
+                        mediaBuffers.emplace_back(buffer.data(), buffer.size());
+                        buffer.clear();
+                    }
+                    break;
+
+                case CodecSwitchResult::notNegotiated:
+                    // No offer of ours can hand the client a codec it cannot decode, so there
+                    // is nothing left to try: this Device stops and the client is told why.
+                    // Anything still queued for it would only be dropped.
                     NX_WARNING(this,
-                        "Failed to renegotiate provider %1 after codec change, "
-                        "ask the client to reconnect",
+                        "Device %1 switched to a codec the client did not take, stop it",
+                        deviceId);
+                    if (auto provider = m_session->provider(deviceId))
+                        provider->suspend();
+                    clearQueueForDevice(deviceId);
+                    m_streamer->handleStreamStatus(deviceId, StreamStatus::codecNotSupported);
+                    return;
+
+                case CodecSwitchResult::failed:
+                    NX_WARNING(this,
+                        "Failed to switch the %1 codec of device %2, ask the client to reconnect",
+                        media->dataType,
                         deviceId);
                     m_streamer->handleStreamStatus(deviceId, StreamStatus::reconnect);
                     return;
@@ -465,30 +494,6 @@ void Consumer::processNextData()
             break;
         }
     }
-}
-
-// A single timer is enough: on expiration every device that is still waiting for an answer is
-// reported, so re-arming it for a second device doesn't lose the first one.
-void Consumer::startRenegotiationTimeout()
-{
-    m_renegotiationTimer.start(
-        std::chrono::duration_cast<std::chrono::milliseconds>(kRenegotiationTimeout),
-        [this]()
-        {
-            for (const auto& provider: m_session->allProviders())
-            {
-                const auto deviceId = provider->resource()->getId();
-                if (!m_session->isRenegotiationPending(deviceId))
-                    continue;
-
-                NX_WARNING(this,
-                    "No answer for the renegotiation offer of device %1 in %2, "
-                    "ask the client to reconnect",
-                    deviceId,
-                    kRenegotiationTimeout);
-                m_streamer->handleStreamStatus(deviceId, StreamStatus::reconnect);
-            }
-        });
 }
 
 void Consumer::runInMuxingThread(std::function<void()>&& func)

@@ -2,13 +2,16 @@
 
 #pragma once
 
+#include <optional>
+#include <vector>
+
 #include <nx/rtp/rtcp.h>
 #include <nx/rtp/rtcp_nack_responder.h>
 #include <nx/utils/byte_array.h>
 
+#include <transcoding/ffmpeg_transcoder.h>
 #include "rtsp/abstract_rtsp_encoder.h"
 #include "srtp_encryptor.h"
-#include <transcoding/ffmpeg_transcoder.h>
 
 class NX_VMS_COMMON_API QnUniversalRtpEncoder: public AbstractRtspEncoder
 {
@@ -22,6 +25,10 @@ public:
         bool useMultipleSdpPayloadTypes = false;
         bool useRtcpNack = false;
         bool webRtcMode = false;
+        // The payload type to use instead of the one the codec implies. A WebRTC video m-line
+        // offers H.264 and H.265 at once, which works only if each of them has a payload type
+        // of its own, while getPayloadType() gives both the same one.
+        std::optional<int> payloadType;
         QnFfmpegTranscoder::Config transcoderConfig;
     };
 
@@ -54,6 +61,40 @@ public:
     int payloadType() const;
 
     QStringList sdpAttributes() const;
+    AVCodecID sourceCodec() const { return m_sourceCodec; }
+
+    /**
+     * Puts `payloadTypes` on the m-line next to the one this encoder streams, and `sdpAttributes`
+     * (their rtpmap and fmtp lines) after its own. They describe codecs that nothing streams
+     * yet: a WebRTC m-line offers every codec its Device may switch to, so that the switch
+     * itself needs no new SDP. See nx::webrtc::alternativeCodecSdp().
+     */
+    void setAlternativeCodecs(std::vector<int> payloadTypes, QStringList sdpAttributes);
+    const std::vector<int>& alternativePayloadTypes() const { return m_altPayloadTypes; }
+
+    /**
+     * RTP state that has to outlive this encoder when another one takes over the same stream,
+     * as happens when a Device changes codec and the encoder is rebuilt around the new one
+     * without touching the SSRC. The receiver reads that as one continuous RTP stream, so the
+     * numbering may not restart; and SRTP must never encrypt two packets with the same
+     * (SSRC, index) under one key, which a fresh libsrtp session on an unchanged SSRC would do.
+     * See nx::webrtc::Session::switchCodec().
+     */
+    struct Continuity
+    {
+        uint16_t sequence = 0;
+        uint32_t rtpTimestampBase = 0;
+        std::unique_ptr<nx::rtsp::SrtpEncryptor> encryptor;
+        nx::rtp::RtcpSenderReporter rtcpReporter;
+        // Holds the packets sent so far, by sequence number, so that the ones sent before the
+        // switch can still be retransmitted when the receiver asks for them.
+        std::unique_ptr<nx::rtp::RtcpNackResponder> nackResponder;
+    };
+
+    // NOTE: leaves this encoder without an SRTP context, so it must not packetize anything
+    // afterwards: it is meant for an encoder that is about to be replaced.
+    Continuity takeContinuity();
+    void restoreContinuity(Continuity continuity);
 
     void setMid(const std::string& value) { m_mid = value; }
     std::string mid() const { return m_mid; }
@@ -84,6 +125,15 @@ private:
     std::unique_ptr<nx::rtsp::SrtpEncryptor> m_encryptor;
     std::unique_ptr<nx::rtp::RtcpNackResponder> m_rtcpNackResponder;
     std::string m_mid;
+    // Seeded from the first packet the muxer produces and the encoder's own from there on, so
+    // that an encoder taking over a stream can go on numbering it. See Continuity.
+    uint16_t m_sequence = 0;
+    bool m_sequenceInitialized = false;
+    // Added to every RTP timestamp the muxer produces, which it numbers from zero.
+    uint32_t m_rtpTimestampBase = 0;
+    uint32_t m_lastRtpTimestamp = 0;
+    std::vector<int> m_altPayloadTypes;
+    QStringList m_altSdpAttributes;
 };
 
 using QnUniversalRtpEncoderPtr = std::unique_ptr<QnUniversalRtpEncoder>;

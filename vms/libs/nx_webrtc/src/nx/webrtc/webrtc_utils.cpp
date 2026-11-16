@@ -33,6 +33,30 @@ void getTokens(std::string_view str, char delim, Callback callback)
     }
 }
 
+// The format list of an m-line: everything after "m=<media> <port> <proto>", for example the
+// "96 100" of "m=video 9 UDP/TLS/RTP/SAVPF 96 100".
+std::set<int> parsePayloadTypes(const std::string_view& mediaLine)
+{
+    std::set<int> result;
+    int index = 0;
+    getTokens(mediaLine,
+        ' ',
+        [&](const std::string_view& token)
+        {
+            if (index++ < 3)
+                return;
+
+            try
+            {
+                result.insert(std::stoi(std::string(token)));
+            }
+            catch (...)
+            {
+            }
+        });
+    return result;
+}
+
 } // namespace
 
 namespace nx::webrtc {
@@ -159,6 +183,7 @@ SdpParseResult SdpParseResult::parse(const std::string& sdp)
     std::set<std::string> supportedMids;
     int lastMid = -1;
     bool inactiveTrack = false;
+    std::set<int> payloadTypes;
 
     getTokens(
         sdp,
@@ -190,6 +215,7 @@ SdpParseResult SdpParseResult::parse(const std::string& sdp)
                 // new track started
                 lastMid = -1;
                 inactiveTrack = false;
+                payloadTypes = parsePayloadTypes(sv);
             }
             else if (sv.find(kAttributeInactive) == 0)
             {
@@ -204,6 +230,7 @@ SdpParseResult SdpParseResult::parse(const std::string& sdp)
                     int mid = std::stoi(midStr);
                     result.tracksState[mid] = supportedMids.count(midStr) && !inactiveTrack
                         ? TrackState::active : TrackState::inactive;
+                    result.trackPayloadTypes[mid] = payloadTypes;
                     lastMid = mid;
                 }
                 catch (...)

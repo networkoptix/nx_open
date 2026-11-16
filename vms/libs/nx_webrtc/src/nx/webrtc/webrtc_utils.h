@@ -2,7 +2,9 @@
 
 #pragma once
 
+#include <map>
 #include <optional>
+#include <set>
 #include <string>
 
 #include <nx/network/socket_common.h>
@@ -66,6 +68,9 @@ struct SdpParseResult
     std::string iceUfrag;
     std::string icePwd;
     std::map<int, TrackState> tracksState;
+    // The format list of each m-line, by mid: in an answer, the payload types of the offer that
+    // the client accepts, under the numbers the offer gave them (RFC 3264 section 6.1).
+    std::map<int, std::set<int>> trackPayloadTypes;
 
     static SdpParseResult parse(const std::string& sdp);
 };

@@ -23,6 +23,12 @@ static const int kVideoPayloadType = 96;
 static const int kAudioPayloadType = 97;
 static const int kSecondaryStreamPayloadType = 98;
 
+// How far the RTP timestamps of a stream advance across an encoder switch, in the clock the
+// stream is sampled with: one frame at 30 fps of the 90 kHz video clock, 20 ms of the 8 kHz
+// clock the audio codecs here share. See takeContinuity().
+static constexpr uint32_t kVideoCodecSwitchRtpGap = 3000;
+static constexpr uint32_t kAudioCodecSwitchRtpGap = 160;
+
 /* from http://www.iana.org/assignments/rtp-parameters last updated 05 January 2005 */
 /* payload types >= 96 are dynamic;
  * payload types between 72 and 76 are reserved for RTCP conflict avoidance;
@@ -313,7 +319,7 @@ bool QnUniversalRtpEncoder::open(
     m_isVideo = media->dataType == QnAbstractMediaData::VIDEO;
     m_sourceCodec = media->compressionType;
     AVCodecID codec = m_transcodingEnabled ? dstCodec : media->compressionType;
-    m_payloadType = getPayloadType(codec, m_isVideo);
+    m_payloadType = m_config.payloadType.value_or(getPayloadType(codec, m_isVideo));
     QnFfmpegTranscoder::TranscodeMethod method = m_transcodingEnabled
         ? QnFfmpegTranscoder::TM_FfmpegTranscode
         : QnFfmpegTranscoder::TM_DirectStreamCopy;
@@ -383,7 +389,8 @@ bool QnUniversalRtpEncoder::open(const AVCodecParameters* codecParameters)
         NX_WARNING(this, "Failed to open Ffmpeg muxer");
         return false;
     }
-    m_payloadType = getPayloadType(codecParameters->codec_id, m_isVideo);
+    m_payloadType =
+        m_config.payloadType.value_or(getPayloadType(codecParameters->codec_id, m_isVideo));
     m_sdpAttributes = getSdpAttributesFromCodecpar(
         codecParameters, m_payloadType, m_config.webRtcMode);
     return true;
@@ -403,10 +410,16 @@ QString QnUniversalRtpEncoder::getSdpMedia(bool isVideo, int trackId, int port, 
         (ssl ? " UDP/TLS/RTP/SAVPF " : " RTP/AVP ") << m_payloadType;
     if (m_useSecondaryPayloadType)
         stream << ' ' << kSecondaryStreamPayloadType;
+    // The codec in use comes first: the format list is ordered by preference (RFC 3264 section
+    // 5.1), and the alternatives are there to be switched to, not to be chosen now.
+    for (const int payloadType: m_altPayloadTypes)
+        stream << ' ' << payloadType;
     stream << kEndl;
     stream << "a=control:trackID=" << trackId << kEndl;
-    stream << m_sdpAttributes.join(kEndl);
-    if (!m_sdpAttributes.empty())
+    QStringList attributes = m_sdpAttributes;
+    attributes.append(m_altSdpAttributes);
+    stream << attributes.join(kEndl);
+    if (!attributes.empty())
         stream << kEndl;
 
     return sdpMedia;
@@ -526,14 +539,35 @@ bool QnUniversalRtpEncoder::getNextPacket(nx::utils::ByteArray& sendBuffer)
     nx::rtp::RtpHeader* rtpHeader =
         (nx::rtp::RtpHeader*)(m_outputBuffer.data() + m_outputPos);
 
+    // Unless it is told to skip them (see open()), ffmpeg writes its own sender reports into
+    // the same output, and a report is not an RTP packet: a payload type, an ssrc or a sequence
+    // number written into one lands on fields of its own, and a number taken out of the RTP
+    // sequence for it reads as a packet the receiver never got. Pass it on as it stands.
+    if (rtpHeader->isRtcp())
+    {
+        sendBuffer.write(m_outputBuffer.data() + m_outputPos, packets[m_packetIndex]);
+        m_outputPos += packets[m_packetIndex];
+        ++m_packetIndex;
+
+        if (m_encryptor)
+            return m_encryptor->encryptPacket(&sendBuffer, dataStartIndex);
+        return true;
+    }
+
+    // The muxer numbers its output from zero, so an encoder that took a stream over from another
+    // one carries that stream's timestamps forward instead. See restoreContinuity().
+    const uint32_t rtpTimestamp = timestamps.rtpTimestamp + m_rtpTimestampBase;
+
     if (m_isCurrentPacketSecondaryStream)
         rtpHeader->payloadType = kSecondaryStreamPayloadType;
+    else if (m_config.payloadType)
+        rtpHeader->payloadType = *m_config.payloadType;
     if (m_ssrc)
         rtpHeader->ssrc = qToBigEndian(m_ssrc.value());
 
     if (m_config.absoluteRtcpTimestamps)
     {
-        if (m_rtcpReporter.needReport(timestamps.ntpTimestamp, timestamps.rtpTimestamp))
+        if (m_rtcpReporter.needReport(timestamps.ntpTimestamp, rtpTimestamp))
         {
             using namespace nx::rtp;
             uint8_t buffer[256];
@@ -550,10 +584,21 @@ bool QnUniversalRtpEncoder::getNextPacket(nx::utils::ByteArray& sendBuffer)
         }
 
         // update rtp timestamp
-        rtpHeader->timestamp = htonl(timestamps.rtpTimestamp);
+        rtpHeader->timestamp = htonl(rtpTimestamp);
         uint32_t payloadSize = packets[m_packetIndex] - nx::rtp::RtpHeader::kSize;
         m_rtcpReporter.onPacket(payloadSize);
     }
+    m_lastRtpTimestamp = rtpTimestamp;
+
+    // Seeded from what the muxer produced first, and the encoder's own from there on: an encoder
+    // that took a stream over from another one has to go on numbering that stream, and its muxer
+    // starts the sequence afresh. Nothing below reads the number from the header before this.
+    if (!m_sequenceInitialized)
+    {
+        m_sequence = rtpHeader->getSequence();
+        m_sequenceInitialized = true;
+    }
+    rtpHeader->sequence = htons(m_sequence++);
 
     const char* packetOffset = m_outputBuffer.data() + m_outputPos;
     uint32_t packetSize = packets[m_packetIndex];
@@ -620,7 +665,10 @@ void QnUniversalRtpEncoder::setSrtpEncryptionData(const EncryptionData& data)
 
 FfmpegMuxer::PacketTimestamp QnUniversalRtpEncoder::getLastTimestamps() const
 {
-    return m_transcoder.muxer().getLastPacketTimestamp();
+    auto timestamps = m_transcoder.muxer().getLastPacketTimestamp();
+    // The muxer numbers from zero, while the packets carry the base, see getNextPacket().
+    timestamps.rtpTimestamp += m_rtpTimestampBase;
+    return timestamps;
 }
 
 nx::rtsp::SrtpEncryptor* QnUniversalRtpEncoder::encryptor() const
@@ -636,4 +684,39 @@ int QnUniversalRtpEncoder::payloadType() const
 QStringList QnUniversalRtpEncoder::sdpAttributes() const
 {
     return m_sdpAttributes;
+}
+
+void QnUniversalRtpEncoder::setAlternativeCodecs(
+    std::vector<int> payloadTypes, QStringList sdpAttributes)
+{
+    m_altPayloadTypes = std::move(payloadTypes);
+    m_altSdpAttributes = std::move(sdpAttributes);
+}
+
+QnUniversalRtpEncoder::Continuity QnUniversalRtpEncoder::takeContinuity()
+{
+    // The stream has to move forward over the switch rather than stand still, and the encoder
+    // taking over starts its own timestamps at zero.
+    const uint32_t rtpTimestampBase =
+        m_lastRtpTimestamp + (m_isVideo ? kVideoCodecSwitchRtpGap : kAudioCodecSwitchRtpGap);
+
+    return Continuity{.sequence = m_sequence,
+        .rtpTimestampBase = rtpTimestampBase,
+        .encryptor = std::move(m_encryptor),
+        .rtcpReporter = m_rtcpReporter,
+        .nackResponder = std::move(m_rtcpNackResponder)};
+}
+
+void QnUniversalRtpEncoder::restoreContinuity(Continuity continuity)
+{
+    m_sequence = continuity.sequence;
+    m_sequenceInitialized = true;
+    m_rtpTimestampBase = continuity.rtpTimestampBase;
+    m_lastRtpTimestamp = continuity.rtpTimestampBase;
+    // An encoder of a session without SRTP has none to hand over.
+    if (continuity.encryptor)
+        m_encryptor = std::move(continuity.encryptor);
+    if (continuity.nackResponder)
+        m_rtcpNackResponder = std::move(continuity.nackResponder);
+    m_rtcpReporter = continuity.rtcpReporter;
 }

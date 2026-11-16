@@ -4,8 +4,8 @@
 
 #include <core/resource/camera_resource.h>
 #include <nx/sdk/helpers/uuid_helper.h>
-#include <nx/utils/random.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/random.h>
 
 #include "webrtc_session.h"
 #include "webrtc_twcc.h"
@@ -114,7 +114,6 @@ void Tracks::freeTracks(nx::Uuid deviceId)
 void Tracks::freeTrack(Track* track)
 {
     track->offerState = TrackState::inactive;
-    track->pendingAnswer = false;
     track->deviceId = {};
 }
 
@@ -131,26 +130,6 @@ Track* Tracks::track(uint32_t ssrc) const
 bool Tracks::isSsrcTaken(uint32_t ssrc) const
 {
     return track(ssrc) != nullptr;
-}
-
-uint32_t Tracks::updateSsrc(Track* track, std::optional<uint32_t> newSsrc)
-{
-    if (!track)
-        return 0;
-
-    if (!newSsrc)
-    {
-        do
-            newSsrc = nx::utils::random::number<uint32_t>();
-        while (isSsrcTaken(*newSsrc));
-    }
-    else if (isSsrcTaken(*newSsrc))
-    {
-        return 0;
-    }
-
-    track->ssrc = *newSsrc;
-    return *newSsrc;
 }
 
 Tracks::Tracks(Session* session)
@@ -276,7 +255,17 @@ std::string Tracks::getSdpForTrack(const Track* track, uint16_t /*port*/) const
     // 'ssrc' of track used by Chromium's demuxer. Not sure about 'cname'.
     sdp += "a=ssrc:" + std::to_string(track->ssrc) + " cname:" + track->cname + ENDL;
     // Generic RTCP feedbacks supported: https://www.rfc-editor.org/rfc/rfc4585.html#section-3.6.2
-    sdp += "a=rtcp-fb:" + std::to_string(track->payloadType) + " nack" ENDL;
+    // Every codec the m-line offers gets the feedback, not only the one being streamed: the
+    // others are there to be switched to without a new offer, see Session::switchCodec().
+    if (track->offeredPayloadTypes.empty())
+    {
+        sdp += "a=rtcp-fb:" + std::to_string(track->payloadType) + " nack" ENDL;
+    }
+    else
+    {
+        for (const int payloadType: track->offeredPayloadTypes)
+            sdp += "a=rtcp-fb:" + std::to_string(payloadType) + " nack" ENDL;
+    }
 
     // Mid in RTP extension is not used now.
     //sdp += "a=extmap:1 urn:ietf:params:rtp-hdrext:sdes:mid" ENDL;

@@ -5,6 +5,7 @@
 #include "webrtc_utils.h"
 
 #include <optional>
+#include <set>
 
 #include <nx/utils/uuid.h>
 
@@ -23,17 +24,19 @@ struct NX_WEBRTC_API Track
     std::string streamId;
     std::string trackId;
     int mid = -1;
+    // The payload type of the codec being streamed right now.
     int payloadType = 0;
+    // Every payload type this m-line offers, and the ones of those that the client took in its
+    // answer. A video m-line offers each codec its Device may switch to, so that the switch
+    // changes nothing but the payload type of the packets -- see Session::switchCodec() --
+    // and a codec the client left out of its answer is one that cannot be streamed on it.
+    std::set<int> offeredPayloadTypes;
+    std::set<int> negotiatedPayloadTypes;
     Purpose purpose = Purpose::sendrecv;
     nx::Uuid deviceId;
     TrackType trackType = TrackType::unknown;
 
     TrackState offerState{};
-    // A renegotiation offer was sent (Session::renegotiateProvider()) but not answered yet, so the
-    // client doesn't know the new SSRC/payload type.
-    bool pendingAnswer = false;
-    // Valid only while pendingAnswer: where to resume the provider (DATETIME_NOW for live).
-    int64_t resumePositionUs = 0;
 
     // No Device holds this m-line. It is still offered, as a rejected one, and the next Device
     // that needs an m-line of this type takes it, see Tracks::addTrack().
@@ -59,11 +62,6 @@ public:
     // Hands one m-line back, leaving the other m-lines of its Device alone: that Device goes on
     // streaming whatever the client took of it. See freeTracks().
     void freeTrack(Track* track);
-
-    // Without `newSsrc` assigns a fresh random one, telling the receiver that the RTP stream
-    // restarted, e.g. on a mid-session codec change. `newSsrc` can be set to roll back to the old
-    // ssrc when the codec change fails. Returns the ssrc in use, or 0 if `newSsrc` is taken.
-    uint32_t updateSsrc(Track* track, std::optional<uint32_t> newSsrc = std::nullopt);
 
     Tracks(Session* session);
     virtual ~Tracks() = default;
