@@ -272,14 +272,14 @@ SystemSettings::SystemSettings(SystemContext* context, QObject* parent):
     SystemContextAware(context),
     d(new Private)
 {
-    d->allAdaptors
-        << initEmailAdaptors()
-        << initStaticticsAdaptors()
-        << initConnectionAdaptors()
-        << initTimeSynchronizationAdaptors()
-        << initCloudAdaptors()
-        << initMiscAdaptors()
-        ;
+    initEmailAdaptors();
+    initStaticticsAdaptors();
+    initConnectionAdaptors();
+    initTimeSynchronizationAdaptors();
+    initCloudAdaptors();
+    initMiscAdaptors();
+
+    d->allAdaptors = findChildren<QnAbstractResourcePropertyAdaptor*>(Qt::FindDirectChildrenOnly);
 
     for (const auto& adapter: d->allAdaptors)
     {
@@ -343,7 +343,7 @@ bool SystemSettings::isInitialized() const
     return !d->admin.isNull();
 }
 
-SystemSettings::AdaptorList SystemSettings::initEmailAdaptors()
+void SystemSettings::initEmailAdaptors()
 {
     const auto isValid =
         [](const nx::vms::api::EmailSettings& s)
@@ -360,17 +360,14 @@ SystemSettings::AdaptorList SystemSettings::initEmailAdaptors()
             this,
             [] { return tr("SMTP settings. These settings are visible for Power Users only."); });
 
-    connect(
-        d->emailSettingsAdaptor,
+    connect(d->emailSettingsAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
         &SystemSettings::emailSettingsChanged,
         Qt::QueuedConnection);
-
-    return {d->emailSettingsAdaptor};
 }
 
-SystemSettings::AdaptorList SystemSettings::initStaticticsAdaptors()
+void SystemSettings::initStaticticsAdaptors()
 {
     d->statisticsAllowedAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "statisticsAllowed", true, this,
@@ -413,30 +410,14 @@ SystemSettings::AdaptorList SystemSettings::initStaticticsAdaptors()
             "deviceStorageInfoUpdateIntervalS", 7 * 24 * 3600 * 1s, this,
             [] { return tr("Device storage information update interval."); });
 
-    connect(
-        d->statisticsAllowedAdaptor,
+    connect(d->statisticsAllowedAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
         &SystemSettings::statisticsAllowedChanged,
         Qt::QueuedConnection);
-
-    AdaptorList result;
-    result
-        << d->statisticsAllowedAdaptor
-        << d->statisticsReportLastTimeAdaptor
-        << d->statisticsReportLastVersionAdaptor
-        << d->statisticsReportLastNumberAdaptor
-        << d->statisticsReportTimeCycleAdaptor
-        << d->statisticsReportUpdateDelayAdaptor
-        << d->statisticsReportServerApiAdaptor
-        << d->crashReportServerApiAdaptor
-        << d->clientStatisticsSettingsUrlAdaptor
-        << d->deviceStorageInfoUpdateIntervalSAdaptor;
-
-    return result;
 }
 
-SystemSettings::AdaptorList SystemSettings::initConnectionAdaptors()
+void SystemSettings::initConnectionAdaptors()
 {
     AdaptorList ec2Adaptors;
 
@@ -470,11 +451,9 @@ SystemSettings::AdaptorList SystemSettings::initConnectionAdaptors()
             },
             Qt::QueuedConnection);
     }
-
-    return ec2Adaptors;
 }
 
-SystemSettings::AdaptorList SystemSettings::initTimeSynchronizationAdaptors()
+void SystemSettings::initTimeSynchronizationAdaptors()
 {
     using namespace std::chrono;
 
@@ -535,11 +514,9 @@ SystemSettings::AdaptorList SystemSettings::initTimeSynchronizationAdaptors()
             &SystemSettings::timeSynchronizationSettingsChanged,
             Qt::QueuedConnection);
     }
-
-    return timeSynchronizationAdaptors;
 }
 
-SystemSettings::AdaptorList SystemSettings::initCloudAdaptors()
+void SystemSettings::initCloudAdaptors()
 {
     d->cloudAccountNameAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         Names::cloudAccountName, QString(), this, [] { return tr("Cloud owner account."); });
@@ -596,17 +573,14 @@ SystemSettings::AdaptorList SystemSettings::initCloudAdaptors()
         &SystemSettings::cloudCredentialsChanged,
         Qt::QueuedConnection);
 
-    connect(
-        d->cloudAuthKeyAdaptor,
+    connect(d->cloudAuthKeyAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
         &SystemSettings::cloudCredentialsChanged,
         Qt::QueuedConnection);
-
-    return result;
 }
 
-SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
+void SystemSettings::initMiscAdaptors()
 {
     using namespace std::chrono;
 
@@ -1389,105 +1363,6 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         this,
         &SystemSettings::jsonRpcSubUpdateChanged,
         Qt::DirectConnection);
-
-    AdaptorList result;
-    result
-        << d->systemNameAdaptor
-        << d->localSystemIdAdaptor
-        << d->lastMergeMasterIdAdaptor
-        << d->lastMergeSlaveIdAdaptor
-        << d->disabledVendorsAdaptor
-        << d->cameraSettingsOptimizationAdaptor
-        << d->autoUpdateThumbnailsAdaptor
-        << d->maxSceneItemsAdaptor
-        << d->useTextEmailFormatAdaptor
-        << d->useWindowsEmailLineFeedAdaptor
-        << d->auditTrailEnabledAdaptor
-        << d->auditTrailPeriodDaysAdaptor
-        << d->trafficEncryptionForcedAdaptor
-        << d->videoTrafficEncryptionForcedAdaptor
-        << d->exposeDeviceCredentialsAdaptor
-        << d->useHttpsOnlyForCamerasAdaptor
-        << d->securityForPowerUsersAdaptor
-        << d->insecureDeprecatedApiEnabledAdaptor
-        << d->insecureDeprecatedApiInUseEnabledAdaptor
-        << d->insecureDeprecatedAuthEnabledAdaptor
-        << d->eventLogPeriodDaysAdaptor
-        << d->autoDiscoveryEnabledAdaptor
-        << d->autoDiscoveryResponseEnabledAdaptor
-        << d->updateNotificationsEnabledAdaptor
-        << d->backupSettingsAdaptor
-        << d->upnpPortMappingEnabledAdaptor
-        << d->cloudHostAdaptor
-        << d->crossdomainEnabledAdaptor
-        << d->arecontRtspEnabledAdaptor
-        << d->sequentialFlirOnvifSearcherEnabledAdaptor
-        << d->maxP2pQueueSizeBytesAdaptor
-        << d->maxP2pAllClientsSizeBytesAdaptor
-        << d->maxRecordQueueSizeBytesAdaptor
-        << d->maxRecordQueueSizeElementsAdaptor
-        << d->rtpTimeoutMsAdaptor
-        << d->maxRtspConnectDurationSecondsAdaptor
-        << d->cloudConnectUdpHolePunchingEnabledAdaptor
-        << d->cloudConnectRelayingEnabledAdaptor
-        << d->cloudConnectRelayingOverSslForcedAdaptor
-        << d->enableEdgeRecordingAdaptor
-        << d->webSocketEnabledAdaptor
-        << d->maxRemoteArchiveSynchronizationThreadsAdaptor
-        << d->customReleaseListUrlAdaptor
-        << d->targetUpdateInformationAdaptor
-        << d->installedUpdateInformationAdaptor
-        << d->maxVirtualCameraArchiveSynchronizationThreadsAdaptor
-        << d->watermarkSettingsAdaptor
-        << d->pixelationSettingsAdaptor
-        << d->sessionLimitSAdaptor
-        << d->useSessionLimitForCloudAdaptor
-        << d->sessionsLimitAdaptor
-        << d->sessionsLimitPerUserAdaptor
-        << d->remoteSessionUpdateSAdaptor
-        << d->remoteSessionUpdateKeysSAdaptor
-        << d->remoteSessionTimeoutSAdaptor
-        << d->defaultVideoCodecAdaptor
-        << d->defaultExportVideoCodecAdaptor
-        << d->downloaderPeersAdaptor
-        << d->clientUpdateSettingsAdaptor
-        << d->lowQualityScreenVideoCodecAdaptor
-        << d->licenseServerAdaptor
-        << d->resourceFileUriAdaptor
-        << d->maxHttpTranscodingSessionsAdaptor
-        << d->maxEventLogRecordsAdaptor
-        << d->maxBookmarksAdaptor
-        << d->forceLiveCacheForPrimaryStreamAdaptor
-        << d->metadataStorageChangePolicyAdaptor
-        << d->maxRtpRetryCountAdaptor
-        << d->targetPersistentUpdateStorageAdaptor
-        << d->installedPersistentUpdateStorageAdaptor
-        << d->specificFeaturesAdaptor
-        << d->defaultUserLocaleAdaptor
-        << d->additionalLocalFsTypesAdaptor
-        << d->keepIoPortStateIntactOnInitializationAdaptor
-        << d->mediaBufferSizeKbAdaptor
-        << d->mediaSendTimeoutSAdaptor
-        << d->mediaBufferSizeForAudioOnlyDeviceKbAdaptor
-        << d->forceAnalyticsDbStoragePermissionsAdaptor
-        << d->checkVideoStreamPeriodMsAdaptor
-        << d->storageEncryptionAdaptor
-        << d->currentStorageEncryptionKeyAdaptor
-        << d->showServersInTreeForNonAdminsAdaptor
-        << d->serverHeaderAdaptor
-        << d->supportedOriginsAdaptor
-        << d->supportedOriginCredentialsAdaptor
-        << d->frameOptionsHeaderAdaptor
-        << d->showMouseTimelinePreviewAdaptor
-        << d->ldapAdaptor
-        << d->exposeServerEndpointsAdaptor
-        << d->cloudPollingIntervalSAdaptor
-        << d->allowRegisteringIntegrationsAdaptor
-        << d->integrationProcessModeAdaptor
-        << d->jsonRpcSubUpdateMsAdaptor
-    ;
-
-    return result;
 }
 
 QString SystemSettings::disabledVendors() const

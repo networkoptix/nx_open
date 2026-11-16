@@ -659,12 +659,12 @@ signals:
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;
 
-    AdaptorList initEmailAdaptors();
-    AdaptorList initStaticticsAdaptors();
-    AdaptorList initConnectionAdaptors();
-    AdaptorList initTimeSynchronizationAdaptors();
-    AdaptorList initCloudAdaptors();
-    AdaptorList initMiscAdaptors();
+    void initEmailAdaptors();
+    void initStaticticsAdaptors();
+    void initConnectionAdaptors();
+    void initTimeSynchronizationAdaptors();
+    void initCloudAdaptors();
+    void initMiscAdaptors();
 
     void at_resourcePool_resourceRemoved(const QnResourcePtr& resource);
 
