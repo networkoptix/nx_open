@@ -31,6 +31,11 @@ QnResourcePtr QnAbstractPtzController::resource() const
     return m_resource;
 }
 
+QnPtzMapperPtr QnAbstractPtzController::discoveredPtzMapper() const
+{
+    return {};
+}
+
 std::optional<QnPtzTour> QnAbstractPtzController::getActiveTour()
 {
     return std::nullopt;

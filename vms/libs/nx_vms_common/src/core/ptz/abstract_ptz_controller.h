@@ -51,6 +51,12 @@ public:
     virtual QnResourcePtr resource() const;
 
     /**
+     * Returns a PTZ mapper discovered by the controller at runtime, if available.
+     * A mapper configured by the resource remains authoritative over this fallback.
+     */
+    virtual QnPtzMapperPtr discoveredPtzMapper() const;
+
+    /**
      * This method will be invoked after the controller is moved to the executor thread.
      * Note: invocation is done through the event loop in the executor thread.
      */
