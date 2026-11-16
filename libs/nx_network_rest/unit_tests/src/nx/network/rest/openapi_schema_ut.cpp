@@ -33,8 +33,10 @@ class OpenApiSchemaTest: public ::testing::TestWithParam<std::string_view>
 public:
     virtual void SetUp() override
     {
-        m_schemas = std::make_shared<OpenApiSchemas>(std::vector<std::shared_ptr<OpenApiSchema>>{
-            OpenApiSchema::load(":/openapi_v4.json"), OpenApiSchema::load(":/openapi_v3.json")});
+        m_schemas = std::make_shared<OpenApiSchemas>(
+            OpenApiSchemas{{OpenApiSchema::load(":/openapi_v5.json"),
+                OpenApiSchema::load(":/openapi_v4.json"),
+                OpenApiSchema::load(":/openapi_v3.json")}});
     }
 
     std::unique_ptr<Request> restRequest(QStringList text, QByteArray body = {})

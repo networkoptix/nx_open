@@ -97,9 +97,10 @@ class CrudHandlerTest: public ::testing::TestWithParam<std::string_view>{};
 TEST_P(CrudHandlerTest, BookmarkPatch)
 {
     BookmarkHandler handler;
-    handler.setSchemas(std::make_shared<json::OpenApiSchemas>(json::OpenApiSchemas{{
-        json::OpenApiSchema::load(":/openapi_v4.json"),
-        json::OpenApiSchema::load(":/openapi_v3.json")}}));
+    handler.setSchemas(std::make_shared<json::OpenApiSchemas>(
+        json::OpenApiSchemas{{json::OpenApiSchema::load(":/openapi_v5.json"),
+            json::OpenApiSchema::load(":/openapi_v4.json"),
+            json::OpenApiSchema::load(":/openapi_v3.json")}}));
     Response response;
     const auto request =
         [&](const QByteArray& body)
@@ -195,8 +196,9 @@ TEST_P(CrudHandlerTest, ObjectTrackGet)
         return;
 
     AnalyticsObjectTracksHandler handler;
-    handler.setSchemas(std::make_shared<json::OpenApiSchemas>(json::OpenApiSchemas{{
-        json::OpenApiSchema::load(":/openapi_v4.json")}}));
+    handler.setSchemas(std::make_shared<json::OpenApiSchemas>(
+        json::OpenApiSchemas{{json::OpenApiSchema::load(":/openapi_v5.json"),
+            json::OpenApiSchema::load(":/openapi_v4.json")}}));
     http::Request httpRequest;
     httpRequest.requestLine.method = http::Method::get;
     Request request{&httpRequest, std::optional<Content>{}};
@@ -254,7 +256,8 @@ TEST_P(CrudHandlerTest, DevicePatch)
 {
     DevicesHandler handler;
     handler.setSchemas(std::make_shared<json::OpenApiSchemas>(
-        json::OpenApiSchemas{{json::OpenApiSchema::load(":/openapi_v4.json"),
+        json::OpenApiSchemas{{json::OpenApiSchema::load(":/openapi_v5.json"),
+            json::OpenApiSchema::load(":/openapi_v4.json"),
             json::OpenApiSchema::load(":/openapi_v3.json")}}));
     const auto request =
         [&](const QByteArray& body)

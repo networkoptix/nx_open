@@ -2,33 +2,27 @@
 
 include(openapi)
 
-nx_generate_openapi_schema(
-    TEMPLATE "${CMAKE_CURRENT_SOURCE_DIR}/src/nx/network/rest/openapi_template_ut.yaml"
-    VMS_PATH "${open_source_root}"
-    CONFIG "${CMAKE_CURRENT_SOURCE_DIR}/src/nx/network/rest/apidoctool_v4.properties"
-    TMP_DIR "${CMAKE_CURRENT_BINARY_DIR}/openapi_tmp_v4"
-    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/openapi_v4.json"
-    VERBOSE "-verbose")
-
-nx_generate_openapi_schema(
-    TEMPLATE "${CMAKE_CURRENT_SOURCE_DIR}/src/nx/network/rest/openapi_template_ut.yaml"
-    VMS_PATH "${open_source_root}"
-    CONFIG "${CMAKE_CURRENT_SOURCE_DIR}/src/nx/network/rest/apidoctool_v3.properties"
-    TMP_DIR "${CMAKE_CURRENT_BINARY_DIR}/openapi_tmp_v3"
-    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/openapi_v3.json"
-    VERBOSE "-verbose")
-
-# ARM builds with productType=mobile do not include nx_vms_api library, but include nx_network_rest
-if(TARGET nx_vms_api)
-    nx_add_test(nx_network_rest_ut
-        ADDITIONAL_RESOURCES
-            ${CMAKE_CURRENT_BINARY_DIR}/openapi_v4.json
-            ${CMAKE_CURRENT_BINARY_DIR}/openapi_v3.json
-        PUBLIC_LIBS
-            nx_network_rest
-            nx_vms_api # nx_network_rest itself does not depend on nx_vms_api. This dependency is
-                    # needed to verify nx_vms_api structs against nx_network_rest.
-        PROJECT NXLIB
-        FOLDER common/tests
+set(testSourceDir "${CMAKE_CURRENT_SOURCE_DIR}/src/nx/network/rest")
+set(versionedOpenapiJsons)
+foreach(apiVersion RANGE 3 5)
+    set(_openapiJson "${CMAKE_CURRENT_BINARY_DIR}/openapi_v${apiVersion}.json")
+    list(APPEND versionedOpenapiJsons "${_openapiJson}")
+    nx_generate_openapi_schema(
+        TEMPLATE "${testSourceDir}/openapi_template_ut.yaml"
+        VMS_PATH "${open_source_root}"
+        CONFIG "${testSourceDir}/apidoctool_v${apiVersion}.properties"
+        TMP_DIR "${CMAKE_CURRENT_BINARY_DIR}/openapi_tmp_v${apiVersion}"
+        OUTPUT "${_openapiJson}"
+        VERBOSE "-verbose"
     )
-endif()
+endforeach()
+
+nx_add_test(nx_network_rest_ut
+    ADDITIONAL_RESOURCES ${versionedOpenapiJsons}
+    PUBLIC_LIBS
+        nx_network_rest
+        nx_vms_api # nx_network_rest itself does not depend on nx_vms_api. This dependency is
+                   # needed to verify nx_vms_api structs against nx_network_rest.
+    PROJECT NXLIB
+    FOLDER common/tests
+)
