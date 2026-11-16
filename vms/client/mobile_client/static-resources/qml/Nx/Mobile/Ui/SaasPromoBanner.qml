@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Controls
 
 import Nx.Core
+import Nx.Core.Controls
 import Nx.Mobile.Controls
 
 import nx.vms.client.mobile
@@ -37,10 +38,11 @@ BaseBanner
     text: qsTr("Unlock exclusive features for actionable video intelligence and data-driven "
         + "operations at scale")
 
-    iconItem: Text
+    iconItem: ColoredImage
     {
-        font.pixelSize: 20
-        text: "\uD83D\uDE80" //< "Rocket" emoji.
+        sourcePath: "image://skin/20x20/Solid/rocket.svg"
+        primaryColor: control.textColor
+        sourceSize: Qt.size(20, 20)
     }
 
     action: Action
