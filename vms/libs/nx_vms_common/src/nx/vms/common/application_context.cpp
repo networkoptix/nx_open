@@ -12,6 +12,7 @@
 #include <nx/network/cloud/tunnel/tcp/tunnel_tcp_endpoint_verificator_factory.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/i18n/translation_manager.h>
+#include <nx/utils/log/logger_collection.h>
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/timer_manager.h>
@@ -139,6 +140,10 @@ ApplicationContext::~ApplicationContext()
 
     if (NX_ASSERT(s_instance == this))
         s_instance = nullptr;
+
+    // Static destructors log during DLL unload, when threads can't be started on Windows.
+    // Afterwards logs are rotated without zipping, they are zipped on the next start.
+    nx::log::LoggerCollection::instance()->stopArchiving();
 }
 
 const ApplicationContext::Features& ApplicationContext::commonFeatures() const

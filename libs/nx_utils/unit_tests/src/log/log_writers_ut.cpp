@@ -11,6 +11,7 @@
 #include <nx/utils/log/storage_info.h>
 #include <nx/utils/nx_utils_ini.h>
 #include <nx/utils/random.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/test_support/test_options.h>
 
 namespace nx::log::test {
@@ -77,13 +78,14 @@ public:
 
     virtual void SetUp() override
     {
+        // Leftovers of aborted tests count towards the volume limit too.
         auto dir = QFileInfo(m_basePath).dir();
-        const auto logs = dir.entryList(
-            {
-                QString("*") + toQString(File::Extension::log),
-                QString("*") + toQString(File::Extension::zip)
-            },
-            QDir::Files, QDir::Name);
+        const auto logs = dir.entryList({QString("*") + toQString(File::Extension::log),
+                                            QString("*") + toQString(File::Extension::tmp),
+                                            QString("*") + toQString(File::Extension::zip),
+                                            QString("*") + toQString(File::Extension::zipTmp)},
+            QDir::Files,
+            QDir::Name);
         for (const auto& log: logs)
             dir.remove(log);
 
@@ -198,6 +200,62 @@ TEST_F(LogFile, Rotation)
     checkFile({"a", "b", "12345678901234567890"}, "_002", File::Extension::zip);
     checkFile({"6666666666", "1234567890"}, "_003", File::Extension::zip);
     checkFile({"zzz"});
+}
+
+TEST_F(LogFile, RotationAfterArchivingStopped)
+{
+    static constexpr size_t kLogSize = 20;
+    static constexpr size_t kVolumeSize = 500;
+
+    {
+        auto w = makeWriter(kLogSize, kVolumeSize);
+        w->stopArchivingAsync().get();
+
+        // Rotated without zipping.
+        w->write(Level::undefined, "1234567890");
+        w->write(Level::undefined, "1234567890"); //< Overflow
+        checkFile({"1234567890", "1234567890"}, "_001");
+        checkFile();
+
+        w->write(Level::undefined, "xxx");
+        w->write(Level::undefined, "12345678901234567890"); //< Overflow
+        checkFile({"1234567890", "1234567890"}, "_001");
+        checkFile({"xxx", "12345678901234567890"}, "_002");
+        checkFile();
+    }
+
+    // Zipped on the next start.
+    auto w = makeWriter(kLogSize, kVolumeSize);
+    checkFile({"1234567890", "1234567890"}, "_001", File::Extension::zip);
+    checkFile({"xxx", "12345678901234567890"}, "_002", File::Extension::zip);
+}
+
+TEST_F(LogFile, FailedArchiving)
+{
+    static constexpr size_t kLogSize = 20;
+    static constexpr size_t kVolumeSize = 500;
+
+    // A directory in place of the temporary archive makes zipping fail.
+    const auto blockedZipTmp = m_basePath + "_001" + toQString(File::Extension::zipTmp);
+    ASSERT_TRUE(QDir().mkpath(blockedZipTmp));
+    auto guard = nx::utils::makeScopeGuard([&]() { QDir().rmdir(blockedZipTmp); });
+
+    {
+        auto w = makeWriter(kLogSize, kVolumeSize);
+
+        // The rotated log is restored as a plain log, nothing is left as tmp.
+        w->write(Level::undefined, "1234567890");
+        w->write(Level::undefined, "1234567890"); //< Overflow
+
+        // The next rotation waits for the failed archiving and does not take the number.
+        w->write(Level::undefined, "xxx");
+        w->write(Level::undefined, "12345678901234567890"); //< Overflow
+    }
+
+    checkFile({"1234567890", "1234567890"}, "_001");
+    EXPECT_FALSE(QFile::exists(m_basePath + "_001" + toQString(File::Extension::tmp)));
+    checkFile({"xxx", "12345678901234567890"}, "_002", File::Extension::zip);
+    checkFile();
 }
 
 TEST_F(LogFile, RotationWithArchiveOpenedByAnotherProcess)

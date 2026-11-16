@@ -239,6 +239,17 @@ void File::archive(QString fileName, QString archiveName)
     auto tmpArchiveName = archiveName;
     tmpArchiveName.replace(toQString(Extension::zip), toQString(Extension::zipTmp));
 
+    // Declared before the files to run after they are closed. On failure the rotated log is
+    // restored, so it is neither overwritten by the next rotation nor lost.
+    bool archiveCreated = false;
+    auto cleanup = nx::utils::makeScopeGuard(
+        [&]()
+        {
+            if (archiveCreated)
+                QFile::remove(tmpArchiveName);
+            restoreRotatedLog(fileName);
+        });
+
     QFile textLog(fileName);
     if (!textLog.open(QIODevice::ReadOnly))
     {
@@ -254,6 +265,7 @@ void File::archive(QString fileName, QString archiveName)
             << tmpArchiveName.toStdString() << '\n';
         return;
     }
+    archiveCreated = true;
 
     QuaZip archive(&archiveFile);
     archive.setZip64Enabled(true);
@@ -301,9 +313,23 @@ void File::archive(QString fileName, QString archiveName)
                   << tmpArchiveName.toStdString() << " as " << archiveName.toStdString() << '\n';
         return;
     }
+    cleanup.disarm();
 
     textLog.close();
     textLog.remove();
+}
+
+void File::restoreRotatedLog(const QString& fileName)
+{
+    if (!fileName.endsWith(toQString(Extension::tmp)) || !QFile::exists(fileName))
+        return;
+
+    const auto logName = makeFileName(fileName, 0, Extension::log);
+    if (!renameFileWithoutCopyFallback(fileName, logName))
+    {
+        std::cerr << nx::toString(this).toStdString() << ": Could not restore log file "
+                  << fileName.toStdString() << " as " << logName.toStdString() << '\n';
+    }
 }
 
 void File::rotateAndStartArchivingIfNeeded()
@@ -387,7 +413,9 @@ void File::rotateAndStartArchivingIfNeeded()
         }
     }
 
-    if (!m_settings.archivingEnabled)
+    // No new threads at shutdown: the rotated log is zipped by rotateLeftovers() on the next
+    // start.
+    if (!m_settings.archivingEnabled || m_backgroundArchivingStopped)
     {
         auto rotateName = makeFileName(m_settings.name, freeNumber(), Extension::log);
         if (!renameFileWithoutCopyFallback(getFileName(), rotateName))
@@ -409,9 +437,11 @@ void File::rotateAndStartArchivingIfNeeded()
                   << getFileName().toStdString() << " to " << tmpName.toStdString() << '\n';
         return;
     }
+
     try
     {
-        m_archive = std::async(std::launch::async, &File::archive, this, tmpName, archiveName);
+        m_archive =
+            std::async(std::launch::async, &File::archive, this, tmpName, archiveName).share();
     }
     catch (const std::exception& e)
     {
@@ -563,8 +593,19 @@ bool File::queueToArchive(nx::Locker<nx::Mutex>* lock)
     m_archiveQueue++;
     if (m_archive.valid() && m_archiveQueue == 1)
     {
+        // A copy is waited: stopArchivingAsync() may wait for the same archiving.
+        const auto pending = m_archive;
+        auto guard = nx::utils::makeScopeGuard([this]() { m_archive = {}; });
         nx::Unlocker<nx::Mutex> unlocker(lock);
-        m_archive.get();
+        try
+        {
+            pending.get();
+        }
+        catch (const std::exception& e)
+        {
+            std::cerr << nx::toString(this).toStdString() << ": Log archiving failed: " << e.what()
+                      << '\n';
+        }
     }
     m_archiveQueue--;
     return m_archiveQueue == 0;
@@ -572,25 +613,18 @@ bool File::queueToArchive(nx::Locker<nx::Mutex>* lock)
 
 cf::future<cf::unit> File::stopArchivingAsync()
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    m_archiveQueue++;
+    std::shared_future<void> pending;
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        m_backgroundArchivingStopped = true;
+        pending = m_archive;
+    }
 
-    if (!m_archive.valid())
-        return cf::make_ready_future(cf::unit());
-
-    return cf::initiate(
-        [this]() mutable
-        {
-            try
-            {
-                m_archive.wait();
-                return cf::unit();
-            }
-            catch (const std::future_error&)
-            {
-                return cf::unit();
-            }
-        });
+    // The started archiving is finished before the exit, so its thread is not killed in the
+    // middle. Waited without the writer lock, the archiving thread does not need it.
+    if (pending.valid())
+        pending.wait();
+    return cf::make_ready_future(cf::unit());
 }
 
 bool File::isCurrentLimitReached(nx::Locker<nx::Mutex>* /*lock*/)
