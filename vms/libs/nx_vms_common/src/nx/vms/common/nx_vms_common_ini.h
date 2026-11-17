@@ -12,6 +12,8 @@ struct NX_VMS_COMMON_API Ini: nx::kit::IniConfig
 
     NX_INI_STRING("https://licensing.vmsproxy.com", defaultLicenseServerUrl,
         "License server URL (can be overridden in the system settings)");
+
+    NX_INI_FLAG(0, enableHwTranscoding, "Transcode video on the GPU.");
 };
 
 NX_VMS_COMMON_API Ini& ini();

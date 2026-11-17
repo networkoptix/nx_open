@@ -128,8 +128,15 @@ HwVideoDecoder::HwVideoDecoder(
 HwVideoDecoder::~HwVideoDecoder()
 {
     resetDecoder(nullptr);
+    av_buffer_unref(&m_sharedHwDeviceContext);
     if (m_metrics)
         m_metrics->decoders()--;
+}
+
+void HwVideoDecoder::setHwDeviceContext(AVBufferRef* context)
+{
+    av_buffer_unref(&m_sharedHwDeviceContext);
+    m_sharedHwDeviceContext = av_buffer_ref(context);
 }
 
 bool HwVideoDecoder::isCompatible(
@@ -304,6 +311,10 @@ bool HwVideoDecoder::initializeHardware(const QnConstCompressedVideoDataPtr& dat
             NX_DEBUG(this, "Failed to init HW device context %1", avErrorToString(status));
             return false;
         }
+    }
+    else if (m_sharedHwDeviceContext)
+    {
+        m_decoderContext->hw_device_ctx = av_buffer_ref(m_sharedHwDeviceContext);
     }
     else
     {

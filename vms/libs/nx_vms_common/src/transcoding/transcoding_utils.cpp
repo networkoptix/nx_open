@@ -13,6 +13,7 @@
 #include <nx/streaming/abstract_stream_data_provider.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/math.h>
+#include <nx/vms/common/nx_vms_common_ini.h>
 
 namespace nx::transcoding {
 
@@ -72,6 +73,15 @@ AVCodecID findEncoderCodecId(const QString& codecName)
         {"vp8", {"libvpx"}},
         {"vp9", {"libvpx-vp9"}},
     };
+    // Only the hardware encoders are configured for these.
+    static const std::map<QString, AVCodecID> kHardwareOnly{
+        {"hevc", AV_CODEC_ID_HEVC}, {"h265", AV_CODEC_ID_HEVC}, {"av1", AV_CODEC_ID_AV1}};
+    if (const auto it = kHardwareOnly.find(codecLower);
+        it != kHardwareOnly.end() && nx::vms::common::ini().enableHwTranscoding)
+    {
+        return it->second;
+    }
+
     auto substitutes = codecSubstitutesMap.find(codecLower.toUtf8().constData());
     if (substitutes == codecSubstitutesMap.end())
         return AV_CODEC_ID_NONE;

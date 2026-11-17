@@ -43,6 +43,10 @@ public:
 
     bool isDownscaleRequired(const QSize& srcResolution) const;
 
+    // The prepared frame filters in the order they apply, after the metadata filters.
+    const std::list<QnAbstractImageFilterPtr>& filters() const { return m_filters; }
+    bool hasMetadataFilters() const { return !m_metadataFilters.empty(); }
+
     bool isReady() const;
     void reset();
     bool empty();

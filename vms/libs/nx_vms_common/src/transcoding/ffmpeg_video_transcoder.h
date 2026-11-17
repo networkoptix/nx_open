@@ -17,8 +17,10 @@
 #include <nx/media/video_data_packet.h>
 #include <transcoding/abstract_codec_transcoder.h>
 #include <transcoding/transcoding_utils.h>
+#include <transcoding/video_encoder.h>
 
 namespace nx::metric { struct Storage; }
+namespace nx::transcoding { class VideoProcessor; }
 
 NX_VMS_COMMON_API AVCodecID findVideoEncoder(const QString& codecName);
 
@@ -78,20 +80,25 @@ public:
 private:
     int transcodePacketImpl(const QnConstCompressedVideoDataPtr& video, QnAbstractMediaDataPtr* const result);
     bool prepareFilters(AVCodecID dstCodec, const QnConstCompressedVideoDataPtr& video);
-    std::pair<uint32_t, QnFfmpegVideoDecoder*> getDecoder(
+    void configureEncoder(AVCodecContext* context, nx::media::ffmpeg::AvOptions& options) const;
+    // Null frame drains the encoder.
+    int encodeFrame(const CLVideoDecoderOutputPtr& frame, QnAbstractMediaDataPtr* const result);
+    std::pair<uint32_t, QnAbstractVideoDecoder*> getDecoder(
         const QnConstCompressedVideoDataPtr& video);
 
 private:
     const Config m_config;
     uint32_t m_lastFlushedDecoder = 0;
-    std::map<uint32_t, std::unique_ptr<QnFfmpegVideoDecoder>> m_videoDecoders;
+    std::map<uint32_t, std::unique_ptr<QnAbstractVideoDecoder>> m_videoDecoders;
+    // Decoders, processor and encoder each use it or software on their own.
+    AVBufferRef* m_hwDevice = nullptr;
     nx::core::transcoding::FilterChainPtr m_filters;
+    std::unique_ptr<nx::transcoding::VideoProcessor> m_processor;
+    nx::transcoding::VideoEncoder m_encoder;
     QSize m_outputResolutionLimit;
     QSize m_targetResolution;
     QSize m_sourceResolution;
-    int m_bitrate = -1;
 
-    AVCodecContext* m_encoderCtx = nullptr;
     int m_lastSrcWidth[CL_MAX_CHANNELS];
     int m_lastSrcHeight[CL_MAX_CHANNELS];
     QElapsedTimer m_encodeTimer;

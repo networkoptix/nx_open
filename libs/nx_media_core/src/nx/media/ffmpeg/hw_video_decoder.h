@@ -63,6 +63,10 @@ public:
     // rather than on every subsequent packet while the decoder runs in SW fallback.
     bool consumeHardwareResourceFailed();
 
+    // Decodes on an existing device instead of creating one, so that the decoded surfaces can go
+    // to filters and an encoder on the same device. Call before the first decode().
+    void setHwDeviceContext(AVBufferRef* context);
+
 private:
     bool initialize(const QnConstCompressedVideoDataPtr& frame);
     bool initializeHardware(const QnConstCompressedVideoDataPtr& frame);
@@ -75,6 +79,7 @@ private:
     bool m_hardwareResourceFailed = false;
     AVCodecContext* m_decoderContext = nullptr;
     AVBufferRef* m_hwDeviceContext = nullptr;
+    AVBufferRef* m_sharedHwDeviceContext = nullptr;
     AVPixelFormat m_targetPixelFormat = AV_PIX_FMT_NONE;
     int m_lastDecodeResult = 0;
     std::string m_device;
