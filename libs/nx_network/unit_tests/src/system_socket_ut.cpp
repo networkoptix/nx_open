@@ -6,6 +6,7 @@
 #include <future>
 #include <memory>
 #include <mutex>
+#include <new>
 #include <thread>
 
 #ifndef _WIN32
@@ -374,6 +375,50 @@ void operator delete(void* ptr) noexcept
 }
 
 void operator delete(void* ptr, std::size_t) noexcept
+{
+    operator delete(ptr);
+}
+
+// Replace the other forms too, or ASan reports a new/delete mismatch against the ones above.
+
+void* operator new(std::size_t size, const std::nothrow_t& /*tag*/) noexcept
+{
+    try
+    {
+        return operator new(size);
+    }
+    catch (...)
+    {
+        return nullptr;
+    }
+}
+
+void operator delete(void* ptr, const std::nothrow_t& /*tag*/) noexcept
+{
+    operator delete(ptr);
+}
+
+void* operator new[](std::size_t size)
+{
+    return operator new(size);
+}
+
+void* operator new[](std::size_t size, const std::nothrow_t& tag) noexcept
+{
+    return operator new(size, tag);
+}
+
+void operator delete[](void* ptr) noexcept
+{
+    operator delete(ptr);
+}
+
+void operator delete[](void* ptr, std::size_t /*size*/) noexcept
+{
+    operator delete(ptr);
+}
+
+void operator delete[](void* ptr, const std::nothrow_t& /*tag*/) noexcept
 {
     operator delete(ptr);
 }
