@@ -405,17 +405,20 @@ bool Demuxer::demux(const char* data, size_t size)
     if (gotData)
     {
         nx::rtp::RtcpSenderReport senderReport;
-        auto media = context.parser.nextData(senderReport);
-        media->channelNumber = static_cast<uint32_t>(context.trackIdx);
-        media->timestamp = context.timeHelper
-                               ->getTime(qnSyncTime->currentTimePoint(),
-                                   std::chrono::microseconds(media->timestamp),
-                                   context.parser.isUtcTime(),
-                                   true)
-                               .count();
-        // TODO emit network issues like in server_rtsp_stream_provider.cpp.
-        // TODO Separate timestamp-related code.
-        m_frames.emplace_back(std::move(media));
+        // Null for a frame the parser dropped, e.g. one without codec parameters.
+        if (auto media = context.parser.nextData(senderReport))
+        {
+            media->channelNumber = static_cast<uint32_t>(context.trackIdx);
+            media->timestamp = context.timeHelper
+                                   ->getTime(qnSyncTime->currentTimePoint(),
+                                       std::chrono::microseconds(media->timestamp),
+                                       context.parser.isUtcTime(),
+                                       true)
+                                   .count();
+            // TODO emit network issues like in server_rtsp_stream_provider.cpp.
+            // TODO Separate timestamp-related code.
+            m_frames.emplace_back(std::move(media));
+        }
         buffer.clear(); //< Should be clear()ed only after got data.
     }
     return true;
