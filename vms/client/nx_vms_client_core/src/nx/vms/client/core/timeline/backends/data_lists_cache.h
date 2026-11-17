@@ -46,9 +46,9 @@ namespace timeline {
  * If an incoming block intersects with existing blocks, it's subtracted (in terms of time periods)
  * from the existing blocks (they can be cut, split or erased), and then added as a new block.
  *
- * For simplicity, an incoming block always takes precedence over an existing block. An expirable
- * block can overwrite a block that never expires, and an incomplete block can overwrite a part of
- * a complete block.
+ * An incoming block takes precedence over existing blocks, except that an incoming incomplete
+ * block is dropped if an unexpired complete block already contains its millisecond with at least
+ * as many items. An expirable block can overwrite a block that never expires.
  *
  * Empty neighboring never expiring blocks are merged together.
  * Non-empty or expirable neighboring blocks are never merged.
@@ -198,7 +198,8 @@ private:
         const std::optional<seconds>& expiration = std::nullopt);
 
     /**
-     * Add incomplete one-millisecond block into the cache.
+     * Add incomplete one-millisecond block into the cache, unless an unexpired complete block
+     * already contains `timestamp` with at least as many items.
      */
     void addIncompleteBlock(milliseconds timestamp, DataList data,
         const std::optional<seconds>& expiration = std::nullopt);
@@ -337,7 +338,7 @@ std::optional<DataList> DataListsCache<DataList>::get(const QnTimePeriod& period
 
     DataList result = Helpers::slice(it->second->data(), period, limit);
     milliseconds prevStartTime = it->second->period().startTime();
-    bool prevBlockIncomplete = false;
+    bool prevBlockIncomplete = it->second->incomplete();
     touch(it->second);
 
     int count = 1;
@@ -586,80 +587,25 @@ void DataListsCache<DataList>::addIncompleteBlock(milliseconds timestamp, DataLi
     const std::optional<seconds>& expiration)
 {
     const QnTimePeriod period(timestamp, milliseconds(1));
-    auto firstOutIt = m_lookup.lower_bound(timestamp);
 
-    // If a previous block that possibly contains `timestamp` exists in the cache...
-    if (firstOutIt != m_lookup.begin())
+    // An unexpired complete block containing `timestamp` has more data for this millisecond,
+    // unless it has fewer items than incoming, which means it's outdated.
+    if (const auto it = m_lookup.lower_bound(timestamp); it != m_lookup.begin())
     {
-        const auto it = std::prev(firstOutIt);
-
-        // Erase the previous block if it's expired or is the same period as the new block.
-        if (it->second->expired())
+        const auto& block = *std::prev(it)->second;
+        if (block.complete() && !block.expired() && block.period().contains(timestamp)
+            && Helpers::slice(block.data(), period).size() >= data.size())
         {
-            NX_VERBOSE(this, "Dropping expired %1 from the cache", it->second->info());
-            eraseBlock(it);
-        }
-        else if (it->second->period() == period)
-        {
-            NX_VERBOSE(this, "Erasing %1 fully overlapped by an incoming incomplete block [%2]",
-                it->second->info(), timestamp.count());
-            eraseBlock(it);
-        }
-        else if (it->second->period().contains(timestamp))
-        {
-            const auto leftPeriod = QnTimePeriod::fromInterval(
-                period.endTime(), it->second->period().endTime());
-
-            const auto rightPeriod = QnTimePeriod::fromInterval(
-                it->second->period().startTime(), period.startTime());
-
-            // Split the overlapping block in the cache in two, if needed...
-            if (leftPeriod.isValid() && rightPeriod.isValid())
-            {
-                NX_VERBOSE(this,
-                    "The %1 is being split in two by an incoming incomplete block [%2]",
-                    it->second->info(), timestamp.count());
-
-                // Construct and insert the new block.
-                const auto newBlockIt = m_cache.emplace(std::next(it->second), &m_totalCount,
-                    rightPeriod, Helpers::slice(it->second->data(), rightPeriod),
-                    it->second->remainingTime());
-
-                firstOutIt = m_lookup.emplace_hint(firstOutIt, rightPeriod.endTime(), newBlockIt);
-                NX_VERBOSE(this, "First part: %1", newBlockIt->info());
-
-                // Clip the original block.
-                it->second->clipToPeriod(leftPeriod);
-                NX_VERBOSE(this, "Second part: %1", it->second->info());
-            }
-            // ... or clip it at the right...
-            else if (leftPeriod.isValid())
-            {
-                NX_VERBOSE(this, "The %1 is being cut by an incoming incomplete block [%2]",
-                    it->second->info(), timestamp.count());
-
-                it->second->clipToPeriod(QnTimePeriod::fromInterval(period.endTime(),
-                    it->second->period().endTime()));
-
-                NX_VERBOSE(this, "Result: %1", it->second->info());
-            }
-            // ... or clip it at the left.
-            else if (NX_ASSERT(rightPeriod.isValid()))
-            {
-                NX_VERBOSE(this, "The %1 is being cut by an incoming incomplete block [%2]",
-                    it->second->info(), timestamp.count());
-
-                const auto blockIt = it->second;
-                blockIt->clipToPeriod(blockIt->period().truncated(period.startTimeMs));
-
-                // Re-insert it in the map with the changed key.
-                const auto nextPosIt = m_lookup.erase(it);
-                firstOutIt = m_lookup.emplace_hint(nextPosIt, blockIt->period().endTime(), blockIt);
-
-                NX_VERBOSE(this, "Result: %1", blockIt->info());
-            }
+            NX_VERBOSE(this,
+                "Keeping %1 instead of an incoming incomplete block [%2]",
+                block.info(),
+                timestamp.count());
+            return;
         }
     }
+
+    // Free up the millisecond in the cache, cutting, splitting or erasing the overlapping blocks.
+    const auto nextPosIt = subtractPeriod(period);
 
     // Construct and insert the new block.
     NX_VERBOSE(this,
@@ -669,7 +615,7 @@ void DataListsCache<DataList>::addIncompleteBlock(milliseconds timestamp, DataLi
     const auto blockIt = m_cache.emplace(m_cache.end(), &m_totalCount,
         timestamp, std::move(data), expiration.value_or(seconds(-1)));
 
-    m_lookup.emplace_hint(firstOutIt, blockIt->period().endTime(), blockIt);
+    m_lookup.emplace_hint(nextPosIt, blockIt->period().endTime(), blockIt);
 }
 
 template<typename DataList>

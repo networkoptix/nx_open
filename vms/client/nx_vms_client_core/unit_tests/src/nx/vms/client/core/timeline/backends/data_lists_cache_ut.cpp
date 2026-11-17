@@ -2,11 +2,14 @@
 
 #include <gtest/gtest.h>
 
-#include <memory>
+#include <optional>
+#include <vector>
 
 #include <nx/vms/client/core/timeline/backends/data_lists_cache.h>
 
 #include "test_backends.h"
+
+// clang-format off
 
 namespace nx::vms::client::core::timeline {
 namespace test {
@@ -15,192 +18,229 @@ using namespace std::chrono;
 
 class TimelineDataListsCacheTest: public ::testing::Test
 {
-    using base_type = ::testing::Test;
-
-public:
+protected:
     using TimestampList = std::vector<milliseconds>;
-    std::unique_ptr<DataListsCache<TimestampList>> cache;
+    using Block = DataListsCache<TimestampList>::Block;
 
-    virtual void SetUp() override
+    struct ExpectedBlock
     {
-        base_type::SetUp();
-        cache = std::make_unique<DataListsCache<TimestampList>>();
+        QnTimePeriod period;
+        TimestampList data;
+        bool complete = true;
+    };
+
+    static ExpectedBlock block(const QnTimePeriod& period, TimestampList data)
+    {
+        return {.period = period, .data = std::move(data), .complete = true};
     }
 
-    virtual void TearDown() override
+    static ExpectedBlock incompleteBlock(milliseconds timestamp, TimestampList data)
     {
-        cache.reset();
-        base_type::TearDown();
+        return {
+            .period = QnTimePeriod(timestamp, 1ms), .data = std::move(data), .complete = false};
     }
 
-    const auto& firstBlock() const { return cache->cache().front(); }
-    const auto& lastBlock() const { return cache->cache().back(); }
+    void givenBlock(const QnTimePeriod& period, int limit, TimestampList data,
+        std::optional<seconds> expiration = std::nullopt)
+    {
+        cache.add(period, limit, std::move(data), expiration);
+    }
+
+    void givenInvalidated(const QnTimePeriod& period) { cache.invalidate(period); }
+    void givenMaximumBlockCount(int value) { cache.setMaximumBlockCount(value); }
+    void givenMaximumCacheSize(int value) { cache.setMaximumCacheSize(value); }
+
+    void whenAdded(const QnTimePeriod& period, int limit, TimestampList data,
+        std::optional<seconds> expiration = std::nullopt)
+    {
+        cache.add(period, limit, std::move(data), expiration);
+    }
+
+    void whenLookedUp(const QnTimePeriod& period, int limit) { result = cache.get(period, limit); }
+    void whenInvalidated(const QnTimePeriod& period) { cache.invalidate(period); }
+    void whenCleared() { cache.clear(); }
+    void whenMaximumBlockCountSet(int value) { cache.setMaximumBlockCount(value); }
+    void whenMaximumCacheSizeSetTo(int value) { cache.setMaximumCacheSize(value); }
+
+    /** Checks the consistency of the internal structures. */
+    void thenIntegrityIsKept()
+    {
+        int count = 0;
+        EXPECT_EQ(cache.cache().size(), cache.lookup().size());
+        for (auto blockIt = cache.cache().begin(); blockIt != cache.cache().end(); ++blockIt)
+        {
+            count += blockIt->size();
+            const auto it = cache.lookup().find(blockIt->period().endTime());
+            ASSERT_TRUE(it != cache.lookup().end());
+            EXPECT_TRUE(it->second == blockIt);
+            if (const auto nextIt = std::next(it); nextIt != cache.lookup().end())
+                EXPECT_GE(blockIt->period().startTime(), nextIt->first);
+        }
+        EXPECT_EQ(count, cache.cacheSize());
+    }
+
+    void thenBlockCountIs(int expected) { ASSERT_EQ((int) cache.cache().size(), expected); }
+    void thenCacheSizeIs(int expected) { EXPECT_EQ(cache.cacheSize(), expected); }
+
+    /** Checks all blocks, from the least recently accessed to the most recently accessed. */
+    void thenBlocksAre(const std::vector<ExpectedBlock>& expected)
+    {
+        ASSERT_EQ(cache.cache().size(), expected.size());
+        auto it = cache.cache().begin();
+        for (const auto& expectedBlock: expected)
+            checkBlock(*it++, expectedBlock);
+    }
+
+    void thenGot(const TimestampList& expected) { EXPECT_EQ(result, expected); }
+    void thenMissed() { EXPECT_EQ(result, std::nullopt); }
+
+private:
+    static void checkBlock(const Block& actual, const ExpectedBlock& expected)
+    {
+        EXPECT_EQ(actual.period(), expected.period);
+        EXPECT_EQ(actual.data(), expected.data);
+        EXPECT_EQ(actual.complete(), expected.complete);
+    }
+
+protected:
+    DataListsCache<TimestampList> cache;
+    std::optional<TimestampList> result;
 };
-
-#define CHECK_INTEGRITY { \
-    int count = 0; \
-    EXPECT_EQ(cache->cache().size(), cache->lookup().size()); \
-    for (auto blockIt = cache->cache().begin(); blockIt != cache->cache().end(); ++blockIt) \
-    { \
-        count += blockIt->size(); \
-        const auto it = cache->lookup().find(blockIt->period().endTime()); \
-        ASSERT_TRUE(it != cache->lookup().end()); \
-        EXPECT_TRUE(it->second == blockIt); \
-        if (const auto nextIt = std::next(it); nextIt != cache->lookup().end()) \
-            EXPECT_GE(blockIt->period().startTime(), nextIt->first); \
-    } \
-    EXPECT_EQ(count, cache->cacheSize()); }
-
-#define CHECK_BLOCK_DATA(block, expectedPeriod, expectedData) \
-    EXPECT_EQ((block).period(), (expectedPeriod)); \
-    EXPECT_EQ((block).data(), (expectedData));
-
-#define CHECK_BLOCK(block, expectedPeriod, expectedData) \
-    CHECK_BLOCK_DATA(block, expectedPeriod, expectedData); \
-    EXPECT_TRUE((block).complete());
-
-#define CHECK_INCOMPLETE_BLOCK(block, expectedTimestamp, expectedData) \
-    CHECK_BLOCK_DATA(block, QnTimePeriod(expectedTimestamp, 1ms), expectedData); \
-    EXPECT_TRUE((block).incomplete());
-
-#define ASSERT_BLOCK_COUNT(expectedCount) \
-    ASSERT_EQ(cache->cache().size(), expectedCount);
-
-#define EXPECT_CACHE_SIZE(expectedSize) \
-    EXPECT_EQ(cache->cacheSize(), expectedSize);
 
 // ------------------------------------------------------------------------------------------------
 // Complete blocks behavior.
 
 TEST_F(TimelineDataListsCacheTest, addComplete)
 {
-    cache->add(interval(2ms, 1ms), kUnlimited, {1ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(1);
-    EXPECT_EQ(cache->cacheSize(), 1);
-    CHECK_BLOCK(firstBlock(), interval(2ms, 1ms), TimestampList({1ms}));
+    whenAdded(interval(2ms, 1ms), kUnlimited, {1ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(1);
+    thenBlocksAre({block(interval(2ms, 1ms), {1ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, addSeparateLeft)
 {
-    cache->add(interval(2ms, 1ms), kUnlimited, {1ms});
-    cache->add(interval(9ms, 5ms), kUnlimited, {7ms, 6ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(2);
-    EXPECT_CACHE_SIZE(3);
-    CHECK_BLOCK(firstBlock(), interval(2ms, 1ms), TimestampList({1ms}));
-    CHECK_BLOCK(lastBlock(), interval(9ms, 5ms), TimestampList({7ms, 6ms}));
+    givenBlock(interval(2ms, 1ms), kUnlimited, {1ms});
+    whenAdded(interval(9ms, 5ms), kUnlimited, {7ms, 6ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(2);
+    thenCacheSizeIs(3);
+    thenBlocksAre({
+        block(interval(2ms, 1ms), {1ms}),
+        block(interval(9ms, 5ms), {7ms, 6ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, addSeparateRight)
 {
-    cache->add(interval(9ms, 5ms), kUnlimited, {7ms, 6ms});
-    cache->add(interval(2ms, 1ms), kUnlimited, {1ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(2);
-    EXPECT_CACHE_SIZE(3);
-    CHECK_BLOCK(firstBlock(), interval(9ms, 5ms), TimestampList({7ms, 6ms}));
-    CHECK_BLOCK(lastBlock(), interval(2ms, 1ms), TimestampList({1ms}));
+    givenBlock(interval(9ms, 5ms), kUnlimited, {7ms, 6ms});
+    whenAdded(interval(2ms, 1ms), kUnlimited, {1ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(2);
+    thenCacheSizeIs(3);
+    thenBlocksAre({
+        block(interval(9ms, 5ms), {7ms, 6ms}),
+        block(interval(2ms, 1ms), {1ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, addTouchingLeft)
 {
-    cache->add(interval(2ms, 1ms), kUnlimited, {1ms});
-    cache->add(interval(5ms, 3ms), kUnlimited, {5ms, 4ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(2);
-    EXPECT_CACHE_SIZE(3);
-    CHECK_BLOCK(firstBlock(), interval(2ms, 1ms), TimestampList({1ms}));
-    CHECK_BLOCK(lastBlock(), interval(5ms, 3ms), TimestampList({5ms, 4ms}));
+    givenBlock(interval(2ms, 1ms), kUnlimited, {1ms});
+    whenAdded(interval(5ms, 3ms), kUnlimited, {5ms, 4ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(2);
+    thenCacheSizeIs(3);
+    thenBlocksAre({
+        block(interval(2ms, 1ms), {1ms}),
+        block(interval(5ms, 3ms), {5ms, 4ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, addTouchingRight)
 {
-    cache->add(interval(5ms, 3ms), kUnlimited, {5ms, 4ms});
-    cache->add(interval(2ms, 1ms), kUnlimited, {1ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(2);
-    EXPECT_CACHE_SIZE(3);
-    CHECK_BLOCK(firstBlock(), interval(5ms, 3ms), TimestampList({5ms, 4ms}));
-    CHECK_BLOCK(lastBlock(), interval(2ms, 1ms), TimestampList({1ms}));
+    givenBlock(interval(5ms, 3ms), kUnlimited, {5ms, 4ms});
+    whenAdded(interval(2ms, 1ms), kUnlimited, {1ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(2);
+    thenCacheSizeIs(3);
+    thenBlocksAre({
+        block(interval(5ms, 3ms), {5ms, 4ms}),
+        block(interval(2ms, 1ms), {1ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, addOverlappingLeft)
 {
-    cache->add(interval(4ms, 1ms), kUnlimited, {4ms, 1ms});
-    cache->add(interval(5ms, 3ms), kUnlimited, {5ms, 4ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(2);
-    EXPECT_CACHE_SIZE(3);
-    CHECK_BLOCK(firstBlock(), interval(2ms, 1ms), TimestampList({1ms}));
-    CHECK_BLOCK(lastBlock(), interval(5ms, 3ms), TimestampList({5ms, 4ms}));
+    givenBlock(interval(4ms, 1ms), kUnlimited, {4ms, 1ms});
+    whenAdded(interval(5ms, 3ms), kUnlimited, {5ms, 4ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(2);
+    thenCacheSizeIs(3);
+    thenBlocksAre({
+        block(interval(2ms, 1ms), {1ms}),
+        block(interval(5ms, 3ms), {5ms, 4ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, addOverlappingRight)
 {
-    cache->add(interval(5ms, 3ms), kUnlimited, {5ms, 4ms});
-    cache->add(interval(4ms, 1ms), kUnlimited, {4ms, 1ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(2);
-    EXPECT_CACHE_SIZE(3);
-    CHECK_BLOCK(firstBlock(), interval(5ms, 5ms), TimestampList({5ms}));
-    CHECK_BLOCK(lastBlock(), interval(4ms, 1ms), TimestampList({4ms, 1ms}));
+    givenBlock(interval(5ms, 3ms), kUnlimited, {5ms, 4ms});
+    whenAdded(interval(4ms, 1ms), kUnlimited, {4ms, 1ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(2);
+    thenCacheSizeIs(3);
+    thenBlocksAre({
+        block(interval(5ms, 5ms), {5ms}),
+        block(interval(4ms, 1ms), {4ms, 1ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, addOverlappingEntirely)
 {
-    cache->add(interval(4ms, 3ms), kUnlimited, {4ms});
-    cache->add(interval(9ms, 1ms), kUnlimited, {7ms, 4ms, 2ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(1);
-    EXPECT_CACHE_SIZE(3);
-    CHECK_BLOCK(firstBlock(), interval(9ms, 1ms), TimestampList({7ms, 4ms, 2ms}));
+    givenBlock(interval(4ms, 3ms), kUnlimited, {4ms});
+    whenAdded(interval(9ms, 1ms), kUnlimited, {7ms, 4ms, 2ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(3);
+    thenBlocksAre({block(interval(9ms, 1ms), {7ms, 4ms, 2ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, addSamePeriod)
 {
-    cache->add(interval(9ms, 1ms), kUnlimited, {4ms});
-    cache->add(interval(9ms, 1ms), kUnlimited, {7ms, 4ms, 2ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(1);
-    EXPECT_CACHE_SIZE(3);
-    CHECK_BLOCK(firstBlock(), interval(9ms, 1ms), TimestampList({7ms, 4ms, 2ms}));
+    givenBlock(interval(9ms, 1ms), kUnlimited, {4ms});
+    whenAdded(interval(9ms, 1ms), kUnlimited, {7ms, 4ms, 2ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(3);
+    thenBlocksAre({block(interval(9ms, 1ms), {7ms, 4ms, 2ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, addOverlappingMiddle)
 {
-    cache->add(interval(9ms, 1ms), kUnlimited, {7ms, 4ms, 2ms});
-    cache->add(interval(7ms, 3ms), kUnlimited, {7ms, 5ms, 4ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(3);
-    EXPECT_CACHE_SIZE(4);
-    auto it = cache->cache().begin();
-    CHECK_BLOCK(*it, interval(9ms, 8ms), TimestampList({})); ++it;
-    CHECK_BLOCK(*it, interval(2ms, 1ms), TimestampList({2ms})); ++it;
-    CHECK_BLOCK(*it, interval(7ms, 3ms), TimestampList({7ms, 5ms, 4ms}));
+    givenBlock(interval(9ms, 1ms), kUnlimited, {7ms, 4ms, 2ms});
+    whenAdded(interval(7ms, 3ms), kUnlimited, {7ms, 5ms, 4ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(3);
+    thenCacheSizeIs(4);
+    thenBlocksAre({
+        block(interval(9ms, 8ms), {}),
+        block(interval(2ms, 1ms), {2ms}),
+        block(interval(7ms, 3ms), {7ms, 5ms, 4ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, addOverlappingComplexScenario)
 {
     // 4 separate blocks.
-    cache->add(interval(9ms, 7ms), kUnlimited, {9ms, 8ms, 8ms, 7ms});
-    cache->add(interval(5ms, 5ms), kUnlimited, {5ms});
-    cache->add(interval(4ms, 3ms), kUnlimited, {3ms, 3ms});
-    cache->add(interval(2ms, 0ms), kUnlimited, {2ms, 1ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(4);
-    EXPECT_CACHE_SIZE(9);
+    givenBlock(interval(9ms, 7ms), kUnlimited, {9ms, 8ms, 8ms, 7ms});
+    givenBlock(interval(5ms, 5ms), kUnlimited, {5ms});
+    givenBlock(interval(4ms, 3ms), kUnlimited, {3ms, 3ms});
+    givenBlock(interval(2ms, 0ms), kUnlimited, {2ms, 1ms});
 
     // New block cuts blocks #1 and #4, blocks #2 and #3 get erased.
-    cache->add(interval(8ms, 2ms), kUnlimited, {7ms, 5ms, 3ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(3);
-    EXPECT_CACHE_SIZE(5);
-
-    auto it = cache->cache().begin();
-    CHECK_BLOCK(*it, interval(9ms, 9ms), TimestampList({9ms})); ++it;
-    CHECK_BLOCK(*it, interval(1ms, 0ms), TimestampList({1ms})); ++it;
-    CHECK_BLOCK(*it, interval(8ms, 2ms), TimestampList({7ms, 5ms, 3ms}));
+    whenAdded(interval(8ms, 2ms), kUnlimited, {7ms, 5ms, 3ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(3);
+    thenCacheSizeIs(5);
+    thenBlocksAre({
+        block(interval(9ms, 9ms), {9ms}),
+        block(interval(1ms, 0ms), {1ms}),
+        block(interval(8ms, 2ms), {7ms, 5ms, 3ms})});
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -210,131 +250,134 @@ TEST_F(TimelineDataListsCacheTest, addOverlappingComplexScenario)
 
 TEST_F(TimelineDataListsCacheTest, addEmptySeparateLeft)
 {
-    cache->add(interval(2ms, 1ms), kUnlimited, {});
-    cache->add(interval(9ms, 5ms), kUnlimited, {});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(2);
-    EXPECT_CACHE_SIZE(0);
-    CHECK_BLOCK(firstBlock(), interval(2ms, 1ms), TimestampList());
-    CHECK_BLOCK(lastBlock(), interval(9ms, 5ms), TimestampList());
+    givenBlock(interval(2ms, 1ms), kUnlimited, {});
+    whenAdded(interval(9ms, 5ms), kUnlimited, {});
+    thenIntegrityIsKept();
+    thenBlockCountIs(2);
+    thenCacheSizeIs(0);
+    thenBlocksAre({
+        block(interval(2ms, 1ms), {}),
+        block(interval(9ms, 5ms), {})});
 }
 
 TEST_F(TimelineDataListsCacheTest, addEmptySeparateRight)
 {
-    cache->add(interval(9ms, 5ms), kUnlimited, {});
-    cache->add(interval(2ms, 1ms), kUnlimited, {});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(2);
-    EXPECT_CACHE_SIZE(0);
-    CHECK_BLOCK(firstBlock(), interval(9ms, 5ms), TimestampList());
-    CHECK_BLOCK(lastBlock(), interval(2ms, 1ms), TimestampList());
+    givenBlock(interval(9ms, 5ms), kUnlimited, {});
+    whenAdded(interval(2ms, 1ms), kUnlimited, {});
+    thenIntegrityIsKept();
+    thenBlockCountIs(2);
+    thenCacheSizeIs(0);
+    thenBlocksAre({
+        block(interval(9ms, 5ms), {}),
+        block(interval(2ms, 1ms), {})});
 }
 
 // Expirable empty blocks are not merged.
 
 TEST_F(TimelineDataListsCacheTest, addEmptyExpirableTouchingLeft)
 {
-    cache->add(interval(2ms, 1ms), kUnlimited, {});
-    cache->add(interval(5ms, 3ms), kUnlimited, {}, 30s);
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(2);
-    EXPECT_CACHE_SIZE(0);
-    CHECK_BLOCK(firstBlock(), interval(2ms, 1ms), TimestampList());
-    CHECK_BLOCK(lastBlock(), interval(5ms, 3ms), TimestampList());
+    givenBlock(interval(2ms, 1ms), kUnlimited, {});
+    whenAdded(interval(5ms, 3ms), kUnlimited, {}, 30s);
+    thenIntegrityIsKept();
+    thenBlockCountIs(2);
+    thenCacheSizeIs(0);
+    thenBlocksAre({
+        block(interval(2ms, 1ms), {}),
+        block(interval(5ms, 3ms), {})});
 }
 
 TEST_F(TimelineDataListsCacheTest, addEmptyExpirableTouchingRight)
 {
-    cache->add(interval(5ms, 3ms), kUnlimited, {});
-    cache->add(interval(2ms, 1ms), kUnlimited, {}, 30s);
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(2);
-    EXPECT_CACHE_SIZE(0);
-    CHECK_BLOCK(firstBlock(), interval(5ms, 3ms), TimestampList());
-    CHECK_BLOCK(lastBlock(), interval(2ms, 1ms), TimestampList());
+    givenBlock(interval(5ms, 3ms), kUnlimited, {});
+    whenAdded(interval(2ms, 1ms), kUnlimited, {}, 30s);
+    thenIntegrityIsKept();
+    thenBlockCountIs(2);
+    thenCacheSizeIs(0);
+    thenBlocksAre({
+        block(interval(5ms, 3ms), {}),
+        block(interval(2ms, 1ms), {})});
 }
 
 TEST_F(TimelineDataListsCacheTest, addEmptyToExpirableTouchingLeft)
 {
-    cache->add(interval(2ms, 1ms), kUnlimited, {}, 30s);
-    cache->add(interval(5ms, 3ms), kUnlimited, {});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(2);
-    EXPECT_CACHE_SIZE(0);
-    CHECK_BLOCK(firstBlock(), interval(2ms, 1ms), TimestampList());
-    CHECK_BLOCK(lastBlock(), interval(5ms, 3ms), TimestampList());
+    givenBlock(interval(2ms, 1ms), kUnlimited, {}, 30s);
+    whenAdded(interval(5ms, 3ms), kUnlimited, {});
+    thenIntegrityIsKept();
+    thenBlockCountIs(2);
+    thenCacheSizeIs(0);
+    thenBlocksAre({
+        block(interval(2ms, 1ms), {}),
+        block(interval(5ms, 3ms), {})});
 }
 
 TEST_F(TimelineDataListsCacheTest, addEmptyToExpirableTouchingRight)
 {
-    cache->add(interval(5ms, 3ms), kUnlimited, {}, 30s);
-    cache->add(interval(2ms, 1ms), kUnlimited, {});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(2);
-    EXPECT_CACHE_SIZE(0);
-    CHECK_BLOCK(firstBlock(), interval(5ms, 3ms), TimestampList());
-    CHECK_BLOCK(lastBlock(), interval(2ms, 1ms), TimestampList());
+    givenBlock(interval(5ms, 3ms), kUnlimited, {}, 30s);
+    whenAdded(interval(2ms, 1ms), kUnlimited, {});
+    thenIntegrityIsKept();
+    thenBlockCountIs(2);
+    thenCacheSizeIs(0);
+    thenBlocksAre({
+        block(interval(5ms, 3ms), {}),
+        block(interval(2ms, 1ms), {})});
 }
 
 // Neighboring or overlapped not expirable empty blocks are merged.
 
 TEST_F(TimelineDataListsCacheTest, appendEmptyTouchingLeft)
 {
-    cache->add(interval(2ms, 1ms), kUnlimited, {});
-    cache->add(interval(5ms, 3ms), kUnlimited, {});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(1);
-    EXPECT_CACHE_SIZE(0);
-    CHECK_BLOCK(firstBlock(), interval(5ms, 1ms), TimestampList());
+    givenBlock(interval(2ms, 1ms), kUnlimited, {});
+    whenAdded(interval(5ms, 3ms), kUnlimited, {});
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(0);
+    thenBlocksAre({block(interval(5ms, 1ms), {})});
 }
 
 TEST_F(TimelineDataListsCacheTest, appendEmptyTouchingRight)
 {
-    cache->add(interval(5ms, 3ms), kUnlimited, {});
-    cache->add(interval(2ms, 1ms), kUnlimited, {});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(1);
-    EXPECT_CACHE_SIZE(0);
-    CHECK_BLOCK(firstBlock(), interval(5ms, 1ms), TimestampList());
+    givenBlock(interval(5ms, 3ms), kUnlimited, {});
+    whenAdded(interval(2ms, 1ms), kUnlimited, {});
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(0);
+    thenBlocksAre({block(interval(5ms, 1ms), {})});
 }
 
 TEST_F(TimelineDataListsCacheTest, appendEmptyOverlappingLeft)
 {
-    cache->add(interval(4ms, 1ms), kUnlimited, {});
-    cache->add(interval(5ms, 3ms), kUnlimited, {});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(1);
-    EXPECT_CACHE_SIZE(0);
-    CHECK_BLOCK(firstBlock(), interval(5ms, 1ms), TimestampList());
+    givenBlock(interval(4ms, 1ms), kUnlimited, {});
+    whenAdded(interval(5ms, 3ms), kUnlimited, {});
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(0);
+    thenBlocksAre({block(interval(5ms, 1ms), {})});
 }
 
 TEST_F(TimelineDataListsCacheTest, appendEmptyOverlappingRight)
 {
-    cache->add(interval(5ms, 3ms), kUnlimited, {});
-    cache->add(interval(4ms, 1ms), kUnlimited, {});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(1);
-    EXPECT_CACHE_SIZE(0);
-    CHECK_BLOCK(firstBlock(), interval(5ms, 1ms), TimestampList());
+    givenBlock(interval(5ms, 3ms), kUnlimited, {});
+    whenAdded(interval(4ms, 1ms), kUnlimited, {});
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(0);
+    thenBlocksAre({block(interval(5ms, 1ms), {})});
 }
 
 TEST_F(TimelineDataListsCacheTest, appendEmptyOverlappingComplexScenario)
 {
     // 4 separate blocks.
-    cache->add(interval(9ms, 7ms), kUnlimited, {8ms, 8ms, 7ms});
-    cache->add(interval(5ms, 5ms), kUnlimited, {5ms});
-    cache->add(interval(4ms, 3ms), kUnlimited, {4ms, 3ms});
-    cache->add(interval(2ms, 0ms), kUnlimited, {2ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(4);
-    EXPECT_CACHE_SIZE(7);
+    givenBlock(interval(9ms, 7ms), kUnlimited, {8ms, 8ms, 7ms});
+    givenBlock(interval(5ms, 5ms), kUnlimited, {5ms});
+    givenBlock(interval(4ms, 3ms), kUnlimited, {4ms, 3ms});
+    givenBlock(interval(2ms, 0ms), kUnlimited, {2ms});
 
     // New block cuts blocks #1 and #4 and they become empty; blocks #2 and #3 get erased.
-    cache->add(interval(8ms, 2ms), kUnlimited, {});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(1);
-    EXPECT_CACHE_SIZE(0);
-    CHECK_BLOCK(firstBlock(), interval(9ms, 0ms), TimestampList());
+    whenAdded(interval(8ms, 2ms), kUnlimited, {});
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(0);
+    thenBlocksAre({block(interval(9ms, 0ms), {})});
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -342,198 +385,268 @@ TEST_F(TimelineDataListsCacheTest, appendEmptyOverlappingComplexScenario)
 
 TEST_F(TimelineDataListsCacheTest, addIncompleteOneMs)
 {
-    cache->add(interval(5ms, 1ms), /*limit*/ 2, {5ms, 5ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(1);
-    EXPECT_EQ(cache->cacheSize(), 2);
-    CHECK_INCOMPLETE_BLOCK(firstBlock(), 5ms, TimestampList({5ms, 5ms}));
+    whenAdded(interval(5ms, 1ms), /*limit*/ 2, {5ms, 5ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(2);
+    thenBlocksAre({incompleteBlock(5ms, {5ms, 5ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, addIncompleteAsTwoBlocks1)
 {
-    cache->add(interval(9ms, 1ms), /*limit*/ 2, {5ms, 5ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(2);
-    EXPECT_EQ(cache->cacheSize(), 2);
-    CHECK_INCOMPLETE_BLOCK(firstBlock(), 5ms, TimestampList({5ms, 5ms}));
-    CHECK_BLOCK(lastBlock(), interval(9ms, 6ms), TimestampList());
+    whenAdded(interval(9ms, 1ms), /*limit*/ 2, {5ms, 5ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(2);
+    thenCacheSizeIs(2);
+    thenBlocksAre({
+        incompleteBlock(5ms, {5ms, 5ms}),
+        block(interval(9ms, 6ms), {})});
 }
 
 TEST_F(TimelineDataListsCacheTest, addIncompleteAsTwoBlocks2)
 {
-    cache->add(interval(9ms, 1ms), /*limit*/ 3, {9ms, 6ms, 5ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(2);
-    EXPECT_EQ(cache->cacheSize(), 3);
-    CHECK_INCOMPLETE_BLOCK(firstBlock(), 5ms, TimestampList({5ms}));
-    CHECK_BLOCK(lastBlock(), interval(9ms, 6ms), TimestampList({9ms, 6ms}));
+    whenAdded(interval(9ms, 1ms), /*limit*/ 3, {9ms, 6ms, 5ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(2);
+    thenCacheSizeIs(3);
+    thenBlocksAre({
+        incompleteBlock(5ms, {5ms}),
+        block(interval(9ms, 6ms), {9ms, 6ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, addIncompleteSeparateLeft)
 {
-    cache->add(interval(3ms, 1ms), kUnlimited, {3ms, 2ms});
-    cache->add(interval(5ms, 5ms), /*limit*/ 2, {5ms, 5ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(2);
-    EXPECT_EQ(cache->cacheSize(), 4);
-    CHECK_BLOCK(firstBlock(), interval(3ms, 1ms), TimestampList({3ms, 2ms}));
-    CHECK_INCOMPLETE_BLOCK(lastBlock(), 5ms, TimestampList({5ms, 5ms}));
+    givenBlock(interval(3ms, 1ms), kUnlimited, {3ms, 2ms});
+    whenAdded(interval(5ms, 5ms), /*limit*/ 2, {5ms, 5ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(2);
+    thenCacheSizeIs(4);
+    thenBlocksAre({
+        block(interval(3ms, 1ms), {3ms, 2ms}),
+        incompleteBlock(5ms, {5ms, 5ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, addIncompleteSeparateRight)
 {
-    cache->add(interval(9ms, 7ms), kUnlimited, {8ms, 7ms});
-    cache->add(interval(5ms, 5ms), /*limit*/ 2, {5ms, 5ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(2);
-    EXPECT_EQ(cache->cacheSize(), 4);
-    CHECK_BLOCK(firstBlock(), interval(9ms, 7ms), TimestampList({8ms, 7ms}));
-    CHECK_INCOMPLETE_BLOCK(lastBlock(), 5ms, TimestampList({5ms, 5ms}));
+    givenBlock(interval(9ms, 7ms), kUnlimited, {8ms, 7ms});
+    whenAdded(interval(5ms, 5ms), /*limit*/ 2, {5ms, 5ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(2);
+    thenCacheSizeIs(4);
+    thenBlocksAre({
+        block(interval(9ms, 7ms), {8ms, 7ms}),
+        incompleteBlock(5ms, {5ms, 5ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, addIncompleteTouchingLeft)
 {
-    cache->add(interval(4ms, 1ms), kUnlimited, {3ms, 2ms});
-    cache->add(interval(5ms, 5ms), /*limit*/ 2, {5ms, 5ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(2);
-    EXPECT_EQ(cache->cacheSize(), 4);
-    CHECK_BLOCK(firstBlock(), interval(4ms, 1ms), TimestampList({3ms, 2ms}));
-    CHECK_INCOMPLETE_BLOCK(lastBlock(), 5ms, TimestampList({5ms, 5ms}));
+    givenBlock(interval(4ms, 1ms), kUnlimited, {3ms, 2ms});
+    whenAdded(interval(5ms, 5ms), /*limit*/ 2, {5ms, 5ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(2);
+    thenCacheSizeIs(4);
+    thenBlocksAre({
+        block(interval(4ms, 1ms), {3ms, 2ms}),
+        incompleteBlock(5ms, {5ms, 5ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, addIncompleteTouchingRight)
 {
-    cache->add(interval(9ms, 6ms), kUnlimited, {8ms, 7ms});
-    cache->add(interval(5ms, 5ms), /*limit*/ 2, {5ms, 5ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(2);
-    EXPECT_EQ(cache->cacheSize(), 4);
-    CHECK_BLOCK(firstBlock(), interval(9ms, 6ms), TimestampList({8ms, 7ms}));
-    CHECK_INCOMPLETE_BLOCK(lastBlock(), 5ms, TimestampList({5ms, 5ms}));
+    givenBlock(interval(9ms, 6ms), kUnlimited, {8ms, 7ms});
+    whenAdded(interval(5ms, 5ms), /*limit*/ 2, {5ms, 5ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(2);
+    thenCacheSizeIs(4);
+    thenBlocksAre({
+        block(interval(9ms, 6ms), {8ms, 7ms}),
+        incompleteBlock(5ms, {5ms, 5ms})});
 }
 
-// In current implementation incoming blocks overwrite existing blocks even if they have less data.
+// An incoming incomplete block doesn't overwrite an unexpired complete block.
 
 TEST_F(TimelineDataListsCacheTest, addIncompleteOverlappingLeft)
 {
-    cache->add(interval(5ms, 1ms), kUnlimited, {5ms, 5ms, 5ms, 5ms, 3ms, 2ms});
-    cache->add(interval(5ms, 5ms), /*limit*/ 2, {5ms, 5ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(2);
-    EXPECT_EQ(cache->cacheSize(), 4);
-    CHECK_BLOCK(firstBlock(), interval(4ms, 1ms), TimestampList({3ms, 2ms}));
-    CHECK_INCOMPLETE_BLOCK(lastBlock(), 5ms, TimestampList({5ms, 5ms}));
+    givenBlock(interval(5ms, 1ms), kUnlimited, {5ms, 5ms, 5ms, 5ms, 3ms, 2ms});
+    whenAdded(interval(5ms, 5ms), /*limit*/ 2, {5ms, 5ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(6);
+    thenBlocksAre({block(interval(5ms, 1ms), {5ms, 5ms, 5ms, 5ms, 3ms, 2ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, addIncompleteOverlappingRight)
 {
-    cache->add(interval(9ms, 5ms), kUnlimited, {8ms, 7ms, 5ms, 5ms, 5ms, 5ms});
-    cache->add(interval(5ms, 5ms), /*limit*/ 2, {5ms, 5ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(2);
-    EXPECT_EQ(cache->cacheSize(), 4);
-    CHECK_BLOCK(firstBlock(), interval(9ms, 6ms), TimestampList({8ms, 7ms}));
-    CHECK_INCOMPLETE_BLOCK(lastBlock(), 5ms, TimestampList({5ms, 5ms}));
+    givenBlock(interval(9ms, 5ms), kUnlimited, {8ms, 7ms, 5ms, 5ms, 5ms, 5ms});
+    whenAdded(interval(5ms, 5ms), /*limit*/ 2, {5ms, 5ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(6);
+    thenBlocksAre({block(interval(9ms, 5ms), {8ms, 7ms, 5ms, 5ms, 5ms, 5ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, addIncompleteOverlappingMiddle)
 {
-    cache->add(interval(9ms, 1ms), kUnlimited, {8ms, 7ms, 5ms, 5ms, 5ms, 5ms, 3ms, 2ms});
-    cache->add(interval(5ms, 5ms), /*limit*/ 2, {5ms, 5ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(3);
-    EXPECT_EQ(cache->cacheSize(), 6);
+    givenBlock(interval(9ms, 1ms), kUnlimited, {8ms, 7ms, 5ms, 5ms, 5ms, 5ms, 3ms, 2ms});
+    whenAdded(interval(5ms, 5ms), /*limit*/ 2, {5ms, 5ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(8);
+    thenBlocksAre({block(interval(9ms, 1ms), {8ms, 7ms, 5ms, 5ms, 5ms, 5ms, 3ms, 2ms})});
+}
 
-    auto it = cache->cache().begin();
-    CHECK_BLOCK(*it, interval(9ms, 6ms), TimestampList({8ms, 7ms})); ++it;
-    CHECK_BLOCK(*it, interval(4ms, 1ms), TimestampList({3ms, 2ms})); ++it;
-    CHECK_INCOMPLETE_BLOCK(*it, 5ms, TimestampList({5ms, 5ms}));
+TEST_F(TimelineDataListsCacheTest, addIncompleteOverlappingExpiredComplete)
+{
+    givenBlock(interval(9ms, 1ms), kUnlimited, {8ms, 5ms, 5ms, 5ms, 2ms}, /*expiration*/ 0s);
+    whenAdded(interval(5ms, 5ms), /*limit*/ 2, {5ms, 5ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(2);
+    thenBlocksAre({incompleteBlock(5ms, {5ms, 5ms})});
+}
+
+TEST_F(TimelineDataListsCacheTest, addIncompleteOverlappingCompleteWithSameCount)
+{
+    givenBlock(interval(5ms, 5ms), kUnlimited, {5ms, 5ms});
+    whenAdded(interval(5ms, 5ms), /*limit*/ 2, {5ms, 5ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(2);
+    thenBlocksAre({block(interval(5ms, 5ms), {5ms, 5ms})});
+}
+
+// An incoming incomplete block overwrites a complete block which has fewer items in its
+// millisecond, as it's outdated.
+
+TEST_F(TimelineDataListsCacheTest, addIncompleteOverlappingCompleteWithFewerItems)
+{
+    givenBlock(interval(9ms, 1ms), kUnlimited, {8ms, 5ms, 2ms});
+    whenAdded(interval(5ms, 5ms), /*limit*/ 2, {5ms, 5ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(3);
+    thenCacheSizeIs(4);
+    thenBlocksAre({
+        block(interval(9ms, 6ms), {8ms}),
+        block(interval(4ms, 1ms), {2ms}),
+        incompleteBlock(5ms, {5ms, 5ms})});
+}
+
+TEST_F(TimelineDataListsCacheTest, addTruncatedOverOutdatedEmpty)
+{
+    givenBlock(interval(9ms, 0ms), kUnlimited, {});
+
+    // The incomplete part splits the outdated empty block, and the complete part replaces its
+    // later part.
+    whenAdded(interval(19ms, 5ms), /*limit*/ 2, {5ms, 5ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(3);
+    thenCacheSizeIs(2);
+    thenBlocksAre({
+        block(interval(4ms, 0ms), {}),
+        incompleteBlock(5ms, {5ms, 5ms}),
+        block(interval(19ms, 6ms), {})});
+}
+
+TEST_F(TimelineDataListsCacheTest, addTruncatedOverComplete)
+{
+    givenBlock(interval(9ms, 1ms), kUnlimited, {8ms, 7ms, 5ms, 5ms, 3ms});
+
+    // The incomplete millisecond 5ms is kept from the existing block.
+    whenAdded(interval(9ms, 5ms), /*limit*/ 3, {8ms, 7ms, 5ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(2);
+    thenCacheSizeIs(5);
+    thenBlocksAre({
+        block(interval(5ms, 1ms), {5ms, 5ms, 3ms}),
+        block(interval(9ms, 6ms), {8ms, 7ms})});
+}
+
+TEST_F(TimelineDataListsCacheTest, getAfterTruncatedOverComplete)
+{
+    givenBlock(interval(9ms, 1ms), kUnlimited, {8ms, 7ms, 5ms, 5ms, 3ms});
+    givenBlock(interval(9ms, 5ms), /*limit*/ 3, {8ms, 7ms, 5ms});
+    whenLookedUp(interval(9ms, 1ms), kUnlimited);
+    thenGot({8ms, 7ms, 5ms, 5ms, 3ms});
 }
 
 TEST_F(TimelineDataListsCacheTest, addIncompleteOverlappingIncomplete)
 {
-    cache->add(interval(5ms, 5ms), /*limit*/ 3, {5ms, 5ms, 5ms});
-    cache->add(interval(5ms, 5ms), /*limit*/ 2, {5ms, 5ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(1);
-    EXPECT_EQ(cache->cacheSize(), 2);
-    CHECK_INCOMPLETE_BLOCK(lastBlock(), 5ms, TimestampList({5ms, 5ms}));
+    givenBlock(interval(5ms, 5ms), /*limit*/ 3, {5ms, 5ms, 5ms});
+    whenAdded(interval(5ms, 5ms), /*limit*/ 2, {5ms, 5ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(2);
+    thenBlocksAre({incompleteBlock(5ms, {5ms, 5ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, addIncompleteFullyOverlappingComplete)
 {
-    cache->add(interval(5ms, 5ms), kUnlimited, {5ms, 5ms, 5ms});
-    cache->add(interval(5ms, 5ms), /*limit*/ 2, {5ms, 5ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(1);
-    EXPECT_EQ(cache->cacheSize(), 2);
-    CHECK_INCOMPLETE_BLOCK(lastBlock(), 5ms, TimestampList({5ms, 5ms}));
+    givenBlock(interval(5ms, 5ms), kUnlimited, {5ms, 5ms, 5ms});
+    whenAdded(interval(5ms, 5ms), /*limit*/ 2, {5ms, 5ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(3);
+    thenBlocksAre({block(interval(5ms, 5ms), {5ms, 5ms, 5ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, addCompleteFullyOverlappingIncomplete)
 {
-    cache->add(interval(5ms, 5ms), /*limit*/ 2, {5ms, 5ms});
-    cache->add(interval(5ms, 5ms), kUnlimited, {5ms, 5ms, 5ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(1);
-    EXPECT_EQ(cache->cacheSize(), 3);
-    CHECK_BLOCK(lastBlock(), interval(5ms, 5ms), TimestampList({5ms, 5ms, 5ms}));
+    givenBlock(interval(5ms, 5ms), /*limit*/ 2, {5ms, 5ms});
+    whenAdded(interval(5ms, 5ms), kUnlimited, {5ms, 5ms, 5ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(3);
+    thenBlocksAre({block(interval(5ms, 5ms), {5ms, 5ms, 5ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, addCompleteOverlappingIncompleteMiddle)
 {
-    cache->add(interval(5ms, 5ms), /*limit*/ 2, {5ms, 5ms});
-    cache->add(interval(9ms, 1ms), kUnlimited, {8ms, 6ms, 5ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(1);
-    EXPECT_EQ(cache->cacheSize(), 3);
-    CHECK_BLOCK(lastBlock(), interval(9ms, 1ms), TimestampList({8ms, 6ms, 5ms}));
+    givenBlock(interval(5ms, 5ms), /*limit*/ 2, {5ms, 5ms});
+    whenAdded(interval(9ms, 1ms), kUnlimited, {8ms, 6ms, 5ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(3);
+    thenBlocksAre({block(interval(9ms, 1ms), {8ms, 6ms, 5ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, addCompleteOverlappingIncompleteLeft)
 {
-    cache->add(interval(5ms, 5ms), /*limit*/ 2, {5ms, 5ms});
-    cache->add(interval(9ms, 5ms), kUnlimited, {8ms, 6ms, 5ms, 5ms, 5ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(1);
-    EXPECT_EQ(cache->cacheSize(), 5);
-    CHECK_BLOCK(lastBlock(), interval(9ms, 5ms), TimestampList({8ms, 6ms, 5ms, 5ms, 5ms}));
+    givenBlock(interval(5ms, 5ms), /*limit*/ 2, {5ms, 5ms});
+    whenAdded(interval(9ms, 5ms), kUnlimited, {8ms, 6ms, 5ms, 5ms, 5ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(5);
+    thenBlocksAre({block(interval(9ms, 5ms), {8ms, 6ms, 5ms, 5ms, 5ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, addCompleteOverlappingIncompleteRight)
 {
-    cache->add(interval(5ms, 5ms), /*limit*/ 2, {5ms, 5ms});
-    cache->add(interval(5ms, 1ms), kUnlimited, {5ms, 5ms, 5ms, 3ms, 1ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(1);
-    EXPECT_EQ(cache->cacheSize(), 5);
-    CHECK_BLOCK(lastBlock(), interval(5ms, 1ms), TimestampList({5ms, 5ms, 5ms, 3ms, 1ms}));
+    givenBlock(interval(5ms, 5ms), /*limit*/ 2, {5ms, 5ms});
+    whenAdded(interval(5ms, 1ms), kUnlimited, {5ms, 5ms, 5ms, 3ms, 1ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(5);
+    thenBlocksAre({block(interval(5ms, 1ms), {5ms, 5ms, 5ms, 3ms, 1ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, addIncompleteComplexScenario)
 {
-    // 4 separate blocks.
-    cache->add(interval(9ms, 7ms), /*limit*/ 3, {9ms, 8ms, 7ms});
-    cache->add(interval(5ms, 5ms), kUnlimited, {5ms});
-    cache->add(interval(4ms, 3ms), kUnlimited, {3ms, 3ms});
-    cache->add(interval(2ms, 0ms), kUnlimited, {2ms, 1ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(5); //< #1(c), #1(i), #2, #3, #4
-    EXPECT_CACHE_SIZE(8);
+    // 4 separate blocks; #1 is incomplete, so it's stored as complete #1(c) and incomplete #1(i).
+    givenBlock(interval(9ms, 7ms), /*limit*/ 3, {9ms, 8ms, 7ms});
+    givenBlock(interval(5ms, 5ms), kUnlimited, {5ms});
+    givenBlock(interval(4ms, 3ms), kUnlimited, {3ms, 3ms});
+    givenBlock(interval(2ms, 0ms), kUnlimited, {2ms, 1ms});
 
-    // New block cuts blocks #1(c) and #4, blocks #1(i), #2 and #3 get erased.
-    // The new block is itself split into two parts, complete and incomplete.
-    cache->add(interval(8ms, 2ms), /*limit*/ 4, {7ms, 5ms, 3ms, 2ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(4);
-    EXPECT_CACHE_SIZE(6);
-
-    auto it = cache->cache().begin();
-    CHECK_BLOCK(*it, interval(9ms, 9ms), TimestampList({9ms})); ++it;
-    CHECK_BLOCK(*it, interval(1ms, 0ms), TimestampList({1ms})); ++it;
-    CHECK_INCOMPLETE_BLOCK(*it, 2ms, TimestampList({2ms})); ++it;
-    CHECK_BLOCK(*it, interval(8ms, 3ms), TimestampList({7ms, 5ms, 3ms}));
+    // New block is split into complete [8ms...3ms] and incomplete [2ms]. The complete part cuts
+    // block #1(c) and erases blocks #1(i), #2 and #3; the incomplete part is dropped, as complete
+    // block #4 contains 2ms.
+    whenAdded(interval(8ms, 2ms), /*limit*/ 4, {7ms, 5ms, 3ms, 2ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(3);
+    thenCacheSizeIs(6);
+    thenBlocksAre({
+        block(interval(9ms, 9ms), {9ms}),
+        block(interval(2ms, 0ms), {2ms, 1ms}),
+        block(interval(8ms, 3ms), {7ms, 5ms, 3ms})});
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -541,65 +654,151 @@ TEST_F(TimelineDataListsCacheTest, addIncompleteComplexScenario)
 
 TEST_F(TimelineDataListsCacheTest, failToGetFromEmpty)
 {
-    const auto result = cache->get(interval(2ms, 1ms), kUnlimited);
-    EXPECT_EQ(result, std::nullopt);
+    whenLookedUp(interval(2ms, 1ms), kUnlimited);
+    thenMissed();
+    thenIntegrityIsKept();
+    thenBlockCountIs(0);
+    thenCacheSizeIs(0);
 }
 
 TEST_F(TimelineDataListsCacheTest, getExact)
 {
-    cache->add(interval(5ms, 1ms), kUnlimited, {4ms, 2ms, 1ms, 1ms, 1ms});
-    const auto result = cache->get(interval(5ms, 1ms), kUnlimited);
-    EXPECT_EQ(result, TimestampList({4ms, 2ms, 1ms, 1ms, 1ms}));
+    givenBlock(interval(5ms, 1ms), kUnlimited, {4ms, 2ms, 1ms, 1ms, 1ms});
+    whenLookedUp(interval(5ms, 1ms), kUnlimited);
+    thenGot({4ms, 2ms, 1ms, 1ms, 1ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(5);
 }
 
 TEST_F(TimelineDataListsCacheTest, getSubset)
 {
-    cache->add(interval(5ms, 1ms), kUnlimited, {4ms, 2ms, 1ms, 1ms, 1ms});
-    const auto result = cache->get(interval(4ms, 2ms), kUnlimited);
-    EXPECT_EQ(result, TimestampList({4ms, 2ms}));
+    givenBlock(interval(5ms, 1ms), kUnlimited, {4ms, 2ms, 1ms, 1ms, 1ms});
+    whenLookedUp(interval(4ms, 2ms), kUnlimited);
+    thenGot({4ms, 2ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(5);
 }
 
 TEST_F(TimelineDataListsCacheTest, getLimited)
 {
-    cache->add(interval(5ms, 1ms), kUnlimited, {4ms, 2ms, 1ms, 1ms, 1ms});
-    const auto result = cache->get(interval(5ms, 0ms), /*limit*/ 3);
-    EXPECT_EQ(result, TimestampList({4ms, 2ms, 1ms}));
+    givenBlock(interval(5ms, 1ms), kUnlimited, {4ms, 2ms, 1ms, 1ms, 1ms});
+    whenLookedUp(interval(5ms, 0ms), /*limit*/ 3);
+    thenGot({4ms, 2ms, 1ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(5);
 }
 
 TEST_F(TimelineDataListsCacheTest, getCombination)
 {
-    cache->add(interval(9ms, 6ms), kUnlimited, {8ms, 7ms, 6ms, 6ms, 6ms});
-    cache->add(interval(5ms, 4ms), kUnlimited, {5ms, 4ms, 4ms});
-    cache->add(interval(3ms, 3ms), kUnlimited, {});
-    cache->add(interval(2ms, 1ms), /*limit*/ 2, {2ms, 1ms});
-    const auto result = cache->get(interval(6ms, 0ms), /*limit*/ 8);
-    EXPECT_EQ(result, TimestampList({6ms, 6ms, 6ms, 5ms, 4ms, 4ms, 2ms, 1ms}));
+    givenBlock(interval(9ms, 6ms), kUnlimited, {8ms, 7ms, 6ms, 6ms, 6ms});
+    givenBlock(interval(5ms, 4ms), kUnlimited, {5ms, 4ms, 4ms});
+    givenBlock(interval(3ms, 3ms), kUnlimited, {});
+    givenBlock(interval(2ms, 1ms), /*limit*/ 2, {2ms, 1ms});
+    whenLookedUp(interval(6ms, 0ms), /*limit*/ 8);
+    thenGot({6ms, 6ms, 6ms, 5ms, 4ms, 4ms, 2ms, 1ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(5);
+    thenCacheSizeIs(10);
 }
 
 TEST_F(TimelineDataListsCacheTest, getEmpty)
 {
-    cache->add(interval(9ms, 1ms), kUnlimited, {});
-    const auto result = cache->get(interval(5ms, 3ms), kUnlimited);
-    EXPECT_EQ(result, TimestampList());
+    givenBlock(interval(9ms, 1ms), kUnlimited, {});
+    whenLookedUp(interval(5ms, 3ms), kUnlimited);
+    thenGot({});
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(0);
 }
 
-TEST_F(TimelineDataListsCacheTest, failToGetPartial)
+TEST_F(TimelineDataListsCacheTest, failToGetIncomplete)
 {
-    cache->add(interval(9ms, 6ms), /*limit*/ 5, {8ms, 7ms, 6ms, 6ms, 6ms});
-    cache->add(interval(5ms, 4ms), kUnlimited, {5ms, 5ms, 4ms});
-    cache->add(interval(2ms, 1ms), kUnlimited, {2ms, 1ms});
+    givenBlock(interval(9ms, 6ms), /*limit*/ 5, {8ms, 7ms, 6ms, 6ms, 6ms});
+    givenBlock(interval(5ms, 4ms), kUnlimited, {5ms, 5ms, 4ms});
+    givenBlock(interval(2ms, 1ms), kUnlimited, {2ms, 1ms});
 
     // Cannot get cached but incomplete interval.
-    auto result = cache->get(interval(9ms, 6ms), kUnlimited);
-    EXPECT_EQ(result, std::nullopt);
+    whenLookedUp(interval(9ms, 6ms), kUnlimited);
+    thenMissed();
+    thenIntegrityIsKept();
+    thenBlockCountIs(4);
+    thenCacheSizeIs(10);
+}
+
+TEST_F(TimelineDataListsCacheTest, failToGetPastIncomplete)
+{
+    givenBlock(interval(9ms, 6ms), /*limit*/ 5, {8ms, 7ms, 6ms, 6ms, 6ms});
+    givenBlock(interval(5ms, 4ms), kUnlimited, {5ms, 5ms, 4ms});
+    givenBlock(interval(2ms, 1ms), kUnlimited, {2ms, 1ms});
 
     // There is a gap between [9ms...6ms] and [5ms...4ms] due to the first block incompleteness.
-    result = cache->get(interval(9ms, 4ms), /*limit*/ 8);
-    EXPECT_EQ(result, std::nullopt);
+    whenLookedUp(interval(9ms, 4ms), /*limit*/ 8);
+    thenMissed();
+    thenIntegrityIsKept();
+    thenBlockCountIs(4);
+    thenCacheSizeIs(10);
+}
+
+TEST_F(TimelineDataListsCacheTest, failToGetOverGap)
+{
+    givenBlock(interval(9ms, 6ms), /*limit*/ 5, {8ms, 7ms, 6ms, 6ms, 6ms});
+    givenBlock(interval(5ms, 4ms), kUnlimited, {5ms, 5ms, 4ms});
+    givenBlock(interval(2ms, 1ms), kUnlimited, {2ms, 1ms});
 
     // There is a one millisecond gap between [5ms...4ms] and [2ms...1ms].
-    result = cache->get(interval(5ms, 1ms), /*limit*/ 5);
-    EXPECT_EQ(result, std::nullopt);
+    whenLookedUp(interval(5ms, 1ms), /*limit*/ 5);
+    thenMissed();
+    thenIntegrityIsKept();
+    thenBlockCountIs(4);
+    thenCacheSizeIs(10);
+}
+
+TEST_F(TimelineDataListsCacheTest, failToGetStartingWithIncompleteBlock)
+{
+    givenBlock(interval(4ms, 0ms), kUnlimited, {2ms});
+    givenBlock(interval(9ms, 5ms), /*limit*/ 2, {5ms, 5ms});
+
+    // The lookup starts with the incomplete block [5ms...5ms], which can't be walked past, as some
+    // items of that millisecond may be missing.
+    whenLookedUp(interval(5ms, 0ms), /*limit*/ 5);
+    thenMissed();
+    thenIntegrityIsKept();
+    thenBlockCountIs(3);
+    thenCacheSizeIs(3);
+}
+
+TEST_F(TimelineDataListsCacheTest, getWithinIncompleteBlock)
+{
+    givenBlock(interval(4ms, 0ms), kUnlimited, {2ms});
+    givenBlock(interval(9ms, 5ms), /*limit*/ 2, {5ms, 5ms});
+
+    // The limit can be filled up within the incomplete block.
+    whenLookedUp(interval(5ms, 0ms), /*limit*/ 2);
+    thenGot({5ms, 5ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(3);
+    thenCacheSizeIs(3);
+}
+
+TEST_F(TimelineDataListsCacheTest, failToGetPastIncompleteBlockOverOutdatedEmpty)
+{
+    givenBlock(interval(9ms, 0ms), kUnlimited, {});
+    givenBlock(interval(19ms, 5ms), /*limit*/ 2, {5ms, 5ms});
+
+    // The outdated empty block doesn't hide the items received later.
+    whenLookedUp(interval(19ms, 0ms), kUnlimited);
+    thenMissed();
+}
+
+TEST_F(TimelineDataListsCacheTest, getIncompleteBlockOverOutdatedEmpty)
+{
+    givenBlock(interval(9ms, 0ms), kUnlimited, {});
+    givenBlock(interval(19ms, 5ms), /*limit*/ 2, {5ms, 5ms});
+    whenLookedUp(interval(19ms, 0ms), /*limit*/ 2);
+    thenGot({5ms, 5ms});
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -608,34 +807,28 @@ TEST_F(TimelineDataListsCacheTest, failToGetPartial)
 
 TEST_F(TimelineDataListsCacheTest, expiration)
 {
-    cache->add(interval(9ms, 6ms), kUnlimited, {8ms, 7ms, 6ms}, /*expirationTime*/ 0s);
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(1);
-    EXPECT_CACHE_SIZE(3);
+    givenBlock(interval(9ms, 6ms), kUnlimited, {8ms, 7ms, 6ms}, /*expiration*/ 0s);
 
     // After an attempt to get data, the block will be discarded.
-    const auto result = cache->get(interval(9ms, 6ms), kUnlimited);
-    EXPECT_EQ(result, std::nullopt);
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(0);
-    EXPECT_CACHE_SIZE(0);
+    whenLookedUp(interval(9ms, 6ms), kUnlimited);
+    thenMissed();
+    thenIntegrityIsKept();
+    thenBlockCountIs(0);
+    thenCacheSizeIs(0);
 }
 
 TEST_F(TimelineDataListsCacheTest, expirationOfOne)
 {
-    cache->add(interval(9ms, 6ms), kUnlimited, {8ms, 7ms, 6ms});
-    cache->add(interval(3ms, 1ms), kUnlimited, {3ms, 2ms});
-    cache->add(interval(5ms, 4ms), kUnlimited, {5ms}, /*expirationTime*/ 0s);
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(3);
-    EXPECT_CACHE_SIZE(6);
+    givenBlock(interval(9ms, 6ms), kUnlimited, {8ms, 7ms, 6ms});
+    givenBlock(interval(3ms, 1ms), kUnlimited, {3ms, 2ms});
+    givenBlock(interval(5ms, 4ms), kUnlimited, {5ms}, /*expiration*/ 0s);
 
     // After an attempt to get data, the expired block will be discarded.
-    const auto result = cache->get(interval(9ms, 1ms), kUnlimited);
-    EXPECT_EQ(result, std::nullopt);
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(2);
-    EXPECT_CACHE_SIZE(5);
+    whenLookedUp(interval(9ms, 1ms), kUnlimited);
+    thenMissed();
+    thenIntegrityIsKept();
+    thenBlockCountIs(2);
+    thenCacheSizeIs(5);
 }
 
 // When a new block is being added and it is overlapping an existing expired block,
@@ -643,32 +836,32 @@ TEST_F(TimelineDataListsCacheTest, expirationOfOne)
 
 TEST_F(TimelineDataListsCacheTest, expirationAddOverlappingLeft)
 {
-    cache->add(interval(4ms, 1ms), kUnlimited, {4ms, 1ms}, 0s);
-    cache->add(interval(5ms, 3ms), kUnlimited, {5ms, 4ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(1);
-    EXPECT_CACHE_SIZE(2);
-    CHECK_BLOCK(firstBlock(), interval(5ms, 3ms), TimestampList({5ms, 4ms}));
+    givenBlock(interval(4ms, 1ms), kUnlimited, {4ms, 1ms}, /*expiration*/ 0s);
+    whenAdded(interval(5ms, 3ms), kUnlimited, {5ms, 4ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(2);
+    thenBlocksAre({block(interval(5ms, 3ms), {5ms, 4ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, expirationAddOverlappingRight)
 {
-    cache->add(interval(5ms, 3ms), kUnlimited, {5ms, 4ms}, 0s);
-    cache->add(interval(4ms, 1ms), kUnlimited, {4ms, 1ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(1);
-    EXPECT_CACHE_SIZE(2);
-    CHECK_BLOCK(firstBlock(), interval(4ms, 1ms), TimestampList({4ms, 1ms}));
+    givenBlock(interval(5ms, 3ms), kUnlimited, {5ms, 4ms}, /*expiration*/ 0s);
+    whenAdded(interval(4ms, 1ms), kUnlimited, {4ms, 1ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(2);
+    thenBlocksAre({block(interval(4ms, 1ms), {4ms, 1ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, expirationAddOverlappingMiddle)
 {
-    cache->add(interval(9ms, 1ms), kUnlimited, {7ms, 4ms, 2ms}, 0s);
-    cache->add(interval(7ms, 3ms), kUnlimited, {7ms, 5ms, 4ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(1);
-    EXPECT_CACHE_SIZE(3);
-    CHECK_BLOCK(firstBlock(), interval(7ms, 3ms), TimestampList({7ms, 5ms, 4ms}));
+    givenBlock(interval(9ms, 1ms), kUnlimited, {7ms, 4ms, 2ms}, /*expiration*/ 0s);
+    whenAdded(interval(7ms, 3ms), kUnlimited, {7ms, 5ms, 4ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(3);
+    thenBlocksAre({block(interval(7ms, 3ms), {7ms, 5ms, 4ms})});
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -676,120 +869,134 @@ TEST_F(TimelineDataListsCacheTest, expirationAddOverlappingMiddle)
 
 TEST_F(TimelineDataListsCacheTest, invalidateEmptyCache)
 {
-    cache->invalidate(interval(9ms, 1ms));
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(0);
-    EXPECT_CACHE_SIZE(0);
+    whenInvalidated(interval(9ms, 1ms));
+    thenIntegrityIsKept();
+    thenBlockCountIs(0);
+    thenCacheSizeIs(0);
 }
 
 TEST_F(TimelineDataListsCacheTest, invalidateNotIntersecting)
 {
-    cache->add(interval(9ms, 5ms), kUnlimited, {9ms, 5ms});
-    cache->invalidate(interval(3ms, 1ms));
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(1);
-    EXPECT_CACHE_SIZE(2);
-    CHECK_BLOCK(firstBlock(), interval(9ms, 5ms), TimestampList({9ms, 5ms}));
+    givenBlock(interval(9ms, 5ms), kUnlimited, {9ms, 5ms});
+    whenInvalidated(interval(3ms, 1ms));
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(2);
+    thenBlocksAre({block(interval(9ms, 5ms), {9ms, 5ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, invalidateTouching)
 {
-    cache->add(interval(9ms, 5ms), kUnlimited, {9ms, 5ms});
-    cache->invalidate(interval(4ms, 1ms));
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(1);
-    EXPECT_CACHE_SIZE(2);
-    CHECK_BLOCK(firstBlock(), interval(9ms, 5ms), TimestampList({9ms, 5ms}));
+    givenBlock(interval(9ms, 5ms), kUnlimited, {9ms, 5ms});
+    whenInvalidated(interval(4ms, 1ms));
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(2);
+    thenBlocksAre({block(interval(9ms, 5ms), {9ms, 5ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, invalidateEntireBlock)
 {
-    cache->add(interval(9ms, 5ms), kUnlimited, {9ms, 5ms});
-    cache->add(interval(4ms, 1ms), kUnlimited, {4ms, 1ms});
-    cache->invalidate(interval(9ms, 5ms));
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(1);
-    EXPECT_CACHE_SIZE(2);
-    CHECK_BLOCK(firstBlock(), interval(4ms, 1ms), TimestampList({4ms, 1ms}));
+    givenBlock(interval(9ms, 5ms), kUnlimited, {9ms, 5ms});
+    givenBlock(interval(4ms, 1ms), kUnlimited, {4ms, 1ms});
+    whenInvalidated(interval(9ms, 5ms));
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(2);
+    thenBlocksAre({block(interval(4ms, 1ms), {4ms, 1ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, invalidateSeveralBlocks)
 {
-    cache->add(interval(9ms, 7ms), kUnlimited, {9ms, 7ms});
-    cache->add(interval(6ms, 5ms), kUnlimited, {5ms});
-    cache->add(interval(4ms, 1ms), kUnlimited, {4ms, 1ms});
-    cache->invalidate(interval(9ms, 5ms));
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(1);
-    EXPECT_CACHE_SIZE(2);
-    CHECK_BLOCK(firstBlock(), interval(4ms, 1ms), TimestampList({4ms, 1ms}));
+    givenBlock(interval(9ms, 7ms), kUnlimited, {9ms, 7ms});
+    givenBlock(interval(6ms, 5ms), kUnlimited, {5ms});
+    givenBlock(interval(4ms, 1ms), kUnlimited, {4ms, 1ms});
+    whenInvalidated(interval(9ms, 5ms));
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(2);
+    thenBlocksAre({block(interval(4ms, 1ms), {4ms, 1ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, invalidateEarlierPartOfBlock)
 {
-    cache->add(interval(9ms, 1ms), kUnlimited, {9ms, 5ms, 1ms});
-    cache->invalidate(interval(4ms, 1ms));
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(1);
-    EXPECT_CACHE_SIZE(2);
-    CHECK_BLOCK(firstBlock(), interval(9ms, 5ms), TimestampList({9ms, 5ms}));
+    givenBlock(interval(9ms, 1ms), kUnlimited, {9ms, 5ms, 1ms});
+    whenInvalidated(interval(4ms, 1ms));
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(2);
+    thenBlocksAre({block(interval(9ms, 5ms), {9ms, 5ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, invalidateLaterPartOfBlock)
 {
-    cache->add(interval(9ms, 1ms), kUnlimited, {9ms, 5ms, 1ms});
-    cache->invalidate(interval(9ms, 5ms));
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(1);
-    EXPECT_CACHE_SIZE(1);
-    CHECK_BLOCK(firstBlock(), interval(4ms, 1ms), TimestampList({1ms}));
+    givenBlock(interval(9ms, 1ms), kUnlimited, {9ms, 5ms, 1ms});
+    whenInvalidated(interval(9ms, 5ms));
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(1);
+    thenBlocksAre({block(interval(4ms, 1ms), {1ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, invalidateMiddleOfBlock)
 {
-    cache->add(interval(9ms, 1ms), kUnlimited, {9ms, 5ms, 1ms});
-    cache->invalidate(interval(6ms, 4ms));
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(2);
-    EXPECT_CACHE_SIZE(2);
-    auto it = cache->cache().begin();
-    CHECK_BLOCK(*it, interval(9ms, 7ms), TimestampList({9ms}));
-    ++it;
-    CHECK_BLOCK(*it, interval(3ms, 1ms), TimestampList({1ms}));
+    givenBlock(interval(9ms, 1ms), kUnlimited, {9ms, 5ms, 1ms});
+    whenInvalidated(interval(6ms, 4ms));
+    thenIntegrityIsKept();
+    thenBlockCountIs(2);
+    thenCacheSizeIs(2);
+    thenBlocksAre({
+        block(interval(9ms, 7ms), {9ms}),
+        block(interval(3ms, 1ms), {1ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, invalidateIncompleteBlock)
 {
-    cache->add(interval(5ms, 1ms), /*limit*/ 2, {5ms, 5ms});
-    ASSERT_BLOCK_COUNT(1);
-    cache->invalidate(interval(5ms, 5ms));
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(0);
-    EXPECT_CACHE_SIZE(0);
+    givenBlock(interval(5ms, 1ms), /*limit*/ 2, {5ms, 5ms});
+    whenInvalidated(interval(5ms, 5ms));
+    thenIntegrityIsKept();
+    thenBlockCountIs(0);
+    thenCacheSizeIs(0);
 }
 
 TEST_F(TimelineDataListsCacheTest, invalidateEverything)
 {
-    cache->add(interval(9ms, 7ms), kUnlimited, {9ms, 7ms});
-    cache->add(interval(4ms, 1ms), kUnlimited, {4ms, 1ms});
-    cache->invalidate(QnTimePeriod::anytime());
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(0);
-    EXPECT_CACHE_SIZE(0);
+    givenBlock(interval(9ms, 7ms), kUnlimited, {9ms, 7ms});
+    givenBlock(interval(4ms, 1ms), kUnlimited, {4ms, 1ms});
+    whenInvalidated(QnTimePeriod::anytime());
+    thenIntegrityIsKept();
+    thenBlockCountIs(0);
+    thenCacheSizeIs(0);
 }
 
 TEST_F(TimelineDataListsCacheTest, invalidatedPeriodIsNotReturnedByGet)
 {
-    cache->add(interval(9ms, 1ms), kUnlimited, {9ms, 5ms, 1ms});
-    cache->invalidate(interval(6ms, 4ms));
-    CHECK_INTEGRITY;
+    givenBlock(interval(9ms, 1ms), kUnlimited, {9ms, 5ms, 1ms});
+    givenInvalidated(interval(6ms, 4ms));
 
     // The invalidated period is not in the cache anymore, thus the whole period is not covered.
-    EXPECT_EQ(cache->get(interval(9ms, 1ms), kUnlimited), std::nullopt);
+    whenLookedUp(interval(9ms, 1ms), kUnlimited);
+    thenMissed();
+}
+
+TEST_F(TimelineDataListsCacheTest, periodAfterInvalidatedIsReturnedByGet)
+{
+    givenBlock(interval(9ms, 1ms), kUnlimited, {9ms, 5ms, 1ms});
+    givenInvalidated(interval(6ms, 4ms));
 
     // The remaining parts are still cached.
-    EXPECT_EQ(cache->get(interval(9ms, 7ms), kUnlimited), TimestampList({9ms}));
-    EXPECT_EQ(cache->get(interval(3ms, 1ms), kUnlimited), TimestampList({1ms}));
+    whenLookedUp(interval(9ms, 7ms), kUnlimited);
+    thenGot({9ms});
+}
+
+TEST_F(TimelineDataListsCacheTest, periodBeforeInvalidatedIsReturnedByGet)
+{
+    givenBlock(interval(9ms, 1ms), kUnlimited, {9ms, 5ms, 1ms});
+    givenInvalidated(interval(6ms, 4ms));
+
+    // The remaining parts are still cached.
+    whenLookedUp(interval(3ms, 1ms), kUnlimited);
+    thenGot({1ms});
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -797,95 +1004,100 @@ TEST_F(TimelineDataListsCacheTest, invalidatedPeriodIsNotReturnedByGet)
 
 TEST_F(TimelineDataListsCacheTest, touchByGet)
 {
-    cache->add(interval(1ms, 1ms), kUnlimited, {1ms});
-    cache->add(interval(3ms, 3ms), kUnlimited, {3ms});
-    cache->add(interval(5ms, 5ms), kUnlimited, {5ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(3);
-    EXPECT_CACHE_SIZE(3);
-    CHECK_BLOCK(firstBlock(), interval(1ms, 1ms), TimestampList({1ms}));
-    CHECK_BLOCK(lastBlock(), interval(5ms, 5ms), TimestampList({5ms}));
-    cache->get(interval(1ms, 1ms), kUnlimited);
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(3);
-    EXPECT_CACHE_SIZE(3);
-    CHECK_BLOCK(firstBlock(), interval(3ms, 3ms), TimestampList({3ms}));
-    CHECK_BLOCK(lastBlock(), interval(1ms, 1ms), TimestampList({1ms}));
+    givenBlock(interval(1ms, 1ms), kUnlimited, {1ms});
+    givenBlock(interval(3ms, 3ms), kUnlimited, {3ms});
+    givenBlock(interval(5ms, 5ms), kUnlimited, {5ms});
+
+    whenLookedUp(interval(3ms, 3ms), kUnlimited);
+
+    // Only the looked up block becomes the most recently accessed; others keep their order.
+    thenBlocksAre({
+        block(interval(1ms, 1ms), {1ms}),
+        block(interval(5ms, 5ms), {5ms}),
+        block(interval(3ms, 3ms), {3ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, clear)
 {
-    cache->add(interval(2ms, 1ms), kUnlimited, {1ms});
-    cache->clear();
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(0);
-    EXPECT_CACHE_SIZE(0);
+    givenBlock(interval(2ms, 1ms), kUnlimited, {1ms});
+    whenCleared();
+    thenIntegrityIsKept();
+    thenBlockCountIs(0);
+    thenCacheSizeIs(0);
 }
 
 TEST_F(TimelineDataListsCacheTest, trimToBlockCount)
 {
-    cache->add(interval(1ms, 1ms), kUnlimited, {1ms});
-    cache->add(interval(3ms, 3ms), kUnlimited, {3ms});
-    cache->add(interval(5ms, 5ms), kUnlimited, {5ms});
-    cache->setMaximumBlockCount(2);
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(2);
-    EXPECT_CACHE_SIZE(2);
-    CHECK_BLOCK(firstBlock(), interval(3ms, 3ms), TimestampList({3ms}));
-    CHECK_BLOCK(lastBlock(), interval(5ms, 5ms), TimestampList({5ms}));
+    givenBlock(interval(1ms, 1ms), kUnlimited, {1ms});
+    givenBlock(interval(3ms, 3ms), kUnlimited, {3ms});
+    givenBlock(interval(5ms, 5ms), kUnlimited, {5ms});
+    whenMaximumBlockCountSet(2);
+    thenIntegrityIsKept();
+    thenBlockCountIs(2);
+    thenCacheSizeIs(2);
+    thenBlocksAre({
+        block(interval(3ms, 3ms), {3ms}),
+        block(interval(5ms, 5ms), {5ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, trimToMaximumSize)
 {
-    cache->add(interval(1ms, 1ms), kUnlimited, {1ms, 1ms, 1ms});
-    cache->add(interval(3ms, 3ms), kUnlimited, {3ms, 3ms});
-    cache->add(interval(5ms, 5ms), kUnlimited, {5ms});
-    cache->add(interval(6ms, 6ms), kUnlimited, {6ms, 6ms, 6ms});
-    ASSERT_BLOCK_COUNT(4);
+    givenBlock(interval(1ms, 1ms), kUnlimited, {1ms, 1ms, 1ms});
+    givenBlock(interval(3ms, 3ms), kUnlimited, {3ms, 3ms});
+    givenBlock(interval(5ms, 5ms), kUnlimited, {5ms});
+    givenBlock(interval(6ms, 6ms), kUnlimited, {6ms, 6ms, 6ms});
 
-    cache->setMaximumCacheSize(7);
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(3);
-    EXPECT_CACHE_SIZE(6);
-    CHECK_BLOCK(firstBlock(), interval(3ms, 3ms), TimestampList({3ms, 3ms}));
+    whenMaximumCacheSizeSetTo(7);
+    thenIntegrityIsKept();
+    thenBlockCountIs(3);
+    thenCacheSizeIs(6);
+    thenBlocksAre({
+        block(interval(3ms, 3ms), {3ms, 3ms}),
+        block(interval(5ms, 5ms), {5ms}),
+        block(interval(6ms, 6ms), {6ms, 6ms, 6ms})});
 
-    cache->setMaximumCacheSize(6);
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(3);
-    EXPECT_CACHE_SIZE(6);
-    CHECK_BLOCK(firstBlock(), interval(3ms, 3ms), TimestampList({3ms, 3ms}));
+    whenMaximumCacheSizeSetTo(6);
+    thenIntegrityIsKept();
+    thenBlockCountIs(3);
+    thenCacheSizeIs(6);
+    thenBlocksAre({
+        block(interval(3ms, 3ms), {3ms, 3ms}),
+        block(interval(5ms, 5ms), {5ms}),
+        block(interval(6ms, 6ms), {6ms, 6ms, 6ms})});
 
-    cache->setMaximumCacheSize(3);
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(1);
-    EXPECT_CACHE_SIZE(3);
-    CHECK_BLOCK(firstBlock(), interval(6ms, 6ms), TimestampList({6ms, 6ms, 6ms}));
+    whenMaximumCacheSizeSetTo(3);
+    thenIntegrityIsKept();
+    thenBlockCountIs(1);
+    thenCacheSizeIs(3);
+    thenBlocksAre({block(interval(6ms, 6ms), {6ms, 6ms, 6ms})});
 }
 
 TEST_F(TimelineDataListsCacheTest, trimAfterAdd)
 {
-    cache->setMaximumBlockCount(3);
-    cache->setMaximumCacheSize(5);
-
-    cache->add(interval(9ms, 8ms), kUnlimited, {9ms, 8ms});
-    cache->add(interval(7ms, 5ms), kUnlimited, {7ms, 5ms});
-    ASSERT_BLOCK_COUNT(2);
+    givenMaximumBlockCount(3);
+    givenMaximumCacheSize(5);
+    givenBlock(interval(9ms, 8ms), kUnlimited, {9ms, 8ms});
+    givenBlock(interval(7ms, 5ms), kUnlimited, {7ms, 5ms});
 
     // Add another block, causing the total size exceeding `maximumCacheSize`.
-    cache->add(interval(3ms, 2ms), kUnlimited, {3ms, 3ms});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(2);
-    EXPECT_CACHE_SIZE(4);
-    CHECK_BLOCK(firstBlock(), interval(7ms, 5ms), TimestampList({7ms, 5ms}));
-    CHECK_BLOCK(lastBlock(), interval(3ms, 2ms), TimestampList({3ms, 3ms}));
+    whenAdded(interval(3ms, 2ms), kUnlimited, {3ms, 3ms});
+    thenIntegrityIsKept();
+    thenBlockCountIs(2);
+    thenCacheSizeIs(4);
+    thenBlocksAre({
+        block(interval(7ms, 5ms), {7ms, 5ms}),
+        block(interval(3ms, 2ms), {3ms, 3ms})});
 
     // Add two empty blocks, causing the number of blocks exceeding `maximumBlockCount`.
-    cache->add(interval(15ms, 10ms), kUnlimited, {});
-    cache->add(interval(1ms, 1ms), kUnlimited, {});
-    CHECK_INTEGRITY;
-    ASSERT_BLOCK_COUNT(3);
-    EXPECT_CACHE_SIZE(2);
-    CHECK_BLOCK(firstBlock(), interval(3ms, 2ms), TimestampList({3ms, 3ms}));
+    whenAdded(interval(15ms, 10ms), kUnlimited, {});
+    whenAdded(interval(1ms, 1ms), kUnlimited, {});
+    thenIntegrityIsKept();
+    thenBlockCountIs(3);
+    thenCacheSizeIs(2);
+    thenBlocksAre({
+        block(interval(3ms, 2ms), {3ms, 3ms}),
+        block(interval(15ms, 10ms), {}),
+        block(interval(1ms, 1ms), {})});
 }
 
 } // namespace test

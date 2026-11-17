@@ -5,7 +5,9 @@
 #include <chrono>
 #include <list>
 #include <map>
+#include <memory>
 #include <optional>
+#include <vector>
 
 #include <QtCore/QDeadlineTimer>
 #include <QtCore/QPointer>
@@ -66,11 +68,9 @@ public:
      * The cached data for the period is dropped immediately, so a subsequent load of any
      * intersecting period is requested from the source backend.
      *
-     * Known issue: a load request that is already running is not affected: its result is added to
-     * the cache as usual, even if it was obtained before the change that caused the invalidation.
+     * Running loads intersecting the period are canceled, so their callers get canceled futures.
+     * If a result has already arrived, it is still returned, but not added to the cache.
      */
-    // TODO: MOBILE-3442 #vkutin All running requests intersecting with the invalidated period
-    // must be cancelled.
     void invalidate(const QnTimePeriod& period);
 
     /**
@@ -110,10 +110,22 @@ public:
     void setAgeThreshold(std::optional<std::chrono::seconds> value);
 
 private:
+    struct RunningRequest
+    {
+        const QnTimePeriod period;
+        std::optional<QFuture<DataList>> sourceFuture; //< Not set while the load is being sent.
+        bool invalidated = false;
+    };
+    using RunningRequestPtr = std::shared_ptr<RunningRequest>;
+
     std::optional<std::chrono::seconds> effectiveExpirationTime(
         std::chrono::milliseconds blockEndTime) const;
 
+    /** Drops requests canceled by their callers. Must be called under `m_mutex`. */
+    void dropCanceledRequests();
+
 private:
+    std::list<RunningRequestPtr> m_runningRequests;
     QPointer<QnSyncTime> m_timeSource;
     std::optional<std::chrono::seconds> m_expirationTime{std::chrono::seconds(30)};
     std::optional<std::chrono::seconds> m_ageThreshold{std::chrono::hours(1)};
@@ -162,20 +174,57 @@ QFuture<DataList> CachingProxyBackend<DataList>::load(const QnTimePeriod& period
     NX_VERBOSE(this, "No complete data in the cache for [%1, %2), limit=%3; requesting.",
         period.startTimeMs, period.endTimeMs(), limit);
 
-    return this->source()->load(period, limit).then(
-        [this, period, limit, weakGuard = this->weak_from_this()](DataList result) -> DataList
+    // The request is registered before it's sent, so it can be invalidated while being sent.
+    const auto request = std::make_shared<RunningRequest>(RunningRequest{.period = period});
+    {
+        NX_MUTEX_LOCKER lk(&m_mutex);
+        dropCanceledRequests();
+        m_runningRequests.push_back(request);
+    }
+
+    auto sourceFuture = this->source()->load(period, limit);
+
+    // If the request was invalidated before `request->sourceFuture` was assigned, `invalidate()`
+    // couldn't cancel the future, so it's canceled here.
+    bool invalidatedWhileSending = false;
+    {
+        NX_MUTEX_LOCKER lk(&m_mutex);
+        request->sourceFuture = sourceFuture;
+        invalidatedWhileSending = request->invalidated;
+    }
+
+    if (invalidatedWhileSending)
+        sourceFuture.cancel();
+
+    return sourceFuture.then(
+        [this, request, limit, weakGuard = this->weak_from_this()](DataList result) -> DataList
         {
             const auto guard = weakGuard.lock();
             if (!guard)
                 return {};
 
+            const auto& period = request->period;
             const auto expirationTime = effectiveExpirationTime(period.endTime());
+
+            NX_MUTEX_LOCKER lk(&m_mutex);
+            m_runningRequests.remove(request);
+
+            if (request->invalidated)
+            {
+                NX_VERBOSE(this,
+                    "Received response for [%1, %2), limit=%3, received=%4; "
+                    "not adding to the cache as it was invalidated",
+                    period.startTime(),
+                    period.endTime(),
+                    limit,
+                    result.size());
+                return result;
+            }
 
             NX_VERBOSE(this, "Received response for [%1, %2), limit=%3, received=%4; "
                 "adding to the cache (expirationTime=%5)",
                 period.startTime(), period.endTime(), limit, result.size(), expirationTime);
 
-            NX_MUTEX_LOCKER lk(&m_mutex);
             m_cache.add(period, limit, result, expirationTime);
             return result;
         });
@@ -189,14 +238,51 @@ void CachingProxyBackend<DataList>::invalidate(const QnTimePeriod& period)
 
     NX_VERBOSE(this, "Invalidating [%1, %2) in the cache", period.startTimeMs, period.endTimeMs());
 
-    NX_MUTEX_LOCKER lk(&m_mutex);
-    m_cache.invalidate(period);
+    std::vector<QFuture<DataList>> futuresToCancel;
+    {
+        NX_MUTEX_LOCKER lk(&m_mutex);
+        m_cache.invalidate(period);
+        dropCanceledRequests();
+
+        for (auto it = m_runningRequests.begin(); it != m_runningRequests.end();)
+        {
+            const auto& request = *it;
+            if (!request->period.intersects(period))
+            {
+                ++it;
+                continue;
+            }
+
+            NX_VERBOSE(this,
+                "Canceling running request for [%1, %2)",
+                request->period.startTimeMs,
+                request->period.endTimeMs());
+
+            request->invalidated = true;
+            if (request->sourceFuture)
+                futuresToCancel.push_back(*request->sourceFuture);
+
+            it = m_runningRequests.erase(it);
+        }
+    }
+
+    // Not under the lock, as cancellation notifies the futures' watchers.
+    for (auto& future: futuresToCancel)
+        future.cancel();
 }
 
 template<typename DataList>
 void CachingProxyBackend<DataList>::invalidate(std::chrono::milliseconds timestampMs)
 {
     invalidate(QnTimePeriod{timestampMs, std::chrono::milliseconds(1)});
+}
+
+template<typename DataList>
+void CachingProxyBackend<DataList>::dropCanceledRequests()
+{
+    // A request canceled by its caller never reaches its continuation, which drops finished ones.
+    m_runningRequests.remove_if([](const RunningRequestPtr& request)
+        { return request->sourceFuture && request->sourceFuture->isCanceled(); });
 }
 
 template<typename DataList>
