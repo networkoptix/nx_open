@@ -313,7 +313,9 @@ AdaptiveScreen
         enabled: !windowContext.sessionManager.hasReconnectingSession && !loadingDummy.visible
         layout: resourceHelper.isLayout ? windowContext.deprecatedUiController.resource : null
         keepStatuses: !windowContext.sessionManager.hasReconnectingSession && !windowContext.sessionManager.hasConnectedSession
-        active: resourcesScreen.isActive && !resourcesScreen.showsVideoScreen
+        active: resourcesScreen.isActive
+            && !resourcesScreen.showsVideoScreen
+            && !LayoutController.isUnsupported //< Hidden behind the notice, no live previews.
         bottomMargin : LayoutController.hasSidePanels ? 20 : 0
         leftMargin : LayoutController.hasSidePanels ? 20 : 0
         rightMargin : LayoutController.hasSidePanels ? 20 : 0

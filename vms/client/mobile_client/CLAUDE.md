@@ -40,9 +40,10 @@ All paths relative to `static-resources/qml/Nx/`. Private subcomponents under `S
 
 ### App shell
 
-- Layout mode (horizontal compact / compact / medium / expanded, by window size) -> `Ui/LayoutController.qml`, `Ui/LayoutMode.qml`
+- Layout mode (horizontal compact / compact / medium / expanded / unsupported, by window size) -> `Ui/LayoutController.qml`, `Ui/LayoutMode.qml`
 - Screen container -> `Ui/UiContainer.qml`
 - Base screen with left/right panels, splash -> `Items/AdaptiveScreen.qml`
+- Too-small window notice (Unsupported layout mode hides the screens, they keep the last supported layout and interrupt the video) -> `Ui/UiContainer.qml`
 - Side panel -> `Items/Panel.qml`
 - Top bar -> `Controls/ToolBar.qml`
 - Bottom navigation -> `Controls/ScreenNavigationBar.qml`

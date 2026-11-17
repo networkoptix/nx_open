@@ -421,6 +421,11 @@ FocusScope
         {
             splash.close()
         }
+
+        function onIsUnsupportedChanged()
+        {
+            d.autoCloseIfNarrow()
+        }
     }
 
     Keys.onPressed: (event) =>
@@ -479,6 +484,11 @@ FocusScope
             if (!LayoutController.hasSidePanels)
                 return
 
+            // Behind the unsupported window size notice the panels are kept as they are, the
+            // layout is checked again once the window grows back.
+            if (LayoutController.isUnsupported)
+                return
+
             if (!leftPanel.visible || !rightPanel.visible)
                 return
 
@@ -508,6 +518,8 @@ FocusScope
     Connections
     {
         target: panelsLayout
-        function onWidthChanged() { d.autoCloseIfNarrow() }
+        // Deferred: on a window resize the layout gets its new width before LayoutController
+        // re-evaluates the mode, so isUnsupported is still stale at this point.
+        function onWidthChanged() { Qt.callLater(d.autoCloseIfNarrow) }
     }
 }

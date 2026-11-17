@@ -22,6 +22,7 @@ NxObject
     property ChunkProvider chunkProvider
     property int chunkContentType: CommonGlobals.RecordingContent
     property bool forceVideoPause: false
+    property bool forceVideoStop: false //< Unlike the pause, releases the decoders.
     property bool tryFixVirtualCameraPosition: true
 
     readonly property alias speed: mediaPlayer.speed
@@ -192,6 +193,8 @@ NxObject
         player: mediaPlayer
         playable: windowContext.sessionManager.hasConnectedSession
             && !controller.forceVideoPause
+            && !controller.forceVideoStop
+        forceStopWhenNotPlayable: controller.forceVideoStop
 
         interruptOnInactivity: CoreUtils.isMobilePlatform()
     }

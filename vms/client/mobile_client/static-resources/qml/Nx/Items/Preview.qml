@@ -85,6 +85,9 @@ Rectangle
     {
         player: preview.player
         interruptOnInactivity: CoreUtils.isMobilePlatform()
+
+        // Paused rather than stopped: a stopped player reports no media, shown as "No data".
+        playable: !LayoutController.isUnsupported //< Hidden behind the notice.
     }
 
     IntervalPreview
