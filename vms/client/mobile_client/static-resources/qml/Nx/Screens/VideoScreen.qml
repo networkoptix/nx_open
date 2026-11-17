@@ -246,6 +246,7 @@ Page
         }
 
         forceVideoPause: d.forceVideoPause
+        forceVideoStop: LayoutController.isUnsupported //< Hidden behind the notice.
         chunkProvider: cameraChunkProvider
 
         timelineController: Timeline.Controller

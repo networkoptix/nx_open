@@ -97,6 +97,56 @@ Item
         }
     }
 
+    // A popup rather than an item: the screens' own popups, sheets and the window banner live in
+    // the window overlay above the content, and the notice must cover them as well.
+    Controls.Popup
+    {
+        parent: Controls.Overlay.overlay
+        width: parent?.width ?? 0
+        height: parent?.height ?? 0
+        z: 2 //< Should be above all the other popups and the window banner.
+
+        modal: true
+        dim: false
+        focus: true
+        closePolicy: Controls.Popup.NoAutoClose
+        visible: LayoutController.isUnsupported
+
+        // The popup's own SafeArea is not recalculated on device rotation while it is open, the
+        // overlay's one is.
+        topPadding: parent?.SafeArea.margins.top ?? 0
+        leftPadding: parent?.SafeArea.margins.left ?? 0
+        rightPadding: parent?.SafeArea.margins.right ?? 0
+        bottomPadding: parent?.SafeArea.margins.bottom ?? 0
+        background: Rectangle { color: ColorTheme.colors.dark4 }
+
+        // Scrolls when the window is too short even for the notice itself.
+        contentItem: Flickable
+        {
+            id: noticeFlickable
+
+            contentWidth: width
+            contentHeight: notice.height
+            boundsBehavior: Flickable.StopAtBounds
+            clip: true
+
+            Placeholder
+            {
+                id: notice
+
+                width: noticeFlickable.width
+                height: Math.max(implicitHeight, noticeFlickable.height)
+
+                imageSource: "image://skin/64x64/Outline/expand.svg?primary=light16"
+                text: qsTr("Screen size is too small")
+                description: qsTr(
+                    "There isn't enough screen space. Resize the window or use a larger screen.")
+                textColor: ColorTheme.colors.light12
+                descriptionColor: ColorTheme.colors.light16
+            }
+        }
+    }
+
     StackView
     {
         id: stackView

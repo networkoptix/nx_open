@@ -15,7 +15,7 @@ NxObject
     id: layoutController
 
     // Window height below which the bottom navigation bar and the bottom sheets do not fit. Below
-    // this threshold, HorizontalCompact mode is used.
+    // this threshold, HorizontalCompact mode is used, or Unsupported if it does not fit.
     readonly property int shortWindowHeight: 480
 
     // Window width starting from which the side panels fit next to the content. Below this
@@ -25,6 +25,16 @@ NxObject
     // Window width starting from which the content pane is wide enough for the large metrics. Below
     // this threshold, Medium mode is used; above it, Expanded mode is used.
     readonly property int expandedWindowWidth: 840
+
+    // Minimum window width the Compact mode fits into, Unsupported mode is used below it. No
+    // minimum height: a window shorter than shortWindowHeight is never Compact.
+    readonly property int compactMinimumWidth: 300
+
+    // Minimum window size the HorizontalCompact mode fits into. In a smaller window, Unsupported
+    // mode is used. The layout needs a width of 600, but it is intentionally lowered to 568 to
+    // support iPhone SE in landscape.
+    readonly property int horizontalCompactMinimumWidth: 568
+    readonly property int horizontalCompactMinimumHeight: 300
 
     // Whether the window is taller than wide. This is plain window geometry, NOT a layout mode:
     // use it only where the shape of the window itself matters - the fullscreen video controls,
@@ -38,22 +48,14 @@ NxObject
 
     readonly property int mode:
     {
+        // Unsupported is never forced: it hides the whole UI, including the setting to reset it.
         const forcedMode = appContext.settings.forcedLayoutMode
-        if (forcedMode >= 0)
+        if (forcedMode >= 0 && forcedMode !== LayoutMode.Unsupported)
             return forcedMode
 
-        if (!mainWindow)
-            return LayoutMode.Compact
-
-        if (mainWindow.height < layoutController.shortWindowHeight)
-            return LayoutMode.HorizontalCompact
-
-        if (mainWindow.width < layoutController.mediumWindowWidth)
-            return LayoutMode.Compact
-
-        return mainWindow.width < layoutController.expandedWindowWidth
-            ? LayoutMode.Medium
-            : LayoutMode.Expanded
+        return mainWindow
+            ? d.modeForSize(mainWindow.width, mainWindow.height)
+            : LayoutMode.Compact
     }
 
     readonly property string modeName:
@@ -68,20 +70,26 @@ NxObject
                 return "medium"
             case LayoutMode.Expanded:
                 return "expanded"
+            case LayoutMode.Unsupported:
+                return "unsupported"
         }
 
         return "unknown"
     }
 
-    readonly property bool isCompact: mode === LayoutMode.Compact
-    readonly property bool isHorizontalCompact: mode === LayoutMode.HorizontalCompact
+    readonly property bool isUnsupported: mode === LayoutMode.Unsupported
+
+    // The layout flags below follow the last supported mode: while the window is Unsupported, the
+    // screens are hidden behind the notice and keep their layout and state until it grows back.
+    readonly property bool isCompact: d.layoutMode === LayoutMode.Compact
+    readonly property bool isHorizontalCompact: d.layoutMode === LayoutMode.HorizontalCompact
 
     // Whether the screen is split into a content area with the optional side panels around it.
     // Such a layout also moves the navigation into a rail at the left edge, freeing the bottom.
     readonly property bool hasSidePanels:
-        mode === LayoutMode.Medium || mode === LayoutMode.Expanded
+        d.layoutMode === LayoutMode.Medium || d.layoutMode === LayoutMode.Expanded
 
-    readonly property bool isExpanded: mode === LayoutMode.Expanded
+    readonly property bool isExpanded: d.layoutMode === LayoutMode.Expanded
 
     onHasSidePanelsChanged:
     {
@@ -126,6 +134,11 @@ NxObject
 
         if (isPortrait === (orientation === Qt.PortraitOrientation))
             return //< Already in the wanted orientation, nothing to force.
+
+        // The layouts need different minimum sizes, so the window with its sides swapped may be
+        // too small for any of them. Then the video fills the screen in the current orientation.
+        if (d.modeForSize(mainWindow.height, mainWindow.width) === LayoutMode.Unsupported)
+            return
 
         d.orientationToRestore = isPortrait ? Qt.PortraitOrientation : Qt.LandscapeOrientation
 
@@ -181,16 +194,53 @@ NxObject
         }
     }
 
+    onModeChanged: d.updateLayoutMode()
+    Component.onCompleted: d.updateLayoutMode()
+
     QtObject
     {
         id: d
 
         property bool fullscreen: false
 
+        // The last supported mode, the screens are laid out in it.
+        property int layoutMode: LayoutMode.Compact
+
         // The orientation enterFullscreen() forced the screen away from; 0 while nothing is
         // forced. Restored on exitFullscreen() unless the system is allowed to rotate the screen
         // by itself.
         property int orientationToRestore: 0
+
+        function updateLayoutMode()
+        {
+            // The mode is checked directly: isUnsupported may not be re-evaluated yet.
+            if (layoutController.mode !== LayoutMode.Unsupported)
+                layoutMode = layoutController.mode
+        }
+
+        function modeForSize(width, height)
+        {
+            if (height < layoutController.shortWindowHeight)
+            {
+                if (width < layoutController.horizontalCompactMinimumWidth
+                    || height < layoutController.horizontalCompactMinimumHeight)
+                {
+                    return LayoutMode.Unsupported
+                }
+
+                return LayoutMode.HorizontalCompact
+            }
+
+            if (width < layoutController.compactMinimumWidth)
+                return LayoutMode.Unsupported
+
+            if (width < layoutController.mediumWindowWidth)
+                return LayoutMode.Compact
+
+            return width < layoutController.expandedWindowWidth
+                ? LayoutMode.Medium
+                : LayoutMode.Expanded
+        }
 
         function setFullscreen(value)
         {
