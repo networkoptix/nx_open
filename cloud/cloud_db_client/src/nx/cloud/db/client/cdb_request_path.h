@@ -9,6 +9,7 @@ static constexpr char kAccountActivatePath[] = "/cdb/account/activate";
 static constexpr char kAccountPasswordResetPath[] = "/cdb/account/resetPassword";
 static constexpr char kAccountReactivatePath[] = "/cdb/account/reactivate";
 static constexpr char kAccountCreateTemporaryCredentialsPath[] = "/cdb/account/createTemporaryCredentials";
+static constexpr char kAccountPasswordValidatePath[] = "/cdb/account/password/validate";
 
 static constexpr char kAccountPathV0[] = "/cdb/v0/account/{accountEmail}";
 static constexpr char kAccountPath[] = "/cdb/account/{accountEmail}";

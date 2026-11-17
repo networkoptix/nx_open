@@ -101,6 +101,13 @@ NX_REFLECTION_INSTRUMENT(AccountEmail, AccountEmail_Fields)
 NX_REFLECTION_INSTRUMENT(PasswordResetRequest, PasswordResetRequest_Fields)
 
 //-------------------------------------------------------------------------------------------------
+// PasswordValidationRequest, PasswordValidationResult
+
+NX_REFLECTION_INSTRUMENT(PasswordValidationRequest, (email)(password))
+
+NX_REFLECTION_INSTRUMENT(PasswordValidationResult, (valid)(accountStatus))
+
+//-------------------------------------------------------------------------------------------------
 // class TemporaryCredentials
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, TemporaryCredentialsTimeouts* const data);

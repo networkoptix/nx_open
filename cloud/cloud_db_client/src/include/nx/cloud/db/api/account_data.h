@@ -224,6 +224,26 @@ struct PasswordResetRequest
     std::optional<std::string> customization = std::nullopt;
 };
 
+struct PasswordValidationRequest
+{
+    /**%apidoc Account email. */
+    std::string email;
+
+    /**%apidoc Account password (plain text). */
+    std::string password;
+};
+
+struct PasswordValidationResult
+{
+    /**%apidoc[readonly] Shows if the password matches the account password. "false" is also
+     * reported if the account does not exist or has no password.
+     */
+    bool valid = false;
+
+    /**%apidoc[opt][readonly] Account status. Present only if the password is valid. */
+    std::optional<AccountStatus> accountStatus;
+};
+
 struct TemporaryCredentialsTimeouts
 {
     /**%apidoc Expiration timeout.
