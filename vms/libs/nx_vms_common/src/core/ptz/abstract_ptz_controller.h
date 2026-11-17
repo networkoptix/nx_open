@@ -375,6 +375,9 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      */
     virtual bool activateTour(const QString& tourId) = 0;
 
+    /** Stop the specified tour without removing it. Unsupported controllers return false. */
+    virtual bool deactivateTour(const QString& tourId);
+
     virtual std::optional<QnPtzTour> getActiveTour();
 
     /**

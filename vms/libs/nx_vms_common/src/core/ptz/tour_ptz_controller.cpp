@@ -203,6 +203,20 @@ std::optional<QnPtzTour> QnTourPtzController::getActiveTour()
     return *m_activeTour.lock();
 }
 
+bool QnTourPtzController::deactivateTour(const QString& tourId)
+{
+    auto lockedActiveTour = m_activeTour.lock();
+    if (!m_adaptor->value().contains(tourId))
+        return false;
+
+    if (lockedActiveTour->id == tourId)
+    {
+        m_executor->stopTour();
+        *lockedActiveTour = QnPtzTour();
+    }
+    return true;
+}
+
 bool QnTourPtzController::getTours(QnPtzTourList* tours) const
 {
     *tours = m_adaptor->value().values();

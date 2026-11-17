@@ -135,6 +135,16 @@ bool QnActivityPtzController::getActiveObject(QnPtzObject* activeObject) const
     return true;
 }
 
+bool QnActivityPtzController::deactivateTour(const QString& tourId)
+{
+    if (!base_type::deactivateTour(tourId))
+        return false;
+
+    if (m_mode != Client)
+        m_adaptor->testAndSetValue(QnPtzObject(Qn::TourPtzObject, tourId), QnPtzObject());
+    return true;
+}
+
 bool QnActivityPtzController::getData(
     QnPtzData* data,
     DataFields query,

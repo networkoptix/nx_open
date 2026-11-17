@@ -3,6 +3,8 @@
 #ifndef QN_HOME_PTZ_CONTROLLER_H
 #define QN_HOME_PTZ_CONTROLLER_H
 
+#include <memory>
+
 #include <nx/utils/thread/mutex.h>
 
 #include "proxy_ptz_controller.h"
@@ -36,6 +38,7 @@ public:
 
     virtual bool activatePreset(const QString& presetId, qreal speed) override;
     virtual bool activateTour(const QString& tourId) override;
+    virtual bool deactivateTour(const QString& tourId) override;
 
     virtual bool updateHomeObject(const QnPtzObject& homePosition) override;
     virtual bool getHomeObject(QnPtzObject* homePosition) const override;
@@ -45,6 +48,9 @@ protected:
 
 private:
     void at_adaptor_valueChanged();
+
+    // Home callbacks bypass the outer controller, so they share this lock with deactivation.
+    const std::shared_ptr<nx::Mutex> m_commandMutex = std::make_shared<nx::Mutex>();
 
 protected:
     QnResourcePropertyAdaptor<QnPtzObject>* m_adaptor;

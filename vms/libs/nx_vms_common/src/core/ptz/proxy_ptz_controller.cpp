@@ -215,6 +215,11 @@ std::optional<QnPtzTour> QnProxyPtzController::getActiveTour()
         : std::nullopt;
 }
 
+bool QnProxyPtzController::deactivateTour(const QString& tourId)
+{
+    return m_controller ? m_controller->deactivateTour(tourId) : false;
+}
+
 bool QnProxyPtzController::getTours(
     QnPtzTourList* tours) const
 {

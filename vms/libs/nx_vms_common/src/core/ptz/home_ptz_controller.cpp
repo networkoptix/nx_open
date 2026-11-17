@@ -16,13 +16,11 @@
 using namespace nx::core;
 
 QnHomePtzController::QnHomePtzController(
-    const QnPtzControllerPtr &baseController,
-    QThread* executorThread)
-    :
+    const QnPtzControllerPtr& baseController, QThread* executorThread):
     base_type(baseController),
-    m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzObject>(
-        "ptzHomeObject", QnPtzObject(), this)),
-    m_executor(new QnHomePtzExecutor(baseController))
+    m_adaptor(
+        new QnJsonResourcePropertyAdaptor<QnPtzObject>("ptzHomeObject", QnPtzObject(), this)),
+    m_executor(new QnHomePtzExecutor(baseController, m_commandMutex))
 {
     NX_ASSERT(!baseController->hasCapabilities(Ptz::Capability::asynchronous));
     m_adaptor->setResource(baseController->resource());
@@ -102,6 +100,18 @@ bool QnHomePtzController::activateTour(const QString& tourId)
         return false;
 
     m_executor->stop();
+    return true;
+}
+
+bool QnHomePtzController::deactivateTour(const QString& tourId)
+{
+    NX_MUTEX_LOCKER lock(m_commandMutex.get());
+    const auto activeTour = base_type::getActiveTour();
+    if (!base_type::deactivateTour(tourId))
+        return false;
+
+    if (activeTour && activeTour->id == tourId)
+        restartExecutor();
     return true;
 }
 

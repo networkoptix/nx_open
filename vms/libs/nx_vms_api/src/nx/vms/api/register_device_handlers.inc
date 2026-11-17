@@ -588,6 +588,19 @@ void registerDeviceBaseHandlers(
      * %struct PtzPresetFilter
      * %param[ref] _local,_strict,_ticket
      * %permissions Depends on Resource access rights.
+     *
+     **%apidoc DELETE /rest/v{5-}/devices/{deviceId}/ptz/tours/{id}/active
+     * Deactivates the specified PTZ Tour without deleting the Tour or its Presets.
+     * An existing inactive Tour is left unchanged. An unknown Tour returns an error.
+     * A concrete Tour ID is required; the wildcard "*" is not supported.
+     * Stops subsequent Tour steps; a Preset movement already sent to the Device may complete.
+     * The configured Home object is preserved. If VMS idle-home is used, its timer resumes after
+     * an active Tour is stopped. A Tour configured as Home can start again after the idle timeout.
+     * %caption Deactivate PTZ Tour
+     * %ingroup Device PTZ
+     * %struct PtzPresetFilter
+     * %param[ref] _local,_strict,_ticket
+     * %permissions Depends on Resource access rights.
      */
     reg("rest/v{3-}/devices/:deviceId/ptz/tours/:id/active",
         GlobalPermission::none,

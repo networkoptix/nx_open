@@ -146,6 +146,12 @@ bool ThreadSafePtzController::activateTour(const QString& tourId)
     return base_type::activateTour(tourId);
 }
 
+bool ThreadSafePtzController::deactivateTour(const QString& tourId)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return base_type::deactivateTour(tourId);
+}
+
 bool ThreadSafePtzController::getTours(QnPtzTourList* tours) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);

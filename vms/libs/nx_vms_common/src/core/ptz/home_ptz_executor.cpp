@@ -2,9 +2,9 @@
 
 #include "home_ptz_executor.h"
 
-#include <QtCore/QTimerEvent>
 #include <QtCore/QBasicTimer>
 #include <QtCore/QThread>
+#include <QtCore/QTimerEvent>
 
 #include <nx/utils/thread/mutex.h>
 
@@ -37,6 +37,7 @@ public:
 
     nx::Mutex mutex;
     QnPtzObject homePosition;
+    std::shared_ptr<nx::Mutex> commandMutex;
 };
 
 void QnHomePtzExecutorPrivate::restart() {
@@ -48,6 +49,9 @@ void QnHomePtzExecutorPrivate::stop() {
 }
 
 bool QnHomePtzExecutorPrivate::handleTimer(int timerId) {
+    // Keep activation and its Activity publication atomic with explicit tour deactivation.
+    NX_MUTEX_LOCKER commandLock(commandMutex.get());
+
     if(timerId != timer.timerId())
         return false;
     timer.stop();
@@ -74,11 +78,14 @@ bool QnHomePtzExecutorPrivate::handleTimer(int timerId) {
 // -------------------------------------------------------------------------- //
 // QnHomePtzExecutor
 // -------------------------------------------------------------------------- //
-QnHomePtzExecutor::QnHomePtzExecutor(const QnPtzControllerPtr &controller):
+QnHomePtzExecutor::QnHomePtzExecutor(
+    const QnPtzControllerPtr& controller, std::shared_ptr<nx::Mutex> commandMutex):
     d(new QnHomePtzExecutorPrivate())
 {
     d->q = this;
     d->controller = controller;
+    // The executor can outlive its Home controller until deferred destruction is processed.
+    d->commandMutex = std::move(commandMutex);
 
     connect(
         this, &QnHomePtzExecutor::restartRequested,

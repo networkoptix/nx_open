@@ -64,6 +64,11 @@ bool QnAbstractPtzController::getPresetLimits(nx::vms::api::PtzPresetLimits* lim
     return true;
 }
 
+bool QnAbstractPtzController::deactivateTour(const QString& /*tourId*/)
+{
+    return false;
+}
+
 bool QnAbstractPtzController::hasCapabilities(
     Ptz::Capabilities capabilities,
     const Options& options) const

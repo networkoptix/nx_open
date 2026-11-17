@@ -42,6 +42,7 @@ public:
 
     virtual bool removeTour(const QString& tourId) override;
     virtual bool activateTour(const QString& tourId) override;
+    virtual bool deactivateTour(const QString& tourId) override;
 
     virtual bool getActiveObject(QnPtzObject* activeObject) const override;
 

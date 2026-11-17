@@ -3,7 +3,11 @@
 #ifndef QN_HOME_PTZ_EXECUTOR_H
 #define QN_HOME_PTZ_EXECUTOR_H
 
+#include <memory>
+
 #include <QtCore/QObject>
+
+#include <nx/utils/thread/mutex.h>
 
 #include "ptz_fwd.h"
 
@@ -15,7 +19,8 @@ class NX_VMS_COMMON_API QnHomePtzExecutor: public QObject
     typedef QObject base_type;
 
 public:
-    QnHomePtzExecutor(const QnPtzControllerPtr &controller);
+    QnHomePtzExecutor(
+        const QnPtzControllerPtr& controller, std::shared_ptr<nx::Mutex> commandMutex);
     virtual ~QnHomePtzExecutor();
 
     void restart();
