@@ -37,20 +37,28 @@ struct ArrowPosition
     QRectF geometry;
 };
 
+qreal getArrowPosition(qreal tooltipStart, qreal tooltipEnd, qreal objectStart, qreal objectEnd)
+{
+    const qreal minPosition = tooltipStart + kArrowMargin;
+    const qreal maxPosition = tooltipEnd - kArrowMargin - kArrowSize.width();
+    if (maxPosition < minPosition) //< Too small for the arrow with its margins.
+        return minPosition;
+
+    const qreal desiredPosition =
+        qBound(objectStart - kArrowHalfSize, objectStart, objectEnd - kArrowHalfSize);
+    return qBound(minPosition, desiredPosition, maxPosition);
+}
+
 qreal getTopPosition(const QRectF& tooltipRect, const QRectF& objectRect)
 {
-    return qBound(
-        tooltipRect.top() + kArrowMargin,
-        qBound(objectRect.top() - kArrowHalfSize, objectRect.top(), objectRect.bottom() - kArrowHalfSize),
-        tooltipRect.bottom() - kArrowMargin - kArrowSize.width());
+    return getArrowPosition(
+        tooltipRect.top(), tooltipRect.bottom(), objectRect.top(), objectRect.bottom());
 }
 
 qreal getLeftPosition(const QRectF& tooltipRect, const QRectF& objectRect)
 {
-    return qBound(
-        tooltipRect.left() + kArrowMargin,
-        qBound(objectRect.left() - kArrowHalfSize, objectRect.left(), objectRect.right() - kArrowHalfSize),
-        tooltipRect.right() - kArrowMargin - kArrowSize.width());
+    return getArrowPosition(
+        tooltipRect.left(), tooltipRect.right(), objectRect.left(), objectRect.right());
 }
 
 ArrowPosition arrowPosition(const QRectF& tooltipRect, const QRectF& objectRect)
