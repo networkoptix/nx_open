@@ -2719,6 +2719,9 @@ void QnVirtualCameraResource::setUserAttributesAndNotify(
 
     if (originalAttributes.backupPolicy != attributes.backupPolicy)
         emit backupPolicyChanged(::toSharedPointer(this), originalAttributes.backupPolicy);
+
+    if (originalAttributes.disableDualStreaming != attributes.disableDualStreaming)
+        emit disableDualStreamingChanged(::toSharedPointer(this));
 }
 
 bool QnVirtualCameraResource::isRtspMetatadaRequired() const
