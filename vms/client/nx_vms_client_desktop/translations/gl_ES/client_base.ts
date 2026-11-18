@@ -518,7 +518,7 @@
     </message>
     <message>
       <source>Object Actions</source>
-      <translation type="unfinished">Object Actions</translation>
+      <translation>Accións do obxecto</translation>
     </message>
     <message>
       <source>Delete from Disk</source>
