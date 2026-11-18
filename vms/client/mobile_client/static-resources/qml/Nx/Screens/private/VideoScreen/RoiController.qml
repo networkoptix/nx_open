@@ -1,209 +1,166 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.6
-import Nx.Core 1.0
-import Nx.Core.Items 1.0
-import nx.vms.client.core 1.0
+import QtQuick
 
+import Nx.Core
+
+// Lets the user draw a custom region of interest over the video: a long press starts drawing,
+// a drag sets the region, the release finishes it. The press handlers are called by the owner,
+// with positions in the coordinates of this item.
 Item
 {
     id: controller
 
-    property int dragThreshold: 10
-    property bool allowDrawing: true
-    property int cameraRotation: 0
-    property Item viewport: null
+    readonly property bool customRoiExists: !!d.firstPoint
+    readonly property bool drawingRoi: d.drawing
 
-    property bool motionSearchMode: false
-    property string motionFilter
+    // Relative to the item size. The whole frame if there's no custom region.
+    readonly property rect customRoi: d.finishedRoi ?? Qt.rect(0, 0, 1, 1)
 
-    readonly property bool hasCustomVisualArea: motionFilter != d.kDefaultFilter
-    readonly property bool customRoiExists: d.hasFinishedCustomRoi || drawingRoi
-    readonly property bool drawingRoi: allowDrawing && d.toBool(
-        d.customInitialPoint && d.selectionRoi && d.selectionRoi.expandingFinished)
+    // Motion search filter of the custom region, empty if there's none.
+    readonly property string motionFilter: d.finishedRoi ? d.motionFilter(d.finishedRoi) : ""
 
-    property rect customRoi: Qt.rect(0, 0, 1, 1)
-
-    signal unallowedDrawingRequested()
     signal emptyRoiCleared()
 
     function clearCustomRoi()
     {
-        if (d.customRoi)
-            d.customRoi.hide()
+        d.cancelPress()
 
-        d.customRoi = null
-        d.selectionRoi = null
-
-        d.customFirstPoint = undefined
-        d.customSecondPoint = undefined
-        updateDefaultRoi()
-    }
-
-    function updateDefaultRoi()
-    {
-        if (!controller.motionSearchMode || d.hasFinishedCustomRoi)
-            return
-
-        d.setRoiPoints()
-    }
-
-    function handlePositionChanged(pos)
-    {
-        if (!CoreUtils.nearPositions(pos, unallowedDrawingTimer.initialPos, controller.dragThreshold))
-            unallowedDrawingTimer.stop()
-
-        if (!controller.allowDrawing)
-            return
-
-        var relativePos = d.toRelative(pos)
-        if (drawingRoi)
-        {
-            d.customSecondPoint = relativePos
-            d.selectionRoi.endPoint = Qt.binding(function() { return d.fromRelative(relativePos) })
-            d.selectionRoi.singlePoint =
-                CoreUtils.nearPositions(d.customFirstPoint, d.customSecondPoint, d.kMaxDistance)
-        }
-        else if (!CoreUtils.nearPositions(d.customInitialPoint, relativePos, d.kMaxDistance))
-        {
-            handleCancelled()
-        }
+        d.firstPoint = undefined
+        d.secondPoint = undefined
+        d.finishedRoi = undefined
     }
 
     function handlePressed(pos)
     {
+        // The previous press may have never got its release.
+        if (d.initialPoint)
+            handleCancelled()
+
+        // A long press must not start right after fast clicks (a double click, for example).
         if (pressFilterTimer.running)
-            return // We don't allow to start long tap after fast clicks (double click, for example).
-
-        if (!controller.allowDrawing)
-        {
-            unallowedDrawingTimer.restart()
-            unallowedDrawingTimer.initialPos = pos
             return
-        }
 
-        unallowedDrawingTimer.stop()
         pressFilterTimer.restart()
-        var relativePos = d.toRelative(pos)
-        d.customInitialPoint = relativePos
+        d.initialPoint = d.toRelative(pos)
+        longPressTimer.restart()
+    }
 
-        d.selectionRoi = d.customRoi == firstRoi
-            ? secondRoi
-            : firstRoi
+    function handlePositionChanged(pos)
+    {
+        if (!d.initialPoint)
+            return
 
-        d.selectionRoi.startPoint = Qt.binding(function() { return d.fromRelative(relativePos) })
-        d.selectionRoi.endPoint = Qt.binding(function() { return d.fromRelative(relativePos) })
-        d.selectionRoi.singlePoint = true
-        d.selectionRoi.start()
+        const point = d.toRelative(pos)
+
+        if (d.drawing)
+        {
+            d.secondPoint = point
+            d.crosshairPoint = point
+        }
+        else if (!CoreUtils.nearPositions(d.initialPoint, point, d.kMaxDistance))
+        {
+            d.cancelPress() //< It's a drag, not a long press.
+        }
     }
 
     function handleReleased()
     {
-        d.handleMouseReleased()
+        const wasDrawing = d.drawing
+        d.cancelPress()
+
+        if (wasDrawing)
+            d.finishDrawing()
     }
 
+    // The region being drawn is finished as on a release.
     function handleCancelled()
     {
-        d.handleMouseReleased()
+        handleReleased()
     }
 
-    MotionRoi
+    // A disabled controller doesn't get the input events, so the current press would never end.
+    onEnabledChanged:
     {
-        id: firstRoi
+        if (!enabled)
+            handleCancelled()
+    }
+
+    // Indicates a long press, and the finger position while drawing.
+    RoiCrosshair
+    {
+        id: drawingCrosshair
+
+        color: d.lineColor
+        shadowColor: d.shadowColor
+        centerPoint: d.fromRelative(d.crosshairPoint)
+        expanded: d.longPressed || d.drawing
+
+        onExpandingFinishedChanged:
+        {
+            if (expandingFinished && d.longPressed && !d.drawing)
+                d.startDrawing()
+        }
+    }
+
+    RoiMarker
+    {
+        id: marker
+
+        visible: controller.customRoiExists
+        startPoint: d.fromRelative(d.firstPoint)
+        endPoint: d.fromRelative(d.secondPoint)
+        drawing: d.drawing
+        singlePoint: CoreUtils.nearPositions(d.firstPoint, d.secondPoint, d.kMaxDistance)
 
         roiColor: d.lineColor
         shadowColor: d.shadowColor
-        drawing: controller.drawingRoi && d.selectionRoi == firstRoi
-    }
-
-    MotionRoi
-    {
-        id: secondRoi
-
-        roiColor: d.lineColor
-        shadowColor: d.shadowColor
-        drawing: controller.drawingRoi && d.selectionRoi == secondRoi
     }
 
     Timer
     {
-        id: unallowedDrawingTimer
-
-        property point initialPos
+        id: longPressTimer
 
         interval: 600
+
         onTriggered:
         {
-            if (!motionSearchMode)
-                controller.unallowedDrawingRequested()
+            d.longPressed = true
+            d.crosshairPoint = d.initialPoint
         }
     }
 
     Timer
     {
         id: pressFilterTimer
-        interval: unallowedDrawingTimer.interval
+
+        interval: longPressTimer.interval
     }
-
-    onMotionSearchModeChanged:
-    {
-        if (!motionSearchMode)
-        {
-            clearCustomRoi()
-        }
-        else if (!d.customInitialPoint)
-        {
-            updateDefaultRoi()
-        }
-    }
-
-    onDrawingRoiChanged:
-    {
-        if (drawingRoi)
-        {
-            d.customFirstPoint = d.customInitialPoint
-            d.customSecondPoint = d.customInitialPoint
-            d.selectionRoi.show()
-            if (d.customRoi)
-                d.customRoi.hide()
-
-            windowContext.ui.windowHelpers.makeShortVibration()
-        }
-        else
-        {
-            d.customRoi = d.selectionRoi
-            d.selectionRoi = null
-            d.setRoiPoints(d.customFirstPoint, d.customSecondPoint)
-        }
-    }
-
-    onCameraRotationChanged: updateDefaultRoi()
 
     QtObject
     {
         id: d
 
-        property MotionRoi selectionRoi: null
-        property MotionRoi customRoi: null
-
         readonly property int kFilterHorizontalRange: 44
         readonly property int kFilterVerticalRange: 32
-        readonly property string kDefaultFilter: getMotionFilter(
-            Qt.point(0, 0),
-            Qt.point(kFilterHorizontalRange - 1, kFilterVerticalRange - 1)).filter
 
         readonly property real kMaxDistance: 0.05
         readonly property color lineColor: ColorTheme.colors.light1
         readonly property color shadowColor: ColorTheme.transparent(ColorTheme.colors.dark1, 0.2)
-        readonly property bool hasFinishedCustomRoi: toBool(
-            !controller.drawingRoi && customFirstPoint && customSecondPoint)
 
-        property var customInitialPoint
-        property var customFirstPoint
-        property var customSecondPoint
+        // All points are relative to the item size.
 
-        property var currentFirstPoint
-        property var currentSecondPoint
+        property var initialPoint //< Of the current press.
+        property bool longPressed: false
+        property bool drawing: false
+        property var crosshairPoint
+
+        // Of the region being drawn or the finished one.
+        property var firstPoint
+        property var secondPoint
+
+        // A rect, updated only when the drawing is finished.
+        property var finishedRoi
 
         function toRelative(absolute)
         {
@@ -217,100 +174,58 @@ Item
                 : Qt.point(0, 0)
         }
 
-        function getMotionFilter(first, second)
+        function startDrawing()
         {
-            var result = { filter: "", correctBounds: true }
+            drawing = true
+            firstPoint = initialPoint
+            secondPoint = initialPoint
 
-            if (!first|| !second)
-                return result
-
-            var topLeft = Qt.point(
-                Math.min(first.x, second.x),
-                Math.min(first.y, second.y))
-            var bottomRight = Qt.point(
-                Math.max(first.x, second.x),
-                Math.max(first.y, second.y))
-
-            var maxHorizontalValue = kFilterHorizontalRange - 1
-            var maxVerticalValue = kFilterVerticalRange - 1
-
-            var left = Math.floor(topLeft.x * kFilterHorizontalRange)
-            var right = Math.floor(bottomRight.x * kFilterHorizontalRange)
-            var top = Math.floor(topLeft.y * kFilterVerticalRange)
-            var bottom = Math.floor(bottomRight.y * kFilterVerticalRange)
-
-            result.correctBounds =
-                left < kFilterHorizontalRange
-                && right >= 0
-                && top < kFilterVerticalRange
-                && bottom >= 0
-
-            left = result.correctBounds ? Math.max(left, 0) : 0
-            right = result.correctBounds ? Math.min(right, maxHorizontalValue) : maxHorizontalValue
-            top = result.correctBounds ? Math.max(top, 0) : 0
-            bottom = result.correctBounds ? Math.min(bottom, maxVerticalValue) : maxVerticalValue
-
-            result.filter = JSON.stringify([[
-                { "x": left, "y": top, "width": right - left + 1, "height": bottom - top + 1 }
-                ]])
-
-            return result
+            windowContext.ui.windowHelpers.makeShortVibration()
         }
 
-        function getRectangle(first, second)
+        function finishDrawing()
         {
-            var width = Math.abs(second.x - first.x)
-            var height = Math.abs(second.y - first.y)
-            var x = Math.min(first.x, second.x)
-            var y = Math.min(first.y, second.y)
-            return Qt.rect(x, y, width, height)
-        }
+            const roi = Qt.rect(
+                Math.min(firstPoint.x, secondPoint.x),
+                Math.min(firstPoint.y, secondPoint.y),
+                Math.abs(secondPoint.x - firstPoint.x),
+                Math.abs(secondPoint.y - firstPoint.y))
 
-        function intersection(first, second)
-        {
-            var left = Math.max(first.left, second.left)
-            var right = Math.min(first.right, second.right)
-            var bottom = Math.min(first.bottom, second.bottom)
-            var top = Math.max(first.top, second.top)
+            // The region may be drawn outside of the frame entirely.
+            const intersectsFrame = roi.x < 1 && roi.x + roi.width >= 0
+                && roi.y < 1 && roi.y + roi.height >= 0
 
-            return left < right && top < bottom
-                ? Qt.rect(left, top, right - left, bottom - top)
-                : undefined
-        }
-
-        function toBool(value)
-        {
-            return !!value
-        }
-
-        function handleMouseReleased()
-        {
-            d.customInitialPoint = undefined
-            if (d.selectionRoi)
+            if (intersectsFrame)
             {
-                d.selectionRoi.hide()
-                d.selectionRoi = null
+                finishedRoi = roi
             }
-            unallowedDrawingTimer.stop()
-        }
-
-        function setRoiPoints(first, second)
-        {
-            currentFirstPoint = first
-            currentSecondPoint = second
-
-            var filterResult = getMotionFilter(first, second)
-            controller.motionFilter = filterResult.filter
-
-            controller.customRoi = first && second
-                ? getRectangle(first, second)
-                : Qt.rect(0, 0, 1, 1)
-
-            if (!filterResult.correctBounds)
+            else
             {
                 controller.clearCustomRoi()
                 controller.emptyRoiCleared()
             }
+        }
+
+        function cancelPress()
+        {
+            longPressTimer.stop()
+            initialPoint = undefined
+            longPressed = false
+            drawing = false
+        }
+
+        function motionFilter(roi)
+        {
+            const left = Math.max(Math.floor(roi.x * kFilterHorizontalRange), 0)
+            const right = Math.min(Math.floor((roi.x + roi.width) * kFilterHorizontalRange),
+                kFilterHorizontalRange - 1)
+            const top = Math.max(Math.floor(roi.y * kFilterVerticalRange), 0)
+            const bottom = Math.min(Math.floor((roi.y + roi.height) * kFilterVerticalRange),
+                kFilterVerticalRange - 1)
+
+            return JSON.stringify([[
+                { "x": left, "y": top, "width": right - left + 1, "height": bottom - top + 1 }
+                ]])
         }
     }
 }

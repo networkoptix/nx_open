@@ -1,10 +1,11 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.6
-import Qt5Compat.GraphicalEffects
-import Nx.Core 1.0
-import Nx.Core.Items 1.0
+import QtQuick
 
+import Nx.Core.Items
+
+// Displays a region of interest: a frame between two points, or a crosshair if it's a single
+// point. While the region is being drawn, its corners are marked with dots.
 Item
 {
     id: item
@@ -12,13 +13,10 @@ Item
     property point startPoint
     property point endPoint
     property bool drawing: false
+    property bool singlePoint: true
 
     property color roiColor
     property color shadowColor
-    property int lineWidth: 1
-    property bool singlePoint: true
-
-    property bool expandingFinished: false
 
     x: d.topLeftPoint.x
     y: d.topLeftPoint.y
@@ -26,70 +24,47 @@ Item
     width: d.bottomRightPoint.x - d.topLeftPoint.x + 1
     height: d.bottomRightPoint.y - d.topLeftPoint.y + 1
 
-    // Shows preloader
-    function start()
+    // A filled circle with a thin shadow outline.
+    component ShadedCircle: Circle
     {
-        delayedPreloaderTimer.restart()
+        id: shadedCircle
+
+        property color fillColor
+        property color shadowColor
+
+        radius: dot.radius + border.width
+        border.width: 1
+        borderColor: shadowColor
+
+        Circle
+        {
+            id: dot
+
+            anchors.centerIn: parent
+            radius: 2.5
+            circleColor: shadedCircle.fillColor
+        }
     }
 
-    // Shows selection
-    function show()
+    // Never expanded. Fades in by its own opacity animation.
+    RoiCrosshair
     {
-        d.visible = true
-        d.preloader = false
-        delayedPreloaderTimer.stop()
-    }
+        id: singlePointMarker
 
-    // Hides whatever it shows.
-    function hide()
-    {
-        delayedPreloaderTimer.stop()
-        d.preloader = false
-        d.visible = false
-    }
-
-    Timer
-    {
-        id: delayedPreloaderTimer
-        interval: 600
-        onTriggered: d.preloader = true;
-    }
-
-    RoiSelectionPreloader
-    {
-        id: singleSelectionMarker
-
-        mainColor: item.roiColor
+        color: item.roiColor
         shadowColor: item.shadowColor
-        state:
-        {
-            if (d.preloader || item.drawing)
-                return "expanded"
-
-            return d.visible && item.singlePoint ? "normal" : "hidden"
-        }
-
         centerPoint: d.endMarkerPoint
-        visible: opacity > 0
 
-        onExpandingFinishedChanged:
-        {
-            // We use motion MotionRoi::expandingFinished to determine if drawing is in process.
-            // Since it's value depends on MotionRoi state, we have to use executeLater to
-            // break direct dependencies and avoid binding loop.
-            var value = singleSelectionMarker.expandingFinished
-            var updateExpandingFlag =
-                function() { item.expandingFinished = value }
-
-            CoreUtils.executeLater(updateExpandingFlag, this)
-        }
+        // Hidden at once when drawing starts, otherwise it would fade out at the new point.
+        visible: !item.drawing && opacity > 0
+        opacity: item.singlePoint ? 1 : 0
     }
 
     Rectangle
     {
-        id: roiMarker
+        id: frame
 
-        visible: (item.drawing || !item.singlePoint) && d.visible
+        visible: item.drawing || !item.singlePoint
         anchors.fill: parent
         border.width: d.shadowRadius * 2 + boundingLines.border.width
         border.color: item.shadowColor
@@ -105,27 +80,24 @@ Item
             height: parent.height - d.shadowRadius * 2
             color: "transparent"
 
-            border.width: item.lineWidth
+            border.width: 1
             border.color: item.roiColor
-
         }
 
         ShadedCircle
         {
             visible: item.drawing
-            circleRadius: 2.5
             centerPoint: d.startMarkerPoint
+            fillColor: item.roiColor
             shadowColor: item.shadowColor
-            circleColor: item.roiColor
         }
 
         ShadedCircle
         {
             visible: item.drawing
-            circleRadius: 2.5
             centerPoint: d.endMarkerPoint
+            fillColor: item.roiColor
             shadowColor: item.shadowColor
-            circleColor: item.roiColor
         }
     }
 
@@ -133,26 +105,25 @@ Item
     {
         id: d
 
-        property bool visible: false
-        property bool preloader: false
         readonly property int shadowRadius: 1
         readonly property real subpixelOffset: 0.5
         readonly property real markerOffset: shadowRadius + subpixelOffset
         readonly property real markerRight: item.width - shadowRadius - subpixelOffset
         readonly property real markerBottom: item.height - shadowRadius - subpixelOffset
 
-        property point topLeftPoint: Qt.point(
+        readonly property point topLeftPoint: Qt.point(
             Math.min(item.startPoint.x, item.endPoint.x) - shadowRadius,
             Math.min(item.startPoint.y, item.endPoint.y) - shadowRadius)
-        property point bottomRightPoint: Qt.point(
+
+        readonly property point bottomRightPoint: Qt.point(
             Math.max(item.startPoint.x, item.endPoint.x) + shadowRadius,
             Math.max(item.startPoint.y, item.endPoint.y) + shadowRadius)
 
-        property point startMarkerPoint: Qt.point(
+        readonly property point startMarkerPoint: Qt.point(
             item.startPoint.x < item.endPoint.x ? markerOffset : markerRight,
             item.startPoint.y < item.endPoint.y ? markerOffset : markerBottom)
 
-        property point endMarkerPoint: Qt.point(
+        readonly property point endMarkerPoint: Qt.point(
             item.startPoint.x > item.endPoint.x ? markerOffset : markerRight,
             item.startPoint.y > item.endPoint.y ? markerOffset : markerBottom)
     }

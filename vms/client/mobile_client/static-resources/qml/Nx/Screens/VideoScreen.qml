@@ -601,12 +601,6 @@ Page
 
         roiController
         {
-            // At this point we're using a legacy ROI design and a legacy ROI drawing mechanism
-            // crudely adapted for the new needs.
-
-            allowDrawing: true
-            motionSearchMode: true
-
             enabled: video.supportsRoi
             visible: video.supportsRoi
         }

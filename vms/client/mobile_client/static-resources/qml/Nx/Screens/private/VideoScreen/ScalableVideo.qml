@@ -258,13 +258,8 @@ ScalableContentHolder
         {
             id: roiController
 
-            dragThreshold: control.mouseArea.drag.threshold
             parent: videoContent.videoOutput
             anchors.fill: parent
-            viewport: control
-
-            allowDrawing: !control.fisheyeMode
-            cameraRotation: control.resourceHelper.customRotation
 
             Connections
             {
@@ -299,16 +294,6 @@ ScalableContentHolder
                 }
             }
 
-            Connections
-            {
-                target: control
-
-                function onMovementEnded()
-                {
-                    roiController.updateDefaultRoi()
-                }
-            }
-
             onDrawingRoiChanged:
             {
                 if (drawingRoi)
@@ -324,8 +309,7 @@ ScalableContentHolder
         // Boxes are drawn on the raw frame, so they would be misplaced on a dewarped image.
         readonly property bool showAnalytics: control.showAnalytics && !control.fisheyeMode
 
-        property bool showRoiHint: roiController.motionSearchMode
-            && roiController.enabled
+        property bool showRoiHint: roiController.enabled
             && !roiController.drawingRoi
             && falseDragging
 
