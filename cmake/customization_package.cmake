@@ -112,6 +112,36 @@ macro(nx_load_customization_package)
     endif()
 endmacro()
 
+# Loads a customization package into <out_prefix>.* variables, leaving customization.* untouched.
+# A macro so that the variables from the included generated.cmake reach the caller.
+macro(nx_load_source_customization_package source_id artifactory_path out_prefix)
+    set(_source_dir "${CMAKE_BINARY_DIR}/customization/${source_id}")
+    set(_source_file "${_source_dir}.zip")
+    set(_source_unpack_log "${CMAKE_BINARY_DIR}/build_logs/unpack-${source_id}.log")
+
+    if(NOT EXISTS "${_source_file}")
+        nx_download_from_nx_artifactory(
+            "${artifactory_path}/${source_id}/package.zip"
+            "${_source_file}"
+            RESULT _source_download_result)
+        if(NOT _source_download_result AND NOT EXISTS "${_source_file}")
+            message(FATAL_ERROR "Cannot download source customization package \"${source_id}\".")
+        endif()
+    endif()
+
+    _unpack_customization_package("${_source_file}" "${_source_dir}" "${_source_unpack_log}")
+
+    set(_source_cmake "${_source_dir}/generated.cmake")
+    nx_json_to_cmake("${_source_dir}/description.json" "${_source_cmake}" ${out_prefix})
+
+    _store_customization_package("${_source_dir}")
+    nx_store_known_file("${_source_file}")
+    nx_store_known_file("${_source_unpack_log}")
+    nx_store_known_file("${_source_cmake}")
+
+    include("${_source_cmake}")
+endmacro()
+
 function(_download_customization_package artifactory_path customization_file)
     nx_download_from_nx_artifactory(
         "${artifactory_path}/${customization}/package.zip"
