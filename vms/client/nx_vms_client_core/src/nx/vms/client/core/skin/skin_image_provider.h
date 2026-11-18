@@ -1,5 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#pragma once
+
 #include <QtQuick/QQuickImageProvider>
 
 namespace nx::vms::client::core {
@@ -11,7 +13,7 @@ namespace nx::vms::client::core {
  *
  * An example of a customization URL query: `?primary=dark4&secondary=%23F0F0F0`
  */
-class SkinImageProvider: public QQuickImageProvider
+class NX_VMS_CLIENT_CORE_API SkinImageProvider: public QQuickImageProvider
 {
 public:
     explicit SkinImageProvider();

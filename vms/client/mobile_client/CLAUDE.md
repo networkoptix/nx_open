@@ -113,3 +113,12 @@ Subpages under `private/SettingsScreen/`: InterfaceSettingsPage, PerformanceSett
 - SSL certificate -> `Web/UnknownSslCertificateDialog.qml`, `Web/InvalidOrChangedCertificateDialog.qml`
 - External link -> `Web/LinkAboutToOpenDialog.qml`
 - 2FA error -> `Web/TwoFactorAuthenticationErrorDialog.qml`
+
+## Tests
+
+- C++ unit tests (GoogleTest): `unit_tests/`, target `mobile_client_ut`. Fixture with the
+  application context in the unit tests mode:
+  `unit_tests/src/nx/vms/client/mobile/test_support/test_context.h`.
+- QML tests (Qt Quick Test): `unit_tests/qml/`, target `mobile_client_qml_ut`. Test files are
+  `unit_tests/qml/static-resources/tests/<module path>/tst_*.qml`. See `unit_tests/qml/readme.md`
+  for the conventions, the available environment and how to run them.

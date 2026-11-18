@@ -1,0 +1,55 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
+#include "qml_test_setup.h"
+
+#include <QtCore/QSettings>
+#include <QtGui/QFont>
+#include <QtGui/QGuiApplication>
+#include <QtQml/QQmlContext>
+#include <QtQml/QQmlEngine>
+
+#include <mobile_client/mobile_client_settings.h>
+#include <mobile_client/mobile_client_startup_parameters.h>
+#include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/skin/skin_image_provider.h>
+#include <nx/vms/client/core/utils/font_loader.h>
+#include <nx/vms/client/mobile/mobile_client_meta_types.h>
+
+#include "test_utils.h"
+
+namespace nx::vms::client::mobile::test {
+
+void QmlTestSetup::applicationAvailable()
+{
+    // Keep the settings in a temporary directory, since the default one persists between runs.
+    NX_ASSERT(m_settingsDir.isValid());
+    QSettings::setDefaultFormat(QSettings::IniFormat);
+    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, m_settingsDir.path());
+
+    QnMobileClientStartupParameters startupParams;
+    std::unique_ptr<QnMobileClientSettings> settings(new QnMobileClientSettings());
+
+    m_appContext = std::make_unique<ApplicationContext>(
+        startupParams, std::move(settings), core::ApplicationContext::Mode::unitTests);
+
+    initializeQmlTypes();
+    TestUtils::registerQmlType();
+
+    core::FontLoader::loadFonts(":/fonts");
+    QGuiApplication::setFont(QFont("Roboto"));
+}
+
+void QmlTestSetup::qmlEngineAvailable(QQmlEngine* engine)
+{
+    // Adds the resources last, so the modules from QML_IMPORT_PATH take precedence.
+    engine->setImportPathList(engine->importPathList() << "qrc:///qml");
+    engine->addImageProvider("skin", new core::SkinImageProvider());
+    engine->rootContext()->setContextProperty("appContext", m_appContext.get());
+}
+
+void QmlTestSetup::cleanupTestCase()
+{
+    m_appContext.reset();
+}
+
+} // namespace nx::vms::client::mobile::test

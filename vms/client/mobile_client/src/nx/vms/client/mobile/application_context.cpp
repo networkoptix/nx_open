@@ -347,6 +347,8 @@ ApplicationContext::ApplicationContext(
     {
         initializeMetaTypes();
         resetResourceIconCache(new core::ResourceIconCache());
+        d->localSettings = std::make_unique<LocalSettings>();
+        d->settingsAdaptor = std::make_unique<nx::client::mobile::QmlSettingsAdaptor>();
         d->initializeMainSystemContext();
         return;
     }
