@@ -81,6 +81,10 @@ QByteArray substituteColors(
                     continue;
                 }
 
+                // Skip references like "url(#paint0_...)".
+                if (!QColor::isValidColorName(currentColor))
+                    continue;
+
                 if (length == kShortColorValueStringLength)
                 {
                     currentColor = QColor::fromString(currentColor).name(QColor::HexRgb);

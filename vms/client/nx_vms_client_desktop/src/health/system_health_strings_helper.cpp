@@ -135,8 +135,6 @@ QString QnSystemHealthStringsHelper::messageNotificationTitle(
 {
     namespace html = nx::vms::common::html;
 
-    static const auto kRocketEmoji = QStringLiteral("\U0001F680");
-
     switch (messageType)
     {
         case MessageType::emailIsEmpty:
@@ -200,9 +198,6 @@ QString QnSystemHealthStringsHelper::messageNotificationTitle(
                       "",
                       resources.size());
         }
-
-        case MessageType::saasPromo:
-            return NX_FMT("%1 %2", kRocketEmoji, messageShortTitle(systemContext, messageType));
 
         default:
             break;

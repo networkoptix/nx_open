@@ -908,6 +908,9 @@ QString SystemHealthListModel::Private::decorationPath(
         case MessageType::cloudPromo:
             return "20x20/Outline/cloud.svg";
 
+        case MessageType::saasPromo:
+            return "20x20/Solid/rocket.svg";
+
         // There is no specific icon for message, the icon will be provided according it's level.
         default:
             break;
