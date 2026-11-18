@@ -1590,6 +1590,17 @@
     </message>
   </context>
   <context>
+    <name>UiContainer</name>
+    <message>
+      <source>Screen size is too small</source>
+      <translation type="unfinished">Screen size is too small</translation>
+    </message>
+    <message>
+      <source>There isn&apos;t enough screen space. Resize the window or use a larger screen.</source>
+      <translation type="unfinished">There isn&apos;t enough screen space. Resize the window or use a larger screen.</translation>
+    </message>
+  </context>
+  <context>
     <name>UnknownSslCertificateDialog</name>
     <message>
       <source>Cancel</source>
