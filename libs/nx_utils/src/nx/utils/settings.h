@@ -4,9 +4,14 @@
 
 #include <QJsonObject>
 #include <QSettings>
+#include <charconv>
 #include <chrono>
 #include <functional>
 #include <map>
+#include <string>
+#include <type_traits>
+#include <utility>
+#include <vector>
 
 #include <nx/reflect/instrument.h>
 #include <nx/utils/log/log.h>
@@ -16,13 +21,33 @@ namespace nx::utils {
 
 namespace detail {
 
+/**
+ * Rejects the non-numeric strings and checks for overflow of the target type, unlike Qt's
+ * convert, which silently gives 0 for them.
+ */
+template<typename T>
+bool integerFromQVariant(const QVariant& value, T* result)
+{
+    const QByteArray string = value.toString().trimmed().toUtf8();
+    const char* const end = string.constData() + string.size();
+    T number{};
+    const auto [parsedEnd, error] = std::from_chars(string.constData(), end, number);
+    if (string.isEmpty() || error != std::errc() || parsedEnd != end)
+        return false;
+
+    *result = number;
+    return true;
+}
+
 template<typename Rep, typename Period>
 bool fromQVariant(const QVariant& value, std::chrono::duration<Rep, Period>* result)
 {
-    if (!value.isValid() || !value.canConvert<quint64>())
+    // Parsed as Rep, as the negative durations are meaningful for some options.
+    Rep count{};
+    if (!value.isValid() || !integerFromQVariant(value, &count))
         return false;
 
-    *result = std::chrono::duration<Rep, Period>(value.value<quint64>());
+    *result = std::chrono::duration<Rep, Period>(count);
     return true;
 }
 
@@ -55,11 +80,22 @@ inline QVariant toQVariant(const nx::Uuid& value)
 template<typename T>
 bool fromQVariant(const QVariant& qVariant, T* outValue)
 {
-    if (!qVariant.isValid() || !qVariant.canConvert<T>())
+    if (!qVariant.isValid())
         return false;
 
-    *outValue = qVariant.value<T>();
-    return true;
+    if constexpr (std::is_integral_v<T> && !std::is_same_v<T, bool>)
+    {
+        return integerFromQVariant(qVariant, outValue);
+    }
+    else
+    {
+        QVariant converted = qVariant;
+        if (!converted.convert(QMetaType::fromType<T>()))
+            return false;
+
+        *outValue = converted.value<T>();
+        return true;
+    }
 }
 
 template<typename Rep, typename Period>
@@ -147,6 +183,11 @@ public:
 
     std::map<QString, SettingInfo> buildDocumentation() const;
 
+    /**
+     * The problems found in the attached settings, as the messages to log.
+     */
+    const std::vector<std::string>& problems() const { return m_problems; }
+
 protected:
     struct BaseOption
     {
@@ -217,6 +258,12 @@ protected:
             m_settings->m_qtSettings->remove(m_name);
         }
 
+        void reset()
+        {
+            if (isPresent && m_value != m_defaultValue)
+                set(m_defaultValue);
+        }
+
         QString name() const
         {
             return m_name;
@@ -264,6 +311,7 @@ private:
     bool m_loaded = false;
     std::map<QString, BaseOption*> m_options;
     std::shared_ptr<AbstractQSettings> m_qtSettings;
+    std::vector<std::string> m_problems;
 
     virtual void applyMigrations(std::shared_ptr<AbstractQSettings>& settings) = 0;
 };

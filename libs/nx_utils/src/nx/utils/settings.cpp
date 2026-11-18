@@ -4,8 +4,8 @@
 
 #include <QJsonArray>
 
-#include <nx/utils/log/log.h>
 #include <nx/utils/literal.h>
+#include <nx/utils/log/log.h>
 
 namespace nx::utils {
 
@@ -26,6 +26,7 @@ void Settings::add(const QString& name, BaseOption* option)
 void Settings::attach(std::shared_ptr<AbstractQSettings>& settings)
 {
     m_qtSettings = settings;
+    m_problems.clear();
     QStringList keys = settings->allKeys();
     for (const auto& key: keys)
     {
@@ -50,6 +51,9 @@ void Settings::attach(std::shared_ptr<AbstractQSettings>& settings)
         if (const auto setting = settings->value(optionName); !option->load(setting))
         {
             NX_ERROR(this, "Failed to load option: %1", optionName);
+            m_problems.push_back(nx::format(
+                "Ignoring the invalid value of %1: '%2', the default is used", optionName, setting)
+                    .toStdString());
         }
         else
         {
