@@ -46,11 +46,11 @@ Control
 
     // Extra space around the content. Unlike the control paddings, it is scaled down together with
     // the image if there is not enough space even for the image alone.
-    property real verticalContentPadding: 44
+    property real verticalContentPadding: 32
 
     property bool interactive: true
 
-    horizontalPadding: 8
+    horizontalPadding: 32
     verticalPadding: 0
     clip: true
 
@@ -118,16 +118,16 @@ Control
     {
         id: content
 
-        readonly property real imageSize: 48
+        readonly property real imageSize: 32
         readonly property real titleSpacing: 16
-        readonly property real buttonSpacing: 24
+        readonly property real buttonSpacing: 16
 
         readonly property bool hasButton: !!control.action && control.interactive
         readonly property bool hasTitle: !!control.text
 
         readonly property real buttonHeight: hasButton ? (buttonSpacing + button.height) : 0
         readonly property real titleHeight:
-            hasTitle ? (titleSpacing + title.tightHeight * title.scale) : 0
+            hasTitle ? (titleSpacing + title.height * title.scale) : 0
 
         readonly property real paddingsHeight: control.verticalContentPadding * 2
 
@@ -177,8 +177,6 @@ Control
             {
                 id: title
 
-                readonly property real tightHeight: lineHeight * lineCount
-
                 width: Math.min(300, content.width)
                 scale: MathUtils.bound(0, width / contentWidth, 1)
                 transformOrigin: Item.Top
@@ -186,23 +184,21 @@ Control
                 visible: content.showTitle
 
                 anchors.top: image.bottom
-                anchors.topMargin:
-                    content.titleSpacing - Math.round((height - tightHeight) * scale / 2)
+                anchors.topMargin: content.titleSpacing
                 anchors.horizontalCenter: contentColumn.horizontalCenter
 
-                font.pixelSize: 40
+                font.pixelSize: 18
+                font.weight: Font.Medium
                 font.capitalization: Font.AllUppercase
                 color: control.foregroundColor
                 horizontalAlignment: Qt.AlignHCenter
+                lineHeight: 1.25
+
                 maximumLineCount: 3
                 wrapMode: Text.WordWrap
 
                 // A single word must not be elided: it is scaled down to fit instead.
                 elide: /\s/.test(text.trim()) ? Text.ElideRight : Text.ElideNone
-
-                // Fixed line height for cross-device stability.
-                lineHeightMode: Text.FixedHeight
-                lineHeight: 48
             }
 
             Button
