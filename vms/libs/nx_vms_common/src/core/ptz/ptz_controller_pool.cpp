@@ -2,6 +2,8 @@
 
 #include "ptz_controller_pool.h"
 
+#include <set>
+
 #include <QtCore/QAtomicInt>
 #include <QtCore/QThreadPool>
 
@@ -41,11 +43,38 @@ void moveControllerToThread(QnPtzControllerPtr controller, QThread* thread)
 
 struct QnPtzControllerPool::Private
 {
+    void updateControllerUntilUpToDate(const QnResourcePtr& resource);
     void updateController(const QnResourcePtr& resource);
+
+    /** @return Whether the caller has to run the update, as none runs for the resource. */
+    bool startUpdate(const QnResourcePtr& resource)
+    {
+        NX_MUTEX_LOCKER locker(&mutex);
+        if (updatingResources.insert(resource).second)
+            return true;
+        outdatedResources.insert(resource);
+        return false;
+    }
+
+    /** @return Whether the update has to be repeated, as another one was requested meanwhile. */
+    bool finishUpdate(const QnResourcePtr& resource)
+    {
+        NX_MUTEX_LOCKER locker(&mutex);
+        if (outdatedResources.erase(resource) > 0)
+            return true;
+        updatingResources.erase(resource);
+        return false;
+    }
 
     mutable nx::Mutex mutex;
     QAtomicInt mode = QnPtzControllerPool::NormalControllerConstruction;
     QHash<QnResourcePtr, QnPtzControllerPtr> controllerByResource;
+
+    // Creations for one resource run one at a time, so the last one to finish reads the latest
+    // device state. A request made while one runs makes it repeat once it finishes.
+    std::set<QnResourcePtr> updatingResources;
+    std::set<QnResourcePtr> outdatedResources; //< Requested again while being updated.
+
     QThread *executorThread = nullptr;
     QThreadPool *commandThreadPool = nullptr;
     QnPtzControllerPool *q;
@@ -63,7 +92,7 @@ public:
     {
     }
 
-    virtual void run() override { m_pool->d->updateController(m_resource); }
+    virtual void run() override { m_pool->d->updateControllerUntilUpToDate(m_resource); }
 
 private:
     QnResourcePtr m_resource;
@@ -205,9 +234,12 @@ void QnPtzControllerPool::unregisterResource(const QnResourcePtr& resource)
 
 void QnPtzControllerPool::updateController(const QnResourcePtr& resource)
 {
+    if (!d->startUpdate(resource))
+        return; //< The running update repeats itself.
+
     if (d->mode.loadAcquire() == NormalControllerConstruction)
     {
-        d->updateController(resource);
+        d->updateControllerUntilUpToDate(resource);
     }
     else
     {
@@ -215,6 +247,13 @@ void QnPtzControllerPool::updateController(const QnResourcePtr& resource)
         command->setAutoDelete(true);
         d->commandThreadPool->start(command);
     }
+}
+
+void QnPtzControllerPool::Private::updateControllerUntilUpToDate(const QnResourcePtr& resource)
+{
+    do
+        updateController(resource);
+    while (finishUpdate(resource));
 }
 
 void QnPtzControllerPool::Private::updateController(const QnResourcePtr& resource)
