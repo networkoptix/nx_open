@@ -66,7 +66,7 @@ void JsonComposer::writeAttributeName(const std::string_view& name)
 
 std::string JsonComposer::take()
 {
-    return m_buffer.GetString();
+    return std::string(m_buffer.GetString(), m_buffer.GetSize());
 }
 
 } // namespace nx::reflect::json::detail

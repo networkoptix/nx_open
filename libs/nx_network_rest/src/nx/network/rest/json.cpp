@@ -5,6 +5,7 @@
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
 
+#include <nx/utils/json/byte_array.h>
 #include <nx/utils/json/qjson.h>
 #include <nx/utils/log/log_main.h>
 
@@ -659,8 +660,7 @@ QJsonValue serialized(const rapidjson::Value& data)
 {
     if (data.IsObject() || data.IsArray())
     {
-        auto document = QJsonDocument::fromJson(
-            QByteArray::fromStdString(nx::reflect::json_detail::getStringRepresentation(data)));
+        auto document = QJsonDocument::fromJson(nx::json::toByteArray(data));
         if (data.IsObject())
             return document.object();
         return document.array();
@@ -721,8 +721,7 @@ QByteArray serialized(const rapidjson::Value& value, Qn::SerializationFormat for
 
         case Qn::SerializationFormat::json:
         case Qn::SerializationFormat::unsupported:
-            return QByteArray::fromStdString(
-                nx::reflect::json_detail::getStringRepresentation(value));
+            return nx::json::toByteArray(value);
 
         case Qn::SerializationFormat::csv:
             return QnCsv::serialized(value);
