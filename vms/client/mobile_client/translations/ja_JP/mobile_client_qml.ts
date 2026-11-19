@@ -1596,11 +1596,11 @@
     <name>UiContainer</name>
     <message>
       <source>Screen size is too small</source>
-      <translation type="unfinished">Screen size is too small</translation>
+      <translation>画面サイズが小さすぎます</translation>
     </message>
     <message>
       <source>There isn&apos;t enough screen space. Resize the window or use a larger screen.</source>
-      <translation type="unfinished">There isn&apos;t enough screen space. Resize the window or use a larger screen.</translation>
+      <translation>十分な画面スペースがありません。ウィンドウのサイズを変更するか、より大きな画面を使用してください。</translation>
     </message>
   </context>
   <context>
