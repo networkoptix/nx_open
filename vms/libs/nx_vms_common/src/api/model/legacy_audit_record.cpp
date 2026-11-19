@@ -119,14 +119,13 @@ const auto session =
         record.details = SessionDetails{{std::chrono::seconds(legacyRecord.rangeStartSec),
             std::chrono::seconds(legacyRecord.rangeEndSec)}};
     };
-const auto proxySession =
-    [](const QnLegacyAuditRecord& legacyRecord, AuditRecord& record)
-    {
-        record.details = ProxySessionDetails{
-            {std::chrono::seconds(legacyRecord.rangeStartSec), std::chrono::seconds(legacyRecord.rangeEndSec)},
-            QString(legacyRecord.extractParam("target")),
-            legacyRecord.extractParam("wasConnected") == "1"};
-    };
+const auto proxySession = [](const QnLegacyAuditRecord& legacyRecord, AuditRecord& record)
+{
+    record.details = ProxySessionDetails{{std::chrono::seconds(legacyRecord.rangeStartSec),
+                                             std::chrono::seconds(legacyRecord.rangeEndSec)},
+        QString::fromUtf8(legacyRecord.extractParam("target")),
+        legacyRecord.extractParam("wasConnected") == "1"};
+};
 const auto playback =
     [](const QnLegacyAuditRecord& legacyRecord, AuditRecord& record)
     {
@@ -269,16 +268,18 @@ void QnLegacyAuditRecord::removeParam(const QnLatin1Array& name)
     params.remove(pos, pos2 - pos);
 }
 
-QnByteArrayConstRef QnLegacyAuditRecord::extractParam(const QnLatin1Array& name) const
+std::string_view QnLegacyAuditRecord::extractParam(const QnLatin1Array& name) const
 {
-    int pos = params.indexOf(name);
+    auto pos = params.indexOf(name);
     if (pos == -1)
-        return QnByteArrayConstRef();
-    int pos2 = params.indexOf(';', pos);
+        return {};
+    auto pos2 = params.indexOf(';', pos);
     if (pos2 == -1)
         pos2 = params.size();
     pos += name.size() + 1;
-    return QnByteArrayConstRef(params, pos, pos2 - pos);
+    if (pos > pos2) //< The name is not followed by '='.
+        return {};
+    return std::string_view(params).substr(pos, pos2 - pos);
 }
 void QnLegacyAuditRecord::addParam(const QnLatin1Array& name, const QnLatin1Array& value)
 {

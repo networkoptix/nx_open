@@ -6,7 +6,6 @@
 #include <cstdint>
 #include <deque>
 
-#include <nx/utils/qnbytearrayref.h>
 #include <nx/utils/string.h>
 #include <nx/utils/system_network_headers.h>
 

@@ -688,7 +688,7 @@ void QnAuditLogDialog::at_headerCheckStateChanged(Qt::CheckState state)
 void QnAuditLogDialog::processPlaybackAction(const QnLegacyAuditRecord* record)
 {
     QnResourceList resList;
-    QnByteArrayConstRef archiveData = record->extractParam("archiveExist");
+    const auto archiveData = record->extractParam("archiveExist");
     size_t i = 0;
     for (const auto& id: record->resources)
     {
@@ -782,8 +782,8 @@ void QnAuditLogDialog::triggerAction(
 
     if (resList.isEmpty() && isStorageRecord) // Try to add server for removed storage.
     {
-        if (auto server = system()->resourcePool()->getResourceById(nx::Uuid(record->extractParam(
-            QnAuditLogModel::kSourceServerParamName))))
+        if (auto server = system()->resourcePool()->getResourceById(nx::Uuid::fromString(
+                record->extractParam(QnAuditLogModel::kSourceServerParamName))))
         {
             resList.append(server);
         }

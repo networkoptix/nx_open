@@ -20,7 +20,6 @@
 
 #include "general_macros.h"
 #include "literal.h"
-#include "qnbytearrayref.h"
 #include "std_string_utils.h"
 
 namespace nx::utils {

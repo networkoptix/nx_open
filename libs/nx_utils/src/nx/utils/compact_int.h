@@ -2,11 +2,10 @@
 
 #pragma once
 
+#include <span>
 #include <vector>
 
 #include <QtCore/QByteArray>
-
-#include "qnbytearrayref.h"
 
 /**
  * Contains functions for serializing integers into the following format:
@@ -56,21 +55,21 @@ NX_UTILS_API bool deserialize(const char** begin, const char* end, long long* va
 /**
  * NOTE: Deserialized bytes are removed from the buf.
  */
-NX_UTILS_API bool deserialize(QnByteArrayConstRef* buf, long long* value);
+NX_UTILS_API bool deserialize(std::span<const char>* buf, long long* value);
 
 /**
  * Deserializes the whole buf as a sequence of compressed integers.
  * So, end of the buffer == end of the sequence.
+ * Stops at the first malformed number.
  * NOTE: Deserialized bytes are removed from the buf.
  */
-NX_UTILS_API void deserialize(QnByteArrayConstRef* buf, std::vector<long long>* numbers);
+NX_UTILS_API void deserialize(std::span<const char>* buf, std::vector<long long>* numbers);
 
 template<typename T>
-T deserialized(const QByteArray& buf)
+T deserialized(std::span<const char> buf)
 {
     T value;
-    QnByteArrayConstRef localBuf(buf);
-    deserialize(&localBuf, &value);
+    deserialize(&buf, &value);
     return value;
 }
 

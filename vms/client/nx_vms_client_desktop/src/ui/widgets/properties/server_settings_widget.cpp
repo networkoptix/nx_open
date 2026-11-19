@@ -175,7 +175,7 @@ private:
             if (record.eventType != Qn::AR_MitmAttack)
                 continue;
 
-            nx::Uuid id(record.extractParam("serverId"));
+            const auto id = nx::Uuid::fromString(record.extractParam("serverId"));
             if (id != m_serverId)
                 continue;
 
@@ -183,8 +183,7 @@ private:
                 continue;
 
             newestRecordTime = record.createdTimeSec;
-            const auto& actualPem = record.extractParam("actualPem");
-            m_result = std::string(actualPem.data(), actualPem.size());
+            m_result = std::string(record.extractParam("actualPem"));
         }
 
         q->showCertificateMismatchBanner(/*dataLoaded*/ true);

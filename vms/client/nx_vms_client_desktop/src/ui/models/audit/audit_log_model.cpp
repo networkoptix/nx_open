@@ -69,8 +69,8 @@ QString displayName(const QnResourcePool* pool, const QString& name)
 
 QString sourceServerName(const QnResourcePool* resourcePool, const QnLegacyAuditRecord *rec)
 {
-    const auto server = resourcePool->getResourceById<QnMediaServerResource>(nx::Uuid(
-        rec->extractParam(QnAuditLogModel::kSourceServerParamName)));
+    const auto server = resourcePool->getResourceById<QnMediaServerResource>(
+        nx::Uuid::fromString(rec->extractParam(QnAuditLogModel::kSourceServerParamName)));
 
     return server ? server->getName() : QString();
 }
@@ -179,8 +179,7 @@ public:
 
     static bool lessThanActivity(const QnLegacyAuditRecord *d1, const QnLegacyAuditRecord *d2)
     {
-        return d1->extractParam(ChildCntParamName).toUInt()
-            < d2->extractParam(ChildCntParamName).toUInt();
+        return childCount(d1) < childCount(d2);
     }
 
     bool lessThanSourceServer(const QnLegacyAuditRecord* l, const QnLegacyAuditRecord* r) const
@@ -257,6 +256,11 @@ bool QnAuditLogModel::hasDetail(const QnLegacyAuditRecord* record)
 void QnAuditLogModel::setDetail(QnLegacyAuditRecord* record, bool showDetail)
 {
     record->addParam("detail", showDetail ? "1" : "0");
+}
+
+uint QnAuditLogModel::childCount(const QnLegacyAuditRecord* record)
+{
+    return QByteArrayView(record->extractParam(ChildCntParamName)).toUInt();
 }
 
 QnAuditLogModel::QnAuditLogModel(QObject *parent)
@@ -480,7 +484,7 @@ QString QnAuditLogModel::eventDescriptionText(const QnLegacyAuditRecord* data) c
             break;
         case Qn::AR_UpdateInstall:
         {
-            QString version = QString(data->extractParam("version"));
+            QString version = QString::fromUtf8(data->extractParam("version"));
             result += tr("Site has been updated to version %1").arg(version);
             break;
         }
@@ -695,7 +699,7 @@ QString QnAuditLogModel::textData(const Column& column, const QnLegacyAuditRecor
             return eventDescriptionText(data);
 
         case UserActivityColumn:
-            return tr("%n actions", "", data->extractParam(ChildCntParamName).toUInt());
+            return tr("%n actions", "", childCount(data));
 
         case SourceServerColumn:
             return sourceServerName(resourcePool(), data);

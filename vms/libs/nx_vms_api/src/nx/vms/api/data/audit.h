@@ -6,7 +6,6 @@
 #include <nx/network/rest/audit.h>
 #include <nx/utils/json/qjson.h>
 #include <nx/utils/latin1_array.h>
-#include <nx/utils/qnbytearrayref.h>
 #include <nx/utils/uuid.h>
 
 #include "audit_details.h"

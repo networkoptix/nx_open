@@ -78,6 +78,7 @@ public:
 
     static bool hasDetail(const QnLegacyAuditRecord* record);
     static void setDetail(QnLegacyAuditRecord* record, bool showDetail);
+    static uint childCount(const QnLegacyAuditRecord* record);
     static QString eventTypeToString(QnResourcePool* pool,
         Qn::LegacyAuditRecordType recordType);
 

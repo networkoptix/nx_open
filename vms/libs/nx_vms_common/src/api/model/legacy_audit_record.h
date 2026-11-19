@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <string_view>
+
 #include <common/common_globals.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/rest/auth_session.h>
@@ -14,7 +16,8 @@ struct NX_VMS_COMMON_API QnLegacyAuditRecord
     bool isPlaybackType() const { return eventType == Qn::AR_ViewArchive || eventType == Qn::AR_ViewLive || eventType == Qn::AR_ExportVideo; }
     bool isCameraType() const { return eventType == Qn::AR_CameraUpdate || eventType == Qn::AR_CameraInsert || eventType == Qn::AR_CameraRemove; }
 
-    QnByteArrayConstRef extractParam(const QnLatin1Array& name) const;
+    /** @return View into params; valid while this record is alive and not modified. */
+    std::string_view extractParam(const QnLatin1Array& name) const;
     void addParam(const QnLatin1Array& name, const QnLatin1Array& value);
     void removeParam(const QnLatin1Array& name);
 

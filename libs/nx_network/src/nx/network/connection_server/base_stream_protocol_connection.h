@@ -9,7 +9,6 @@
 
 #include <nx/network/buffered_stream_socket.h>
 #include <nx/utils/interruption_flag.h>
-#include <nx/utils/qnbytearrayref.h>
 
 #include "base_protocol_message_types.h"
 #include "base_server_connection.h"

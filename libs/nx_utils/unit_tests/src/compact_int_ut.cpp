@@ -58,6 +58,31 @@ TEST_F(CompactInt, sequence_serialize_and_deserialize_are_symmetric)
     assertSerializeAndDeserializeAreSymmetric(generateRandomIntegerSequence());
 }
 
+TEST_F(CompactInt, truncated_integer_is_not_consumed)
+{
+    const QByteArray full = serialized(1LL << 40);
+    const QByteArray truncated = full.left(full.size() - 1); //< Last byte has continuation bit.
+
+    std::span<const char> buf(truncated);
+    long long value = 0;
+    ASSERT_FALSE(deserialize(&buf, &value));
+    ASSERT_EQ((std::size_t) truncated.size(), buf.size());
+}
+
+TEST_F(CompactInt, sequence_deserialization_stops_at_truncated_integer)
+{
+    const std::vector<long long> expected{1, 300, 70000};
+    QByteArray data = serialized(expected);
+    data.append('\x81'); //< Continuation bit is set, but no more bytes follow.
+
+    std::span<const char> buf(data);
+    std::vector<long long> numbers;
+    deserialize(&buf, &numbers); //< Used to loop forever here.
+
+    ASSERT_EQ(expected, numbers);
+    ASSERT_EQ(1U, buf.size());
+}
+
 //-------------------------------------------------------------------------------------------------
 
 struct Compacted

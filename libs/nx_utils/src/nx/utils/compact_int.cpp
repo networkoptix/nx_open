@@ -71,24 +71,21 @@ bool deserialize(const char** begin, const char* end, long long* value)
     return false;
 }
 
-bool deserialize(QnByteArrayConstRef* buf, long long* value)
+bool deserialize(std::span<const char>* buf, long long* value)
 {
     const char* begin = buf->data();
     if (!deserialize(&begin, buf->data() + buf->size(), value))
         return false;
 
-    buf->pop_front(begin - buf->data());
+    *buf = buf->subspan(begin - buf->data());
     return true;
 }
 
-void deserialize(QnByteArrayConstRef* buf, std::vector<long long>* numbers)
+void deserialize(std::span<const char>* buf, std::vector<long long>* numbers)
 {
-    while (!buf->isEmpty())
-    {
-        long long value = 0;
-        deserialize(buf, &value);
+    long long value = 0;
+    while (!buf->empty() && deserialize(buf, &value))
         numbers->push_back(value);
-    }
 }
 
 } // namespace nx::utils::compact_int
