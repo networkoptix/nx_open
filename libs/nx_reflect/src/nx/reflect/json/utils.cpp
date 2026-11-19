@@ -87,7 +87,7 @@ std::string getStringRepresentation(const Value& val)
     strbuf.Clear();
     Writer<StringBuffer> writer(strbuf);
     val.Accept(writer);
-    return strbuf.GetString();
+    return std::string(strbuf.GetString(), strbuf.GetSize());
 }
 
 std::string parseErrorToString(const rapidjson::ParseResult& parseResult)

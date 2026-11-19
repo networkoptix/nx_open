@@ -19,22 +19,24 @@ DeserializationResult deserialize(
     std::enable_if_t<std::is_same_v<T, QJsonObject>>* = nullptr)
 {
     const auto& val = ctx.value;
+    const auto strVal = getStringRepresentation(val);
+
     if (!val.IsObject())
     {
-        return DeserializationResult(
-            false, "Can't parse a QJson object", getStringRepresentation(val));
+        return DeserializationResult(false, "Can't parse a QJson object", strVal);
     }
 
-    auto qStrVal = QString::fromStdString(getStringRepresentation(val));
     QJsonParseError error;
-    auto qjsonDoc = QJsonDocument::fromJson(qStrVal.toUtf8(), &error);
+    const auto qjsonDoc =
+        QJsonDocument::fromJson(QByteArray::fromRawData(strVal.data(), strVal.size()), &error);
+
     if (qjsonDoc.isNull())
     {
-        return DeserializationResult(
-            false, error.errorString().toStdString(), getStringRepresentation(val));
+        return DeserializationResult(false, error.errorString().toStdString(), strVal);
     }
 
     *data = qjsonDoc.object();
+
     return DeserializationResult(true);
 }
 
@@ -47,16 +49,18 @@ DeserializationResult deserialize(
     const auto& val = ctx.value;
     if (val.IsObject() || val.IsArray())
     {
-        auto qStrVal = QString::fromStdString(getStringRepresentation(val));
+        const auto strVal = getStringRepresentation(val);
         QJsonParseError error;
-        auto qjsonDoc = QJsonDocument::fromJson(qStrVal.toUtf8(), &error);
+        const auto qjsonDoc =
+            QJsonDocument::fromJson(QByteArray::fromRawData(strVal.data(), strVal.size()), &error);
+
         if (qjsonDoc.isNull())
-            return DeserializationResult(
-                false, error.errorString().toStdString(), getStringRepresentation(val));
+            return DeserializationResult(false, error.errorString().toStdString(), strVal);
         if (val.IsObject())
             *data = qjsonDoc.object();
         if (val.IsArray())
             *data = qjsonDoc.array();
+
         return DeserializationResult(true);
     }
     if (val.IsString())
