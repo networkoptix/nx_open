@@ -425,7 +425,6 @@ if(NOT compilerMsvc)
 
             -fms-extensions
             -fms-compatibility
-            -fms-compatibility-version=19.34.00000
             -msse4.1
         )
 

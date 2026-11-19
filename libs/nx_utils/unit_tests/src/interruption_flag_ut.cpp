@@ -21,7 +21,10 @@ TEST(InterruptionFlag, Watcher)
 TEST(InterruptionFlag, toString)
 {
     static const std::string kFunctionName =
-#ifdef _WIN32
+#if defined(_WIN32) && defined(__clang__)
+        //< Unlike MSVC, Clang-cl spells "virtual" out in __FUNCSIG__.
+        "virtual void __cdecl nx::utils::test::InterruptionFlag_toString_Test::TestBody(void)";
+#elif defined(_WIN32)
         "void __cdecl nx::utils::test::InterruptionFlag_toString_Test::TestBody(void)";
 #else
         "virtual void nx::utils::test::InterruptionFlag_toString_Test::TestBody()";

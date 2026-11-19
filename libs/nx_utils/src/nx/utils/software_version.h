@@ -49,6 +49,20 @@ public:
 
     static SoftwareVersion fromStdString(const std::string& string);
 
+    /**
+     * NOTE: operator== is hand-written on purpose, it must not be defaulted. When compiled by
+     * Clang, MSVC STL enables its hand-vectorized std::find() implementation for every type which
+     * Clang reports as trivially equality comparable (which a struct of ints with a defaulted
+     * comparison operator is), but that implementation only supports element sizes of 1, 2, 4 and
+     * 8 bytes and fails to compile for anything else.
+     * See https://github.com/microsoft/STL/issues/6294.
+     */
+    constexpr bool operator==(const SoftwareVersion& other) const noexcept
+    {
+        return major == other.major && minor == other.minor && bugfix == other.bugfix
+            && build == other.build;
+    }
+
     auto operator<=>(const SoftwareVersion&) const = default;
 
 public:

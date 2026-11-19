@@ -7,6 +7,7 @@
 #include <optional>
 #include <string>
 #include <tuple>
+#include <type_traits>
 #include <utility>
 
 #include <QtCore/QString>
@@ -37,22 +38,68 @@ private:
 
 // TODO: Add macros for multiple original exceptions.
 
+namespace detail {
+
+#if defined(__clang__) && defined(_MSC_VER) //< Clang-cl.
+
 /**
- * Catches ORIGINAL_EXCEPTION thrown by EXPRESSION, wraps it and rethrows std::nested_exception
- * inherited from NEW_EXCEPTION with message MESSAGE.
+ * Glues an exception to std::nested_exception, the same way the Standard Library does inside
+ * std::throw_with_nested(). Clang-cl emits broken exception handling data for the Standard Library
+ * glue class, which makes copying such an exception - something std::current_exception() does -
+ * recurse infinitely until the stack is exhausted. Unlike the Standard Library one, this class has
+ * no constructor template, which is what the broken exception handling data refers to.
+ * See https://github.com/llvm/llvm-project/issues/191462.
+ */
+template<typename Error>
+struct WithNested: Error, std::nested_exception
+{
+    explicit WithNested(Error error): Error(std::move(error)) {}
+};
+
+#endif // Clang-cl.
+
+/**
+ * Same as std::throw_with_nested(), which cannot be used directly because of the Clang-cl issue
+ * described above.
+ */
+template<typename Error>
+[[noreturn]] void throwWithNested(Error error)
+{
+#if defined(__clang__) && defined(_MSC_VER)
+    if constexpr (std::is_class_v<Error> && !std::is_base_of_v<std::nested_exception, Error>
+        && !std::is_final_v<Error>)
+    {
+        throw WithNested<Error>(std::move(error));
+    }
+    else
+    {
+        throw std::move(error);
+    }
+#else
+    std::throw_with_nested(std::move(error));
+#endif
+}
+
+} // namespace detail
+
+/**
+ * Evaluates EXPRESSION. If it throws ORIGINAL_EXCEPTION, throws NEW_EXCEPTION(MESSAGE) with the
+ * original exception nested, as std::throw_with_nested() does (see detail::throwWithNested()).
  *
  * unwrapNestedErrors() should be used to get output string for wrapped exceptions.
  */
-#define NX_WRAP_EXCEPTION(EXPRESSION, ORIGINAL_EXCEPTION, NEW_EXCEPTION, MESSAGE) [&]() \
-{ \
-    try \
+#define NX_WRAP_EXCEPTION(EXPRESSION, ORIGINAL_EXCEPTION, NEW_EXCEPTION, MESSAGE) \
+    [&]() \
     { \
-        return EXPRESSION; \
-    } catch (const ORIGINAL_EXCEPTION&)  \
-    { \
-        std::throw_with_nested(NEW_EXCEPTION(MESSAGE)); \
-    } \
-}()
+        try \
+        { \
+            return EXPRESSION; \
+        } \
+        catch (const ORIGINAL_EXCEPTION&) \
+        { \
+            ::nx::utils::detail::throwWithNested(NEW_EXCEPTION(MESSAGE)); \
+        } \
+    }()
 
 class NX_UTILS_API ContextedException: public Exception
 {
