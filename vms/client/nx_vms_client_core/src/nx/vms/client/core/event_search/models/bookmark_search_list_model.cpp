@@ -169,14 +169,11 @@ bool BookmarkSearchListModel::Private::requestFetch(
 
     auto filter = QnCameraBookmarkSearchFilter{
         .centralTimePointMs = duration_cast<milliseconds>(request.centralPointUs),
-        .text = formatFilterText(textFilter->text().trimmed()),
+        .text = formatFilterText(textFilter->text().trimmed(), q->systemContext()),
         .limit = q->maximumCount(),
         .orderBy = QnBookmarkSortOrder(BookmarkSortField::startTime, sortOrder),
-        .shareFilter = searchSharedOnly
-            ? kSharedBookmarkFilters
-            : api::BookmarkShareFilter::none,
-        .cameras = idsFromCameras(q->cameraSet().cameras())
-    };
+        .shareFilter = searchSharedOnly ? kSharedBookmarkFilters : api::BookmarkShareFilter::none,
+        .cameras = idsFromCameras(q->cameraSet().cameras())};
 
     if (const auto& interestTimePeriod = q->interestTimePeriod())
     {

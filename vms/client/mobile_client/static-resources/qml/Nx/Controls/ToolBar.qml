@@ -23,6 +23,7 @@ ToolBarBase
     property alias titleUnderlineVisible: labelUnderline.visible
 
     property alias leftControl: leftControlContainer.data
+    readonly property alias leftControlArea: leftControlContainer
     property alias centerControl: customCenterControlContainer.data
     property alias rightControl: rightControlContainer.data
 

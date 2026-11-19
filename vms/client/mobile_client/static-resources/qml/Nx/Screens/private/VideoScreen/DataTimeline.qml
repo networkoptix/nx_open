@@ -32,6 +32,7 @@ Rectangle
     property ChunkProvider chunkProvider
 
     property alias objectsType: objects.objectsType
+    property string textFilter: ""
     property alias tileHeight: objects.tileHeight
     property alias tileSpacing: objects.spacing
 
@@ -388,6 +389,8 @@ Rectangle
             durationMs: timeline.durationMs
             liveTimeMs: NxGlobals.syncNowMs()
             currentPositionMs: timeline.positionMs
+
+            bookmarksTextFilter: timeline.textFilter
 
             interactive: timeline.interactive
 
@@ -914,6 +917,15 @@ Rectangle
             target: timeScale
             property: "durationMs"
         }
+    }
+
+    Binding
+    {
+        target: timeline.chunkProvider
+        property: "analyticsTextFilter"
+        value: timeline.textFilter
+        when: timeline.objectsType === Timeline.ObjectsLoader.ObjectsType.analytics
+        restoreMode: Binding.RestoreNone
     }
 
     // When the archive data becomes available for each opened camera:

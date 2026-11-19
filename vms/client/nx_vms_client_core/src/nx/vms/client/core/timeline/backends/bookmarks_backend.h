@@ -4,6 +4,8 @@
 
 #include <memory>
 
+#include <QtCore/QString>
+
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
@@ -25,6 +27,7 @@ class NX_VMS_CLIENT_CORE_API BookmarksBackend: public AbstractBackend<QnCameraBo
 {
 public:
     explicit BookmarksBackend(const QnResourcePtr& resource,
+        const QString& textFilter,
         const std::shared_ptr<CustomChunkAccumulator>& chunksReceiver);
 
     virtual ~BookmarksBackend() override;

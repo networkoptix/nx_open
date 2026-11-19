@@ -5,14 +5,12 @@
 #include <core/resource/media_server_resource.h>
 #include <nx/utils/software_version.h>
 #include <nx/utils/string.h>
-#include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/system_context.h>
 
 namespace nx::vms::client::core {
 
-QString formatFilterText(const QString& text)
+QString formatFilterText(const QString& text, const SystemContext* systemContext)
 {
-    const auto systemContext = appContext()->currentSystemContext();
     const auto server = systemContext ? systemContext->currentServer() : QnMediaServerResourcePtr{};
     if (server && server->getVersion() < nx::utils::SoftwareVersion(6, 1))
         return text;

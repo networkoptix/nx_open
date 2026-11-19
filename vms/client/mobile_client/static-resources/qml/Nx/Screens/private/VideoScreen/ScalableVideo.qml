@@ -22,6 +22,7 @@ ScalableContentHolder
 
     property bool showMotion: false
     property bool showAnalytics: false
+    property string analyticsTextFilter: ""
 
     property alias mediaPlayer: videoContent.mediaPlayer
     property alias resourceHelper: videoContent.resourceHelper
@@ -251,6 +252,7 @@ ScalableContentHolder
                 analyticsProvider: mediaPlayerAnalyticsProvider
                 mediaPlayer: videoContent.mediaPlayer
                 filterRect: roiController.customRoi
+                filterText: control.analyticsTextFilter
             }
         }
 

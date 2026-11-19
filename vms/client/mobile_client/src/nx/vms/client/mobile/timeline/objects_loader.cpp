@@ -127,6 +127,8 @@ struct ObjectsLoader::Private
     milliseconds topBound{milliseconds::max()};
 
     QPointer<core::ChunkProvider> chunkProvider;
+
+    QString bookmarksTextFilter;
     BackendPtr<ObjectTrackList> analyticsBackend;
     std::shared_ptr<CachingProxyBackend<QnCameraBookmarkList>> bookmarksBackend;
     std::unique_ptr<AbstractLoaderDelegate> loaderDelegate;
@@ -612,7 +614,8 @@ struct ObjectsLoader::Private
                 break;
 
             case ObjectsType::bookmarks:
-                contentWatcher.reset(new BookmarkContentWatcher(chunkProvider));
+                contentWatcher.reset(
+                    new BookmarkContentWatcher(chunkProvider, bookmarksTextFilter));
                 contentWatcher->setForced(!bookmarkChunks->empty());
                 break;
 
@@ -634,6 +637,24 @@ struct ObjectsLoader::Private
                 if (objectsType == ObjectsType::bookmarks)
                     contentWatcher->setForced(!bookmarkChunks->empty());
             });
+    }
+
+    void applyBookmarksTextFilter()
+    {
+        if (objectsType != ObjectsType::bookmarks)
+        {
+            bookmarksBackend.reset();
+            bookmarkChunks->clear();
+            return;
+        }
+
+        clear();
+        bookmarksBackend.reset();
+        bookmarkChunks->clear();
+        initializeLoaderDelegate();
+        initializeContentWatcher();
+        emit q->hasContentChanged();
+        handleWindowChanged();
     }
 
     void setBottomBound(std::optional<milliseconds> value)
@@ -671,11 +692,10 @@ struct ObjectsLoader::Private
         if (analyticsBackend || !NX_ASSERT(chunkProvider))
             return analyticsBackend;
 
-        analyticsBackend =
-            std::make_shared<CachingProxyBackend<ObjectTrackList>>(
-                std::make_shared<AggregatingProxyBackend<ObjectTrackList>>(
-                    std::make_shared<AnalyticsBackend>(
-                        chunkProvider->resource(), chunkProvider->analyticsRoi())));
+        analyticsBackend = std::make_shared<CachingProxyBackend<ObjectTrackList>>(
+            std::make_shared<AggregatingProxyBackend<ObjectTrackList>>(
+                std::make_shared<AnalyticsBackend>(
+                    chunkProvider->resource(), chunkProvider->analyticsFilter())));
 
         return analyticsBackend;
     }
@@ -687,7 +707,8 @@ struct ObjectsLoader::Private
 
         const auto cachingBackend = std::make_shared<CachingProxyBackend<QnCameraBookmarkList>>(
             std::make_shared<AggregatingProxyBackend<QnCameraBookmarkList>>(
-                std::make_shared<BookmarksBackend>(chunkProvider->resource(), bookmarkChunks)));
+                std::make_shared<BookmarksBackend>(
+                    chunkProvider->resource(), bookmarksTextFilter, bookmarkChunks)));
 
         // Bookmarks can be modified in the past, therefore the cache blocks are always expirable.
         cachingBackend->setAgeThreshold(std::nullopt);
@@ -783,7 +804,9 @@ void ObjectsLoader::setChunkProvider(core::ChunkProvider* value)
             d->handleWindowChanged();
         });
 
-    connect(d->chunkProvider, &core::ChunkProvider::analyticsRoiChanged, this,
+    connect(d->chunkProvider,
+        &core::ChunkProvider::analyticsFilterChanged,
+        this,
         [this]()
         {
             if (d->objectsType != ObjectsType::analytics)
@@ -813,6 +836,22 @@ void ObjectsLoader::setChunkProvider(core::ChunkProvider* value)
         [this]() { d->setBottomBoundMs(d->chunkProvider->bottomBound()); });
 
     d->setBottomBoundMs(d->chunkProvider->bottomBound());
+}
+
+QString ObjectsLoader::bookmarksTextFilter() const
+{
+    return d->bookmarksTextFilter;
+}
+
+void ObjectsLoader::setBookmarksTextFilter(const QString& value)
+{
+    const auto text = value.trimmed();
+    if (d->bookmarksTextFilter == text)
+        return;
+
+    d->bookmarksTextFilter = text;
+    d->applyBookmarksTextFilter();
+    emit bookmarksTextFilterChanged();
 }
 
 QVariant ObjectsLoader::bottomBoundMs() const

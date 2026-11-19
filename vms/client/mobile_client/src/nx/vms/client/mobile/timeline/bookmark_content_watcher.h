@@ -4,6 +4,8 @@
 
 #include <chrono>
 
+#include <QtCore/QString>
+
 #include <common/common_globals.h>
 #include <nx/utils/impl_ptr.h>
 
@@ -22,6 +24,7 @@ class BookmarkContentWatcher: public AbstractContentWatcher
 
 public:
     explicit BookmarkContentWatcher(core::ChunkProvider* resourceHolder,
+        const QString& textFilter = {},
         std::chrono::seconds updateInterval = std::chrono::seconds{30});
 
     virtual ~BookmarkContentWatcher() override;

@@ -12,8 +12,10 @@ Item
     id: control
 
     property alias placeholderText: textField.placeholderText
+    property alias backgroundColor: textField.backgroundColor
 
     property alias text: textField.text
+    property alias readOnly: textField.readOnly
     readonly property alias displayText: textField.displayText
     property bool hasClearButton: true
 
@@ -65,6 +67,7 @@ Item
 
         anchors.verticalCenter: parent.verticalCenter
         x: 8
+        z: 1 //< Above the text field, which may have an opaque background.
     }
 
     TextField

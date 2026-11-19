@@ -8,8 +8,8 @@
 
 #include <QtCore/QObject>
 
-#include <recording/time_period_list.h>
 #include <nx/utils/impl_ptr.h>
+#include <recording/time_period_list.h>
 
 #include "objects_bucket.h"
 
@@ -58,6 +58,8 @@ class ObjectsLoader: public QObject
         NOTIFY objectsTypeChanged)
     Q_PROPERTY(core::ChunkProvider* chunkProvider READ chunkProvider WRITE setChunkProvider
         NOTIFY chunkProviderChanged)
+    Q_PROPERTY(QString bookmarksTextFilter READ bookmarksTextFilter WRITE setBookmarksTextFilter
+            NOTIFY bookmarksTextFilterChanged)
     Q_PROPERTY(bool synchronous READ isSynchronous NOTIFY objectsTypeChanged)
     Q_PROPERTY(QVariant bottomBoundMs READ bottomBoundMs NOTIFY bottomBoundChanged)
     Q_PROPERTY(qint64 topBoundMs READ topBoundMs NOTIFY topBoundChanged)
@@ -107,7 +109,9 @@ public:
      *    - the archive beginning (an origin for the time domain division into temporal buckets);
      *    - motion content as is;
      *    - analytics chunks as a hint of where the analytics object tracks are present,
-     *      so the loader doesn't attempt to request them where they are not present.
+     *      so the loader doesn't attempt to request them where they are not present;
+     *    - the analytics filter (ROI, free text), so the loaded analytics object tracks match
+     *      the analytics chunks.
      */
     core::ChunkProvider* chunkProvider() const;
     void setChunkProvider(core::ChunkProvider* value);
@@ -137,6 +141,10 @@ public:
     qint64 durationMs() const;
     void setDuration(std::chrono::milliseconds value);
     void setDurationMs(qint64 value);
+
+    /** Free text filter for bookmarks. Analytics filtering is defined by `chunkProvider`. */
+    QString bookmarksTextFilter() const;
+    void setBookmarksTextFilter(const QString& value);
 
     /**
      * Current live time value.
@@ -236,6 +244,7 @@ public:
 signals:
     void objectsTypeChanged();
     void chunkProviderChanged();
+    void bookmarksTextFilterChanged();
     void bottomBoundChanged();
     void topBoundChanged();
     void startTimeChanged();

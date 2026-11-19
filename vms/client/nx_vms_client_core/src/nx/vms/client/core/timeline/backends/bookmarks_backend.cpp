@@ -9,6 +9,7 @@
 
 #include <camera/camera_bookmarks_manager.h>
 #include <core/resource/resource.h>
+#include <nx/vms/client/core/event_search/utils/bookmark_search_utils.h>
 #include <nx/vms/client/core/system_context.h>
 
 #include "custom_chunk_accumulator.h"
@@ -30,13 +31,15 @@ struct BookmarksBackend::Private
 {
     const QWeakPointer<QnResource> resource;
     const std::weak_ptr<CustomChunkAccumulator> chunksReceiver;
+    const QString textFilter;
 };
 
-BookmarksBackend::BookmarksBackend(
-    const QnResourcePtr& resource,
-    const std::shared_ptr<CustomChunkAccumulator>& chunksReceiver)
-    :
-    d(new Private{.resource = resource, .chunksReceiver = chunksReceiver})
+BookmarksBackend::BookmarksBackend(const QnResourcePtr& resource,
+    const QString& textFilter,
+    const std::shared_ptr<CustomChunkAccumulator>& chunksReceiver):
+    d(new Private{.resource = resource,
+        .chunksReceiver = chunksReceiver,
+        .textFilter = textFilter.trimmed()})
 {
 }
 
@@ -53,15 +56,16 @@ QnResourcePtr BookmarksBackend::resource() const
 QFuture<QnCameraBookmarkList> BookmarksBackend::load(const QnTimePeriod& period, int limit)
 {
     const auto resource = d->resource.lock();
-    if (!resource
-        || !NX_ASSERT(resource->systemContext())
-        || !NX_ASSERT(!period.isEmpty() && limit > 0)
+    if (!resource || !NX_ASSERT(!period.isEmpty() && limit > 0)
         || !NX_ASSERT(this->shared_from_this()))
     {
         return {};
     }
 
-    const auto systemContext = resource->systemContext()->as<core::SystemContext>();
+    const auto systemContext = SystemContext::fromResource(resource);
+    if (!NX_ASSERT(systemContext))
+        return {};
+
     const auto manager = systemContext->cameraBookmarksManager();
     if (!NX_ASSERT(manager))
         return {};
@@ -126,12 +130,12 @@ QFuture<QnCameraBookmarkList> BookmarksBackend::load(const QnTimePeriod& period,
             promise->finish();
         };
 
-    const QnCameraBookmarkSearchFilter filter{
-        .startTimeMs = period.startTime(),
+    const QnCameraBookmarkSearchFilter filter{.startTimeMs = period.startTime(),
         .endTimeMs = period.endTime() - 1ms, //< Bookmark request treats endTime as included.
+        .text = formatFilterText(d->textFilter, systemContext),
         .limit = limit,
-        .orderBy = common::BookmarkSortOrder{
-            api::BookmarkSortField::startTime, Qt::DescendingOrder},
+        .orderBy =
+            common::BookmarkSortOrder{api::BookmarkSortField::startTime, Qt::DescendingOrder},
         .cameras = {resource->getId()}};
 
     const auto requestId = manager->getBookmarksAsync(filter, responseHandler, /*executor*/ {});

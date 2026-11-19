@@ -8,6 +8,7 @@
 
 #include <camera/camera_bookmarks_manager.h>
 #include <core/resource/resource.h>
+#include <nx/vms/client/core/event_search/utils/bookmark_search_utils.h>
 #include <nx/vms/client/core/media/chunk_provider.h>
 #include <nx/vms/client/core/system_context.h>
 
@@ -18,6 +19,7 @@ struct BookmarkContentWatcher::Private
 {
     BookmarkContentWatcher* const q;
     const QPointer<core::ChunkProvider> resourceHolder;
+    const QString textFilter;
     const std::unique_ptr<QTimer> updateTimer{new QTimer{}};
     rest::Handle requestHandle{};
 
@@ -39,14 +41,13 @@ struct BookmarkContentWatcher::Private
         if (!NX_ASSERT(resourceHolder) || !resourceHolder->resource() || q->isForced())
             return;
 
-        const auto systemContext =
-            resourceHolder->resource()->systemContext()->as<core::SystemContext>();
-
+        const auto systemContext = core::SystemContext::fromResource(resourceHolder->resource());
         if (!systemContext || !NX_ASSERT(systemContext->connection()))
             return;
 
         QnCameraBookmarkSearchFilter filter;
         filter.cameras.insert(resourceHolder->resource()->getId());
+        filter.text = core::formatFilterText(textFilter, systemContext);
         filter.limit = 1;
 
         requestHandle = systemContext->cameraBookmarksManager()->getBookmarksAsync(filter,
@@ -59,11 +60,10 @@ struct BookmarkContentWatcher::Private
     }
 };
 
-BookmarkContentWatcher::BookmarkContentWatcher(
-    core::ChunkProvider* resourceHolder,
-    std::chrono::seconds updateInterval)
-    :
-    d(new Private{.q = this, .resourceHolder = resourceHolder})
+BookmarkContentWatcher::BookmarkContentWatcher(core::ChunkProvider* resourceHolder,
+    const QString& textFilter,
+    std::chrono::seconds updateInterval):
+    d(new Private{.q = this, .resourceHolder = resourceHolder, .textFilter = textFilter.trimmed()})
 {
     if (!NX_ASSERT(d->resourceHolder))
         return;

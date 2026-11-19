@@ -13,6 +13,8 @@
 
 Q_MOC_INCLUDE("core/resource/resource.h")
 
+namespace nx::analytics::db { struct Filter; }
+
 namespace nx::vms::client::core {
 
 class NX_VMS_CLIENT_CORE_API ChunkProvider:
@@ -32,6 +34,8 @@ class NX_VMS_CLIENT_CORE_API ChunkProvider:
         NOTIFY motionFilterChanged)
     Q_PROPERTY(QRectF analyticsRoi READ analyticsRoi WRITE setAnalyticsRoi
         NOTIFY analyticsRoiChanged)
+    Q_PROPERTY(QString analyticsTextFilter READ analyticsTextFilter WRITE setAnalyticsTextFilter
+            NOTIFY analyticsTextFilterChanged)
 
 public:
     explicit ChunkProvider(QObject* parent = nullptr);
@@ -48,6 +52,11 @@ public:
 
     QRectF analyticsRoi() const;
     void setAnalyticsRoi(const QRectF& value);
+
+    QString analyticsTextFilter() const;
+    void setAnalyticsTextFilter(const QString& value);
+
+    const nx::analytics::db::Filter& analyticsFilter() const;
 
     bool isLoading() const;
     bool isLoadingMotion() const;
@@ -72,6 +81,8 @@ signals:
     void loadingContentChanged(Qn::TimePeriodContent type);
     void motionFilterChanged();
     void analyticsRoiChanged();
+    void analyticsTextFilterChanged();
+    void analyticsFilterChanged();
 
 private:
     QnResource* rawResource() const;

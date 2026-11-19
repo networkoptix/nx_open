@@ -17,6 +17,7 @@ Item
 
     property alias chunkProvider: loader.chunkProvider
     property alias objectsType: loader.objectsType
+    property alias bookmarksTextFilter: loader.bookmarksTextFilter
     property alias bottomBoundMs: loader.bottomBoundMs
     property alias topBoundMs: loader.topBoundMs
 

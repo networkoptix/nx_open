@@ -238,6 +238,17 @@ BaseSettingsPage
                 appContext.settings.showObjectBoxes = checkState != Qt.Unchecked
         }
 
+        LabeledSwitch
+        {
+            id: timelineTextSearchSwitch
+
+            width: parent.width
+            text: "Timeline text search"
+            checkState: appContext.settings.timelineTextSearch ? Qt.Checked : Qt.Unchecked
+            onCheckStateChanged:
+                appContext.settings.timelineTextSearch = checkState != Qt.Unchecked
+        }
+
         Row
         {
             spacing: 8

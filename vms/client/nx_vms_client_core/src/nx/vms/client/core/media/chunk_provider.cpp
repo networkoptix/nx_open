@@ -24,6 +24,8 @@ using namespace nx::analytics::db;
 
 namespace nx::vms::client::core {
 
+namespace { constexpr QRectF kFullRoi{0, 0, 1, 1}; } // namespace
+
 // ------------------------------------------------------------------------------------------------
 
 class ChunkProvider::ChunkProviderInternal
@@ -98,7 +100,7 @@ public:
             return result;
         }()};
 
-    QRectF analyticsRoi{0, 0, 1, 1};
+    Filter analyticsFilter;
 
     explicit Private(ChunkProvider* q);
 
@@ -107,7 +109,7 @@ public:
     void updateAnalyticsBottom();
     void resetAnalyticsBottom();
 
-    void updateAnalyticsFilter();
+    void applyAnalyticsFilter();
 };
 
 // ------------------------------------------------------------------------------------------------
@@ -116,6 +118,7 @@ ChunkProvider::Private::Private(ChunkProvider* q): q(q)
 {
     analyticsUpdateTimer.setInterval(1h);
     analyticsUpdateTimer.callOnTimeout([this]() { updateAnalyticsBottom(); });
+    applyAnalyticsFilter();
 }
 
 void ChunkProvider::Private::updateAnalyticsBottom()
@@ -163,16 +166,11 @@ void ChunkProvider::Private::resetAnalyticsBottom()
     providers.at(Qn::AnalyticsContent)->setForcedBottomBound(std::nullopt, /*notifyChange*/ false);
 }
 
-void ChunkProvider::Private::updateAnalyticsFilter()
+void ChunkProvider::Private::applyAnalyticsFilter()
 {
-    Filter filter;
-    if (q->resource())
-        filter.deviceIds.insert(q->resource()->getId());
-
-    if (analyticsRoi != QRectF{0, 0, 1, 1})
-        filter.boundingBox = analyticsRoi;
-
-    providers.at(Qn::AnalyticsContent)->setFilter(QString::fromUtf8(QJson::serialized(filter)));
+    providers.at(Qn::AnalyticsContent)
+        ->setFilter(QString::fromUtf8(QJson::serialized(analyticsFilter)));
+    emit q->analyticsFilterChanged();
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -287,6 +285,8 @@ bool ChunkProvider::ChunkProviderInternal::setFilter(const QString& filter)
         return false;
 
     m_filter = filter;
+    if (!m_loader)
+        return true;
 
     setLoading(true);
     update();
@@ -381,7 +381,6 @@ void ChunkProvider::setRawResource(QnResource* value)
         provider->setResource(resource);
 
     d->updateAnalyticsBottom();
-    d->updateAnalyticsFilter();
     emit resourceChanged();
 }
 
@@ -475,18 +474,39 @@ void ChunkProvider::setMotionFilter(const QString& value)
 
 QRectF ChunkProvider::analyticsRoi() const
 {
-    return d->analyticsRoi;
+    return d->analyticsFilter.boundingBox.value_or(kFullRoi);
 }
 
 void ChunkProvider::setAnalyticsRoi(const QRectF& value)
 {
-    if (d->analyticsRoi == value) //< Internally a fuzzy comparison.
+    if (analyticsRoi() == value) //< Internally a fuzzy comparison.
         return;
 
-    d->analyticsRoi = value;
-    d->updateAnalyticsFilter();
+    d->analyticsFilter.boundingBox = value == kFullRoi ? std::nullopt : std::make_optional(value);
 
+    d->applyAnalyticsFilter();
     emit analyticsRoiChanged();
+}
+
+QString ChunkProvider::analyticsTextFilter() const
+{
+    return d->analyticsFilter.freeText;
+}
+
+void ChunkProvider::setAnalyticsTextFilter(const QString& value)
+{
+    const auto text = value.trimmed();
+    if (d->analyticsFilter.freeText == text)
+        return;
+
+    d->analyticsFilter.freeText = text;
+    d->applyAnalyticsFilter();
+    emit analyticsTextFilterChanged();
+}
+
+const Filter& ChunkProvider::analyticsFilter() const
+{
+    return d->analyticsFilter;
 }
 
 } // namespace nx::vms::client::core

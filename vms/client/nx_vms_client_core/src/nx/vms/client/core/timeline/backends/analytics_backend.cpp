@@ -4,7 +4,6 @@
 
 #include <chrono>
 #include <memory>
-#include <optional>
 
 #include <QtCore/QWeakPointer>
 
@@ -34,15 +33,11 @@ microseconds timestamp(const ObjectTrackEx& source)
 struct AnalyticsBackend::Private
 {
     const QWeakPointer<QnResource> resource;
-    const std::optional<QRectF> roi;
+    const Filter filter;
 };
 
-AnalyticsBackend::AnalyticsBackend(const QnResourcePtr& resource, const QRectF& roi):
-    d(new Private{
-        .resource = resource,
-        .roi = roi != QRectF{0, 0, 1, 1}
-            ? std::optional<QRectF>{roi}
-            : std::nullopt})
+AnalyticsBackend::AnalyticsBackend(const QnResourcePtr& resource, const Filter& filter):
+    d(new Private{.resource = resource, .filter = filter})
 {
 }
 
@@ -115,11 +110,10 @@ QFuture<ObjectTrackList> AnalyticsBackend::load(const QnTimePeriod& period, int 
             promise.finish();
         };
 
-    Filter filter;
-    filter.deviceIds.insert(resource->getId());
+    Filter filter = d->filter;
+    filter.deviceIds = {resource->getId()};
     filter.maxObjectTracksToSelect = limit;
     filter.sortOrder = Qt::DescendingOrder;
-    filter.boundingBox = d->roi;
 
     // Object track request treats timePeriod.endTimeMs as included, so we need to cut the last ms.
     filter.timePeriod = QnTimePeriod{period.startTime(), period.duration() - 1ms};

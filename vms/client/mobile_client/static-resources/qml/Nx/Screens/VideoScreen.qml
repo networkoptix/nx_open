@@ -60,9 +60,16 @@ Page
     property bool leftPanelButtonWanted: false
     property bool rightPanelButtonWanted: false
 
+    property alias searchActive: searchEdit.active
+
+    // The tool bar which hosts the search field. Like `menuAnchor`, overridden when this
+    // VideoScreen is embedded in another screen which keeps its own tool bar instead of ours.
+    // That screen must turn the search off by its back button.
+    property Item activeToolBar: toolBar
+
     signal closeRequested()
 
-    customBackHandler: d.closeVideoScreen
+    customBackHandler: d.handleBack
     backgroundColor: "black"
     clip: false
 
@@ -328,11 +335,6 @@ Page
 
         readonly property bool applicationActive: Qt.application.state === Qt.ApplicationActive
 
-        // TODO: Implement free text search mode.
-        property bool searchActive: false
-        property int searchResults: 0
-        property int searchIndex: 0
-
         property bool controlsVisible: true
         property real controlsOpacity: controlsVisible ? 1.0 : 0.0
         Behavior on controlsOpacity
@@ -356,6 +358,17 @@ Page
         onCameraWarningVisibleChanged:
         {
             d.controlsVisible = !(d.cameraWarningVisible && controller.serverOffline)
+        }
+
+        function handleBack()
+        {
+            // Same as the back button of the fullscreen controls.
+            if (LayoutController.fullscreen)
+                LayoutController.exitFullscreen()
+            else if (modernVideoScreen.searchActive)
+                modernVideoScreen.searchActive = false
+            else
+                d.closeVideoScreen()
         }
 
         function closeVideoScreen()
@@ -383,6 +396,77 @@ Page
         icon.source: "image://skin/24x24/Outline/more.svg?primary=%1"
             .arg(StyleHints.foregroundColorName)
         onClicked: menu.open()
+    }
+
+    SearchEdit
+    {
+        id: searchEdit
+
+        property bool active: false
+
+        // Whether the search is enabled and applies to the selected objects type.
+        readonly property bool relevant:
+        {
+            if (!appContext.settings.timelineTextSearch)
+                return false
+
+            const type = modernVideoScreen.selectedObjectsType
+            return type === Timeline.ObjectsLoader.ObjectsType.bookmarks
+                || type === Timeline.ObjectsLoader.ObjectsType.analytics
+        }
+
+        // When unfolded, the field spans from the back button to the right edge of the tool bar.
+        readonly property real leftInset: modernVideoScreen.activeToolBar.leftControlArea.x
+            + modernVideoScreen.activeToolBar.leftControlArea.width + 12
+
+        readonly property real minimumWidth: 48
+        readonly property real expandedWidth: parent.width - leftInset - anchors.rightMargin
+
+        // Linear expansion parameter from 0 (search is off) to 1 (the search field is expanded).
+        property real t: active ? 1.0 : 0.0
+        Behavior on t { NumberAnimation { duration: 250 }}
+
+        parent: modernVideoScreen.activeToolBar.contentItem
+        z: 1
+
+        anchors.right: parent.right
+        anchors.rightMargin: 16
+        anchors.verticalCenter: parent.verticalCenter
+
+        width: expandedWidth - (expandedWidth - minimumWidth) * Math.pow((1 - t), 3)
+        height: 36
+
+        // Covers the tool bar controls under it.
+        backgroundColor: ColorTheme.colors.dark4
+
+        visible: t > 0
+        readOnly: !active || LayoutController.fullscreen
+        opacity: 1 - Math.pow(1 - t, 6)
+
+        onRelevantChanged:
+        {
+            if (!relevant)
+                active = false
+        }
+
+        onActiveChanged:
+        {
+            if (active)
+                forceActiveFocus()
+            else
+                Qt.inputMethod.hide() //< The field turns read-only, but keeps the focus.
+        }
+
+        // The field keeps its focus and text while collapsing, so its frame and content do not
+        // change until it is gone.
+        onTChanged:
+        {
+            if (t === 0.0)
+            {
+                resetFocus()
+                clear()
+            }
+        }
     }
 
     // Anchor item for the kebab menu in non-fullscreen state. Defaults to the toolBar's
@@ -524,6 +608,23 @@ Page
 
         MenuItem
         {
+            id: searchMenuItem
+
+            text: qsTr("Search")
+            // Not offered in fullscreen, where the tool bar hosting the search field is hidden.
+            // An already active search stays active there, along with its results.
+            visible: !LayoutController.fullscreen && searchEdit.relevant
+            height: visible ? implicitHeight : 0
+
+            onTriggered:
+            {
+                modernVideoScreen.searchActive = true
+                menu.itemToFocusAfterClose = searchEdit
+            }
+        }
+
+        MenuItem
+        {
             id: bookmarksMenuItem
 
             text: qsTr("Bookmarks")
@@ -598,6 +699,8 @@ Page
             && !d.ptzMode
             && modernVideoScreen.selectedObjectsType
                 === Timeline.ObjectsLoader.ObjectsType.analytics
+
+        analyticsTextFilter: cameraChunkProvider.analyticsTextFilter
 
         roiController
         {
@@ -1155,6 +1258,12 @@ Page
 
             timeZone: video.resourceHelper.timeZone
 
+            PropertyUpdateFilter on textFilter
+            {
+                source: searchEdit.active ? searchEdit.displayText : ""
+                minimumIntervalMs: 250
+            }
+
             onDetailsRequested: (data, tile) =>
             {
                 if (!data?.perObjectData || !tile)
@@ -1228,8 +1337,6 @@ Page
                 anchors.right: bottomBar.right
                 anchors.rightMargin: 12
                 anchors.verticalCenter: bottomBar.verticalCenter
-
-                visible: !d.searchActive
 
                 spacing: 0
 

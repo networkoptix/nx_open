@@ -50,6 +50,8 @@ public:
 
         SupportMetaOrganizations,
 
+        TimelineTextSearch,
+
         // Beta features and settings flags.
         UseDownloadVideoFeature,
         UseLogInToOrganizationFeature,
@@ -170,6 +172,9 @@ private:
             SupportMetaOrganizations, false)
 
         QN_DECLARE_RW_PROPERTY(bool, showObjectBoxes, setShowObjectBoxes, ShowObjectBoxes, false)
+
+        QN_DECLARE_RW_PROPERTY(
+            bool, timelineTextSearch, setTimelineTextSearch, TimelineTextSearch, false)
 
         QN_DECLARE_RW_PROPERTY(
             bool,

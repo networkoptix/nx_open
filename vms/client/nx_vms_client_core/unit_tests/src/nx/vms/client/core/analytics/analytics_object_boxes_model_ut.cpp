@@ -811,6 +811,27 @@ TEST_F(AnalyticsObjectBoxesModelTest, emptyFilterTextShowsAllObjects)
     thenObjectCountIs(2);
 }
 
+TEST_F(AnalyticsObjectBoxesModelTest, whitespaceFilterTextShowsAllObjects)
+{
+    givenPacket(10000ms, {{trackA}, {trackB}});
+    givenPosition(10000ms);
+
+    whenFilterTextIs("   ");
+
+    thenObjectCountIs(2);
+}
+
+TEST_F(AnalyticsObjectBoxesModelTest, filterTextIgnoresSurroundingWhitespace)
+{
+    givenPacket(10000ms,
+        {{.trackId = trackA, .typeId = kPersonTypeId}, {.trackId = trackB, .typeId = kCarTypeId}});
+    givenPosition(10000ms);
+
+    whenFilterTextIs("  car  ");
+
+    thenObjectsAre({trackB});
+}
+
 TEST_F(AnalyticsObjectBoxesModelTest, allFiltersMustMatch)
 {
     const QRectF kInside(0.6, 0.6, 0.1, 0.1);

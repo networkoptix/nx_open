@@ -18,6 +18,9 @@ Item
     /** Only objects intersecting this relative rectangle are shown. */
     property rect filterRect: Qt.rect(0, 0, 1, 1)
 
+    /** Text matched against object type names and attributes, as in the object search. */
+    property string filterText: ""
+
     /** If not null, only the object of this track is shown. */
     property var filterTrackId: NxGlobals.uuid("")
 
@@ -37,6 +40,7 @@ Item
         resource: overlay.mediaPlayer?.resource ?? null
         channel: overlay.index
         filterRect: overlay.filterRect
+        filterText: overlay.filterText
         filterTrackId: overlay.filterTrackId
     }
 

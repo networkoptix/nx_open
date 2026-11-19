@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <QtCore/QRectF>
-
 #include <analytics/db/analytics_db_types.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
@@ -28,7 +26,12 @@ struct DataListTraits<ObjectTrackList>
 class NX_VMS_CLIENT_CORE_API AnalyticsBackend: public AbstractBackend<ObjectTrackList>
 {
 public:
-    explicit AnalyticsBackend(const QnResourcePtr& resource, const QRectF& roi);
+    /**
+     * @param filter Filter defining which object tracks to load. Device ids, time period,
+     *     limit and sort order are overridden by each load request.
+     */
+    explicit AnalyticsBackend(
+        const QnResourcePtr& resource, const nx::analytics::db::Filter& filter);
     virtual ~AnalyticsBackend() override;
 
     virtual QnResourcePtr resource() const override;

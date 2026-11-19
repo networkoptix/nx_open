@@ -151,6 +151,7 @@ AdaptiveScreen
             {
                 name: "returnToLayout"
                 when: resourcesScreen.contentItem === videoScreenLoader.item
+                    && !videoScreenLoader.item.searchActive
                     && (resourceHelper.isLayout
                         || resourceHelper.resource === null
                         || (resourceHelper.isCamera && !LayoutController.hasSidePanels))
@@ -160,6 +161,19 @@ AdaptiveScreen
                     leftControl.icon.source: "image://skin/24x24/Outline/arrow_back.svg?primary=%1"
                         .arg(StyleHints.foregroundColorName)
                     leftControl.onClicked: resourcesScreen.closeVideoScreen()
+                }
+            },
+            State
+            {
+                name: "closeSearch"
+                when: resourcesScreen.contentItem === videoScreenLoader.item
+                    && videoScreenLoader.item.searchActive
+
+                PropertyChanges
+                {
+                    leftControl.icon.source: "image://skin/24x24/Outline/arrow_back.svg?primary=%1"
+                        .arg(StyleHints.foregroundColorName)
+                    leftControl.onClicked: videoScreenLoader.item.searchActive = false
                 }
             },
             State
@@ -380,6 +394,7 @@ AdaptiveScreen
                 // The visible kebab button lives in resourcesScreen's toolBar (above), so
                 // anchor the menu to it instead of VideoScreen's hidden internal kebab.
                 menuAnchor: resourcesScreen.menuButton
+                activeToolBar: resourcesScreen.toolBar
 
                 Component.onCompleted:
                 {
@@ -515,6 +530,19 @@ AdaptiveScreen
 
     customBackHandler: (isEscKeyPressed) =>
     {
+        // Same as the back button of the fullscreen video controls.
+        if (LayoutController.fullscreen)
+        {
+            LayoutController.exitFullscreen()
+            return
+        }
+
+        if (videoScreenLoader.item?.searchActive)
+        {
+            videoScreenLoader.item.searchActive = false
+            return
+        }
+
         if (resourcesScreen.showsVideoScreen)
         {
             resourcesScreen.closeVideoScreen()

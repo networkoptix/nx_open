@@ -195,7 +195,8 @@ void QnSearchBookmarksModelPrivate::setRange(qint64 utcStartTimeMs, qint64 utcFi
 
 void QnSearchBookmarksModelPrivate::setFilterText(const QString& text)
 {
-    m_filter.text = nx::vms::client::core::formatFilterText(text);
+    m_filter.text =
+        nx::vms::client::core::formatFilterText(text, appContext()->currentSystemContext());
 }
 
 const std::set<nx::Uuid>& QnSearchBookmarksModelPrivate::cameras() const

@@ -10,6 +10,10 @@ Menu
 
     property real minimumWidth: 200
 
+    // The item to give the focus to once the menu is closed, instead of the item which had it
+    // before the menu was opened. Reset after each closing.
+    property Item itemToFocusAfterClose: null
+
     width:
     {
         let implicitItemWidth = 0
@@ -30,4 +34,13 @@ Menu
     modal: true
     dim: false
     clip: true
+
+    onClosed:
+    {
+        if (!itemToFocusAfterClose)
+            return
+
+        itemToFocusAfterClose.forceActiveFocus()
+        itemToFocusAfterClose = null
+    }
 }
