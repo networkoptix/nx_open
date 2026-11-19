@@ -2879,6 +2879,7 @@ void QnVirtualCameraResource::emitPropertyChanged(
 {
     if (key == nx::vms::api::device_properties::kIoSettings)
     {
+        m_cachedIoPorts.reset();
         m_isIntercom.reset();
         emit ioPortDescriptionsChanged(::toSharedPointer(this));
     }
