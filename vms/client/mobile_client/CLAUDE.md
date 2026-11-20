@@ -26,7 +26,8 @@ All headers relative to `src/`.
 | QnCameraListModel | `models/camera_list_model.h` | Camera list with filtering |
 | VoiceSpectrumItem | `nx/client/mobile/two_way_audio/voice_spectrum_item.h` | Audio spectrum viz |
 
-Core types from `nx.vms.client.core` (not mobile-specific, under `open/vms/client/nx_vms_client_core/`): MediaPlayer, ChunkProvider, ResourceHelper.
+Core types (not mobile-specific, under `open/vms/client/nx_vms_client_core/`): MediaPlayer and
+ChunkProvider in the QML module `nx.vms.client.core`, ResourceHelper in `Nx.Core`.
 
 ### Legacy code (older namespaces)
 
@@ -73,7 +74,7 @@ Also known as: Camera Screen, Live View, Video View
 - Video player -> `private/VideoScreen/ScalableVideo.qml`
 - Controller -> `private/VideoScreen/VideoScreenController.qml`
 - Timeline -> `private/VideoScreen/DataTimeline.qml`
-- PTZ panel -> `private/VideoScreen/PtzPanel.qml`, `Ptz/Joystick.qml`
+- PTZ panel -> `private/VideoScreen/PtzPanel.qml`, `private/VideoScreen/Ptz/Joystick.qml`
 - Action buttons (soft triggers, two-way audio) -> `private/VideoScreen/ActionSheet.qml`
 - Export -> `Mobile/Ui/Sheets/DownloadMediaDurationSheet.qml`
 
@@ -89,8 +90,8 @@ Also known as: Notifications Screen, Notifications Tab
 
 Also known as: Bookmark List, Object Search, Smart Search
 
-- Search results -> `private/items/EventSearchItem.qml`
-- Filters -> `private/items/FiltersItem.qml`
+- Search results -> `Screens/EventSearch/private/items/EventSearchItem.qml`
+- Filters -> `Screens/EventSearch/private/items/FiltersItem.qml`
 - Sharing -> `Mobile/Ui/Sheets/ShareBookmarkSheet.qml`
 
 ### Menu Screen -- `Screens/MenuScreen.qml`
