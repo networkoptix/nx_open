@@ -89,7 +89,7 @@ QuickControls.TextField
         anchors.right: parent.right
         visible: control.text
 
-        icon.source: lp("/images/clear_text.svg")
+        icon.source: "qrc:///images/clear_text.svg"
         icon.width: 20
         icon.height: icon.width
 

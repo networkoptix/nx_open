@@ -105,7 +105,7 @@ Item
             PropertyChanges
             {
                 target: handleItem
-                source: lp("/images/controls/cursor_handle.png")
+                source: "qrc:///images/controls/cursor_handle.png"
             }
             PropertyChanges
             {
@@ -122,7 +122,7 @@ Item
             PropertyChanges
             {
                 target: handleItem
-                source: lp("/images/controls/selection_start_handle.png")
+                source: "qrc:///images/controls/selection_start_handle.png"
             }
             PropertyChanges
             {
@@ -139,7 +139,7 @@ Item
             PropertyChanges
             {
                 target: handleItem
-                source: lp("/images/controls/selection_end_handle.png")
+                source: "qrc:///images/controls/selection_end_handle.png"
             }
             PropertyChanges
             {

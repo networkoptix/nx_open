@@ -6,6 +6,8 @@
 #include <type_traits>
 
 #include <QtCore/QByteArrayView>
+#include <QtCore/QList>
+#include <QtCore/QMetaMethod>
 #include <QtCore/QMetaObject>
 #include <QtCore/QMetaProperty>
 #include <QtCore/QObject>
@@ -87,6 +89,29 @@ inline QSet<QByteArray> propertyNames(
     return result;
 }
 
+/** Returns signals, slots and invokables of the object. */
+template<class Base = QObject>
+inline QList<QMetaMethod> methods(const QObject* object, bool includeBaseMethods = false)
+{
+    static_assert(std::is_base_of<QObject, Base>());
+
+    if (!object)
+        return {};
+
+    const auto baseMetaObject = &Base::staticMetaObject;
+    const auto metaObject = object->metaObject();
+    if (!NX_ASSERT(metaObject->inherits(baseMetaObject)))
+        return {};
+
+    const int offset =
+        includeBaseMethods ? baseMetaObject->methodOffset() : baseMetaObject->methodCount();
+
+    QList<QMetaMethod> result;
+    for (int i = offset; i < metaObject->methodCount(); ++i)
+        result << metaObject->method(i);
+
+    return result;
+}
 
 /** Connects all the sender properties notify signals with the receiver meta method. */
 void NX_UTILS_API watchOnPropertyChanges(
@@ -97,5 +122,11 @@ void NX_UTILS_API watchOnPropertyChanges(
 void NX_UTILS_API resetProperties(QObject* object);
 
 std::optional<QMetaMethod> NX_UTILS_API findSignal(const QObject* object, QByteArrayView name);
+
+/** Returns all the overloads with the given name, including the ones of the base classes. */
+QList<QMetaMethod> NX_UTILS_API findMethods(const QMetaObject* metaObject, QByteArrayView name);
+
+/** Whether the method is a NOTIFY signal of some property. */
+bool NX_UTILS_API isNotifySignal(const QMetaObject* metaObject, const QMetaMethod& method);
 
 } // namespace nx::utils

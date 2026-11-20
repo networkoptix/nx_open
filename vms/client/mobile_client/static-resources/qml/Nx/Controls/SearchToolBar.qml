@@ -34,7 +34,7 @@ ToolBarBase
         IconButton
         {
             id: cancelButton
-            icon.source: lp("/images/arrow_back.png")
+            icon.source: "qrc:///images/arrow_back.png"
             onClicked: close()
             alwaysCompleteHighlightAnimation: false
         }

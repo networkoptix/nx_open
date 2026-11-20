@@ -64,7 +64,7 @@ Column
             width: 48
             height: 48
 
-            icon.source: lp("/images/clear.png")
+            icon.source: "qrc:///images/clear.png"
 
             opacity: passwordField.length ? 1.0 : 0.0
             visible: opacity > 0

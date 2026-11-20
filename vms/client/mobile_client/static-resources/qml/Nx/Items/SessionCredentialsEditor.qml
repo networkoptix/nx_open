@@ -59,7 +59,7 @@ Pane
                 id: chooseHostButton
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
-                icon.source: lp("/images/expand.png")
+                icon.source: "qrc:///images/expand.png"
                 onClicked: hostSelectionDialog.open()
                 visible: hostsModel.count > 1
             }
@@ -102,7 +102,7 @@ Pane
                 id: chooseUserButton
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
-                icon.source: lp("/images/expand.png")
+                icon.source: "qrc:///images/expand.png"
                 onClicked: userSelectionDialog.open()
                 visible: authenticationDataAccessor.count > 1
             }
@@ -165,7 +165,7 @@ Pane
                 width: 48
                 height: 48
 
-                icon.source: lp("/images/clear.png")
+                icon.source: "qrc:///images/clear.png"
 
                 opacity: isPasswordSaved ? 1.0 : 0.0
                 visible: opacity > 0

@@ -332,7 +332,7 @@ def main():
             archiveFiles(a,
                 join(bin_dir, 'imageformats'),
                 join(conf.QT_DIR, 'plugins', 'imageformats'),
-                ["libqtiff.so", "libqjpeg.so"])
+                ["libqtiff.so", "libqjpeg.so", "libqsvg.so"])
 
         if isMac:
             archiveMacOsFrameworks(a, lib_dir, join(conf.QT_DIR, "lib"))

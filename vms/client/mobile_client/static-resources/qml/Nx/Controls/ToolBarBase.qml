@@ -58,7 +58,7 @@ ToolBar
 
         Image
         {
-            source: lp("/images/toolbar_gradient.png")
+            source: "qrc:///images/toolbar_gradient.png"
         }
     }
 }

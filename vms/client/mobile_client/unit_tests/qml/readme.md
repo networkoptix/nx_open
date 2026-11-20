@@ -12,6 +12,13 @@ For a test of a single control, `ControlTestCase` from `Nx.Test` can be used, se
 Note: `appContext` in the unit tests mode, the client QML modules and the `image://skin/` image
 provider are available.
 
+Note: `windowContext` is a mock, `WindowContextMock` from `Nx.Test`: the real one does not exist in
+the unit tests mode. It has only what the tested components use, so a component which needs more
+fails with a warning until the member is added to the mock. A test sets its properties directly,
+and `ControlTestCase` resets them before every test function. `tst_WindowContextMock.qml` fails
+when the mock has a member which the `WindowContext` class does not have: another name, another
+type or another number of parameters.
+
 Note: Settings are shared by all test files and some persist between runs, so a test restores the
 ones it changes in `cleanup()`.
 

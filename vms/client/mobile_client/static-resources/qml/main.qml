@@ -76,11 +76,6 @@ Controls.ApplicationWindow
         }
     }
 
-    function lp(path)
-    {
-        return "qrc:///" + path
-    }
-
     // Workaround object for Qt bug. On iOS main window padding (which should be equal to
     // SafeArea.margins) are not updated, but SafeArea works as expected.
     QtObject

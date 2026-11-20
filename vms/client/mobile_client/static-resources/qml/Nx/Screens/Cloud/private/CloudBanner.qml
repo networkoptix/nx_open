@@ -13,7 +13,7 @@ Column
 
     Image
     {
-        source: lp("/images/cloud_big.png")
+        source: "qrc:///images/cloud_big.png"
         anchors.horizontalCenter: parent.horizontalCenter
     }
 

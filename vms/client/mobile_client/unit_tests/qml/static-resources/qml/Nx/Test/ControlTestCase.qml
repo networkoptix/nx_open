@@ -41,6 +41,7 @@ TestCase
     function initBase()
     {
         failOnWarning(/.?/)
+        windowContext.reset()
         control = createTemporaryObject(component, test)
         signals.reset()
     }

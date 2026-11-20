@@ -111,6 +111,6 @@ QuickControls.Page
     {
         id: d
 
-        readonly property url kBackButtonIconSource: lp("/images/arrow_back.png")
+        readonly property url kBackButtonIconSource: "qrc:///images/arrow_back.png"
     }
 }

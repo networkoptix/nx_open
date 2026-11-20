@@ -49,4 +49,31 @@ std::optional<QMetaMethod> findSignal(const QObject* object, QByteArrayView name
     return std::nullopt;
 }
 
+QList<QMetaMethod> findMethods(const QMetaObject* metaObject, QByteArrayView name)
+{
+    QList<QMetaMethod> result;
+    for (int i = 0; i < metaObject->methodCount(); ++i)
+    {
+        const QMetaMethod method = metaObject->method(i);
+        if (method.name() == name)
+            result << method;
+    }
+
+    return result;
+}
+
+bool isNotifySignal(const QMetaObject* metaObject, const QMetaMethod& method)
+{
+    if (method.methodType() != QMetaMethod::Signal)
+        return false;
+
+    for (int i = 0; i < metaObject->propertyCount(); ++i)
+    {
+        if (metaObject->property(i).notifySignalIndex() == method.methodIndex())
+            return true;
+    }
+
+    return false;
+}
+
 } // namespace nx::utils

@@ -66,13 +66,13 @@ Item
             {
                 IconButton
                 {
-                    icon.source: lp("/images/arrow_left.png")
+                    icon.source: "qrc:///images/arrow_left.png"
                     onClicked: calendar.previousMonthClicked()
                 }
 
                 IconButton
                 {
-                    icon.source: lp("/images/arrow_right.png")
+                    icon.source: "qrc:///images/arrow_right.png"
                     onClicked: calendar.nextMonthClicked()
                 }
             }
@@ -88,7 +88,7 @@ Item
 
             labelPadding: 8
             text: qsTr("Close")
-            icon.source: lp("/images/close.png")
+            icon.source: "qrc:///images/close.png"
             flat: true
             onClicked: calendar.closeClicked()
         }

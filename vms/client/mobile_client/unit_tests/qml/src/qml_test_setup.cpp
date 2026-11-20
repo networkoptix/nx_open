@@ -5,6 +5,7 @@
 #include <QtCore/QSettings>
 #include <QtGui/QFont>
 #include <QtGui/QGuiApplication>
+#include <QtQml/QQmlComponent>
 #include <QtQml/QQmlContext>
 #include <QtQml/QQmlEngine>
 
@@ -14,6 +15,7 @@
 #include <nx/vms/client/core/skin/skin_image_provider.h>
 #include <nx/vms/client/core/utils/font_loader.h>
 #include <nx/vms/client/mobile/mobile_client_meta_types.h>
+#include <nx/vms/client/mobile/window_context.h>
 
 #include "test_utils.h"
 
@@ -35,6 +37,8 @@ void QmlTestSetup::applicationAvailable()
     initializeQmlTypes();
     TestUtils::registerQmlType();
 
+    qRegisterMetaType<WindowContext*>();
+
     core::FontLoader::loadFonts(":/fonts");
     QGuiApplication::setFont(QFont("Roboto"));
 }
@@ -45,6 +49,16 @@ void QmlTestSetup::qmlEngineAvailable(QQmlEngine* engine)
     engine->setImportPathList(engine->importPathList() << "qrc:///qml");
     engine->addImageProvider("skin", new core::SkinImageProvider());
     engine->rootContext()->setContextProperty("appContext", m_appContext.get());
+
+    // Loaded from the module, since QML_IMPORT_PATH may override the resources.
+    QQmlComponent windowContextMock(engine);
+    windowContextMock.loadFromModule("Nx.Test", "WindowContextMock");
+    const auto windowContext = windowContextMock.create();
+    if (NX_ASSERT(windowContext, windowContextMock.errorString()))
+    {
+        windowContext->setParent(engine);
+        engine->rootContext()->setContextProperty("windowContext", windowContext);
+    }
 }
 
 void QmlTestSetup::cleanupTestCase()

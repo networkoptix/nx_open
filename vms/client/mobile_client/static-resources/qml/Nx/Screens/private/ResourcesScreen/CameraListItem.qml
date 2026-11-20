@@ -67,7 +67,9 @@ Control
             Image
             {
                 anchors.centerIn: parent
-                source: d.unauthorized ? lp("/images/camera_locked.png") : lp("/images/camera_offline.png")
+                source: d.unauthorized
+                    ? "qrc:///images/camera_locked.png"
+                    : "qrc:///images/camera_offline.png"
                 visible: d.offline
                 sourceSize.width: 40
                 sourceSize.height: 40
@@ -119,7 +121,9 @@ Control
 
         Image
         {
-            source: d.unauthorized ? lp("/images/camera_locked.png") : lp("/images/camera_offline.png")
+            source: d.unauthorized
+                ? "qrc:///images/camera_locked.png"
+                : "qrc:///images/camera_offline.png"
             sourceSize.width: 40
             sourceSize.height: 40
         }

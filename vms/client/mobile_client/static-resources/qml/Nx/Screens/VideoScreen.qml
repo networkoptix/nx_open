@@ -478,7 +478,7 @@ Page
     property MotionAreaButton motionAreaButton: MotionAreaButton
     {
         text: qsTr("Area")
-        icon.source: lp("/images/close.png")
+        icon.source: "qrc:///images/close.png"
 
         onClicked: video.roiController.clearCustomRoi()
     }

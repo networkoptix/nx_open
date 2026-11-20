@@ -171,7 +171,7 @@ FocusScope
 
                     PropertyChanges
                     {
-                        defaultLeftControl.icon.source: "qrc:////images/arrow_back.png"
+                        defaultLeftControl.icon.source: "qrc:///images/arrow_back.png"
                         defaultLeftControl.onClicked: Workflow.popCurrentScreen()
                     }
                 }
