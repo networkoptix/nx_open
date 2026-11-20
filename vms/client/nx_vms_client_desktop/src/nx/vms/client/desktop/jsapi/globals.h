@@ -7,7 +7,7 @@
 namespace nx::vms::client::desktop::jsapi {
 
 /** Class contains global constants and methods which may be used in the JS scripts. */
-class Globals: public QObject
+class NX_VMS_CLIENT_DESKTOP_API Globals: public QObject
 {
     Q_OBJECT
 
@@ -44,7 +44,9 @@ public:
 
 public:
     /**
-     * Opens url in an external browser.
+     * Opens url in an external browser or, for mailto and tel URLs, in the default application.
+     * Only http and https URLs with a host, mailto and tel URLs are accepted. Any other URL is
+     * ignored.
      * @ingroup vms
      */
     Q_INVOKABLE void openUrlExternally(const QString& url);
