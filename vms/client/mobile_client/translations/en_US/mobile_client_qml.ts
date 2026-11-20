@@ -1696,6 +1696,10 @@
         <translation></translation>
     </message>
     <message>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Tap and hold to select an area</source>
         <translation></translation>
     </message>
