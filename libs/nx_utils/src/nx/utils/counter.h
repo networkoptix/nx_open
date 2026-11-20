@@ -18,10 +18,10 @@ public:
     public:
         ScopedIncrement() = default;
         ScopedIncrement(Counter* const counter);
-        ScopedIncrement(ScopedIncrement&& right);
+        ScopedIncrement(ScopedIncrement&& right) noexcept;
         ScopedIncrement(const ScopedIncrement& right);
 
-        ScopedIncrement& operator=(ScopedIncrement&& right);
+        ScopedIncrement& operator=(ScopedIncrement&& right) noexcept;
 
         ~ScopedIncrement();
 

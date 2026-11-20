@@ -348,10 +348,10 @@ public:
     }
 
     AttributeDictionary(const AttributeDictionary&);
-    AttributeDictionary(AttributeDictionary&&);
+    AttributeDictionary(AttributeDictionary&&) noexcept;
 
     AttributeDictionary& operator=(const AttributeDictionary&);
-    AttributeDictionary& operator=(AttributeDictionary&&);
+    AttributeDictionary& operator=(AttributeDictionary&&) noexcept;
 
     const Container& data() const { return m_attrs; }
     Container takeData() { return std::exchange(m_attrs, {}); }

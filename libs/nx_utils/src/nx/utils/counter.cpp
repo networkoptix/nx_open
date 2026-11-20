@@ -17,7 +17,7 @@ Counter::ScopedIncrement::ScopedIncrement(Counter* const counter):
         m_counter->increment();
 }
 
-Counter::ScopedIncrement::ScopedIncrement(ScopedIncrement&& right):
+Counter::ScopedIncrement::ScopedIncrement(ScopedIncrement&& right) noexcept:
     m_counter(right.m_counter)
 {
     right.m_counter = nullptr;
@@ -30,7 +30,7 @@ Counter::ScopedIncrement::ScopedIncrement(const ScopedIncrement& right):
         m_counter->increment();
 }
 
-Counter::ScopedIncrement& Counter::ScopedIncrement::operator=(ScopedIncrement&& right)
+Counter::ScopedIncrement& Counter::ScopedIncrement::operator=(ScopedIncrement&& right) noexcept
 {
     if (m_counter)
         m_counter->decrement();

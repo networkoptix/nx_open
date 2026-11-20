@@ -11,18 +11,16 @@ Exception::~Exception()
     delete[] m_whatCache;
 }
 
-Exception::Exception(Exception&& other):
-    m_whatCache(other.m_whatCache.exchange(nullptr))
+Exception::Exception(Exception&& other) noexcept: m_whatCache(other.m_whatCache.exchange(nullptr))
 {
 }
 
-Exception::Exception(const Exception&):
-    m_whatCache(nullptr)
+Exception::Exception(const Exception&): m_whatCache(nullptr)
 {
     // NOTE: It's better to avoid cache copying here and create new one only on-demand.
 }
 
-Exception& Exception::operator=(Exception&& other)
+Exception& Exception::operator=(Exception&& other) noexcept
 {
     m_whatCache = other.m_whatCache.exchange(m_whatCache.load());
     return *this;
@@ -65,8 +63,7 @@ ContextedException::ContextedException(const std::exception& exception):
 {
 }
 
-ContextedException::ContextedException(QString message):
-    m_message(std::move(message))
+ContextedException::ContextedException(QString message): m_message(std::move(message))
 {
 }
 
@@ -77,7 +74,7 @@ void ContextedException::addContext(const std::string& context)
 
 void ContextedException::addContext(const QString& context)
 {
-    m_message = NX_FMT("%1\ncaused by\n%2", context,  m_message);
+    m_message = NX_FMT("%1\ncaused by\n%2", context, m_message);
     clearWhatCache();
 }
 

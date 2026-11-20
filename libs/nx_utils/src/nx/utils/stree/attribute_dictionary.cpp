@@ -35,7 +35,7 @@ AttributeDictionary::AttributeDictionary(const AttributeDictionary& other):
 {
 }
 
-AttributeDictionary::AttributeDictionary(AttributeDictionary&& other):
+AttributeDictionary::AttributeDictionary(AttributeDictionary&& other) noexcept:
     base_type(&m_attrs),
     m_attrs(std::move(other.m_attrs))
 {
@@ -49,7 +49,7 @@ AttributeDictionary& AttributeDictionary::operator=(const AttributeDictionary& o
     return *this;
 }
 
-AttributeDictionary& AttributeDictionary::operator=(AttributeDictionary&& other)
+AttributeDictionary& AttributeDictionary::operator=(AttributeDictionary&& other) noexcept
 {
     if (this != &other)
         m_attrs = std::move(other.m_attrs);

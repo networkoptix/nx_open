@@ -121,7 +121,7 @@ LockGraphEdgeData::LockGraphEdgeData()
 {
 }
 
-LockGraphEdgeData::LockGraphEdgeData(LockGraphEdgeData&& rhs):
+LockGraphEdgeData::LockGraphEdgeData(LockGraphEdgeData&& rhs) noexcept:
     lockPositions(std::move(rhs.lockPositions))
 {
 }
@@ -131,7 +131,7 @@ LockGraphEdgeData::LockGraphEdgeData(const LockGraphEdgeData& rhs):
 {
 }
 
-LockGraphEdgeData& LockGraphEdgeData::operator=(LockGraphEdgeData&& rhs)
+LockGraphEdgeData& LockGraphEdgeData::operator=(LockGraphEdgeData&& rhs) noexcept
 {
     lockPositions = std::move(rhs.lockPositions);
     return *this;

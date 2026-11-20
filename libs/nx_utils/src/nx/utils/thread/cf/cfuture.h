@@ -351,12 +351,12 @@ public:
   future(const future<T>& other) = delete;
   future<T>& operator = (const future<T>& other) = delete;
 
-  future(future<T>&& other)
-    : state_(std::move(other.state_)) {}
+  future(future<T>&& other) noexcept: state_(std::move(other.state_)) {}
 
-  future<T>& operator = (future<T>&& other) {
-    state_ = std::move(other.state_);
-    return *this;
+  future<T>& operator=(future<T>&& other) noexcept
+  {
+      state_ = std::move(other.state_);
+      return *this;
   }
 
   bool valid() const {
@@ -737,50 +737,53 @@ future<T> future<T>::timeout(std::chrono::duration<Rep, Period> duration,
 }
 
 template<typename T>
-class promise {
+class promise
+{
 public:
-  promise()
-    : state_(std::make_shared<detail::shared_state<T>>()) {}
+    promise(): state_(std::make_shared<detail::shared_state<T>>()) {}
 
-  promise(promise&& other)
-    : state_(std::move(other.state_)) {}
+    promise(promise&& other) noexcept: state_(std::move(other.state_)) {}
 
-  promise& operator = (promise&& other) {
-    state_ = std::move(other.state_);
-    return *this;
-  }
-
-  ~promise() {
-    if (state_)
-      state_->abandon();
-  }
-
-  void swap(promise& other) noexcept {
-    state_.swap(other.state_);
-  }
-
-  template<typename U>
-  void set_value(U&& value) {
-    check_state(state_);
-    state_->set_value(std::forward<U>(value));
-  }
-
-  future<T> get_future() {
-    check_state(state_);
-    if (state_.use_count() > 1) {
-      throw future_error(errc::future_already_retrieved,
-                         errc_string(errc::future_already_retrieved));
+    promise& operator=(promise&& other) noexcept
+    {
+        state_ = std::move(other.state_);
+        return *this;
     }
-    return future<T>(state_);
-  }
 
-  void set_exception(std::exception_ptr p) {
-    check_state(state_);
-    state_->set_exception(p);
-  }
+    ~promise()
+    {
+        if (state_)
+            state_->abandon();
+    }
+
+    void swap(promise& other) noexcept { state_.swap(other.state_); }
+
+    template<typename U>
+    void set_value(U&& value)
+    {
+        check_state(state_);
+        state_->set_value(std::forward<U>(value));
+    }
+
+    future<T> get_future()
+    {
+        check_state(state_);
+        if (state_.use_count() > 1)
+        {
+            throw future_error(
+                errc::future_already_retrieved, errc_string(errc::future_already_retrieved));
+        }
+        return future<T>(state_);
+    }
+
+    void set_exception(std::exception_ptr p)
+    {
+        check_state(state_);
+        state_->set_exception(p);
+    }
 
 private:
-  detail::shared_state_ptr<T> state_;
+    detail::shared_state_ptr<T> state_;
 };
 
 template<>

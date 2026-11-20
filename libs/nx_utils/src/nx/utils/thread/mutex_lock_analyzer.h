@@ -70,10 +70,10 @@ public:
     std::set<TwoMutexLockData> lockPositions;
 
     LockGraphEdgeData();
-    LockGraphEdgeData(LockGraphEdgeData&& rhs);
+    LockGraphEdgeData(LockGraphEdgeData&& rhs) noexcept;
     LockGraphEdgeData(const LockGraphEdgeData& rhs);
 
-    LockGraphEdgeData& operator=(LockGraphEdgeData&& rhs);
+    LockGraphEdgeData& operator=(LockGraphEdgeData&& rhs) noexcept;
 
     /*!
     Returns true if run-time transition from *this to rhs is possible.

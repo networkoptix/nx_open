@@ -21,9 +21,9 @@ class NX_UTILS_API Exception: public std::exception
 public:
     Exception() = default;
     virtual ~Exception();
-    Exception(Exception&& other);
+    Exception(Exception&& other) noexcept;
     Exception(const Exception& other);
-    Exception& operator=(Exception&& other);
+    Exception& operator=(Exception&& other) noexcept;
     Exception& operator=(const Exception& other);
 
     virtual QString message() const = 0;
