@@ -39,5 +39,6 @@ struct QnPtzData
     QnPtzObject homeObject;
     QnPtzAuxiliaryTraitList auxiliaryTraits;
 };
-#define QnPtzData_Fields (query)(fields)(capabilities)(logicalPosition)(devicePosition)\
-    (logicalLimits)(deviceLimits)(flip)(presets)(tours)(activeObject)(homeObject)
+#define QnPtzData_Fields \
+    (query)(fields)( \
+        capabilities) (logicalPosition) (devicePosition) (logicalLimits) (deviceLimits) (flip) (presets) (tours) (activeObject) (homeObject) (auxiliaryTraits)
