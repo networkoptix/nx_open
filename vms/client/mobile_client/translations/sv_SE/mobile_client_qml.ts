@@ -1696,6 +1696,10 @@
       <translation>Område</translation>
     </message>
     <message>
+      <source>Search</source>
+      <translation type="unfinished">Search</translation>
+    </message>
+    <message>
       <source>Tap and hold to select an area</source>
       <translation>Tryck och håll ned för att välja ett område</translation>
     </message>

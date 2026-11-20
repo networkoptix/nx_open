@@ -1696,6 +1696,10 @@
       <translation>Area</translation>
     </message>
     <message>
+      <source>Search</source>
+      <translation type="unfinished">Search</translation>
+    </message>
+    <message>
       <source>Tap and hold to select an area</source>
       <translation>Mantenga pulsado para seleccionar un área</translation>
     </message>

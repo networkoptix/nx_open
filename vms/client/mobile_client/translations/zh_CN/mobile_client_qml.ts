@@ -1695,6 +1695,10 @@
       <translation>区域</translation>
     </message>
     <message>
+      <source>Search</source>
+      <translation type="unfinished">Search</translation>
+    </message>
+    <message>
       <source>Tap and hold to select an area</source>
       <translation>点击并按住以选择一个区域</translation>
     </message>

@@ -1696,6 +1696,10 @@
       <translation>Alan</translation>
     </message>
     <message>
+      <source>Search</source>
+      <translation type="unfinished">Search</translation>
+    </message>
+    <message>
       <source>Tap and hold to select an area</source>
       <translation>Bir alan seçmek için dokunun ve basılı tutun</translation>
     </message>

@@ -1696,6 +1696,10 @@
       <translation>Terület</translation>
     </message>
     <message>
+      <source>Search</source>
+      <translation type="unfinished">Search</translation>
+    </message>
+    <message>
       <source>Tap and hold to select an area</source>
       <translation>Kattintson és tartsa nyomva egy terület kiválasztásához</translation>
     </message>

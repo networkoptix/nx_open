@@ -1696,6 +1696,10 @@
       <translation>Zone</translation>
     </message>
     <message>
+      <source>Search</source>
+      <translation type="unfinished">Search</translation>
+    </message>
+    <message>
       <source>Tap and hold to select an area</source>
       <translation>Appuyez et maintenez enfoncé pour sélectionner une zone</translation>
     </message>

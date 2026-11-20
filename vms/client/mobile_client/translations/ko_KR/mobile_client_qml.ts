@@ -1695,6 +1695,10 @@
       <translation>영역</translation>
     </message>
     <message>
+      <source>Search</source>
+      <translation type="unfinished">Search</translation>
+    </message>
+    <message>
       <source>Tap and hold to select an area</source>
       <translation>영역을 선택하기 위해 길게 탭하시오.</translation>
     </message>

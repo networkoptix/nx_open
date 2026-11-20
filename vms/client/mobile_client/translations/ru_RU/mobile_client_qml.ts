@@ -1698,6 +1698,10 @@
       <translation>Область</translation>
     </message>
     <message>
+      <source>Search</source>
+      <translation type="unfinished">Search</translation>
+    </message>
+    <message>
       <source>Tap and hold to select an area</source>
       <translation>Нажмите и удерживайте, чтобы выбрать область</translation>
     </message>

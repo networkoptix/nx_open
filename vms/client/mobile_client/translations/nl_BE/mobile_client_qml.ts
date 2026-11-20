@@ -1696,6 +1696,10 @@
       <translation>Gebied</translation>
     </message>
     <message>
+      <source>Search</source>
+      <translation type="unfinished">Search</translation>
+    </message>
+    <message>
       <source>Tap and hold to select an area</source>
       <translation>Tik en houd ingedrukt om een gebied te selecteren</translation>
     </message>

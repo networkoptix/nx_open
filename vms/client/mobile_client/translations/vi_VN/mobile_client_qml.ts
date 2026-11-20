@@ -1695,6 +1695,10 @@
       <translation>Khu vực</translation>
     </message>
     <message>
+      <source>Search</source>
+      <translation type="unfinished">Search</translation>
+    </message>
+    <message>
       <source>Tap and hold to select an area</source>
       <translation>Nhấn và giữ để chọn một khu vực</translation>
     </message>

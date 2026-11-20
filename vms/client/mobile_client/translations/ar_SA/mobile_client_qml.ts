@@ -1700,6 +1700,10 @@
       <translation>منطقة</translation>
     </message>
     <message>
+      <source>Search</source>
+      <translation type="unfinished">Search</translation>
+    </message>
+    <message>
       <source>Tap and hold to select an area</source>
       <translation>انقر مع الاستمرار لإختيار منطقة</translation>
     </message>

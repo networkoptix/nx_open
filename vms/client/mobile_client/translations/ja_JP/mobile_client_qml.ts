@@ -1695,6 +1695,10 @@
       <translation>エリア</translation>
     </message>
     <message>
+      <source>Search</source>
+      <translation type="unfinished">Search</translation>
+    </message>
+    <message>
       <source>Tap and hold to select an area</source>
       <translation>タップ &amp; ホールドで領域選択</translation>
     </message>

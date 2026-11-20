@@ -1696,6 +1696,10 @@
       <translation>Àrea</translation>
     </message>
     <message>
+      <source>Search</source>
+      <translation type="unfinished">Search</translation>
+    </message>
+    <message>
       <source>Tap and hold to select an area</source>
       <translation>Mantingueu premut per seleccionar una àrea</translation>
     </message>

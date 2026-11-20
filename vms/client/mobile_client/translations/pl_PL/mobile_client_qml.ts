@@ -1698,6 +1698,10 @@
       <translation>Obszar</translation>
     </message>
     <message>
+      <source>Search</source>
+      <translation type="unfinished">Search</translation>
+    </message>
+    <message>
       <source>Tap and hold to select an area</source>
       <translation>Dotknij i przytrzymaj, aby zaznaczyć obszar</translation>
     </message>

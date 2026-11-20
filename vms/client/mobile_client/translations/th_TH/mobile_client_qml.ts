@@ -1695,6 +1695,10 @@
       <translation>พื้นที่</translation>
     </message>
     <message>
+      <source>Search</source>
+      <translation type="unfinished">Search</translation>
+    </message>
+    <message>
       <source>Tap and hold to select an area</source>
       <translation>แตะ ค้างไว้เพื่อเลือกพื้นที่</translation>
     </message>

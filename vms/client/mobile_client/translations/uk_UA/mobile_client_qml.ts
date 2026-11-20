@@ -1698,6 +1698,10 @@
       <translation>Площа</translation>
     </message>
     <message>
+      <source>Search</source>
+      <translation type="unfinished">Search</translation>
+    </message>
+    <message>
       <source>Tap and hold to select an area</source>
       <translation>Натисніть і утримуйте, щоб вибрати область</translation>
     </message>

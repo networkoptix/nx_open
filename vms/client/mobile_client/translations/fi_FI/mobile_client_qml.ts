@@ -1696,6 +1696,10 @@
       <translation>Alue</translation>
     </message>
     <message>
+      <source>Search</source>
+      <translation type="unfinished">Search</translation>
+    </message>
+    <message>
       <source>Tap and hold to select an area</source>
       <translation>Valitse alue valitsemalla ja pitämällä sitä alhaalla</translation>
     </message>

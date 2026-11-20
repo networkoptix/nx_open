@@ -1698,6 +1698,10 @@
       <translation>Oblast</translation>
     </message>
     <message>
+      <source>Search</source>
+      <translation type="unfinished">Search</translation>
+    </message>
+    <message>
       <source>Tap and hold to select an area</source>
       <translation>Klepnutím a podržením vyberte oblast</translation>
     </message>

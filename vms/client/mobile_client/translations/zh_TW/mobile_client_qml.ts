@@ -1695,6 +1695,10 @@
       <translation>區域</translation>
     </message>
     <message>
+      <source>Search</source>
+      <translation type="unfinished">Search</translation>
+    </message>
+    <message>
       <source>Tap and hold to select an area</source>
       <translation>點選畫面並拖曳來選擇範圍</translation>
     </message>
