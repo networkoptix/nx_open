@@ -17,7 +17,7 @@
     </message>
     <message>
       <source>Your Site</source>
-      <translation type="unfinished">Your Site</translation>
+      <translation>Ihre Site</translation>
     </message>
     <message>
       <source>Owner: %1</source>
@@ -138,7 +138,7 @@
     <message>
       <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</translation>
+      <translation>Die Verbindung zu %1 ist noch nicht hergestellt. Überprüfen Sie die Internetverbindung des Servers&apos;oder versuchen Sie es später erneut.</translation>
     </message>
     <message>
       <source>The server&apos;s certificate was rejected.</source>
@@ -146,47 +146,47 @@
     </message>
     <message>
       <source>If this error persists, please contact your site administrator.</source>
-      <translation type="unfinished">If this error persists, please contact your site administrator.</translation>
+      <translation>Sollte dieser Fehler weiterhin bestehen, wenden Sie sich bitte an Ihren Site-Administrator.</translation>
     </message>
     <message>
       <source>Log in as a %1 user to the site in a shutdown state is forbidden. You can still connect as local user.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in as a %1 user to the site in a shutdown state is forbidden. You can still connect as local user.</translation>
+      <translation>Die Anmeldung als %1 -Benutzer auf der heruntergefahrenen Site ist nicht gestattet. Sie können sich weiterhin als lokaler Benutzer anmelden.</translation>
     </message>
     <message>
       <source>Log in as a %1 user to the site in a suspended state is forbidden. You can still connect as local user.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in as a %1 user to the site in a suspended state is forbidden. You can still connect as local user.</translation>
+      <translation>Die Anmeldung als %1 Benutzer auf der Site im gesperrten Zustand ist untersagt. Sie können sich weiterhin als lokaler Benutzer anmelden.</translation>
     </message>
     <message>
       <source>Log in to %1 to log in to this site with %2 user</source>
       <comment>%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in to %1 to log in to this site with %2 user</translation>
+      <translation>Melden Sie sich mit dem Benutzer %1 bei %2 an, um sich auf dieser Site anzumelden</translation>
     </message>
     <message>
       <source>Session duration limit can be changed by a site administrator.</source>
-      <translation type="unfinished">Session duration limit can be changed by a site administrator.</translation>
+      <translation>Die maximale Sitzungsdauer kann vom Site-Administrator geändert werden.</translation>
     </message>
     <message>
       <source>Your access to this site has expired.</source>
-      <translation type="unfinished">Your access to this site has expired.</translation>
+      <translation>Ihr Zugang zu dieser Site ist abgelaufen.</translation>
     </message>
     <message>
       <source>Please contact the site administrator to regain access.</source>
-      <translation type="unfinished">Please contact the site administrator to regain access.</translation>
+      <translation>Bitte kontaktieren Sie den Site-Administrator, um wieder Zugriff zu erhalten.</translation>
     </message>
     <message>
       <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+      <translation>Um sich auf dieser Site anzumelden, deaktivieren Sie &quot;Fordern Sie bei jeder Anmeldung mit Ihrem %1 Konto einen Bestätigungscode an&quot; in Ihrem %2.</translation>
     </message>
     <message>
       <source>This user has been disabled by a site administrator.</source>
-      <translation type="unfinished">This user has been disabled by a site administrator.</translation>
+      <translation>Dieser Benutzer wurde von einem Site-Administrator deaktiviert.</translation>
     </message>
     <message>
       <source>Failed to access site</source>
-      <translation type="unfinished">Failed to access site</translation>
+      <translation>Zugriff auf die Site fehlgeschlagen</translation>
     </message>
   </context>
   <context>
@@ -228,15 +228,15 @@
     </message>
     <message numerus="yes">
       <source>Cannot verify the identity of %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Cannot verify the identity of %n servers</numerusform>
-        <numerusform>Cannot verify the identity of %n servers</numerusform>
+      <translation>
+        <numerusform>Die Identität der %n Server konnte nicht verifiziert werden</numerusform>
+        <numerusform>Die Identität der %n Server konnte nicht verifiziert werden</numerusform>
       </translation>
     </message>
     <message>
       <source>To learn more about the current problem read this %1.</source>
       <comment>%1 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
+      <translation>Um mehr über das aktuelle Problem zu erfahren, lesen Sie dies %1.</translation>
     </message>
     <message>
       <source>Cannot verify the identity of %1</source>
@@ -244,15 +244,15 @@
     </message>
     <message>
       <source>Review the certificate to ensure you trust the server you are connecting to.</source>
-      <translation type="unfinished">Review the certificate to ensure you trust the server you are connecting to.</translation>
+      <translation>Überprüfen Sie das Zertifikat, um sicherzustellen, dass Sie dem Server vertrauen, mit dem Sie sich verbinden.</translation>
     </message>
     <message>
       <source>Review the certificates of the servers to ensure you trust the site you are connecting to.</source>
-      <translation type="unfinished">Review the certificates of the servers to ensure you trust the site you are connecting to.</translation>
+      <translation>Überprüfen Sie die Zertifikate der Server, um sicherzustellen, dass Sie der Website, mit der Sie sich verbinden, vertrauen können.</translation>
     </message>
     <message>
       <source>This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</source>
-      <translation type="unfinished">This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</translation>
+      <translation>Dies könnte an einem abgelaufenen oder ungültigen Serverzertifikat liegen. Wenden Sie sich zur weiteren Untersuchung an Ihren Site-Administrator.</translation>
     </message>
   </context>
   <context>
@@ -267,7 +267,7 @@
     </message>
     <message>
       <source>Click to Show Cameras</source>
-      <translation type="unfinished">Click to Show Cameras</translation>
+      <translation>Klicken Sie hier, um die Kameras anzuzeigen</translation>
     </message>
   </context>
   <context>
@@ -305,12 +305,12 @@
     <name>nx::vms::client::core::DirectSystemFinder</name>
     <message>
       <source>Site</source>
-      <translation type="unfinished">Site</translation>
+      <translation>Site</translation>
     </message>
     <message>
       <source>Site (%1)</source>
       <comment>%1 is ip and port of the site</comment>
-      <translation type="unfinished">Site (%1)</translation>
+      <translation>Site (%1)</translation>
     </message>
   </context>
   <context>
@@ -356,11 +356,11 @@
     </message>
     <message>
       <source>Open Door</source>
-      <translation type="unfinished">Open Door</translation>
+      <translation>Tür öffnen</translation>
     </message>
     <message>
       <source>Stop Object Tracking</source>
-      <translation type="unfinished">Stop Object Tracking</translation>
+      <translation>Objektverfolgung stoppen</translation>
     </message>
   </context>
   <context>
@@ -374,26 +374,26 @@
     <name>nx::vms::client::core::OrganizationsFilterModel</name>
     <message>
       <source>Other results</source>
-      <translation type="unfinished">Other results</translation>
+      <translation>Weitere Ergebnisse</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::core::OrganizationsModel</name>
     <message>
       <source>Organizations</source>
-      <translation type="unfinished">Organizations</translation>
+      <translation>Organisationen</translation>
     </message>
     <message>
       <source>Folders</source>
-      <translation type="unfinished">Folders</translation>
+      <translation>Ordner</translation>
     </message>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>Sites</translation>
     </message>
     <message>
       <source>Partners</source>
-      <translation type="unfinished">Partners</translation>
+      <translation>Partner</translation>
     </message>
   </context>
   <context>
@@ -463,7 +463,7 @@
     <name>nx::vms::client::core::SingleSystemDescription</name>
     <message>
       <source>Unnamed Site</source>
-      <translation type="unfinished">Unnamed Site</translation>
+      <translation>Unbenannte Site</translation>
     </message>
   </context>
   <context>
