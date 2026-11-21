@@ -5,37 +5,25 @@
 #include <map>
 #include <optional>
 #include <string>
+#include <utility>
 
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/time.h>
 
 #include "log/log.h"
 
-namespace nx {
-namespace utils {
+namespace nx::utils {
 
-using namespace std;
-
-TimerManager::TimerGuard::TimerGuard():
-    m_timerManager(nullptr),
-    m_timerId(0)
-{
-}
-
-TimerManager::TimerGuard::TimerGuard(
-    TimerManager* const TimerManager,
-    TimerId timerId)
-:
+TimerManager::TimerGuard::TimerGuard(TimerManager* const TimerManager, TimerId timerId):
     m_timerManager(TimerManager),
     m_timerId(timerId)
 {
 }
 
-TimerManager::TimerGuard::TimerGuard(TimerGuard&& right):
-    m_timerManager(right.m_timerManager),
-    m_timerId(right.m_timerId)
+TimerManager::TimerGuard::TimerGuard(TimerGuard&& right) noexcept:
+    m_timerManager(std::exchange(right.m_timerManager, nullptr)),
+    m_timerId(std::exchange(right.m_timerId, 0))
 {
-    right.m_timerId = 0;
 }
 
 TimerManager::TimerGuard::~TimerGuard()
@@ -44,16 +32,15 @@ TimerManager::TimerGuard::~TimerGuard()
 }
 
 TimerManager::TimerGuard& TimerManager::TimerGuard::operator=(
-    TimerManager::TimerGuard&& right)
+    TimerManager::TimerGuard&& right) noexcept
 {
     if (&right == this)
         return *this;
 
     reset();
 
-    m_timerManager = right.m_timerManager;
-    m_timerId = right.m_timerId;
-    right.m_timerId = 0;
+    m_timerManager = std::exchange(right.m_timerManager, nullptr);
+    m_timerId = std::exchange(right.m_timerId, 0);
     return *this;
 }
 
@@ -72,18 +59,15 @@ TimerId TimerManager::TimerGuard::get() const
 
 TimerId TimerManager::TimerGuard::release()
 {
-    const auto result = m_timerId;
-    m_timerId = 0;
-    return result;
+    return std::exchange(m_timerId, 0);
 }
 
-TimerManager::TimerGuard::operator bool_type() const
+TimerManager::TimerGuard::operator bool() const
 {
-    return m_timerId ? &TimerGuard::this_type_does_not_support_comparisons : 0;
+    return m_timerId != 0;
 }
 
-bool TimerManager::TimerGuard::operator==(
-    const TimerManager::TimerGuard& right) const
+bool TimerManager::TimerGuard::operator==(const TimerManager::TimerGuard& right) const
 {
     return m_timerId == right.m_timerId;
 }
@@ -274,7 +258,7 @@ void TimerManager::run()
                     m_timeToTask.begin()->first.first - currentTime);
             }
         }
-        catch (exception& e)
+        catch (std::exception& e)
         {
             NX_ERROR(this, nx::format("Error. Exception in %1:%2. %3")
                 .arg(__FILE__).arg(__LINE__).arg(e.what()));
@@ -372,5 +356,4 @@ std::optional<std::chrono::milliseconds> parseOptionalTimerDuration(
         return value;
 }
 
-} // namespace utils
-} // namespace nx
+} // namespace nx::utils

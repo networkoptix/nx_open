@@ -14,8 +14,7 @@
 #include "thread/wait_condition.h"
 #include "time/timer_event_handler.h"
 
-namespace nx {
-namespace utils {
+namespace nx::utils {
 
 /**
  * Timer events scheduler.
@@ -37,19 +36,20 @@ public:
      */
     class NX_UTILS_API TimerGuard
     {
-        typedef void (TimerGuard::*bool_type)() const;
-        void this_type_does_not_support_comparisons() const {}
-
     public:
-        TimerGuard();
+        TimerGuard() = default;
         TimerGuard(TimerManager* const timerManager, TimerId timerId);
-        TimerGuard(TimerGuard&& right);
+
+        TimerGuard(const TimerGuard& right) = delete;
+        TimerGuard& operator=(const TimerGuard& right) = delete;
+
+        TimerGuard(TimerGuard&& right) noexcept;
+        TimerGuard& operator=(TimerGuard&& right) noexcept;
+
         /**
          * Calls TimerGuard::reset().
          */
         ~TimerGuard();
-
-        TimerGuard& operator=(TimerGuard&& right);
 
         /**
          * Cancels timer and blocks until running handler returns.
@@ -61,15 +61,12 @@ public:
          */
         TimerId release();
 
-        operator bool_type() const;
+        explicit operator bool() const;
         bool operator==(const TimerGuard& right) const;
 
     private:
-        TimerManager* m_timerManager;
-        TimerId m_timerId;
-
-        TimerGuard(const TimerGuard& right);
-        TimerGuard& operator=(const TimerGuard& right);
+        TimerManager* m_timerManager = nullptr;
+        TimerId m_timerId = 0;
     };
 
     /**
@@ -186,5 +183,4 @@ std::optional<std::chrono::milliseconds> NX_UTILS_API parseOptionalTimerDuration
     const QString& duration,
     std::chrono::milliseconds defaultValue = std::chrono::milliseconds::zero());
 
-} // namespace utils
-} // namespace nx
+} // namespace nx::utils
