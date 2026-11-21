@@ -17,7 +17,7 @@
     </message>
     <message>
       <source>Your Site</source>
-      <translation type="unfinished">Your Site</translation>
+      <translation>Ihre Site</translation>
     </message>
     <message>
       <source>Owner: %1</source>
@@ -178,7 +178,7 @@
     <message>
       <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+      <translation>Um sich auf dieser Site anzumelden, deaktivieren Sie &quot;Fordern Sie bei jeder Anmeldung mit Ihrem %1 Konto einen Bestätigungscode an&quot; in Ihrem %2.</translation>
     </message>
     <message>
       <source>This user has been disabled by a site administrator.</source>
