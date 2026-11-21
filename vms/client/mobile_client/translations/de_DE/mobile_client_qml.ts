@@ -1209,7 +1209,7 @@
     </message>
     <message>
       <source>Failed to access site</source>
-      <translation type="unfinished">Failed to access site</translation>
+      <translation>Zugriff auf die Site fehlgeschlagen</translation>
     </message>
     <message>
       <source>Failed to access channel partner</source>
@@ -1697,7 +1697,7 @@
     </message>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Suche</translation>
     </message>
     <message>
       <source>Tap and hold to select an area</source>

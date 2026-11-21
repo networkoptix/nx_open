@@ -515,7 +515,7 @@
     </message>
     <message>
       <source>Object Actions</source>
-      <translation type="unfinished">Object Actions</translation>
+      <translation>物件動作</translation>
     </message>
     <message>
       <source>Delete from Disk</source>

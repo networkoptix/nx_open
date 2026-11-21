@@ -1699,7 +1699,7 @@
     </message>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Пошук</translation>
     </message>
     <message>
       <source>Tap and hold to select an area</source>

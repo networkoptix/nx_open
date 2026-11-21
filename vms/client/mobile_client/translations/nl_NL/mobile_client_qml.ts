@@ -1697,7 +1697,7 @@
     </message>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Zoeken</translation>
     </message>
     <message>
       <source>Tap and hold to select an area</source>
