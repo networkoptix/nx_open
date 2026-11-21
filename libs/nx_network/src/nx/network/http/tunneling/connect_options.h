@@ -12,14 +12,16 @@ struct NX_NETWORK_API ConnectOptions
     static constexpr char kPeerPriority[] = "peer-priority";
 
     ConnectOptions() = default;
-    ConnectOptions(std::initializer_list<std::pair<std::string, std::string>> list)
+    ConnectOptions(std::initializer_list<std::pair<std::string, std::string>> list):
+        options(list.begin(), list.end())
     {
-        for (auto& [k, v]: list)
-            options.emplace(std::move(k), std::move(v));
     }
 
     template<typename... Args>
-	auto emplace(Args&&... args) { return options.emplace(std::forward<decltype(args)>(args)...); }
+    auto emplace(Args&&... args)
+    {
+        return options.emplace(std::forward<decltype(args)>(args)...);
+    }
 
     nx::UrlQuery toUrlQuery() const;
 
