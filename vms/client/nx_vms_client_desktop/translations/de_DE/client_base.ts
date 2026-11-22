@@ -12940,7 +12940,7 @@ This web page presented an untrusted certificate. It is not recommended to open 
     </message>
     <message>
       <source>Site</source>
-      <translation type="unfinished">Site</translation>
+      <translation>Site</translation>
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
