@@ -12855,7 +12855,7 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     </message>
     <message>
       <source>Site</source>
-      <translation type="unfinished">Site</translation>
+      <translation>Site</translation>
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
