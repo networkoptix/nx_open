@@ -695,7 +695,7 @@
     </message>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>Sites</translation>
     </message>
     <message>
       <source>All Sites</source>
@@ -890,11 +890,11 @@
     </message>
     <message>
       <source>Organizations</source>
-      <translation type="unfinished">Organizations</translation>
+      <translation>Organisationen</translation>
     </message>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>Sites</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
@@ -910,7 +910,7 @@
     </message>
     <message>
       <source>Partners</source>
-      <translation type="unfinished">Partners</translation>
+      <translation>Partner</translation>
     </message>
     <message>
       <source>No Sites</source>
