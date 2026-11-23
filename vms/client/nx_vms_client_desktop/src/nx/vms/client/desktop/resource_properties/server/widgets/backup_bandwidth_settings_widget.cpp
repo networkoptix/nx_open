@@ -218,11 +218,12 @@ BackupBandwidthSettingsWidget::BackupBandwidthSettingsWidget(QWidget* parent):
             for (const auto brushlabel:
                 {ui->unlimitedLabel, ui->scheduledLimitLabel, ui->noBackupLabel})
             {
-                if (const auto button = qobject_cast<SelectableButton*>(brushlabel->buddy()))
+                if (const auto selectableButton =
+                        qobject_cast<SelectableButton*>(brushlabel->buddy()))
                 {
-                    brushlabel->setForegroundRole(button->isChecked()
-                        ? QPalette::Highlight
-                        : QPalette::WindowText);
+                    brushlabel->setForegroundRole(selectableButton->isChecked()
+                            ? QPalette::Highlight
+                            : QPalette::WindowText);
                 }
             }
 

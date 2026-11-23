@@ -127,8 +127,8 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnSpaceMapperPtr<q
         // so we compensate by inserting additional data points.
 
         auto degrees = logical;
-        for (auto& value: degrees)
-            value = q35mmEquivToDegrees(value);
+        for (auto& angle: degrees)
+            angle = q35mmEquivToDegrees(angle);
 
         int i = 0;
         while (i < degrees.size() - 1)

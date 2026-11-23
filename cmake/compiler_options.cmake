@@ -307,8 +307,6 @@ if(compilerMsvc)
 
         # Declaration of 'id' hides previous local declaration.
         /wd4456
-        # Declaration of 'id' hides function parameter.
-        /wd4457
         # Declaration of 'id' hides class member.
         /wd4458
         # Declaration of 'id' hides global declaration.

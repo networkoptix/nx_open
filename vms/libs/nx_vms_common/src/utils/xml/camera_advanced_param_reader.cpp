@@ -119,13 +119,13 @@ bool QnCameraAdvancedParamsXmlParser::readXml(QIODevice *xmlSource, QnCameraAdva
 
     QDomDocument xmlDom;
     {
-        if (const auto result = xmlDom.setContent(xmlSource); !result)
+        if (const auto parseResult = xmlDom.setContent(xmlSource); !parseResult)
         {
             NX_WARNING(typeid(QnCameraAdvancedParamsXmlParser),
                 "Parse xml error at line: %1, column: %2, error: %3",
-                result.errorLine,
-                result.errorColumn,
-                result.errorMessage);
+                parseResult.errorLine,
+                parseResult.errorColumn,
+                parseResult.errorMessage);
             return false;
         }
     }

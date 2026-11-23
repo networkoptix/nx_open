@@ -23,8 +23,8 @@ bool NonUniqueNameTracker::update(const nx::Uuid& id, const QString& name)
 
     if (ids.size() == 2)
     {
-        for (const nx::Uuid& id: ids)
-            m_nonUniqueNameIds.insert(id);
+        for (nx::Uuid sameNameId: ids)
+            m_nonUniqueNameIds.insert(sameNameId);
         changed = true;
     }
     else if (ids.size() > 2)
@@ -54,8 +54,8 @@ bool NonUniqueNameTracker::remove(const nx::Uuid& id)
             m_idsByName.erase(it);
             break;
         case 2:
-            for (const nx::Uuid& id: *it)
-                m_nonUniqueNameIds.remove(id);
+            for (nx::Uuid sameNameId: *it)
+                m_nonUniqueNameIds.remove(sameNameId);
             [[fallthrough]];
         default:
             m_nonUniqueNameIds.remove(id);

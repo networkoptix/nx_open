@@ -1743,10 +1743,10 @@ public:
 
         // Update message body to resend only failed json-rpc requests.
         std::vector<nx::vms::api::JsonRpcRequest> newRequests;
-        for (const auto& request: requestData)
+        for (const auto& jsonRpcRequest: requestData)
         {
-            if (expiredIds.contains(request.id))
-                newRequests.emplace_back(request.copy());
+            if (expiredIds.contains(jsonRpcRequest.id))
+                newRequests.emplace_back(jsonRpcRequest.copy());
         }
         fixedRequest.messageBody = nx::reflect::json::serialize(newRequests);
 
@@ -2984,13 +2984,14 @@ bool setupAuth(
         else //< Server-side option.
         {
             request.url.setHost("127.0.0.1");
-            auto currentServer = systemContext->resourcePool()
-                ->getResourceById<QnMediaServerResource>(systemContext->peerId());
+            const auto currentServer =
+                systemContext->resourcePool()->getResourceById<QnMediaServerResource>(
+                    systemContext->peerId());
             if (NX_ASSERT(currentServer))
             {
-                const auto url = nx::Url(currentServer->getUrl());
-                if (url.port() > 0)
-                    request.url.setPort(url.port());
+                const auto serverUrl = nx::Url(currentServer->getUrl());
+                if (serverUrl.port() > 0)
+                    request.url.setPort(serverUrl.port());
             }
         }
     }

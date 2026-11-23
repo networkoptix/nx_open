@@ -395,10 +395,10 @@ QRectF ZoomWindowWidget::constrainedGeometry(
     // Position constraints go next.
     if (pinSection != Qt::NoSection && pinSection != Qt::TitleBarArea)
     {
-        QRectF constraint = overlayWidget->rect();
-        const QPointF pinPoint = Qn::calculatePinPoint(geometry, pinSection);
-        const auto x = pinPoint.x();
-        const auto y = pinPoint.y();
+        const QRectF constraint = overlayWidget->rect();
+        const QPointF sectionPinPoint = Qn::calculatePinPoint(geometry, pinSection);
+        const auto x = sectionPinPoint.x();
+        const auto y = sectionPinPoint.y();
 
         qreal xScaleFactor = 1.0;
         if (result.left() < constraint.left() && !qFuzzyEquals(result.left(), x))
@@ -426,10 +426,7 @@ QRectF ZoomWindowWidget::constrainedGeometry(
             return Geometry::movedInto(result, overlayWidget->rect());
 
         return ConstrainedResizable::constrainedGeometry(
-            result,
-            pinSection,
-            pinPoint,
-            result.size() * scaleFactor);
+            result, pinSection, sectionPinPoint, result.size() * scaleFactor);
     }
 
     return Geometry::movedInto(result, overlayWidget->rect());

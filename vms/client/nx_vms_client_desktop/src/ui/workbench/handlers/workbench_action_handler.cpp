@@ -2636,48 +2636,6 @@ void ActionHandler::at_deleteFromDiskAction_triggered()
     QnFileProcessor::deleteLocalResources(resources);
 }
 
-bool ActionHandler::validateResourceName(const QnResourcePtr& resource, const QString& newName) const
-{
-    /*
-     * Users, videowalls and local files should be checked to avoid names collisions.
-     * Layouts are checked separately, servers and cameras can have the same name.
-     */
-    auto checkedFlags = resource->flags() & (Qn::user | Qn::videowall | Qn::local_media);
-    if (!checkedFlags)
-        return true;
-
-    /* Resource cannot have both of these flags at once. */
-    NX_ASSERT(checkedFlags == Qn::user
-        || checkedFlags == Qn::videowall
-        || checkedFlags == Qn::local_media);
-
-    for (const auto& resource: resourcePool()->getResources())
-    {
-        if (!resource->hasFlags(checkedFlags))
-            continue;
-
-        if (resource->getName().compare(newName, Qt::CaseInsensitive) != 0)
-            continue;
-
-        if (checkedFlags == Qn::user)
-        {
-            QnMessageBox::warning(mainWindowWidget(), tr("There is another user with the same name"));
-        }
-        else if (checkedFlags == Qn::videowall)
-        {
-            messages::Videowall::anotherVideoWall(mainWindowWidget());
-        }
-        else if (checkedFlags == Qn::local_media)
-        {
-            // Silently skip. Should never get here really, leaving branch for safety.
-        }
-
-        return false;
-    }
-
-    return true;
-}
-
 void ActionHandler::at_renameAction_triggered()
 {
     using NodeType = nx::vms::client::core::ResourceTree::NodeType;

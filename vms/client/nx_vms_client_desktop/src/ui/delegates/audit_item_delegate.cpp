@@ -585,19 +585,20 @@ void QnAuditItemDelegate::paintDescription(const QStyle* style, QPainter* painte
         QRect nameRect(rect.left() + nameMargin, rect.bottom() + kDetailLineVerticalMargin, option.rect.width() - nameMargin, smallFontMetrics.height());
         QPoint markerCenter(rect.left() + markerRadius + kArchiveMarkerMargin, nameRect.bottom() - smallFontMetrics.descent() - markerRadius);
 
-        auto archiveData = record->extractParam("archiveExist");
-        int smallRowHeight = nameRect.height() + kDetailLineVerticalMargin * 2;
-        int index = 0;
+        const auto archiveData = record->extractParam("archiveExist");
+        const int smallRowHeight = nameRect.height() + kDetailLineVerticalMargin * 2;
+        size_t cameraIndex = 0;
 
         for (const auto& camera : cameras)
         {
             /* Draw archive marker: */
             if (record->isPlaybackType())
             {
-                bool recordExists = (size_t)index < archiveData.size() && archiveData[index] == '1';
+                const bool recordExists =
+                    cameraIndex < archiveData.size() && archiveData[cameraIndex] == '1';
                 QnScopedPainterBrushRollback brushRollback(painter, recordExists ? painter->pen().color() : QColor(Qt::transparent));
                 painter->drawEllipse(markerCenter, markerRadius, markerRadius);
-                index++;
+                cameraIndex++;
             }
 
             /* Draw camera name: */

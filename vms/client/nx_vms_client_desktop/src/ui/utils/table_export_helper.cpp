@@ -279,13 +279,13 @@ void QnTableExportHelper::getGridHtmlCsvData(const QAbstractItemModel* tableMode
                     textResult.append(textDelimiter);
                 }
 
-                QString textData = tableModel->data(sortedIndexes[i], dataRole).toString();
-                textResult.append(textData);
+                const auto cellText = tableModel->data(sortedIndexes[i], dataRole).toString();
+                textResult.append(cellText);
 
                 QString dataString =
                     tableModel->data(sortedIndexes[i], Qn::DisplayHtmlRole).toString();
                 if (dataString.isEmpty())
-                    dataString = textData.toHtmlEscaped();
+                    dataString = cellText.toHtmlEscaped();
 
                 html::Tag cellTag("td", htmlResult, html::Tag::NoBreaks);
                 htmlResult.append(dataString);

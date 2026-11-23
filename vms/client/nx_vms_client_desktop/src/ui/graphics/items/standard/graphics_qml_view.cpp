@@ -65,12 +65,12 @@ QWidget* findWindowWidgetOf(QWidget* widget)
 
     for (QObject* p = widget->parent(); p; p = p->parent())
     {
-        QWidget* widget = dynamic_cast<QWidget*>(p);
+        const auto parentWidget = qobject_cast<QWidget*>(p);
 
-        if (!widget)
+        if (!parentWidget)
             continue;
 
-        window = widget->window();
+        window = parentWidget->window();
         if (window)
             return window;
     }

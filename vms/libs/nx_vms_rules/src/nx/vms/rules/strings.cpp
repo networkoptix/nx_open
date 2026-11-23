@@ -195,15 +195,15 @@ QString Strings::eventExtendedDescription(
                 result.push_back(kIndent + line);
         };
 
-    auto [firstEvents, lastEvents] = event->takeLimitedAmount();
-    for (const auto& event: firstEvents)
-        addEvent(event);
+    const auto [firstEvents, lastEvents] = event->takeLimitedAmount();
+    for (const auto& firstEvent: firstEvents)
+        addEvent(firstEvent);
 
     if (event->count() > firstEvents.size())
     {
         result.push_back(kSpacer);
-        for (const auto& event: lastEvents)
-            addEvent(event);
+        for (const auto& lastEvent: lastEvents)
+            addEvent(lastEvent);
         result.push_back({}); //< Add an empty line.
         result.push_back(Strings::totalNumberOfEvents(QString::number(event->count())));
     }

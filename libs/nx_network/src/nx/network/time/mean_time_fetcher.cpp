@@ -103,26 +103,27 @@ void MeanTimeFetcher::timeFetchingDone(
     std::chrono::milliseconds sumOfReceivedRtt = std::chrono::milliseconds::zero();
     qint64 minUtcTimeMillis = std::numeric_limits<qint64>::max();
     size_t collectedValuesCount = 0;
-    for (std::unique_ptr<TimeFetcherContext>& ctx: m_timeFetchers)
+    for (const auto& fetcher: m_timeFetchers)
     {
-        if (ctx->errorCode != SystemError::noError)
+        if (fetcher->errorCode != SystemError::noError)
         {
-            nx::swapAndCall(m_completionHandler, -1, ctx->errorCode, std::chrono::milliseconds::zero());
+            nx::swapAndCall(
+                m_completionHandler, -1, fetcher->errorCode, std::chrono::milliseconds::zero());
             return;
         }
 
         //analyzing fetched time and calculating mean value
-        if ((minUtcTimeMillis != std::numeric_limits<qint64>::max()) &&
-            (qAbs(ctx->utcMillis - minUtcTimeMillis) > m_maxDeviationMillis))
+        if ((minUtcTimeMillis != std::numeric_limits<qint64>::max())
+            && (qAbs(fetcher->utcMillis - minUtcTimeMillis) > m_maxDeviationMillis))
         {
             nx::swapAndCall(m_completionHandler, -1, SystemError::invalidData, std::chrono::milliseconds::zero());
             return;
         }
 
-        if (ctx->utcMillis < minUtcTimeMillis)
-            minUtcTimeMillis = ctx->utcMillis;
-        sumOfReceivedUtcTimesMillis += ctx->utcMillis - ctx->rtt.count() / 2;
-        sumOfReceivedRtt += ctx->rtt;
+        if (fetcher->utcMillis < minUtcTimeMillis)
+            minUtcTimeMillis = fetcher->utcMillis;
+        sumOfReceivedUtcTimesMillis += fetcher->utcMillis - fetcher->rtt.count() / 2;
+        sumOfReceivedRtt += fetcher->rtt;
         ++collectedValuesCount;
     }
 

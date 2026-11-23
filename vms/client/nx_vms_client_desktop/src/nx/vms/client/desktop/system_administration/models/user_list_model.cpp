@@ -364,10 +364,10 @@ void UserListModel::Private::setCheckState(Qt::CheckState state, const QnUserRes
         {
             checkedUsers.clear();
             checkedUsers.reserve(users.size());
-            for (const auto& user: users)
+            for (const auto& listedUser: users)
             {
-                if (canEditUser(user))
-                    checkedUsers.insert(user);
+                if (canEditUser(listedUser))
+                    checkedUsers.insert(listedUser);
             }
         }
         else if (state == Qt::Unchecked)

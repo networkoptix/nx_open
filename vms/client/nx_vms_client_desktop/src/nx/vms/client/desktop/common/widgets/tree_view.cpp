@@ -248,8 +248,8 @@ void TreeView::collapseRecursively(const QModelIndex& index)
 
     const auto nonLeafIndexes = core::item_model::getNonLeafIndexes(model(), index);
     collapse(index);
-    for (const auto& index: nonLeafIndexes)
-        collapse(index);
+    for (const auto& nonLeafIndex: nonLeafIndexes)
+        collapse(nonLeafIndex);
 }
 
 void TreeView::setExpandedRecursively(const QModelIndex& index, bool expanded)

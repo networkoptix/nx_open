@@ -43,16 +43,17 @@ TimeDurationWidget::TimeDurationWidget(QWidget *parent):
         {
             if (value == 0 && ui->periodComboBox->currentIndex() > 0)
             {
-                int index = ui->periodComboBox->currentIndex();
+                const int index = ui->periodComboBox->currentIndex();
                 {
                     QSignalBlocker blocker(ui->periodComboBox);
                     ui->periodComboBox->setCurrentIndex(index - 1);
                     updateMinimumValue();
                 }
 
-                int intervalSec = ui->periodComboBox->itemData(index).toInt();
-                int value = intervalSec / ui->periodComboBox->itemData(index - 1).toInt();
-                ui->valueSpinBox->setValue(value - 1);
+                const auto intervalSec = ui->periodComboBox->itemData(index).toInt();
+                const int convertedValue =
+                    intervalSec / ui->periodComboBox->itemData(index - 1).toInt();
+                ui->valueSpinBox->setValue(convertedValue - 1);
             }
             emit valueChanged();
         });

@@ -337,16 +337,17 @@ struct ResourceTreeInteractionHandler::Private: public QnWorkbenchContextAware
         bool onlySiblings = true;
         QStringList selectedGroupIds;
 
-        for (const auto& index: selection)
+        for (const auto& nodeIndex: selection)
         {
-            if (effectiveParent(index) != firstParentIndex)
+            if (effectiveParent(nodeIndex) != firstParentIndex)
                 onlySiblings = false;
 
-            if (index.data(core::NodeTypeRole).value<NodeType>() == NodeType::customResourceGroup)
+            if (nodeIndex.data(core::NodeTypeRole).value<NodeType>()
+                == NodeType::customResourceGroup)
             {
-                selectedGroupIds << index.data(core::ResourceTreeCustomGroupIdRole).toString();
+                selectedGroupIds << nodeIndex.data(core::ResourceTreeCustomGroupIdRole).toString();
 
-                const auto childLayouts = childLayoutsRecursive(index);
+                const auto childLayouts = childLayoutsRecursive(nodeIndex);
                 if (!childLayouts.empty())
                 {
                     for (const auto& layout: childLayouts)
@@ -354,7 +355,7 @@ struct ResourceTreeInteractionHandler::Private: public QnWorkbenchContextAware
                 }
                 else
                 {
-                    const auto childCameras = childCamerasRecursive(index);
+                    const auto childCameras = childCamerasRecursive(nodeIndex);
                     for (const auto& camera: childCameras)
                         resources.insert(camera);
                 }

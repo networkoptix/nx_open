@@ -62,8 +62,8 @@ void fromResourceToData(
         CrossSystemLayoutItemData itemData;
         ec2::fromResourceToApi(item, itemData);
 
-        if (auto resource = core::getResourceByDescriptor(item.resource))
-            itemData.name = resource->getName();
+        if (const auto itemResource = core::getResourceByDescriptor(item.resource))
+            itemData.name = itemResource->getName();
         else
             itemData.name = item.resource.name;
 

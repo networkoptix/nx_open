@@ -274,9 +274,6 @@ private:
 
     QnAdjustVideoDialog* adjustVideoDialog();
 
-    /** Check if resource can be safely renamed to the new name. */
-    bool validateResourceName(const QnResourcePtr &resource, const QString &newName) const;
-
     void confirmAnalyticsStorageLocation();
 
     void deleteDialogs();

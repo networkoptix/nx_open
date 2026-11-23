@@ -241,16 +241,16 @@ protected:
             engineParameters[kIsDeviceDependentKey].toBool(/*defaultValue*/ false));
 
         std::set<std::string> analyticsEventTypeIds;
-        for (const QJsonValue& value: engineParameters[kAnalyticsEventTypeIdsKey].toArray())
+        for (const QJsonValue& idValue: engineParameters[kAnalyticsEventTypeIdsKey].toArray())
         {
-            if (const std::string eventTypeId = value.toString().toStdString(); !eventTypeId.empty())
+            if (const auto eventTypeId = idValue.toString().toStdString(); !eventTypeId.empty())
                 analyticsEventTypeIds.insert(eventTypeId);
         }
 
         std::set<std::string> analyticsObjectTypeIds;
-        for (const QJsonValue& value: engineParameters[kAnalyticsObjectTypeIdsKey].toArray())
+        for (const QJsonValue& idValue: engineParameters[kAnalyticsObjectTypeIdsKey].toArray())
         {
-            if (const std::string objectTypeId = value.toString().toStdString(); !objectTypeId.empty())
+            if (const auto objectTypeId = idValue.toString().toStdString(); !objectTypeId.empty())
                 analyticsObjectTypeIds.insert(objectTypeId);
         }
 

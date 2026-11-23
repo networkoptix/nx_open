@@ -941,10 +941,10 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget)
                 setOpacity(newWidget, kOpaque);
 
             const auto opacity = (newWidget ? kTransparent : kOpaque);
-            for(auto widget: m_widgets)
+            for (const auto otherWidget: m_widgets)
             {
-                if (widget != newWidget)
-                    setOpacity(widget, opacity);
+                if (otherWidget != newWidget)
+                    setOpacity(otherWidget, opacity);
             }
 
             /* Update margin flags. */

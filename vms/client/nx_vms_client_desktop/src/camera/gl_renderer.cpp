@@ -676,11 +676,11 @@ bool QnGLRenderer::drawVideoTextures(
                 viewProjection.translate(-1, -1 * yCorr, 0);
                 viewProjection.scale(2.0 / size.width(), yCorr * 2.0 / size.height());
 
-                const QRectF viewRect = QRectF(QPointF(0, 0), size);
-                d.data.verts[0] = QVector2D(viewRect.topLeft());
-                d.data.verts[1] = QVector2D(viewRect.topRight());
-                d.data.verts[2] = QVector2D(viewRect.bottomLeft());
-                d.data.verts[3] = QVector2D(viewRect.bottomRight());
+                const QRectF fullRect(QPointF(0, 0), size);
+                d.data.verts[0] = QVector2D(fullRect.topLeft());
+                d.data.verts[1] = QVector2D(fullRect.topRight());
+                d.data.verts[2] = QVector2D(fullRect.bottomLeft());
+                d.data.verts[3] = QVector2D(fullRect.bottomRight());
 
                 QRhiCommandBuffer* commandBuffer = nullptr;
 

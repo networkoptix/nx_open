@@ -393,16 +393,16 @@ void ResizingInstrument::getWidgetAndFrameSection(
     };
 
     QGraphicsWidget* widgetNearby = nullptr;
-    for (const auto& pos: locationsNearby)
+    for (const auto& nearbyPos: locationsNearby)
     {
-        auto w = resizableWidgetAtPos(view, pos);
+        const auto w = resizableWidgetAtPos(view, nearbyPos);
         if (!w)
             continue;
 
         if (!widgetNearby)
         {
             widgetNearby = w;
-            correctedPos = pos;
+            correctedPos = nearbyPos;
             continue;
         }
 

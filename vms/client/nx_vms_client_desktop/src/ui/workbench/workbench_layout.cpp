@@ -264,14 +264,15 @@ bool QnWorkbenchLayout::update(const LayoutResourcePtr& resource)
 
     for (const auto& data: resource->getItems())
     {
-        auto item = this->item(data.uuid);
+        const auto item = this->item(data.uuid);
         if (!item)
         {
-            if (const auto resource = nx::vms::client::core::getResourceByDescriptor(data.resource);
-                resource
-                    && ResourceAccessManager::hasPermissions(resource, Qn::ViewContentPermission))
+            if (const auto itemResource =
+                    nx::vms::client::core::getResourceByDescriptor(data.resource);
+                itemResource
+                && ResourceAccessManager::hasPermissions(itemResource, Qn::ViewContentPermission))
             {
-                auto workbenchItem = new QnWorkbenchItem(resource, data, this);
+                const auto workbenchItem = new QnWorkbenchItem(itemResource, data, this);
                 // Each item must either be pinned or queued to be pinned.
                 if (workbenchItem->flags() == 0)
                     workbenchItem->setFlags(Qn::ItemFlag::PendingGeometryAdjustment);

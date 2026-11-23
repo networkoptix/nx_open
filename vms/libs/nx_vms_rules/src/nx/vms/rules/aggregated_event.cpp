@@ -31,11 +31,11 @@ AggregatedEvent::AggregatedEvent(Engine* engine, const EventLogRecord& record):
     m_count(std::max(1, record.aggregatedInfo.total)) //< Event count can't be less than one.
 {
     m_aggregatedEvents.push_back(engine->buildEvent(record.eventData));
-    for (const auto& record: record.aggregatedInfo.firstEventsData)
-        m_aggregatedEvents.push_back(engine->buildEvent(record));
+    for (const auto& eventData: record.aggregatedInfo.firstEventsData)
+        m_aggregatedEvents.push_back(engine->buildEvent(eventData));
     // Probably we should add a spacer here.
-    for (const auto& record: record.aggregatedInfo.lastEventsData)
-        m_aggregatedEvents.push_back(engine->buildEvent(record));
+    for (const auto& eventData: record.aggregatedInfo.lastEventsData)
+        m_aggregatedEvents.push_back(engine->buildEvent(eventData));
 }
 
 std::pair<std::vector<EventPtr> /*firstEvents*/, std::vector<EventPtr> /*lastEvents*/>

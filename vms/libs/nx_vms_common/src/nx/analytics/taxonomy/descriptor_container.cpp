@@ -93,7 +93,7 @@ Descriptors DescriptorContainer::descriptors(const nx::Uuid& serverId)
             }
         }
 
-        for (auto& [serverId, descriptors]: descriptorsByServer)
+        for (auto& [_, descriptors]: descriptorsByServer)
             result.merge(std::move(descriptors));
 
         fixScopeCompatibility(&result);

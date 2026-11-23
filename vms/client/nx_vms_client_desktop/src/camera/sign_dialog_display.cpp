@@ -104,12 +104,14 @@ bool QnSignDialogDisplay::processData(const QnAbstractDataPacketPtr& data)
     else if (video || audio)
     {
         m_hasProcessedMedia = true;
-        auto codecParameters = media->context ? media->context->getAvCodecParameters() : nullptr;
+        const auto codecParameters =
+            media->context ? media->context->getAvCodecParameters() : nullptr;
         // update digest from current frame
         if (media && media->dataSize() > 4)
         {
-            const quint8* data = (const quint8*)media->data();
-            m_mediaSigner.processMedia(codecParameters, data, static_cast<int>(media->dataSize()));
+            const auto mediaData = (const quint8*) media->data();
+            m_mediaSigner.processMedia(
+                codecParameters, mediaData, static_cast<int>(media->dataSize()));
         }
         if (video)
         {

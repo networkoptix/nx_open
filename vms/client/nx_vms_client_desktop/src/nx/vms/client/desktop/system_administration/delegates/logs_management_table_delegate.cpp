@@ -298,16 +298,15 @@ void LogsManagementTableDelegate::drawText(const QModelIndex& index,
         {
             option.font.setWeight(QFont::Normal);
 
-            const auto extra = m_textPixmapCache.pixmap(
-                extraInfo,
+            const auto extraPixmap = m_textPixmapCache.pixmap(extraInfo,
                 option.font,
                 ipAddressColor,
                 devicePixelRatio,
                 textEnd - textPos.x(),
                 option.textElideMode);
 
-            if (!extra.pixmap.isNull())
-                painter->drawPixmap(textPos + extra.origin, extra.pixmap);
+            if (!extraPixmap.pixmap.isNull())
+                painter->drawPixmap(textPos + extraPixmap.origin, extraPixmap.pixmap);
         }
     }
 }

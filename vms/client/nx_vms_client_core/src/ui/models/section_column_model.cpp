@@ -209,8 +209,8 @@ QVariant SectionColumnModel::data(const QModelIndex& index, int role) const
 
         QVariantMap item;
 
-        for (const auto& [role, roleName]: sourceModel()->roleNames().asKeyValueRange())
-            item[roleName] = sourceModel()->index(i, 0).data(role);
+        for (const auto& [sourceRole, roleName]: sourceModel()->roleNames().asKeyValueRange())
+            item[roleName] = sourceModel()->index(i, 0).data(sourceRole);
 
         result.push_back(item);
     }

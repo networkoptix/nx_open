@@ -504,7 +504,7 @@ protected:
                 using Data = typename List::value_type;
                 auto callbacks = SubscriptionHandler::callbacks(id, std::move(user),
                     [this](const auto& request) { return makePostProcessContext(request); });
-                for (auto& [user, connections]: callbacks)
+                for (auto& [subscriber, connections]: callbacks)
                 {
                     for (auto& [connection, callbacks]: connections)
                     {
@@ -521,7 +521,7 @@ protected:
                             }
 
                             auto payload =
-                                payloadForUpdate<Data>(apiVersion, id, user, connection);
+                                payloadForUpdate<Data>(apiVersion, id, subscriber, connection);
                             if (!payload)
                                 continue;
 
@@ -536,7 +536,7 @@ protected:
             case NotifyType::delete_:
             {
                 auto callbacks = SubscriptionHandler::callbacks(id, std::move(user));
-                for (auto& [user, connections]: callbacks)
+                for (auto& [_, connections]: callbacks)
                 {
                     for (auto& [connection, callbacks]: connections)
                     {

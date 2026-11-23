@@ -205,10 +205,10 @@ bool VoiceSpectrumAnalyzer::processDataInternal(const T* sampleData, int sampleC
     }
 
     // Convert result data to Db.
-    for (auto& data: spectrumData.data)
+    for (auto& value: spectrumData.data)
     {
-        static const double kScaler = 9;
-        data = log10(data * kScaler + 1.0);
+        static constexpr double kScaler = 9;
+        value = log10(value * kScaler + 1.0);
     }
 
     return spectrumData;

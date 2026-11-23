@@ -45,8 +45,7 @@ bool TestResourceSupportProxy::isEntityTypeSupported(
     {
         for (const auto& [attributeName, supportInfo]: attributeSupportInfo)
         {
-
-            for (const auto& [engineId, deviceIds]: supportInfo)
+            for (const auto& [_, deviceIds]: supportInfo)
             {
                 if (deviceId.isNull())
                     return true;
@@ -97,7 +96,7 @@ bool TestResourceSupportProxy::isEntityTypeAttributeSupported(
         if (deviceId.isNull())
             return true;
 
-        for (const auto& [engineId, deviceIds]: supportInfo)
+        for (const auto& [_, deviceIds]: supportInfo)
         {
             if (deviceIds.contains(deviceId))
                 return true;
