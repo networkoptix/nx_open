@@ -101,7 +101,6 @@ public:
     /** Implementation of QnStoppable::pleaseStop. */
     virtual void pleaseStop() override;
 
-    void setRequest(const nx::Url& request);
     void setRole(Qn::ConnectionRole role);
     // Force credentials. If credentials were not explicitly set, derived classes may use other
     // sources to automatically obtain them.
@@ -169,7 +168,6 @@ protected:
     virtual void at_numberOfVideoChannelsChanged() {}
     virtual bool isRtcpReportsForced() const;
     virtual std::string timeHelperKey() const;
-    virtual void updateStreamUrlIfNeeded() {};
     virtual nx::streaming::rtp::TimePolicy getTimePolicy() const;
     virtual CameraDiagnostics::Result registerMulticastAddressesIfNeeded();
 
@@ -230,7 +228,6 @@ protected:
     mutable nx::Mutex m_tracksMutex;
     std::map<int, int> m_trackIndices;
 
-    nx::Url m_request;
     QString m_logName;
 
     std::vector<nx::utils::ByteArray*> m_demuxedData;
@@ -291,7 +288,6 @@ protected:
     virtual void at_numberOfVideoChannelsChanged() override;
     virtual bool isRtcpReportsForced() const override;
     virtual std::string timeHelperKey() const override;
-    virtual void updateStreamUrlIfNeeded() override;
     virtual nx::streaming::rtp::TimePolicy getTimePolicy() const override;
     virtual CameraDiagnostics::Result registerMulticastAddressesIfNeeded() override;
     virtual void processCameraTimeHelperEvent(

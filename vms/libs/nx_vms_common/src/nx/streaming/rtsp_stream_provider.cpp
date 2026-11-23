@@ -12,8 +12,6 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/network/compat_poll.h>
-#include <nx/network/rtsp/rtsp_types.h>
-#include <nx/network/url/url_builder.h>
 #include <nx/rtp/parsers/aac_rtp_parser.h>
 #include <nx/rtp/parsers/av1_rtp_parser.h>
 #include <nx/rtp/parsers/h264_rtp_parser.h>
@@ -113,12 +111,6 @@ void RtspStreamProvider::reportNetworkIssue(
         nx::vms::api::EventReason /*reasonCode*/,
         const nx::vms::rules::NetworkIssueInfo& /*info*/)
 {
-}
-
-void RtspStreamProvider::setRequest(const nx::Url& request)
-{
-    m_request = request;
-    updateStreamUrlIfNeeded();
 }
 
 void RtspStreamProvider::clearKeyData(int channelNum)
@@ -847,7 +839,6 @@ CameraDiagnostics::Result RtspStreamProvider::openStream()
     m_RtpSession.setCloudConnectEnabled(m_cloudConnectEnabled);
 
     m_registeredMulticastAddresses.clear();
-    updateStreamUrlIfNeeded();
 
     m_RtpSession.setCredentials(credentials().value_or(
         nx::network::http::Credentials()), m_preferredAuthScheme);
@@ -872,8 +863,18 @@ CameraDiagnostics::Result RtspStreamProvider::openStream()
         }
     }
 
+    // On any failure, keep the range for the next attempt, e.g. with another URL, unless a new
+    // one is set.
+    auto restorePlaybackRange = nx::utils::makeScopeGuard(
+        [this, &playbackRange]()
+        {
+            NX_MUTEX_LOCKER lock(&m_mutex);
+            if (!m_playbackRange.isValid())
+                m_playbackRange = playbackRange;
+        });
+
     m_openStreamResult = m_RtpSession.open(m_url, playbackRange.startTimeUsec);
-    if(m_openStreamResult.errorCode != CameraDiagnostics::ErrorCode::noError)
+    if (m_openStreamResult.errorCode != CameraDiagnostics::ErrorCode::noError)
         return m_openStreamResult;
 
     if (!m_customParserFactories.empty())
@@ -927,6 +928,7 @@ CameraDiagnostics::Result RtspStreamProvider::openStream()
 
     createTrackParsers();
 
+    restorePlaybackRange.disarm();
     m_openStreamResult = CameraDiagnostics::NoErrorResult();
     NX_DEBUG(this, "Successfully open RTSP stream %1", m_url);
 
@@ -1216,8 +1218,6 @@ nx::vms::api::RtpTransportType RtspResourceStreamProvider::getRtpTransport() con
 
 CameraDiagnostics::Result RtspResourceStreamProvider::openStream()
 {
-    setUrl(m_resource->getUrl());
-
     m_RtpSession.setMediaTypeEnabled(
         nx::rtp::Sdp::MediaType::Audio,
         m_resource->isAudioRequired());
@@ -1371,23 +1371,6 @@ std::string RtspResourceStreamProvider::timeHelperKey() const
 {
     return nx::format("%1(%2)",
         m_resource->getPhysicalId(), toString(toStreamIndex(m_role))).toStdString();
-}
-
-void RtspResourceStreamProvider::updateStreamUrlIfNeeded()
-{
-    const int mediaPort = m_resource->mediaPort();
-    if (nx::network::rtsp::isUrlScheme(m_request.scheme()))
-    {
-        m_url = m_request;
-        if (mediaPort)
-            m_url.setPort(mediaPort); //< Override port.
-        return;
-    }
-
-    m_url = nx::network::url::Builder(m_request)
-                .setScheme(nx::network::rtsp::kUrlSchemeName)
-                .setHost(m_resource->getHostAddress())
-                .setPort(mediaPort ? mediaPort : nx::network::rtsp::DEFAULT_RTSP_PORT);
 }
 
 nx::streaming::rtp::TimePolicy RtspResourceStreamProvider::getTimePolicy() const

@@ -62,6 +62,9 @@ public:
 
 private:
     static bool tryRewriteRequest(nx::Url& url, bool force);
+
+    nx::Url withConfiguredMediaPort(nx::Url url) const;
+
     static CameraDiagnostics::Result requestToken(
         std::chrono::milliseconds timeout,
         const nx::Url& rtspUrl,

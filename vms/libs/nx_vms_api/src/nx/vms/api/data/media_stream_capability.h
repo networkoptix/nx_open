@@ -9,6 +9,7 @@
 #include <nx/reflect/enum_instrument.h>
 #include <nx/vms/api/data/resolution_data.h>
 #include <nx/vms/api/types/motion_types.h>
+#include <nx/vms/api/types/streaming_protocol.h>
 
 namespace nx::vms::api {
 
@@ -45,10 +46,15 @@ struct NX_VMS_API CameraMediaCapability
     std::map<nx::vms::api::StreamIndex, CameraStreamCapability> streamCapabilities;
     bool hasDualStreaming = false;
     bool hasAudio = false;
-    /**%apidoc Device supports secure streaming. */
-    bool hasSecureStreaming = false;
-    /**%apidoc Secure streaming is enabled on device side. */
-    bool isSecureStreamingEnabled = false;
+    /**%apidoc:stringArray
+     * Protocols that can currently be used to read the Device media streams. Empty if none can
+     * be used, or if the Device driver doesn't read the streams with these protocols.
+     * Protocols the Device supports but has disabled are not listed. When camera control is
+     * allowed, the Server enables a disabled protocol on the Device initialization if the stream
+     * security policy would use it (e.g. a secure one if the Site requires secure streaming).
+     * %example ["rtsp", "rtsps"]
+     */
+    std::set<StreamingProtocol> streamingProtocols;
 
     /**%apidoc:string
      * Resolution in format `{width}x{height}`. The string either may contain width
@@ -60,8 +66,7 @@ struct NX_VMS_API CameraMediaCapability
     // TODO: move more fields to here like io port settings e.t.c
 };
 #define CameraMediaCapability_Fields \
-    (streamCapabilities)(hasDualStreaming)( \
-        hasAudio) (hasSecureStreaming) (isSecureStreamingEnabled) (maxResolution)
+    (streamCapabilities)(hasDualStreaming)(hasAudio) (streamingProtocols) (maxResolution)
 QN_FUSION_DECLARE_FUNCTIONS(CameraMediaCapability, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(CameraMediaCapability, CameraMediaCapability_Fields)
 

@@ -133,7 +133,14 @@ void RtspRestreamer::setRequest(const nx::Url& request)
     m_url = request;
     m_useCloud = tryRewriteRequest(m_url, false);
 
-    m_reader.setRequest(m_url);
+    m_reader.setUrl(withConfiguredMediaPort(m_url));
+}
+
+nx::Url RtspRestreamer::withConfiguredMediaPort(nx::Url url) const
+{
+    if (const int mediaPort = m_camera->mediaPort())
+        url.setPort(mediaPort);
+    return url;
 }
 
 QnAbstractMediaDataPtr RtspRestreamer::getNextData()
@@ -264,7 +271,7 @@ CameraDiagnostics::Result RtspRestreamer::openStream()
         {
             m_useCloud = tryRewriteRequest(m_url, true);
             if (m_useCloud)
-                m_reader.setRequest(m_url);
+                m_reader.setUrl(withConfiguredMediaPort(m_url));
         }
         if (m_useCloud)
         {
