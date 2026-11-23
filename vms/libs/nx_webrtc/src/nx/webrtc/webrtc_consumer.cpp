@@ -113,6 +113,13 @@ void Consumer::seek(nx::Uuid deviceId, int64_t timestampUs, StatusHandler handle
             auto doSeek = [this, useAudioLastGop, timestampUs](
                               nx::Uuid id, auto provider, auto handler)
             {
+                if (provider && m_seekGuard && !m_seekGuard(provider->resource(), timestampUs))
+                {
+                    NX_DEBUG(this, "No right to seek device %1 to %2", id, timestampUs);
+                    handler(id, StreamStatus::forbidden);
+                    return;
+                }
+
                 if (provider && !m_session->isStreamedCodecNegotiated(id))
                 {
                     // The client took the track but not the codec the Device streams on it, and
