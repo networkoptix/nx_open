@@ -30,6 +30,7 @@ public:
         wait = http::StatusCode::_continue, //< Don't know result at this moment.
         success = http::StatusCode::ok, //< Success.
         reconnect = http::StatusCode::movedPermanently, //< Only a reconnect can resume the stream.
+        forbidden = http::StatusCode::forbidden, //< No right to view this timestamp.
         nodata = http::StatusCode::notFound, //< No provider for this timestamp, can't seek.
         //< The Device changed to a codec the client did not accept in its answer, and no offer
         //< can add one it cannot decode: its stream is over. See Session::switchCodec().
@@ -37,9 +38,20 @@ public:
     };
     using StatusHandler = std::function<void(nx::Uuid deviceId, StreamStatus)>;
 
+    /** Tells if the user of the session may view the Device at this time; DATETIME_NOW is Live. */
+    using SeekGuard =
+        std::function<bool(const QnVirtualCameraResourcePtr& device, int64_t timestampUs)>;
+
 public:
     Consumer(Session* session);
     virtual ~Consumer();
+
+    /**
+     * Makes seek() ask `guard` before it moves a Device, and report `forbidden` if it refuses. The
+     * position a session is created with is checked by its creator; a seek changes it afterwards.
+     * To be called before the session gets its ICE. Every seek is allowed if not called.
+     */
+    void setSeekGuard(SeekGuard guard) { m_seekGuard = std::move(guard); }
 
     void putData(const QnConstAbstractMediaDataPtr& data);
 
@@ -90,6 +102,7 @@ private:
     Streamer* m_streamer = nullptr;
     int64_t m_lastReportedTimestampUs = AV_NOPTS_VALUE;
     std::chrono::milliseconds m_sendTimestampInterval {1000};
+    SeekGuard m_seekGuard;
     bool m_sendInProgress = false;
     // The Archive delegate repeats cannotDecryptMedia for the same packet until it is decrypted,
     // so the last reported packet is kept per device, as a session can stream several devices, to

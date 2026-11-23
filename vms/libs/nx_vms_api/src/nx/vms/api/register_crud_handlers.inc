@@ -2507,6 +2507,9 @@ static void registerDeviceHandlers(
      * <code>301</code> - the stream can only be resumed by opening a new connection, at the
      * position given by <code>timestampMs</code>.
      * <br/>
+     * <code>403</code> - the user has no permission to view the Device at the position of
+     * <code>seek</code>: live or Archive. The stream stays where it is.
+     * <br/>
      * <code>404</code> - the Device has no Archive at the requested position.
      * <br/>
      * <code>415</code> - the Device changed to a codec the client took no payload type for in
