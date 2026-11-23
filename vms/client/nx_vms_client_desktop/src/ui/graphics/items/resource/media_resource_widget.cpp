@@ -3438,8 +3438,9 @@ bool QnMediaResourceWidget::isAnalyticsObjectsVisibleForcefully() const
 void QnMediaResourceWidget::setAnalyticsObjectsVisibleForcefully(bool visible, bool animate)
 {
     d->analyticsObjectsVisibleForcefully = visible;
-    setOption(DisplayAnalyticsObjects, visible);
-    setAnalyticsModeEnabled(visible, animate);
+    const bool effectiveVisible = visible || item()->displayAnalyticsObjects();
+    setOption(DisplayAnalyticsObjects, effectiveVisible);
+    setAnalyticsModeEnabled(effectiveVisible, animate);
     emit analyticsObjectsVisibleForcefullyChanged();
 }
 
@@ -3509,7 +3510,8 @@ void QnMediaResourceWidget::atItemDataChanged(int role)
     switch (role)
     {
         case Qn::ItemDisplayAnalyticsObjectsRole:
-            updateAnalyticsVisibility(/*animate*/ false);
+            if (!d->analyticsObjectsVisibleForcefully)
+                setAnalyticsObjectsVisible(item()->displayAnalyticsObjects(), /*animate*/ false);
             break;
 
         case Qn::ItemDisplayRoiRole:
