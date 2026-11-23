@@ -14,7 +14,7 @@ namespace nx::vms::client::core {
 namespace ptz {
 
 ControllerPool::ControllerPool(QnResourcePool* resourcePool, QObject* parent):
-    base_type(resourcePool, parent)
+    base_type(resourcePool, NormalControllerConstruction, parent)
 {
     init();
 }
@@ -49,10 +49,6 @@ void ControllerPool::registerResource(const QnResourcePtr &resource)
                 cacheCameraPresets(camera);
             }
         });
-}
-
-void ControllerPool::unregisterResource(const QnResourcePtr &resource) {
-    base_type::unregisterResource(resource);
 }
 
 QnPtzControllerPtr ControllerPool::createController(const QnResourcePtr &resource) const

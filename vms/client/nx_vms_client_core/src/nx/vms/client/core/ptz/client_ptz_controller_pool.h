@@ -19,7 +19,6 @@ public:
 
 protected:
     virtual void registerResource(const QnResourcePtr& resource) override;
-    virtual void unregisterResource(const QnResourcePtr& resource) override;
     virtual QnPtzControllerPtr createController(const QnResourcePtr& resource) const override;
 
 private:

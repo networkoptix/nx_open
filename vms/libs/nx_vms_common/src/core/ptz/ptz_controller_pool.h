@@ -24,14 +24,12 @@ public:
         ThreadedControllerConstruction
     };
 
-    QnPtzControllerPool(QnResourcePool* resourcePool, QObject* parent = nullptr);
+    QnPtzControllerPool(
+        QnResourcePool* resourcePool, ControllerConstructionMode mode, QObject* parent = nullptr);
     virtual ~QnPtzControllerPool();
 
     QThread* executorThread() const;
     QThreadPool* commandThreadPool() const;
-
-    ControllerConstructionMode constructionMode() const;
-    void setConstructionMode(ControllerConstructionMode mode);
 
     QnPtzControllerPtr controller(const QnResourcePtr& resource) const;
 
@@ -61,7 +59,7 @@ protected:
     QnResourcePool* const m_resourcePool;
 
 private:
-    friend class QnPtzControllerCreationCommand;
     struct Private;
     nx::utils::ImplPtr<Private> d;
+    const ControllerConstructionMode m_mode;
 };

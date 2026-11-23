@@ -4,7 +4,6 @@
 
 #include <set>
 
-#include <QtCore/QAtomicInt>
 #include <QtCore/QThreadPool>
 
 #include <core/ptz/ptz_ini.h>
@@ -67,7 +66,6 @@ struct QnPtzControllerPool::Private
     }
 
     mutable nx::Mutex mutex;
-    QAtomicInt mode = QnPtzControllerPool::NormalControllerConstruction;
     QHash<QnResourcePtr, QnPtzControllerPtr> controllerByResource;
 
     // Creations for one resource run one at a time, so the last one to finish reads the latest
@@ -83,29 +81,14 @@ struct QnPtzControllerPool::Private
 
 //-------------------------------------------------------------------------------------------------
 
-class QnPtzControllerCreationCommand: public QRunnable
-{
-public:
-    QnPtzControllerCreationCommand(const QnResourcePtr& resource, QnPtzControllerPool* pool):
-        m_resource(resource),
-        m_pool(pool)
-    {
-    }
-
-    virtual void run() override { m_pool->d->updateControllerUntilUpToDate(m_resource); }
-
-private:
-    QnResourcePtr m_resource;
-    QnPtzControllerPool *m_pool;
-};
-
-//-------------------------------------------------------------------------------------------------
 // QnPtzControllerPool methods
 
-QnPtzControllerPool::QnPtzControllerPool(QnResourcePool* resourcePool, QObject* parent):
+QnPtzControllerPool::QnPtzControllerPool(
+    QnResourcePool* resourcePool, ControllerConstructionMode mode, QObject* parent):
     QObject(parent),
     m_resourcePool(resourcePool),
-    d(new Private())
+    d(new Private()),
+    m_mode(mode)
 {
     d->q = this;
 
@@ -192,16 +175,6 @@ QThreadPool* QnPtzControllerPool::commandThreadPool() const
     return d->commandThreadPool;
 }
 
-QnPtzControllerPool::ControllerConstructionMode QnPtzControllerPool::constructionMode() const
-{
-    return static_cast<ControllerConstructionMode>(d->mode.loadAcquire());
-}
-
-void QnPtzControllerPool::setConstructionMode(ControllerConstructionMode mode)
-{
-    d->mode.storeRelease(mode);
-}
-
 QnPtzControllerPtr QnPtzControllerPool::controller(const QnResourcePtr& resource) const
 {
     NX_MUTEX_LOCKER locker(&d->mutex);
@@ -237,15 +210,14 @@ void QnPtzControllerPool::updateController(const QnResourcePtr& resource)
     if (!d->startUpdate(resource))
         return; //< The running update repeats itself.
 
-    if (d->mode.loadAcquire() == NormalControllerConstruction)
+    if (m_mode == NormalControllerConstruction)
     {
         d->updateControllerUntilUpToDate(resource);
     }
     else
     {
-        QRunnable *command = new QnPtzControllerCreationCommand(resource, this);
-        command->setAutoDelete(true);
-        d->commandThreadPool->start(command);
+        d->commandThreadPool->start(
+            [this, resource] { d->updateControllerUntilUpToDate(resource); });
     }
 }
 
