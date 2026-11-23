@@ -81,9 +81,3 @@ void QnSingleShotFileStreamreader::setStorage(const QnStorageResourcePtr& storag
 {
     m_storage = storage;
 }
-
-CameraDiagnostics::Result QnSingleShotFileStreamreader::diagnoseMediaStreamConnection()
-{
-    //TODO/IMPL
-    return CameraDiagnostics::NotImplementedResult();
-}

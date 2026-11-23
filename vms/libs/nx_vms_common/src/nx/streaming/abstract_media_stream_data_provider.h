@@ -26,12 +26,6 @@ public:
     float getFrameRate() const;
     float getAverageGopSize() const;
 
-    /**
-     * Tests connection to a media stream. Blocks for media stream open attempt. Default
-     * implementation returns notImplemented.
-     */
-    virtual CameraDiagnostics::Result diagnoseMediaStreamConnection();
-
     virtual bool hasThread() const { return true; }
     virtual bool reinitResourceOnStreamError() const { return true; }
     bool isConnectionLost() const;

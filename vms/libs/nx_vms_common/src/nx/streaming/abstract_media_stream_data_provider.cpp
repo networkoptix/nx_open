@@ -206,11 +206,6 @@ void QnAbstractMediaStreamDataProvider::checkAndFixTimeFromCamera(const QnAbstra
     }
 }
 
-CameraDiagnostics::Result QnAbstractMediaStreamDataProvider::diagnoseMediaStreamConnection()
-{
-    return CameraDiagnostics::NotImplementedResult();
-}
-
 const QnResourcePtr& QnAbstractMediaStreamDataProvider::resource() const
 {
     return m_resource;

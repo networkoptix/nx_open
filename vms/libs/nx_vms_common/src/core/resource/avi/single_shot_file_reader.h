@@ -16,9 +16,6 @@ public:
     ~QnSingleShotFileStreamreader(){stop();}
     void setStorage(const QnStorageResourcePtr& storage);
 
-    //!Implementation of QnAbstractMediaStreamDataProvider::diagnoseMediaStreamConnection
-    virtual CameraDiagnostics::Result diagnoseMediaStreamConnection() override;
-
 protected:
     virtual QnAbstractMediaDataPtr getNextData();
     virtual void run() override;

@@ -45,9 +45,6 @@ public:
     //gets current audio channel ( if we have the only channel - returns 0 )
     virtual unsigned getCurrentAudioChannel() const;
 
-    //!Implementation of QnAbstractMediaStreamDataProvider::diagnoseMediaStreamConnection
-    virtual CameraDiagnostics::Result diagnoseMediaStreamConnection() override;
-
     // sets certain track
     virtual bool setAudioChannel(unsigned num);
 
