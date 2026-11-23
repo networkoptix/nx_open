@@ -17,9 +17,7 @@ class NX_VMS_CLIENT_CORE_API CrossSystemPtzControllerPool: public QnPtzControlle
     using base_type = QnPtzControllerPool;
 
 public:
-    CrossSystemPtzControllerPool(
-        nx::vms::common::SystemContext* systemContext,
-        QObject* parent = nullptr);
+    CrossSystemPtzControllerPool(QnResourcePool* resourcePool, QObject* parent = nullptr);
 
     void createControllerIfNeeded(const QnResourcePtr& resource);
 

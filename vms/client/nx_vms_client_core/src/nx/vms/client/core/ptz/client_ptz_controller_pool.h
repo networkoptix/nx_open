@@ -13,13 +13,10 @@ class ControllerPool: public QnPtzControllerPool
     typedef QnPtzControllerPool base_type;
 
 public:
-    ControllerPool(
-        common::SystemContext* systemContext,
-        QObject* parent = nullptr);
+    ControllerPool(QnResourcePool* resourcePool, QObject* parent = nullptr);
 
 protected:
     virtual void registerResource(const QnResourcePtr& resource) override;
-    virtual void unregisterResource(const QnResourcePtr& resource) override;
     virtual QnPtzControllerPtr createController(const QnResourcePtr& resource) const override;
 
 private:

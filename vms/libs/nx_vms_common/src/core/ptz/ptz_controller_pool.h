@@ -7,14 +7,11 @@
 #include <core/ptz/ptz_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
-#include <nx/vms/common/system_context_aware.h>
 
 class QThread;
 class QThreadPool;
 
-class NX_VMS_COMMON_API QnPtzControllerPool:
-    public QObject,
-    public nx::vms::common::SystemContextAware
+class NX_VMS_COMMON_API QnPtzControllerPool: public QObject
 {
     Q_OBJECT
 
@@ -25,14 +22,12 @@ public:
         ThreadedControllerConstruction
     };
 
-    QnPtzControllerPool(nx::vms::common::SystemContext* systemContext, QObject* parent = nullptr);
+    QnPtzControllerPool(
+        QnResourcePool* resourcePool, ControllerConstructionMode mode, QObject* parent = nullptr);
     virtual ~QnPtzControllerPool();
 
     QThread* executorThread() const;
     QThreadPool* commandThreadPool() const;
-
-    ControllerConstructionMode constructionMode() const;
-    void setConstructionMode(ControllerConstructionMode mode);
 
     QnPtzControllerPtr controller(const QnResourcePtr& resource) const;
 
@@ -60,7 +55,8 @@ protected:
     bool isStopping() const;
 
 private:
-    friend class QnPtzControllerCreationCommand;
     struct Private;
     nx::utils::ImplPtr<Private> d;
+    QnResourcePool* const m_resourcePool;
+    const ControllerConstructionMode m_mode;
 };

@@ -242,11 +242,10 @@ QnPtzControllerPool* SystemContext::ptzControllerPool() const
 
     if (!d->ptzControllerPool)
     {
-        SystemContext* context = const_cast<SystemContext*>(this);
         if (mode() == Mode::crossSystem)
-            d->ptzControllerPool = std::make_unique<CrossSystemPtzControllerPool>(context);
+            d->ptzControllerPool = std::make_unique<CrossSystemPtzControllerPool>(resourcePool());
         else
-            d->ptzControllerPool = std::make_unique<ptz::ControllerPool>(context);
+            d->ptzControllerPool = std::make_unique<ptz::ControllerPool>(resourcePool());
     }
 
     return d->ptzControllerPool.get();
