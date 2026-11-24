@@ -175,13 +175,6 @@ Result QnNxRtpParser::processData(
             else if (dataType == QnAbstractMediaData::META_V1
                 || dataType == QnAbstractMediaData::GENERIC_METADATA)
             {
-                if (dataType == QnAbstractMediaData::META_V1
-                    && dataSize != Qn::kMotionGridWidth*Qn::kMotionGridHeight/8 + RTSP_FFMPEG_METADATA_HEADER_SIZE)
-                {
-                    return { false, NX_FMT("Unexpected data size for metadata packet. "
-                        "Got %1 expected %2 bytes.",
-                        dataSize, Qn::kMotionGridWidth * Qn::kMotionGridHeight / 8)};
-                }
                 if (dataSize < RTSP_FFMPEG_METADATA_HEADER_SIZE)
                 {
                     return { false, NX_FMT("Unexpected data size for metadata packet. "
@@ -192,8 +185,10 @@ Result QnNxRtpParser::processData(
                 const auto duration = qFromBigEndian(*((quint32*) payload)) * 1000;
                 const auto metadataType = (MetadataType) qFromBigEndian(*((quint32*) (payload) + 1));
 
-                QnAbstractCompressedMetadata* metadata = nullptr;
+                dataSize -= RTSP_FFMPEG_METADATA_HEADER_SIZE;
+                payload += RTSP_FFMPEG_METADATA_HEADER_SIZE; // deserialize video flags
 
+                QnAbstractCompressedMetadata* metadata = nullptr;
                 if (dataType == QnAbstractMediaData::META_V1
                     || metadataType == MetadataType::Motion)
                 {
@@ -208,9 +203,6 @@ Result QnNxRtpParser::processData(
                 metadata->m_data.clear();
                 context.reset();
                 metadata->m_duration = duration;
-                dataSize -= RTSP_FFMPEG_METADATA_HEADER_SIZE;
-                payload += RTSP_FFMPEG_METADATA_HEADER_SIZE; // deserialize video flags
-
                 m_nextDataPacket = QnAbstractCompressedMetadataPtr(metadata);
                 m_nextDataPacketBuffer = &metadata->m_data;
             }
@@ -291,23 +283,35 @@ Result QnNxRtpParser::processData(
 
         if (rtpHeader.marker)
         {
-            if (m_nextDataPacket->isLive())
+            QnAbstractMediaDataPtr packet;
+            packet.swap(m_nextDataPacket); //< EOF video frame reached.
+            m_nextDataPacketBuffer = nullptr;
+
+            const auto motion = std::dynamic_pointer_cast<QnMetaDataV1>(packet);
+            if (motion && motion->m_data.size() != (size_t) QnMetaDataV1::kMotionDataBufferSize)
+            {
+                return {false,
+                    NX_FMT("Unexpected data size for motion packet. "
+                           "Got %1 expected %2 bytes.",
+                        motion->m_data.size(),
+                        QnMetaDataV1::kMotionDataBufferSize)};
+            }
+
+            if (packet->isLive())
                 m_position = DATETIME_NOW;
             else
-                m_position = m_nextDataPacket->timestamp;
+                m_position = packet->timestamp;
 
-            if (m_nextDataPacket->dataType == QnAbstractMediaData::AUDIO && !m_isAudioEnabled)
+            if (packet->dataType == QnAbstractMediaData::AUDIO && !m_isAudioEnabled)
             {
                 // Skip audio packet.
             }
             else
             {
-                m_mediaData = m_nextDataPacket;
+                m_mediaData = packet;
                 logMediaData(m_mediaData);
                 gotData = true;
             }
-            m_nextDataPacket.reset(); // EOF video frame reached
-            m_nextDataPacketBuffer = nullptr;
         }
     }
     return { true };

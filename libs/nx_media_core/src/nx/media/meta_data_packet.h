@@ -119,7 +119,7 @@ NX_MEDIA_CORE_API bool operator< (const quint64 timeMs, const QnMetaDataV1Light&
 struct NX_MEDIA_CORE_API QnMetaDataV1: public QnAbstractCompressedMetadata
 {
 public:
-    static const int kMotionDataBufferSize = Qn::kMotionGridWidth*Qn::kMotionGridHeight / 8;
+    static constexpr int kMotionDataBufferSize = Qn::kMotionGridWidth * Qn::kMotionGridHeight / 8;
 
     QnMetaDataV1();
     QnMetaDataV1(std::chrono::microseconds timestamp, int initialValue = 0, int extraBufferSize = 0);

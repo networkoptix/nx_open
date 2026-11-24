@@ -112,6 +112,15 @@ void QnMetaDataV1::assign(const QnMetaDataV1* other)
 {
     QnAbstractMediaData::assign(other);
     m_data = other->m_data;
+
+    if (!NX_ASSERT(m_data.size() >= (size_t) kMotionDataBufferSize,
+            "Motion packet holds %1 bytes, expected %2.",
+            m_data.size(),
+            kMotionDataBufferSize))
+    {
+        m_data.writeFiller(0, kMotionDataBufferSize - (int) m_data.size());
+    }
+
     m_duration = other->m_duration;
     m_firstTimestamp = other->m_firstTimestamp;
 }
