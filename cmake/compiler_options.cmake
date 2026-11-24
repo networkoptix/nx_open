@@ -383,7 +383,11 @@ if(compilerMsvc)
         add_compile_options(/wd26444)
     endif()
 
-    set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "ProgramDatabase") # /Zi
+    # Can be overridden, e.g. with "Embedded" (/Z7), which a compiler cache needs: with /Zi every
+    # compile step writes into a shared .pdb, and such a step is not cacheable.
+    if(NOT DEFINED CMAKE_MSVC_DEBUG_INFORMATION_FORMAT)
+        set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "ProgramDatabase") # /Zi
+    endif()
     add_link_options(/DEBUG)
     # Change /Ob1 -> /Ob2 for RelWithDebInfo to match the Release build.
     foreach(lang C CXX)
