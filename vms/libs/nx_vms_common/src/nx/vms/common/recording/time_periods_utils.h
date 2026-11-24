@@ -105,18 +105,19 @@ private:
                 }
                 else
                 {
-                    Period& last = result.back();
-                    NX_ASSERT(
-                        last.startTime() <= startPeriod.startTime(),
+                    Period& lastPeriod = result.back();
+                    NX_ASSERT(lastPeriod.startTime() <= startPeriod.startTime(),
                         "Algorithm semantics failure, order failed");
                     if (startPeriod.isInfinite())
                     {
-                        NX_ASSERT(!last.isInfinite(), "This should never happen");
-                        if (last.isInfinite())
+                        NX_ASSERT(!lastPeriod.isInfinite(), "This should never happen");
+                        if (lastPeriod.isInfinite())
                         {
-                            last.startTime() = qMin(last.startTime(), startPeriod.startTime());
+                            lastPeriod.startTime() =
+                                qMin(lastPeriod.startTime(), startPeriod.startTime());
                         }
-                        else if (startPeriod.startTime() > last.startTime() + last.duration())
+                        else if (startPeriod.startTime()
+                            > lastPeriod.startTime() + lastPeriod.duration())
                         {
                             if ((int) result.size() >= limit)
                                 return result;
@@ -124,17 +125,16 @@ private:
                         }
                         else
                         {
-                            last.resetDuration();
+                            lastPeriod.resetDuration();
                         }
                         // Last element is live and starts before all of rest - no need to process other elements.
                         return result;
                     }
-                    else if (last.startTime() <= minStartTime
-                        && last.startTime() + last.duration() >= minStartTime)
+                    else if (lastPeriod.startTime() <= minStartTime
+                        && lastPeriod.startTime() + lastPeriod.duration() >= minStartTime)
                     {
-                        last.setDuration(qMax(
-                            last.duration(),
-                            minStartTime + startPeriod.duration() - last.startTime()));
+                        lastPeriod.setDuration(qMax(lastPeriod.duration(),
+                            minStartTime + startPeriod.duration() - lastPeriod.startTime()));
                     }
                     else
                     {

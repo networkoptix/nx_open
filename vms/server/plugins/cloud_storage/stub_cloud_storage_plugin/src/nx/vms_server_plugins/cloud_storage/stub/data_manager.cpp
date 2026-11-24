@@ -3,7 +3,6 @@
 #include "data_manager.h"
 
 #include <algorithm>
-#include <cassert>
 #include <chrono>
 #include <cmath>
 #include <functional>
@@ -40,8 +39,6 @@ const char* kDeviceDescriptionFileName = "device_description.txt";
 const char* kMediaFileExtenstion = ".dat";
 const char* kImageFolderName = "images";
 const char* kImageExtension = ".img";
-
-using namespace std::chrono;
 
 struct FileInfo
 {
@@ -590,7 +587,7 @@ std::string normalizeSeparators(std::string s)
     return s;
 }
 
-void renameWithDuration(const std::string& filePath, milliseconds duration)
+void renameWithDuration(const std::string& filePath, std::chrono::milliseconds duration)
 {
     const auto fileInfo = FileInfo(filePath);
     if (filePath.size() < 4 || fileInfo.extension != kMediaFileExtenstion)

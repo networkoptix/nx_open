@@ -14,8 +14,6 @@
 
 namespace nx::vms::client::core {
 
-using namespace std::chrono;
-
 /** Removes duplicated items from the data using id. Returns number of removed elements. */
 template<typename Facade, typename Container, typename ItemIterator>
 int removeDuplicateItems(Container& container,
@@ -130,17 +128,20 @@ void mergeOldData(NewDataContainer& newData,
 template<typename Facade, typename Container>
 OptionalTimePeriod timeWindow(const Container& container)
 {
+    using namespace std::chrono;
+
     if (container.empty())
         return {};
 
-    const auto first = Facade::startTime(*container.begin());
-    const auto last = Facade::startTime(*container.rbegin());
+    const auto start = Facade::startTime(*container.begin());
+    const auto finish = Facade::startTime(*container.rbegin());
 
     // As some of the models work with microseconds (and time window is measured in milliseconds)
     // we need to round time window to the correct direction.
-    const auto start = floor<milliseconds>(std::min(first, last));
-    const auto end = ceil<milliseconds>(std::max(first, last));
-    return QnTimePeriod::fromInterval(start, end);
+    const auto begin = floor<milliseconds>(std::min(start, finish));
+    const auto end = ceil<milliseconds>(std::max(start, finish));
+
+    return QnTimePeriod::fromInterval(begin, end);
 }
 
 /**

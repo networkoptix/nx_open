@@ -12,7 +12,6 @@
 
 #include "test_event.h"
 
-using namespace std::chrono;
 using namespace std::chrono_literals;
 
 namespace nx::vms::rules::test {
@@ -23,7 +22,7 @@ constexpr auto kDefaultAggregationInterval = 1ms;
 constexpr size_t kAggregationLimit = 10;
 
 Aggregator makeAggregator(
-    milliseconds aggregationInterval = kDefaultAggregationInterval,
+    std::chrono::milliseconds aggregationInterval = kDefaultAggregationInterval,
     size_t maxEventListSize = kAggregationLimit)
 {
     return Aggregator{aggregationInterval, maxEventListSize};

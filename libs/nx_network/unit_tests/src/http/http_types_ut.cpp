@@ -893,22 +893,22 @@ TEST(HttpTypesRequestLine, parse)
 //-------------------------------------------------------------------------------------------------
 // Request.
 
-static constexpr char kTestRequest[] =
-    "PLAY rtsp://192.168.0.25:7001/00-1A-07-0A-3A-88 RTSP/1.0\r\n"
-    "CSeq: 2\r\n"
-    "Range: npt=1423440107300000-1423682432925000\r\n"
-    "Scale: 1\r\n"
-    "x-guid: {ff69b2e0-1f1e-4512-8eb9-4d20b33587dc}\r\n"
-    "Session: \r\n"
-    "User-Agent: nx_network\r\n"
-    "x-play-now: true\r\n"
-    "x-media-step: 9693025000\r\n"
-    "Authorization: Basic YWRtaW46MTIz\r\n"
-    "x-server-guid: {d1a49afe-a2a2-990a-2c54-b77e768e6ad2}\r\n"
-    "x-media-quality: low\r\n";
-
 TEST(HttpTypesRequest, parse)
 {
+    static constexpr char kTestRequest[] =
+        "PLAY rtsp://192.168.0.25:7001/00-1A-07-0A-3A-88 RTSP/1.0\r\n"
+        "CSeq: 2\r\n"
+        "Range: npt=1423440107300000-1423682432925000\r\n"
+        "Scale: 1\r\n"
+        "x-guid: {ff69b2e0-1f1e-4512-8eb9-4d20b33587dc}\r\n"
+        "Session: \r\n"
+        "User-Agent: nx_network\r\n"
+        "x-play-now: true\r\n"
+        "x-media-step: 9693025000\r\n"
+        "Authorization: Basic YWRtaW46MTIz\r\n"
+        "x-server-guid: {d1a49afe-a2a2-990a-2c54-b77e768e6ad2}\r\n"
+        "x-media-quality: low\r\n";
+
     Request request;
     ASSERT_TRUE(request.parse(kTestRequest));
     ASSERT_EQ(

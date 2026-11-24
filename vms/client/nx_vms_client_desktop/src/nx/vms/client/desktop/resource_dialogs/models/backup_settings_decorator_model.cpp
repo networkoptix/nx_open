@@ -143,7 +143,7 @@ struct BackupSettingsDecoratorModel::Private
     void setGlobalBackupSettings(const nx::vms::api::BackupSettings& backupSettings);
 
     QnVirtualCameraResourceList camerasToApplySettings() const;
-    void onRowsAboutToBeRemoved(const QModelIndex& parent, int first, int last);
+    void onRowsAboutToBeRemoved(const QModelIndex& parent, int from, int to);
 
     std::optional<MessageTexts> nothingToBackupWarning(const QModelIndex& index) const;
     std::optional<MessageTexts> servicesOveruseWarning(const QModelIndex& index) const;
@@ -226,11 +226,11 @@ QnVirtualCameraResourceList BackupSettingsDecoratorModel::Private::camerasToAppl
 }
 
 void BackupSettingsDecoratorModel::Private::onRowsAboutToBeRemoved(
-    const QModelIndex& parent, int first, int last)
+    const QModelIndex& parent, int from, int to)
 {
     auto hasChangesNotifier = makeHasChangesNotifier(q);
 
-    for (int row = first; row <= last; ++row)
+    for (int row = from; row <= to; ++row)
     {
         if (const auto camera = q->cameraResource(q->index(row, ResourceColumn, parent)))
         {
@@ -454,11 +454,10 @@ BackupSettingsDecoratorModel::BackupSettingsDecoratorModel(
     SystemContextAware(systemContext),
     d(new Private{this})
 {
-    connect(this, &BackupSettingsDecoratorModel::rowsAboutToBeRemoved,
-        [this](const QModelIndex& parent, int first, int last)
-        {
-            d->onRowsAboutToBeRemoved(parent, first, last);
-        });
+    connect(this,
+        &BackupSettingsDecoratorModel::rowsAboutToBeRemoved,
+        [this](const QModelIndex& parent, int from, int to)
+        { d->onRowsAboutToBeRemoved(parent, from, to); });
 
     connect(store, &ServerSettingsDialogStore::stateChanged,
         this, &BackupSettingsDecoratorModel::loadState);

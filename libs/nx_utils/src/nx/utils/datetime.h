@@ -57,10 +57,10 @@ NX_UTILS_API std::string formatDateTime(const QDateTime& value);
 template<typename Rep, typename Period>
 std::string formatDateTimeLockFree(const std::chrono::duration<Rep, Period>& durationSinceEpoch)
 {
-    // Starts with Monday to correspond to QDate::dayOfWeek() return value: 1 for Monday, 7 for
-    // Sunday
-    static constexpr const char* kWeekDays[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
-    static constexpr const char* kMonths[] = {
+    // Starts with Sunday to correspond to tm::tm_wday: 0 for Sunday, 6 for Saturday.
+    static constexpr const char* kWeekDayNames[] = {
+        "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+    static constexpr const char* kMonthNames[] = {
         "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
     // Convert to seconds since epoch
@@ -77,9 +77,9 @@ std::string formatDateTimeLockFree(const std::chrono::duration<Rep, Period>& dur
     snprintf(strDateBuf,
         sizeof(strDateBuf),
         "%s, %02d %s %d %02d:%02d:%02d GMT",
-        kWeekDays[utcTime.tm_wday],
+        kWeekDayNames[utcTime.tm_wday],
         utcTime.tm_mday,
-        kMonths[utcTime.tm_mon],
+        kMonthNames[utcTime.tm_mon],
         utcTime.tm_year + 1900,
         utcTime.tm_hour,
         utcTime.tm_min,

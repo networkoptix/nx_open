@@ -277,22 +277,22 @@ protected:
         EXPECT_EQ(title, value(row, AnalyticsObjectBoxesModel::TitleRole).toString());
     }
 
-    void thenRowsWereInserted(int first, int last) const
+    void thenRowsWereInserted(int from, int to) const
     {
         ASSERT_EQ(1, rowsInsertedSpy->count());
-        EXPECT_EQ(first, rowsInsertedSpy->at(0).at(1).toInt());
-        EXPECT_EQ(last, rowsInsertedSpy->at(0).at(2).toInt());
+        EXPECT_EQ(from, rowsInsertedSpy->at(0).at(1).toInt());
+        EXPECT_EQ(to, rowsInsertedSpy->at(0).at(2).toInt());
     }
 
     void thenNoRowsWereInserted() const { EXPECT_EQ(0, rowsInsertedSpy->count()); }
 
     void thenRowWasRemoved(int row) const { thenRowsWereRemoved(row, row); }
 
-    void thenRowsWereRemoved(int first, int last) const
+    void thenRowsWereRemoved(int from, int to) const
     {
         ASSERT_EQ(1, rowsRemovedSpy->count());
-        EXPECT_EQ(first, rowsRemovedSpy->at(0).at(1).toInt());
-        EXPECT_EQ(last, rowsRemovedSpy->at(0).at(2).toInt());
+        EXPECT_EQ(from, rowsRemovedSpy->at(0).at(1).toInt());
+        EXPECT_EQ(to, rowsRemovedSpy->at(0).at(2).toInt());
     }
 
     void thenNoRowsWereRemoved() const { EXPECT_EQ(0, rowsRemovedSpy->count()); }

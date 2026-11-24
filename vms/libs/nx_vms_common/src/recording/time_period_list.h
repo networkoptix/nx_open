@@ -234,23 +234,23 @@ QnTimePeriodList timePeriodListFromRange(
     result.push_back(QnTimePeriod(itr->startTimeMs, itr->durationMs));
     for (++itr; itr != endItr; ++itr)
     {
-        QnTimePeriod& last = result.last();
-        if (last.isInfinite())
+        QnTimePeriod& lastPeriod = result.last();
+        if (lastPeriod.isInfinite())
             break;
 
         if (itr->isInfinite() && excludeInfinite)
             break;
 
-        if (itr->startTimeMs - last.endTimeMs() < detailLevelMs
+        if (itr->startTimeMs - lastPeriod.endTimeMs() < detailLevelMs
             || QnTimePeriod::kInfiniteDuration == detailLevelMs)
         {
-            last.durationMs = itr->isInfinite()
+            lastPeriod.durationMs = itr->isInfinite()
                 ? QnTimePeriod::kInfiniteDuration
-                : qMax(last.durationMs, itr->endTimeMs() - last.startTimeMs);
+                : qMax(lastPeriod.durationMs, itr->endTimeMs() - lastPeriod.startTimeMs);
         }
         else
         {
-            if (last.durationMs < detailLevelMs && !keepSmallChunks)
+            if (lastPeriod.durationMs < detailLevelMs && !keepSmallChunks)
                 result.pop_back();
 
             result.push_back(QnTimePeriod(itr->startTimeMs, itr->durationMs));

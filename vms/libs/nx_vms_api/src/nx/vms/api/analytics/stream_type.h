@@ -20,14 +20,12 @@ enum class StreamType
 template<typename Visitor>
 constexpr auto nxReflectVisitAllEnumItems(StreamType*, Visitor&& visitor)
 {
-    using Item = nx::reflect::enumeration::Item<StreamType>;
-    return visitor(
-        Item{StreamType::none, ""},
-        Item{StreamType::compressedVideo, "compressedVideo"},
-        Item{StreamType::uncompressedVideo, "uncompressedVideo"},
-        Item{StreamType::metadata, "metadata"},
-        Item{StreamType::motion, "motion"}
-    );
+    using EnumItem = nx::reflect::enumeration::Item<StreamType>;
+    return visitor(EnumItem{StreamType::none, ""},
+        EnumItem{StreamType::compressedVideo, "compressedVideo"},
+        EnumItem{StreamType::uncompressedVideo, "uncompressedVideo"},
+        EnumItem{StreamType::metadata, "metadata"},
+        EnumItem{StreamType::motion, "motion"});
 }
 
 Q_DECLARE_FLAGS(StreamTypes, StreamType)

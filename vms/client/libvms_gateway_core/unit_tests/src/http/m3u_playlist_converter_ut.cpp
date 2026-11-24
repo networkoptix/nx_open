@@ -47,14 +47,14 @@ public:
     }
 
 protected:
-    void whenConvertedPlaylist(const std::string& kOriginalPlaylist)
+    void whenConvertedPlaylist(const std::string& originalPlaylist)
     {
-        m_resultingPlaylist = m_converter->convert(kOriginalPlaylist);
+        m_resultingPlaylist = m_converter->convert(originalPlaylist);
     }
 
-    void thenResultingPlaylistEqualTo(const std::string& kExpectedModifiedPlaylist)
+    void thenResultingPlaylistEqualTo(const std::string& expectedModifiedPlaylist)
     {
-        ASSERT_EQ(kExpectedModifiedPlaylist, m_resultingPlaylist);
+        ASSERT_EQ(expectedModifiedPlaylist, m_resultingPlaylist);
     }
 
 private:

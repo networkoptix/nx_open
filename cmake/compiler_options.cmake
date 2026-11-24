@@ -309,8 +309,6 @@ if(compilerMsvc)
         /wd4456
         # Declaration of 'id' hides class member.
         /wd4458
-        # Declaration of 'id' hides global declaration.
-        /wd4459
 
         # Deprecated / unsafe function or symbol.
         /wd4996

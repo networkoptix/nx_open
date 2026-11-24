@@ -132,8 +132,6 @@ static QSize limitResolution(const QSize& desiredResolution, const QSize& limit)
 
 static QSize resolutionWithHeightAndAspect(int height, const QSize& aspect)
 {
-    static const int kWidthRoundingFactor = 16; //< Used for rounding width up.
-
     const int desiredWidth = (height * aspect.width()) / aspect.height();
     const int roundedWidth = (desiredWidth + (kWidthRoundingFactor - 1))
         / kWidthRoundingFactor * kWidthRoundingFactor;

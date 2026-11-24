@@ -212,31 +212,39 @@ void EventRibbon::Private::setModel(QAbstractListModel* model)
             insertNewTiles(0, m_model->rowCount(), UpdateMode::instant, false);
         });
 
-    m_modelConnections << connect(m_model, &QAbstractListModel::rowsInserted, this,
-        [this](const QModelIndex& /*parent*/, int first, int last)
+    m_modelConnections << connect(m_model,
+        &QAbstractListModel::rowsInserted,
+        this,
+        [this](const QModelIndex& /*parent*/, int from, int to)
         {
-            insertNewTiles(first, last - first + 1, m_insertionMode, m_scrollDownAfterInsertion);
+            insertNewTiles(from, to - from + 1, m_insertionMode, m_scrollDownAfterInsertion);
             NX_ASSERT(m_model->rowCount() == count());
         });
 
-    m_modelConnections << connect(m_model, &QAbstractListModel::rowsAboutToBeRemoved, this,
-        [this](const QModelIndex& /*parent*/, int first, int last)
+    m_modelConnections << connect(m_model,
+        &QAbstractListModel::rowsAboutToBeRemoved,
+        this,
+        [this](const QModelIndex& /*parent*/, int from, int to)
         {
-            for (int index = first; index <= last; ++index)
+            for (int index = from; index <= to; ++index)
                 m_deadlines.remove(m_model->index(index));
         });
 
-    m_modelConnections << connect(m_model, &QAbstractListModel::rowsRemoved, this,
-        [this](const QModelIndex& /*parent*/, int first, int last)
+    m_modelConnections << connect(m_model,
+        &QAbstractListModel::rowsRemoved,
+        this,
+        [this](const QModelIndex& /*parent*/, int from, int to)
         {
-            removeTiles(first, last - first + 1, m_removalMode);
+            removeTiles(from, to - from + 1, m_removalMode);
             NX_ASSERT(m_model->rowCount() == count());
         });
 
-    m_modelConnections << connect(m_model, &QAbstractListModel::dataChanged, this,
-        [this](const QModelIndex& first, const QModelIndex& last)
+    m_modelConnections << connect(m_model,
+        &QAbstractListModel::dataChanged,
+        this,
+        [this](const QModelIndex& from, const QModelIndex& to)
         {
-            const auto updateRange = m_visible.intersected({first.row(), last.row() + 1});
+            const auto updateRange = m_visible.intersected({from.row(), to.row() + 1});
             for (int i = updateRange.lower(); i < updateRange.upper(); ++i)
                 updateTile(i);
         });

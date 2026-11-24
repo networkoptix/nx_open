@@ -109,15 +109,14 @@ enum class AttributeType
 template<typename Visitor>
 constexpr auto nxReflectVisitAllEnumItems(AttributeType*, Visitor&& visitor)
 {
-    using Item = nx::reflect::enumeration::Item<AttributeType>;
-    return visitor(
-        Item{AttributeType::undefined, ""},
-        Item{AttributeType::number, "Number"},
-        Item{AttributeType::boolean, "Boolean"},
-        Item{AttributeType::string, "String"},
-        Item{AttributeType::color, "Color"},
-        Item{AttributeType::enumeration, "Enum"},
-        Item{AttributeType::object, "Object"});
+    using EnumItem = nx::reflect::enumeration::Item<AttributeType>;
+    return visitor(EnumItem{AttributeType::undefined, ""},
+        EnumItem{AttributeType::number, "Number"},
+        EnumItem{AttributeType::boolean, "Boolean"},
+        EnumItem{AttributeType::string, "String"},
+        EnumItem{AttributeType::color, "Color"},
+        EnumItem{AttributeType::enumeration, "Enum"},
+        EnumItem{AttributeType::object, "Object"});
 }
 
 struct AttributeDescriptionCommon
@@ -263,14 +262,13 @@ Q_DECLARE_FLAGS(EventTypeFlags, EventTypeFlag)
 template<typename Visitor>
 constexpr auto nxReflectVisitAllEnumItems(EventTypeFlag*, Visitor&& visitor)
 {
-    using Item = nx::reflect::enumeration::Item<EventTypeFlag>;
-    return visitor(
-        Item{EventTypeFlag::noFlags, ""},
-        Item{EventTypeFlag::noFlags, "noFlags"},
-        Item{EventTypeFlag::stateDependent, "stateDependent"},
-        Item{EventTypeFlag::regionDependent, "regionDependent"},
-        Item{EventTypeFlag::hidden, "hidden"},
-        Item{EventTypeFlag::useTrackBestShotAsPreview, "useTrackBestShotAsPreview"});
+    using EnumItem = nx::reflect::enumeration::Item<EventTypeFlag>;
+    return visitor(EnumItem{EventTypeFlag::noFlags, ""},
+        EnumItem{EventTypeFlag::noFlags, "noFlags"},
+        EnumItem{EventTypeFlag::stateDependent, "stateDependent"},
+        EnumItem{EventTypeFlag::regionDependent, "regionDependent"},
+        EnumItem{EventTypeFlag::hidden, "hidden"},
+        EnumItem{EventTypeFlag::useTrackBestShotAsPreview, "useTrackBestShotAsPreview"});
 }
 
 /**
@@ -303,13 +301,12 @@ Q_DECLARE_FLAGS(ObjectTypeFlags, ObjectTypeFlag)
 template<typename Visitor>
 constexpr auto nxReflectVisitAllEnumItems(ObjectTypeFlag*, Visitor&& visitor)
 {
-    using Item = nx::reflect::enumeration::Item<ObjectTypeFlag>;
-    return visitor(
-        Item{ObjectTypeFlag::noFlags, ""},
-        Item{ObjectTypeFlag::noFlags, "noFlags"},
-        Item{ObjectTypeFlag::hiddenDerivedType, "hiddenDerivedType"},
-        Item{ObjectTypeFlag::nonIndexable, "nonIndexable"},
-        Item{ObjectTypeFlag::liveOnly, "liveOnly"});
+    using EnumItem = nx::reflect::enumeration::Item<ObjectTypeFlag>;
+    return visitor(EnumItem{ObjectTypeFlag::noFlags, ""},
+        EnumItem{ObjectTypeFlag::noFlags, "noFlags"},
+        EnumItem{ObjectTypeFlag::hiddenDerivedType, "hiddenDerivedType"},
+        EnumItem{ObjectTypeFlag::nonIndexable, "nonIndexable"},
+        EnumItem{ObjectTypeFlag::liveOnly, "liveOnly"});
 }
 
 /**

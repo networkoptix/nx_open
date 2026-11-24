@@ -28,6 +28,7 @@
 #include <utils/common/synctime.h>
 
 using namespace nx::vms::client::core;
+using namespace std::chrono;
 
 namespace {
 
@@ -316,8 +317,6 @@ int QnCameraBookmarksManagerPrivate::getBookmarksAroundPoint_compatibilityMode(
 {
     if (!NX_ASSERT(filter.centralTimePointMs.has_value()))
         return {};
-
-    using namespace nx::vms::client::core;
 
     const bool validRange = filter.endTimeMs == milliseconds{}
         || filter.startTimeMs <= filter.endTimeMs;

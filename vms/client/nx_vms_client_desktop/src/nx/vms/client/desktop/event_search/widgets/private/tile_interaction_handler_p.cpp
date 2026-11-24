@@ -658,11 +658,13 @@ void TileInteractionHandler::showContextMenu(
 
     // Avoid capturing menu shared pointer in lambda because it creates a reference cycle.
     const auto model = const_cast<QAbstractItemModel*>(index.model());
-    connect(model, &QAbstractItemModel::rowsAboutToBeRemoved, menu.get(),
+    connect(model,
+        &QAbstractItemModel::rowsAboutToBeRemoved,
+        menu.get(),
         [menu = menu.get(), index = QPersistentModelIndex(index)](
-            const QModelIndex& parent, int first, int last)
+            const QModelIndex& parent, int from, int to)
         {
-            if (!parent.isValid() && index.row() >= first && index.row() <= last)
+            if (!parent.isValid() && index.row() >= from && index.row() <= to)
                 menu->close();
         });
 

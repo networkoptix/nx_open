@@ -267,13 +267,13 @@ enum class SiteSettingName
 template<typename Visitor>
 constexpr auto nxReflectVisitAllEnumItems(SiteSettingName*, Visitor&& visitor)
 {
-    using Item = nx::reflect::enumeration::Item<SiteSettingName>;
+    using EnumItem = nx::reflect::enumeration::Item<SiteSettingName>;
     const auto& itemName = nx::reflect::enumeration::detail::itemName;
-    return visitor(Item{SiteSettingName::none, "*"}
+    return visitor(EnumItem{SiteSettingName::none, "*"}
         #ifndef Q_MOC_RUN
-            #define VALUE(R, ENUM, ITEM) , Item{ENUM::ITEM, itemName(BOOST_PP_STRINGIZE(ITEM))}
-            BOOST_PP_SEQ_FOR_EACH(VALUE, SiteSettingName, SiteSettings_Fields)
-            #undef VALUE
+    #define VALUE(R, ENUM, ITEM) , EnumItem{ENUM::ITEM, itemName(BOOST_PP_STRINGIZE(ITEM))}
+        BOOST_PP_SEQ_FOR_EACH(VALUE, SiteSettingName, SiteSettings_Fields)
+    #undef VALUE
         #endif // Q_MOC_RUN
     );
 }
@@ -463,15 +463,14 @@ enum class SystemSettingName
 template<typename Visitor>
 constexpr auto nxReflectVisitAllEnumItems(SystemSettingName*, Visitor&& visitor)
 {
-    using Item = nx::reflect::enumeration::Item<SystemSettingName>;
+    using EnumItem = nx::reflect::enumeration::Item<SystemSettingName>;
     const auto& itemName = nx::reflect::enumeration::detail::itemName;
-    return visitor(
-        Item{SystemSettingName::sessionLimitMinutes, "sessionLimitMinutes"},
-        Item{SystemSettingName::none, ""}
+    return visitor(EnumItem{SystemSettingName::sessionLimitMinutes, "sessionLimitMinutes"},
+        EnumItem{SystemSettingName::none, ""}
         #ifndef Q_MOC_RUN
-            #define VALUE(R, ENUM, ITEM) , Item{ENUM::ITEM, itemName(BOOST_PP_STRINGIZE(ITEM))}
-            BOOST_PP_SEQ_FOR_EACH(VALUE, SystemSettingName, SystemSettings_Fields)
-            #undef VALUE
+    #define VALUE(R, ENUM, ITEM) , EnumItem{ENUM::ITEM, itemName(BOOST_PP_STRINGIZE(ITEM))}
+        BOOST_PP_SEQ_FOR_EACH(VALUE, SystemSettingName, SystemSettings_Fields)
+    #undef VALUE
         #endif // Q_MOC_RUN
     );
 }

@@ -52,29 +52,22 @@ void WinAudioDeviceInfo::Private::init(const QString& deviceName)
 {
     this->deviceName = deviceName;
 
-    IMMDeviceCollection* ppDevices;
-    HRESULT hr;
-    IMMDevice* pMMDevice;
-
     CoInitialize(0);
 
-    const CLSID CLSID_MMDeviceEnumerator = __uuidof(MMDeviceEnumerator);
-    const IID IID_IMMDeviceEnumerator = __uuidof(IMMDeviceEnumerator);
-    hr = CoCreateInstance(
-        CLSID_MMDeviceEnumerator,
-        nullptr,
-        CLSCTX_ALL,
-        IID_IMMDeviceEnumerator,
-        (void**)&deviceEnumerator);
+    HRESULT hr = CoCreateInstance(
+        __uuidof(MMDeviceEnumerator), nullptr, CLSCTX_ALL, IID_PPV_ARGS(&deviceEnumerator));
     if (hr != S_OK)
         return;
 
+    IMMDevice* pMMDevice = nullptr;
     if (deviceName.toLower() == "default")
     {
-        deviceEnumerator->GetDefaultAudioEndpoint(eCapture, eMultimedia, &pMMDevice);
-        getDeviceInfo(pMMDevice, true);
+        hr = deviceEnumerator->GetDefaultAudioEndpoint(eCapture, eMultimedia, &pMMDevice);
+        if (hr == S_OK)
+            getDeviceInfo(pMMDevice, true);
     }
 
+    IMMDeviceCollection* ppDevices = nullptr;
     hr = deviceEnumerator->EnumAudioEndpoints(eCapture, DEVICE_STATE_ACTIVE, &ppDevices);
     if (hr != S_OK)
         return;

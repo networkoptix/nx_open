@@ -786,19 +786,18 @@ RightPanelModelsAdapter::Private::Private(RightPanelModelsAdapter* q):
             m_unreadItems.clear();
         });
 
-    connect(q, &QAbstractListModel::rowsAboutToBeRemoved, this,
-        [this](const QModelIndex& /*parent*/, int first, int last)
+    connect(q,
+        &QAbstractListModel::rowsAboutToBeRemoved,
+        this,
+        [this](const QModelIndex& /*parent*/, int from, int to)
         {
-            for (int row = first; row <= last; ++row)
+            for (int row = from; row <= to; ++row)
                 m_deadlines.remove(this->q->index(row, 0));
 
             const auto guard = makeUnreadCountGuard();
             m_unreadItems.removeIf(
-                [first, last](
-                    const QHash<QPersistentModelIndex, nx::vms::event::Level>::iterator it)
-                {
-                    return it.key().row() >= first && it.key().row() <= last;
-                });
+                [from, to](const QHash<QPersistentModelIndex, nx::vms::event::Level>::iterator it)
+                { return it.key().row() >= from && it.key().row() <= to; });
         });
 
     connect(q, &QAbstractListModel::modelReset, this,
@@ -808,15 +807,17 @@ RightPanelModelsAdapter::Private::Private(RightPanelModelsAdapter* q):
             createDeadlines(0, count);
         });
 
-    connect(q, &QAbstractListModel::rowsInserted, this,
-        [this](const QModelIndex& parent, int first, int last)
+    connect(q,
+        &QAbstractListModel::rowsInserted,
+        this,
+        [this](const QModelIndex& parent, int from, int to)
         {
             if (!NX_ASSERT(!parent.isValid()))
                 return;
 
-            const auto count = last - first + 1;
-            createDeadlines(first, count);
-            createUnread(first, count);
+            const auto count = to - from + 1;
+            createDeadlines(from, count);
+            createUnread(from, count);
         });
 
     m_autoCloseTimer.callOnTimeout(this, &Private::closeExpired);

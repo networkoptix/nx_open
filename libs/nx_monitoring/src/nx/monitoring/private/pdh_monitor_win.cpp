@@ -29,8 +29,6 @@
 
 #include "disk_utils_win.h"
 
-using namespace std::chrono;
-
 namespace nx::monitoring {
 
 namespace {
@@ -767,7 +765,7 @@ std::optional<std::vector<ActivityMonitor::DiskIo>> PdhMonitor::calculateTotalDi
 
     // Volume enumeration is a handful of kernel calls per volume; the mapping only changes on
     // mount and unmount, so it is refreshed rarely.
-    if (const auto now = steady_clock::now();
+    if (const auto now = std::chrono::steady_clock::now();
         now - m_mountPointsReadAt >= kMountPointsRefreshInterval)
     {
         m_mountPointsByDiskId = readMountPointsByDiskId();

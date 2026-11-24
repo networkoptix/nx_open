@@ -13,6 +13,8 @@
 namespace nx::vms::client::core::event_search {
 namespace test {
 
+using namespace std::chrono_literals;
+
 using FD = EventSearch::FetchDirection;
 
 TEST(removeDuplicateItems, emptyContainer)

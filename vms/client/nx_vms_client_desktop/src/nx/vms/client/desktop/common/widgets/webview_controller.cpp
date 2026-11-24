@@ -130,10 +130,10 @@ public:
         if (m_count == 0)
             return milliseconds::zero();
 
-        size_t first = m_next % limit();
-        size_t last = m_next == 0 ? m_count - 1 : m_next - 1;
+        const size_t oldest = m_next % limit();
+        const size_t newest = m_next == 0 ? m_count - 1 : m_next - 1;
 
-        return duration_cast<milliseconds>(m_timeStamps[last] - m_timeStamps[first]);
+        return duration_cast<milliseconds>(m_timeStamps[newest] - m_timeStamps[oldest]);
     }
 
     bool exceeded(milliseconds time) const

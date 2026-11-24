@@ -196,7 +196,6 @@ TEST_F(HttpClientPoolTest, GeneralNegativeTest)
 
 TEST_F(HttpClientPoolTest, terminateTest)
 {
-    static const int kWaitTimeoutMs = 1000;
     ASSERT_TRUE(testHttpServer()->registerRequestProcessorFunc(
         "/test",
         [&](RequestContext, RequestProcessedHandler handler)

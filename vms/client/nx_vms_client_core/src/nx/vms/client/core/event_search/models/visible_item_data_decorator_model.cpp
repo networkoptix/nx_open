@@ -585,21 +585,25 @@ void VisibleItemDataDecoratorModel::setSourceModel(QAbstractItemModel* value)
 
     if (value)
     {
-        d->modelConnections << connect(value, &QAbstractListModel::rowsInserted, this,
-            [this](const QModelIndex& parent, int first, int last)
+        d->modelConnections << connect(value,
+            &QAbstractListModel::rowsInserted,
+            this,
+            [this](const QModelIndex& parent, int from, int to)
             {
                 if (NX_ASSERT(!parent.isValid()))
-                    d->createPreviews(first, last - first + 1);
+                    d->createPreviews(from, to - from + 1);
             });
 
-        d->modelConnections << connect(value, &QAbstractListModel::rowsRemoved, this,
-            [this](const QModelIndex& parent, int first, int last)
+        d->modelConnections << connect(value,
+            &QAbstractListModel::rowsRemoved,
+            this,
+            [this](const QModelIndex& parent, int from, int to)
             {
                 if (!NX_ASSERT(!parent.isValid()))
                     return;
 
                 const auto beginIt = d->previews.begin();
-                d->previews.erase(beginIt + first, beginIt + last + 1);
+                d->previews.erase(beginIt + from, beginIt + to + 1);
 
                 // Persistent source indices of removed visible items are already invalidated,
                 // so we need to just filter out all invalid indexes.

@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <cstring>
 #include <ctime>
+#include <iterator>
 
 #include <QtCore/QTimeZone>
 
@@ -22,6 +23,7 @@ using namespace std::chrono;
 
 namespace {
 
+// Starts with Monday to match QDate::dayOfWeek(): 1 for Monday, 7 for Sunday.
 static constexpr const char* kWeekDays[] = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
 static constexpr const char* kMonths[] = {
         "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
@@ -49,7 +51,7 @@ QDateTime parseRfc1123Date(std::string_view str)
     if (sscanf(str.data(), kTemplate, weekday, &day, monthStr, &year, &hour, &min, &sec) != 7)
         return QDateTime();
 
-    for (int month = 0; month < 12; ++month)
+    for (int month = 0; month < std::ssize(kMonths); ++month)
     {
         if (strncmp(monthStr, kMonths[month], 3) == 0)
             return QDateTime(QDate(year, month + 1, day), QTime(hour, min, sec), QTimeZone::UTC);
@@ -105,11 +107,8 @@ std::int64_t parseRfc1123DateLockFree(std::string_view str)
         return -1;
 
     // Convert month name to number
-    static constexpr const char* kMonths[] = {
-        "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-
     tm.tm_mon = -1;
-    for (int i = 0; i < 12; ++i)
+    for (int i = 0; i < std::ssize(kMonths); ++i)
     {
         if (strncmp(monthStr, kMonths[i], 3) == 0)
         {
@@ -154,11 +153,8 @@ std::int64_t parseRfc850DateLockFree(std::string_view str)
         return -1;
 
     // Convert month name to number
-    static constexpr const char* kMonths[] = {
-        "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-
     tm.tm_mon = -1;
-    for (int i = 0; i < 12; ++i)
+    for (int i = 0; i < std::ssize(kMonths); ++i)
     {
         if (strncmp(monthStr, kMonths[i], 3) == 0)
         {
@@ -218,11 +214,8 @@ std::int64_t parseAnsiCDateLockFree(std::string_view str)
     }
 
     // Convert month name to number
-    static constexpr const char* kMonths[] = {
-        "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-
     tm.tm_mon = -1;
-    for (int i = 0; i < 12; ++i)
+    for (int i = 0; i < std::ssize(kMonths); ++i)
     {
         if (strncmp(monthStr, kMonths[i], 3) == 0)
         {
@@ -301,8 +294,6 @@ QString timestampToDebugString(milliseconds timestamp, const QString& format)
 
 std::string formatDateTime(const QDateTime& value)
 {
-    // Starts with Monday to correspond to QDate::dayOfWeek() return value: 1 for Monday, 7 for Sunday
-
     if (value.isNull() || !value.isValid())
         return std::string();
 

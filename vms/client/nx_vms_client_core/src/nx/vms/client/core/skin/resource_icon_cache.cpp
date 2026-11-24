@@ -245,8 +245,7 @@ bool isCurrentlyConnectedServer(const QnResourcePtr& resource)
         && appContext()->currentSystemContext()->currentServerId() == server->getId();
 }
 
-using Key = ResourceIconCache::Key;
-Key calculateStatus(Key key, const QnResourcePtr& resource)
+ResourceIconCache::Key calculateStatus(ResourceIconCache::Key key, const QnResourcePtr& resource)
 {
     using Key = ResourceIconCache::KeyPart;
     using Status = ResourceIconCache::KeyPart;

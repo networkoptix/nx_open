@@ -555,12 +555,12 @@ rest::Handle AnalyticsSearchListModel::Private::lookupObjectTracksCached(
                 NX_VERBOSE(q, "Found cached request with %1 callbacks", tmp.callbacks.size());
                 if (NX_ASSERT(tmp.handle == handle && !tmp.callbacks.empty()))
                 {
-                    const auto last = --tmp.callbacks.end();
+                    const auto lastIt = std::prev(tmp.callbacks.end());
 
-                    for (auto it = tmp.callbacks.begin(); it != last; ++it)
+                    for (auto it = tmp.callbacks.begin(); it != lastIt; ++it)
                         (it->second)(success, handle, nx::analytics::db::LookupResult(result));
 
-                    (last->second)(success, handle, std::move(result));
+                    (lastIt->second)(success, handle, std::move(result));
                 }
 
                 NX_VERBOSE(q, "Removed handle=%1 from cache, %2 requests are still cached",
