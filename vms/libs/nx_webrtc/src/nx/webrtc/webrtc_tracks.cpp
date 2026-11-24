@@ -192,16 +192,6 @@ int Tracks::nextMid()
     return m_nextMid++;
 }
 
-std::string TracksForSend::mimeType() const
-{
-    return m_session->muxer()->mimeType();
-}
-
-std::string TracksForRecv::mimeType() const
-{
-    return "";
-}
-
 bool TracksForSend::examineSdp(const std::string& /*sdp*/)
 {
     return true;

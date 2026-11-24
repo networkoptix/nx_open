@@ -4,6 +4,7 @@
 
 #include <nx/network/ssl/certificate.h>
 #include <nx/network/ssl/context.h>
+#include <nx/vms/api/data/resolution_data.h>
 
 #include "abstract_camera_data_provider.h"
 #include "webrtc_consumer.h"
@@ -93,11 +94,9 @@ public:
      */
     nx::network::aio::AbstractAioThread* aioThread() const { return m_aioThread; }
     void setStreamDataFilter(nx::vms::api::StreamDataFilters filter) { m_streamDataFilter = filter; }
-    void setTranscodingParams(nx::vms::api::WebRtcMethod method,
-        const nx::core::transcoding::Settings& transcodingParams,
+    void setTranscodingParams(const nx::core::transcoding::Settings& transcodingParams,
         std::optional<nx::vms::api::ResolutionData> resolution,
         std::optional<nx::vms::api::ResolutionData> resolutionWhenTranscoding,
-        nx::vms::api::WebRtcTrackerSettings::MseFormat mseFormat,
         std::optional<QString> videoCodec = std::nullopt);
     std::shared_ptr<nx::metric::Storage> metrics() const;
     Reader* reader() { return m_reader.get(); }
@@ -158,7 +157,7 @@ public:
      * goes on as one continuous RTP stream whose packets merely carry another payload type from
      * here on. No SDP is exchanged, which is what the m-line offering every codec at once buys
      * (see Transcoder::createRtpEncoder()): the client has already accepted the payload type,
-     * so there is nothing left to ask it. SRTP only, MSE has no payload types.
+     * so there is nothing left to ask it.
      *
      * @return notNegotiated if the client left this codec out of its answer -- the only thing
      *     left then is to tell it so, since no offer of ours can add a codec it cannot decode;
@@ -171,8 +170,7 @@ public:
      * An answer accepts an m-line as a whole, formats of its own and all, so it may well take
      * the track and leave out the very codec the Device streams on it -- and a packet sent
      * under a payload type the answer does not list is dropped by the receiver unread. A track
-     * no answer has covered yet counts as negotiated, as it does in switchCodec(). SRTP only:
-     * MSE carries a mime type instead of payload types.
+     * no answer has covered yet counts as negotiated, as it does in switchCodec().
      */
     bool isStreamedCodecNegotiated(nx::Uuid deviceId);
 
@@ -232,14 +230,12 @@ private:
     std::vector<IceCandidate> m_iceCandidates;
 
     // Transcoding output stream.
-    nx::vms::api::WebRtcMethod m_method = nx::vms::api::WebRtcMethod::srtp;
     nx::core::transcoding::Settings m_transcodingSettings;
-    // The video codec the request asked for, if any; it wins over the default of the delivery
-    // method. Unlike the settings above it names an encoder, not a filter, so it is kept apart.
+    // The video codec the request asked for, if any; it wins over the default. Unlike the
+    // settings above it names an encoder, not a filter, so it is kept apart.
     std::optional<QString> m_videoCodec;
     std::optional<nx::vms::api::ResolutionData> m_resolution;
     std::optional<nx::vms::api::ResolutionData> m_resolutionWhenTranscoding;
-    nx::vms::api::WebRtcTrackerSettings::MseFormat m_mseFormat;
 
     bool m_stopped = false;
     nx::vms::api::StreamDataFilters m_streamDataFilter{nx::vms::api::StreamDataFilter::media};

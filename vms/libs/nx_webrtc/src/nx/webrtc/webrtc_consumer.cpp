@@ -55,7 +55,7 @@ void Consumer::startStream(Streamer* streamer)
 {
     // NOTE: m_pollable is not rebound to the ICE thread here. It stays in the session thread for
     // the whole lifetime of the consumer, see Session::aioThread(). Every Ice method used from
-    // this thread (writeBatch(), writeDataChannelBatch(), writePacket()) is thread-safe and
+    // this thread (writeBatch(), writePacket()) is thread-safe and
     // hops to the socket thread on its own, so nothing needs the two to match.
 
     // A previous ICE may have stopped this consumer before losing the session. This reset must
@@ -108,10 +108,7 @@ void Consumer::seek(nx::Uuid deviceId, int64_t timestampUs, StatusHandler handle
     runInMuxingThread(
         [this, handler, deviceId, timestampUs]()
         {
-            bool useAudioLastGop = //< TODO is it needed?
-                m_session->muxer()->method() == nx::vms::api::WebRtcMethod::mse;
-            auto doSeek = [this, useAudioLastGop, timestampUs](
-                              nx::Uuid id, auto provider, auto handler)
+            auto doSeek = [this, timestampUs](nx::Uuid id, auto provider, auto handler)
             {
                 if (provider && !m_session->isStreamedCodecNegotiated(id))
                 {
@@ -127,7 +124,7 @@ void Consumer::seek(nx::Uuid deviceId, int64_t timestampUs, StatusHandler handle
                     return;
                 }
 
-                auto status = provider && provider->play(timestampUs, useAudioLastGop)
+                auto status = provider && provider->play(timestampUs, /*useAudioLastGop*/ false)
                     ? StreamStatus::success
                     : StreamStatus::nodata;
                 handler(id, status);
@@ -236,12 +233,6 @@ void Consumer::nextFrame(nx::Uuid deviceId, StatusHandler handler)
     runInMuxingThread(
         [this, handler, deviceId]()
         {
-            if (m_session->muxer()->method() == nx::vms::api::WebRtcMethod::mse)
-            {
-                // Pause/Resume/NextFrame not supported for MSE.
-                handler(deviceId, StreamStatus::nodata);
-                return;
-            }
             auto provider = m_session->provider(deviceId);
             auto status = provider && provider->nextFrame()
                 ? StreamStatus::success
@@ -400,7 +391,7 @@ void Consumer::processNextData()
 
         nx::utils::ByteArray buffer;
         std::deque<nx::Buffer> mediaBuffers;
-        while (!m_needStop && m_session->muxer()->getNextPacket(rtpEncoder, buffer))
+        while (!m_needStop && rtpEncoder->getNextPacket(buffer))
         {
             mediaBuffers.emplace_back(buffer.data(), buffer.size());
             buffer.clear();
@@ -409,23 +400,11 @@ void Consumer::processNextData()
         // In case with changed codec, encoder will report with EOF.
         // Maybe need to make additional check for extradata: for example, some high h.264 profiles
         // can be unsupported by browser.
-        if (m_session->muxer()->isEof(deviceId, rtpEncoder))
+        if (rtpEncoder->isEof())
         {
             // The m-line offers every codec its Device may switch to, so a codec change costs no
             // SDP at all: the encoder is rebuilt around the new codec and goes on streaming on
-            // the same m-line, under a payload type the client has already accepted. MSE is the
-            // exception -- it has no payload types and reports EOF for good, its muxer can only
-            // be re-created with the session.
-            if (m_session->muxer()->method() != nx::vms::api::WebRtcMethod::srtp)
-            {
-                NX_WARNING(this,
-                    "Device %1 changed codec, which the MSE delivery method cannot follow, "
-                    "ask the client to reconnect",
-                    deviceId);
-                m_streamer->handleStreamStatus(deviceId, StreamStatus::reconnect);
-                return;
-            }
-
+            // the same m-line, under a payload type the client has already accepted.
             switch (m_session->switchCodec(deviceId, media->dataType))
             {
                 case CodecSwitchResult::done:
@@ -436,7 +415,7 @@ void Consumer::processNextData()
                         continue;
 
                     mediaBuffers.clear();
-                    while (!m_needStop && m_session->muxer()->getNextPacket(rtpEncoder, buffer))
+                    while (!m_needStop && rtpEncoder->getNextPacket(buffer))
                     {
                         mediaBuffers.emplace_back(buffer.data(), buffer.size());
                         buffer.clear();
@@ -486,10 +465,7 @@ void Consumer::processNextData()
             // the ready chunk, it will be sent later in the callback onDataSent, so sending is not
             // wait for chunk collection.
 
-            if (m_session->muxer()->method() == nx::vms::api::WebRtcMethod::srtp)
-                m_streamer->ice()->writeBatch(mediaBuffers);
-            else
-                m_streamer->ice()->writeDataChannelBatch(mediaBuffers);
+            m_streamer->ice()->writeBatch(mediaBuffers);
             m_sendInProgress = true;
             break;
         }

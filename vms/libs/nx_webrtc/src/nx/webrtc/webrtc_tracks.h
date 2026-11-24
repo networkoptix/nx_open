@@ -72,7 +72,6 @@ public:
     // Every m-line of the session, keyed and ordered by its index in the offer.
     std::map<int, std::unique_ptr<Track>>& tracks() { return m_tracks; }
 
-    virtual std::string mimeType() const = 0;
     virtual bool examineSdp(const std::string& sdp) = 0;
 
     // The media description of `track`, or {} when nothing backs it any more -- then the m-line
@@ -106,7 +105,6 @@ public:
     TracksForSend(Session* session);
     virtual ~TracksForSend() override = default;
 
-    virtual std::string mimeType() const override;
     virtual bool examineSdp(const std::string& sdp) override;
     virtual std::string getSdpForTrack(const Track* track, uint16_t port) const override;
 };
@@ -118,7 +116,6 @@ public:
     TracksForRecv(Session* session);
     virtual ~TracksForRecv() override = default;
 
-    virtual std::string mimeType() const override;
     virtual bool examineSdp(const std::string& sdp) override;
     virtual std::string getSdpForTrack(const Track* track, uint16_t port) const override;
 };

@@ -130,8 +130,7 @@ struct NX_VMS_API MediaSettings
 
     /**%apidoc
      * Forces specific video codec. Causes error response if the specified codec is not found, or
-     * is not supported by whatever carries it: the container (see `format`), or, for WebRTC, the
-     * delivery method (see `deliveryMethod`).
+     * is not supported by whatever carries it: the container (see `format`), or WebRTC.
      */
     std::optional<QString> videoCodec;
 

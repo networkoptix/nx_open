@@ -36,7 +36,6 @@ class NoTracks: public Tracks
 {
 public:
     NoTracks(): Tracks(nullptr) {}
-    std::string mimeType() const override { return {}; }
     bool examineSdp(const std::string&) override { return true; }
 };
 

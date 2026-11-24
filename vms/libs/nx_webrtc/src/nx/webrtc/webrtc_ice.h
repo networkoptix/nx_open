@@ -67,10 +67,8 @@ public:
 
     // API for Transceiver.
     void writeBatch(const std::deque<nx::Buffer>& mediaBuffers);
-    void writeDataChannelBatch(const std::deque<nx::Buffer>& mediaBuffers);
     aio::AbstractAioThread* getAioThread();
     void writeDataChannelString(const std::string& data);
-    void writeDataChannelBinary(const std::string& data);
 
     virtual IceCandidate::Filter type() const = 0;
 

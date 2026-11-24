@@ -223,11 +223,10 @@ protected:
             SessionConfig{},
             /*stunServers*/ std::vector<nx::network::SocketAddress>{},
             Purpose::send);
-        m_session->setTranscodingParams(nx::vms::api::WebRtcMethod::srtp,
+        m_session->setTranscodingParams(
             /*transcodingParams*/ {}, //< Nothing forces transcoding; the codec decides.
             /*resolution*/ std::nullopt,
-            /*resolutionWhenTranscoding*/ std::nullopt,
-            /*mseFormat*/ {});
+            /*resolutionWhenTranscoding*/ std::nullopt);
     }
 
     nx::network::SocketGlobals::InitGuard m_socketGlobals;

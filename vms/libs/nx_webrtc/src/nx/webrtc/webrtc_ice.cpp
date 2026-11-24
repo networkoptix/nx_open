@@ -365,12 +365,6 @@ void Ice::writeBatch(const std::deque<nx::Buffer>& mediaBuffers)
     sendNextBufferUnsafe();
 }
 
-void Ice::writeDataChannelBatch(const std::deque<nx::Buffer>& mediaBuffers)
-{
-    for (const auto& packet: mediaBuffers)
-        writeDataChannelBinary({packet.data(), packet.size()});
-}
-
 aio::AbstractAioThread* Ice::getAioThread()
 {
     return m_pollable.getAioThread();
@@ -457,16 +451,6 @@ void Ice::writeDataChannelString(const std::string& data)
         [this, data]()
         {
             if (!m_dataChannel.writeString(data))
-                stopUnsafe();
-        });
-}
-
-void Ice::writeDataChannelBinary(const std::string& data)
-{
-    m_pollable.dispatch(
-        [this, data]()
-        {
-            if (!m_dataChannel.writeBinary(data))
                 stopUnsafe();
         });
 }

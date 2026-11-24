@@ -51,13 +51,9 @@ std::string generatePwd(int size)
     return result;
 }
 
-// What a Device is transcoded to when the request names no codec of its own: whatever the
-// delivery method carries by default.
+// What a Device is transcoded to when the request names no codec of its own.
 static const AVCodecID kDefaultSrtpVideoCodec = AV_CODEC_ID_VP8;
 static const AVCodecID kDefaultSrtpAudioCodec = AV_CODEC_ID_PCM_MULAW;
-
-static const AVCodecID kDefaultMseVideoCodec = AV_CODEC_ID_H264;
-static const AVCodecID kDefaultMseAudioCodec = AV_CODEC_ID_AAC;
 
 // Neither H.264 nor Opus has a statically assigned RTP payload type, so both take one from the
 // dynamic range (96-127). These are the values browsers use, which keeps the offer familiar.
@@ -327,12 +323,8 @@ CodecSwitchResult Session::switchCodec(
     nx::Uuid deviceId, QnAbstractMediaData::DataType videoOrAudio)
 {
     const bool isVideo = videoOrAudio == QnAbstractMediaData::VIDEO;
-    if (!NX_ASSERT(isVideo || videoOrAudio == QnAbstractMediaData::AUDIO)
-        || !NX_ASSERT(m_method == nx::vms::api::WebRtcMethod::srtp,
-            "A payload type means nothing to the MSE delivery method"))
-    {
+    if (!NX_ASSERT(isVideo || videoOrAudio == QnAbstractMediaData::AUDIO))
         return CodecSwitchResult::failed;
-    }
 
     auto provider = this->provider(deviceId);
     if (!provider)
@@ -401,7 +393,7 @@ CodecSwitchResult Session::switchCodec(
 
     // What the m-line offers is the codec itself, not the number: a codec with no payload type
     // of its own would go out under one the client reads as another codec. That is what an
-    // implicit transcode to the default codec of the delivery method would do here.
+    // implicit transcode to the default WebRTC codec would do here.
     const auto payloadType = rtpPayloadType(encoder->sourceCodec());
     if (!payloadType || !track->negotiatedPayloadTypes.contains(*payloadType))
     {
@@ -430,9 +422,6 @@ CodecSwitchResult Session::switchCodec(
 
 bool Session::isStreamedCodecNegotiated(nx::Uuid deviceId)
 {
-    if (m_method != nx::vms::api::WebRtcMethod::srtp)
-        return true;
-
     for (const auto& [_, track]: m_tracks->tracks())
     {
         if (track->deviceId != deviceId || track->offerState != TrackState::active)
@@ -536,20 +525,16 @@ void Session::addProvider(std::shared_ptr<AbstractCameraDataProvider> provider)
     provider->setDataConsumer(m_consumer);
 }
 
-void Session::setTranscodingParams(nx::vms::api::WebRtcMethod method,
-    const nx::core::transcoding::Settings& transcodingSettings,
+void Session::setTranscodingParams(const nx::core::transcoding::Settings& transcodingSettings,
     std::optional<nx::vms::api::ResolutionData> resolution,
     std::optional<nx::vms::api::ResolutionData> resolutionWhenTranscoding,
-    nx::vms::api::WebRtcTrackerSettings::MseFormat mseFormat,
     std::optional<QString> videoCodec)
 {
-    m_method = method;
     m_transcodingSettings = transcodingSettings;
     m_videoCodec = std::move(videoCodec);
     m_resolution = resolution;
     m_resolutionWhenTranscoding = resolutionWhenTranscoding;
-    m_mseFormat = mseFormat;
-    m_muxer = std::make_unique<Transcoder>(this, m_method, m_mseFormat);
+    m_muxer = std::make_unique<Transcoder>(this);
 }
 
 bool Session::initializeMuxer(
@@ -583,12 +568,10 @@ bool Session::initializeMuxer(
         if (videoTranscodingRequired)
         {
             QnFfmpegVideoTranscoder::Config config(transcodePolicy);
-            config.targetCodecId = m_method == nx::vms::api::WebRtcMethod::srtp
-                ? kDefaultSrtpVideoCodec
-                : kDefaultMseVideoCodec;
+            config.targetCodecId = kDefaultSrtpVideoCodec;
 
-            // A request that names the codec gets that codec rather than the default of the
-            // delivery method: the client knows what it can decode and says so.
+            // A request that names the codec gets that codec rather than the default: the client
+            // knows what it can decode and says so.
             if (const auto& requested = m_videoCodec)
             {
                 const auto requestedCodecId = nx::transcoding::findEncoderCodecId(*requested);
@@ -601,9 +584,8 @@ bool Session::initializeMuxer(
                 if (!m_muxer->isVideoCodecSupported(requestedCodecId))
                 {
                     NX_DEBUG(this,
-                        "The requested video codec %1 can't be delivered via %2",
-                        requestedCodecId,
-                        m_method);
+                        "The requested video codec %1 can't be delivered via SRTP",
+                        requestedCodecId);
                     return false;
                 }
 
@@ -611,8 +593,7 @@ bool Session::initializeMuxer(
             }
 
             config.quality = Qn::StreamQuality::normal;
-            if (m_method == nx::vms::api::WebRtcMethod::srtp)
-                config.rtpContatiner = true;
+            config.rtpContatiner = true;
 
             if (m_resolution)
                 config.outputResolutionLimit = m_resolution->size;
@@ -622,13 +603,6 @@ bool Session::initializeMuxer(
                 config.targetCodecId, config.outputResolutionLimit);
 
             config.params = suggestMediaStreamParams(config.targetCodecId, config.quality);
-            if (m_method == nx::vms::api::WebRtcMethod::mse)
-            {
-                // Gop size should be less then MAX_FRAME_DURATION (5s) for correct delay
-                // calculation in Consumer::calculateDelay(). You can only specify gop_size in
-                // number of frames, so 20/ is enough for fps >= 5.
-                config.params.insert(QnCodecParams::gop_size, 20);
-            }
             if (!provider->addVideoTranscoder(config, m_transcodingSettings))
                 return false;
 
@@ -646,9 +620,7 @@ bool Session::initializeMuxer(
             !m_muxer->isAudioCodecSupported(audioCodecParamaters->getCodecId());
         if (audioTranscodingRequired)
         {
-            auto audioCodecId = m_method == nx::vms::api::WebRtcMethod::srtp
-                ? kDefaultSrtpAudioCodec
-                : kDefaultMseAudioCodec;
+            const auto audioCodecId = kDefaultSrtpAudioCodec;
             if (!provider->addAudioTranscoder(audioCodecId))
                 return false;
 

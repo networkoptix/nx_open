@@ -11,8 +11,12 @@ namespace nx::vms::api {
  */
 NX_REFLECTION_ENUM_CLASS(WebRtcMethod,
     srtp, /**<%apidoc Use Secure RTP (a standard way). */
-    mse /**<%apidoc Use media chunks via Data Channel (a non-standard way). */
-);
+
+    /**%apidoc
+     * No longer supported, a request with it fails. Used to deliver media chunks via Data
+     * Channel (a non-standard way). Kept only to report the failure clearly.
+     */
+    mse);
 
 struct NX_VMS_API WebRtcTrackerSettings: public MediaSettings
 {
@@ -31,7 +35,7 @@ struct NX_VMS_API WebRtcTrackerSettings: public MediaSettings
      */
     std::optional<std::string> speed{"1.0"};
 
-    /**%apidoc[opt] */
+    /**%apidoc[opt] Only `srtp` is supported. */
     WebRtcMethod deliveryMethod = WebRtcMethod::srtp;
 
     /**%apidoc[opt] If specified, don't resend lost UDP packets. */
@@ -45,7 +49,8 @@ struct NX_VMS_API WebRtcTrackerSettings: public MediaSettings
         mp4
     );
 
-    /**%apidoc[opt] MSE delivery only, media format(container) in which media data will be mixed.
+    /**%apidoc[opt]
+     * %deprecated Ignored: the MSE delivery method is no longer supported.
      */
     MseFormat mseFormat = MseFormat::mp4;
 

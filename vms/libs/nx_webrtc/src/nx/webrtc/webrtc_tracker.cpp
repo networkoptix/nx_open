@@ -94,12 +94,6 @@ void Tracker::sendOffer()
     std::string sdp = m_session->constructSdp(&m_bundleTag);
     rapidjson::Value sdpValue(sdp, d.GetAllocator());
     sdpRoot.AddMember("sdp", sdpValue, d.GetAllocator());
-    if (const auto& mime = m_session->tracks()->mimeType(); !mime.empty())
-    {
-        rapidjson::Value mimeValue(mime, d.GetAllocator());
-        d.AddMember("mime", mimeValue, d.GetAllocator());
-    }
-
     d.AddMember("sdp", sdpRoot, d.GetAllocator());
     sendJson(d);
 }

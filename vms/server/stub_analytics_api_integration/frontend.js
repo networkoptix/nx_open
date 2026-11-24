@@ -43,8 +43,7 @@ var elements = {
     nextFrameButton: null,
     seekInput: null,
     timestamp: null,
-    transcoding: null,
-    hiddenName: "hidden"};
+    transcoding: null};
 // ws connection
 var serverConnection;
 
@@ -79,7 +78,6 @@ var webrtc = {
     streamValue: null,
     pauseValue: false,
     lastTimestampMs: null,
-    deliveryMethod: null,
     activeConfig: null,
     remoteDescriptionSet: false,
     pendingIceCandidates: [],
@@ -97,11 +95,6 @@ var webrtc = {
     activeDeviceId: null,
     attemptPhase: "idle",
     lastInitReason: ""};
-var mse = {
-    mediaSource: null,
-    sourceBuffer: null,
-    buffersArray: null,
-    mimeType: null};
 
 var peerConnectionConfig = {
   iceServers: kDefaultIceServers,
@@ -591,16 +584,6 @@ async function logAllIceCandidatePairs(reason, peerConnection) {
   }
 }
 
-function getHiddenName() {
-  if (typeof document.hidden !== "undefined") {
-    elements.hiddenName = "hidden";
-  } else if (typeof document.msHidden !== "undefined") {
-    elements.hiddenName = "msHidden";
-  } else if (typeof document.webkitHidden !== "undefined") {
-    elements.hiddenName = "webkitHidden";
-  }
-}
-
 function initWebRtc(config) {
   elements.remoteVideo = document.getElementById('remoteVideo');
   elements.muteButton = document.getElementById('muteButton');
@@ -610,8 +593,6 @@ function initWebRtc(config) {
   elements.timestamp = document.getElementById('timestamp');
   elements.transcoding = document.getElementById('transcoding');
   elements.seekInput = document.getElementById('seekInput');
-
-  getHiddenName();
 
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
@@ -698,14 +679,10 @@ function reconnect(position, effectiveConfig, attemptToken) {
     + " token=" + attemptToken
     + " deviceId=" + (webrtc.activeDeviceId || "unknown")
     + " reason=" + webrtc.lastInitReason);
-  mse.buffersArray = new Array();
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
   const speed = urlParams.get('speed');
-  webrtc.deliveryMethod = (urlParams.get('deliveryMethod') == 'mse') ? 'mse' : 'srtp';
-  if (webrtc.deliveryMethod == 'srtp') {
-    elements.pauseButton.disabled = false;
-  }
+  elements.pauseButton.disabled = false;
 
   function post(path, data = {}) {
     return fetch('https://' + effectiveConfig.vmsHost + ':' + effectiveConfig.vmsPort + path,
@@ -793,7 +770,6 @@ function reconnect(position, effectiveConfig, attemptToken) {
       + '&stream='
       + webrtc.streamValue
       + (speed != null ? '&speed=' + speed : '')
-      + '&deliveryMethod=' + webrtc.deliveryMethod
       + (position != null ? ('&positionMs=' + parseInt(position)) : '')
       + (resolutionWhenTranscoding != null ? ('&resolutionWhenTranscoding=' + resolutionWhenTranscoding) : '')
       + (resolution != null ? ('&resolution=' + resolution) : '')
@@ -825,85 +801,6 @@ function reconnect(position, effectiveConfig, attemptToken) {
       logger.error('Login error', e);
       setAttemptPhase("idle", "ticket-fetch-failed");
     });
-}
-
-function restartMse() {
-  if (mse.sourceBuffer != null) {
-    mse.sourceBuffer.abort();
-    mse.sourceBuffer = null;
-  }
-  mse.mediaSource = null;
-  startMse();
-}
-
-function startMse() {
-  if(!window.MediaSource) {
-    logger.error('No Media Source API available');
-    return;
-  }
-  mse.mediaSource = new MediaSource();
-  elements.remoteVideo.src = window.URL.createObjectURL(mse.mediaSource);
-  mse.mediaSource.onsourceopen = () => {
-    logger.log('ms is opened');
-    if (mse.mimeType)
-      startSourceBuffer();
-  };
-}
-
-function appendToBuffer()
-{
-  if (mse.sourceBuffer && mse.buffersArray.length > 0) {
-    logger.log('ms add from buffers');
-    var buffer = mse.buffersArray.shift();
-    mse.sourceBuffer.appendBuffer(buffer);
-  }
-}
-
-function updateMseAudio()
-{
-  if(mse.sourceBuffer != null
-    && mse.mimeType.indexOf('mp4a.') != -1) { // Check for compatible audio codec.
-    muteUpdate();
-  } else {
-    elements.muteButton.textContent = "No audio";
-    elements.muteButton.disabled = true;
-  }
-}
-
-function startSourceBuffer()
-{
-  if (mse.sourceBuffer != null)
-    return;
-  if (!MediaSource.isTypeSupported(mse.mimeType)) {
-    logger.warn('mime is not supported: ' + mse.mimeType);
-    return;
-  }
-  logger.log('start source buffer');
-  mse.sourceBuffer = mse.mediaSource.addSourceBuffer(mse.mimeType);
-  mse.sourceBuffer.mode = "sequence";
-
-  updateMseAudio();
-  appendToBuffer();
-  mse.sourceBuffer.onupdateend = () => {
-    logger.log('ms update end');
-    appendToBuffer();
-  };
-  mse.sourceBuffer.onerror = event => {
-    logger.error('ms update error ' + event);
-    reconnectHandler(event);
-  };
-
-  // FIXME: is not correct way to start play, see https://goo.gl/LdLk22
-  var playPromise = elements.remoteVideo.play();
-  if (playPromise != undefined) {
-    playPromise.then(_ => {
-      logger.log('play started');
-    })
-    .catch(error => {
-      logger.error('error with play started: ' + error);
-      reconnectHandler(error);
-    });
-  }
 }
 
 function start(attemptToken) {
@@ -977,7 +874,6 @@ function start(attemptToken) {
   peerConnection.addEventListener('datachannel', event => {
     logger.log('got remote data channel');
     webrtc.remoteDataChannel = event.channel;
-    webrtc.remoteDataChannel.binaryType = 'arraybuffer';
     webrtc.remoteDataChannelLastMessageTimestampMs = Date.now();
     startDataChannelWatchdog(peerConnection);
 
@@ -1031,27 +927,6 @@ function start(attemptToken) {
         // 404 (after seek, data for this timestamp is not found)
         if (message.status && message.status == 301) {
           beginReconnect(timestampMs, webrtc.activeConfig, "status-301");
-        } else if (message.status && message.status == 100) {
-          if (webrtc.deliveryMethod != null && webrtc.deliveryMethod == 'mse') {
-            // Note that initial segment can be received before 200, so restarting MSE on 100.
-            restartMse();
-          }
-        }
-      } else {
-        var buffer = new Uint8Array(event.data);
-        logger.log('dc binary: type = ' + typeof(event.data) +  ' len = ' + buffer.length);
-        var buffer = new Uint8Array(event.data);
-        if (mse.sourceBuffer == null || mse.sourceBuffer.updating) {
-          mse.buffersArray.push(buffer);
-          logger.log('ms pushed to buffer array, length = ' + mse.buffersArray.length);
-        } else if (!document[elements.hiddenName]) {
-          try {
-            mse.sourceBuffer.appendBuffer(buffer);
-          } catch(error) {
-            reconnectHandler();
-          }
-        } else {
-            logger.log("skip buffer on hidden page");
         }
       }
     });
@@ -1186,11 +1061,6 @@ function gotMessageFromServer(message, sourceWebSocket, attemptToken) {
 
   var signal = JSON.parse(message.data);
 
-  if(signal.mime) {
-    mse.mimeType = signal.mime;
-    if(mse.mediaSource != null && mse.mediaSource.readyState == 'open')
-      startSourceBuffer();
-  }
   if(signal.transcoding != null) {
     elements.transcoding.textContent = "transcoding: ";
     if(signal.transcoding.video) {
