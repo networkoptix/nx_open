@@ -351,6 +351,11 @@ if(compilerMsvc)
         add_compile_options(/wd26444)
     endif()
 
+    # CMAKE_MSVC_DEBUG_INFORMATION_FORMAT is not set here, so the Debug build uses the CMake
+    # default, ProgramDatabase (/Zi). It can be overridden, e.g. with "Embedded" (/Z7), which a
+    # compiler cache needs: with /Zi every compile step writes into a shared .pdb, and such a step
+    # is not cacheable.
+
     # "/Z7" flag tells the compiler to save the debug info to the .obj file instead of sending this
     # data to the process mspdbsrv.exe, which saves it to a .pdb file. This approach allows to
     # avoid possible interprocess locks, and thus improves the parallelability of the entire build
