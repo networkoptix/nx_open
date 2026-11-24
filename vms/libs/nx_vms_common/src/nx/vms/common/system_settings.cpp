@@ -239,6 +239,8 @@ struct SystemSettings::Private
     QnResourcePropertyAdaptor<bool>* supportedOriginCredentialsAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* frameOptionsHeaderAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* useHttpsOnlyForCamerasAdaptor = nullptr;
+    QnResourcePropertyAdaptor<nx::vms::api::DeviceStreamSecurityPolicy>*
+        deviceSecureStreamAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* securityForPowerUsersAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* insecureDeprecatedApiEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* insecureDeprecatedApiInUseEnabledAdaptor = nullptr;
@@ -926,6 +928,20 @@ void SystemSettings::initMiscAdaptors()
     d->useHttpsOnlyForCamerasAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "useHttpsOnlyForCameras", false, this, [] { return tr("Use only HTTPS for cameras."); });
 
+    d->deviceSecureStreamAdaptor =
+        new QnReflectLexicalResourcePropertyAdaptor<nx::vms::api::DeviceStreamSecurityPolicy>(
+            Names::deviceSecureStream,
+            nx::vms::api::DeviceStreamSecurityPolicy::allowInsecureStream,
+            this,
+            []
+            {
+                return tr(
+                    "Encryption of video streams received from devices (e.g. RTSPS, SRTP): "
+                    "\"allowInsecureStream\" (not required), "
+                    "\"preferSecureStream\" (used if supported by the device), "
+                    "\"requireSecureStream\" (always used).");
+            });
+
     d->securityForPowerUsersAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         Names::securityForPowerUsers, true, this,
         [] { return tr("Allow Power User editing Security Settings."); });
@@ -1076,6 +1092,12 @@ void SystemSettings::initMiscAdaptors()
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
         &SystemSettings::useHttpsOnlyForCamerasChanged,
+        Qt::QueuedConnection);
+
+    connect(d->deviceSecureStreamAdaptor,
+        &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this,
+        &SystemSettings::deviceSecureStreamChanged,
         Qt::QueuedConnection);
 
     connect(
@@ -2660,6 +2682,16 @@ bool SystemSettings::useHttpsOnlyForCameras() const
 void SystemSettings::setUseHttpsOnlyForCameras(bool value)
 {
     d->useHttpsOnlyForCamerasAdaptor->setValue(value);
+}
+
+nx::vms::api::DeviceStreamSecurityPolicy SystemSettings::deviceSecureStream() const
+{
+    return d->deviceSecureStreamAdaptor->value();
+}
+
+void SystemSettings::setDeviceSecureStream(nx::vms::api::DeviceStreamSecurityPolicy value)
+{
+    d->deviceSecureStreamAdaptor->setValue(value);
 }
 
 bool SystemSettings::securityForPowerUsers() const

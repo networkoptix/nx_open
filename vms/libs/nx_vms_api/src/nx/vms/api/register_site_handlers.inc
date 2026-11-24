@@ -96,7 +96,24 @@ void registerSiteSettingHandlers(
         std::make_unique<SiteSetupHandler<api::SetupSystemData>>(
             serverModule, cloudManagerGroup));
 
-    /**%apidoc POST /rest/v{4-}/site/setup
+    /**%apidoc POST /rest/v4/site/setup
+     * Sets up this Server to form a new Site. Can only be called if this Server is not a part of
+     * any other Site.
+     * %caption Set up Site
+     * %ingroup Site
+     * %struct SetupSiteData
+     *     %param:{std::variant<int, QString>} settings.auditTrailPeriodDays
+     *     %param:{std::variant<int, QString>} settings.ec2AliveUpdateIntervalSec
+     *     %param:{std::variant<int, QString>} settings.eventLogPeriodDays
+     *     %param:{std::variant<int, QString>} settings.maxDifferenceBetweenSynchronizedAndInternetTime
+     *     %param:{std::variant<int, QString>} settings.maxRtspConnectDurationSeconds
+     *     %param:{std::variant<int, QString>} settings.syncTimeEpsilon
+     *     %param:{std::variant<int, QString>} settings.syncTimeExchangePeriod
+     *     %param[unused] settings.deviceSecureStream
+     * %param[ref] _strict,_ticket
+     * %permissions Administrator with a fresh session.
+     *
+     **%apidoc POST /rest/v{5-}/site/setup
      * Sets up this Server to form a new Site. Can only be called if this Server is not a part of
      * any other Site.
      * %caption Set up Site
@@ -159,7 +176,18 @@ void registerSiteSettingHandlers(
         GlobalPermission::none, GlobalPermission::powerUserWithFreshSession,
         std::make_unique<SystemSettingsHandler>(serverModule->systemContext(), cloudManagerGroup));
 
-    /**%apidoc GET /rest/v{4-}/site/settings
+    /**%apidoc GET /rest/v4/site/settings
+     * %jsonrpc[result] all
+     * %jsonrpc subscribe Same result and `update` notifications over time where `params` is JSON
+     *     object with single field and actual setting value changed.
+     * %caption Get Site settings
+     * %ingroup Site
+     * %param[ref] _format,_stripDefault,_language,_pretty,_strict,_ticket
+     * %permissions Any User.
+     * %return:{SiteSettings} Site settings and their values.
+     *     %param[unused] deviceSecureStream
+     *
+     **%apidoc GET /rest/v{5-}/site/settings
      * %jsonrpc[result] all
      * %jsonrpc subscribe Same result and `update` notifications over time where `params` is JSON
      *     object with single field and actual setting value changed.
@@ -180,7 +208,21 @@ void registerSiteSettingHandlers(
      * %permissions Any User.
      * %return Value of the particular Site setting.
      *
-     **%apidoc PATCH /rest/v{4-}/site/settings
+     **%apidoc PATCH /rest/v4/site/settings
+     * Modifies a bunch of Site settings by passing a JSON object with the setting keys and
+     * values in the request body. The existing settings can be obtained in the same format using
+     * the "Get Site settings" function.
+     * %example {"siteName": "Site"}
+     * %caption Modify Site settings
+     * %ingroup Site
+     * %struct[opt] SaveableSiteSettings
+     * %param[unused] deviceSecureStream
+     * %param[ref] _strict,_ticket
+     * %permissions Administrator or power user (see manifest) with a fresh session.
+     * %return:{SiteSettings}
+     *     %param[unused] deviceSecureStream
+     *
+     **%apidoc PATCH /rest/v{5-}/site/settings
      * Modifies a bunch of Site settings by passing a JSON object with the setting keys and
      * values in the request body. The existing settings can be obtained in the same format using
      * the "Get Site settings" function.

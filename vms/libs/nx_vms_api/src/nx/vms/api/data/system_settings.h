@@ -3,6 +3,8 @@
 #pragma once
 
 #include <chrono>
+#include <set>
+#include <string_view>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
@@ -29,6 +31,13 @@ NX_REFLECTION_ENUM_CLASS(IntegrationProcessMode,
 inline constexpr auto kDefaultIntegrationProcessMode =
     IntegrationProcessMode::forceLoadingInCurrentProcess;
 
+// clang-format off
+NX_REFLECTION_ENUM_CLASS(DeviceStreamSecurityPolicy,
+    allowInsecureStream,
+    preferSecureStream,
+    requireSecureStream);
+// clang-format on
+
 struct SaveableSettingsBase
 {
     std::optional<QString> defaultExportVideoCodec;
@@ -44,6 +53,7 @@ struct SaveableSettingsBase
     std::optional<bool> auditTrailEnabled;
     std::optional<bool> trafficEncryptionForced;
     std::optional<bool> useHttpsOnlyForCameras;
+    std::optional<DeviceStreamSecurityPolicy> deviceSecureStream;
     std::optional<bool> videoTrafficEncryptionForced;
     std::optional<bool> storageEncryption;
     std::optional<bool> showServersInTreeForNonAdmins;
@@ -140,7 +150,8 @@ struct SaveableSettingsBase
 
     bool operator==(const SaveableSettingsBase&) const = default;
 };
-#define SaveableSettingsBase_Fields \
+// clang-format off
+#define SaveableSettingsBaseV4_Fields \
     (defaultExportVideoCodec) \
     (watermarkSettings)(pixelationSettings)(webSocketEnabled) \
     (autoDiscoveryEnabled)(cameraSettingsOptimization)(statisticsAllowed) \
@@ -223,6 +234,17 @@ struct SaveableSettingsBase
     (upnpPortMappingEnabled) \
     (useTextEmailFormat) \
     (useWindowsEmailLineFeed)
+
+#define SaveableSettingsBaseV5_Fields \
+    (deviceSecureStream)
+
+#define SaveableSettingsBase_Fields SaveableSettingsBaseV4_Fields SaveableSettingsBaseV5_Fields
+// clang-format on
+
+#define NX_VMS_API_SETTING_NAME(R, DATA, ITEM) BOOST_PP_STRINGIZE(ITEM),
+inline const std::set<std::string_view> kSiteSettingsAddedInV5{
+    BOOST_PP_SEQ_FOR_EACH(NX_VMS_API_SETTING_NAME, _, SaveableSettingsBaseV5_Fields)};
+#undef NX_VMS_API_SETTING_NAME
 
 struct NX_VMS_API SettingsBase
 {

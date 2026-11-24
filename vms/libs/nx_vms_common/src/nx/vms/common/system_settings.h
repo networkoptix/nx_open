@@ -36,6 +36,7 @@ struct PixelationSettings;
 enum class ProxyConnectionAccessPolicy;
 enum class SystemSettingName;
 enum class IntegrationProcessMode;
+enum class DeviceStreamSecurityPolicy;
 
 } // nx::vms::api
 
@@ -97,6 +98,7 @@ struct NX_VMS_COMMON_API SystemSettingNames
     DECLARE_SETTING_NAME(deviceStorageInfoUpdateIntervalS);
     DECLARE_SETTING_NAME(secureCookieStorageKey);
     DECLARE_SETTING_NAME(integrationProcessMode);
+    DECLARE_SETTING_NAME(deviceSecureStream);
 
     static const inline std::set<QString> kReadOnlyNames = {
         cloudAccountName,
@@ -120,6 +122,7 @@ struct NX_VMS_COMMON_API SystemSettingNames
 
     static const inline std::set<QString> kSecurityNames = {
         cloudPollingIntervalS,
+        deviceSecureStream,
         disabledVendors,
         jsonRpcSubUpdateMs,
         insecureDeprecatedApiEnabled,
@@ -242,6 +245,9 @@ public:
 
     bool useHttpsOnlyForCameras() const;
     void setUseHttpsOnlyForCameras(bool value);
+
+    nx::vms::api::DeviceStreamSecurityPolicy deviceSecureStream() const;
+    void setDeviceSecureStream(nx::vms::api::DeviceStreamSecurityPolicy value);
 
     bool securityForPowerUsers() const;
     void setSecurityForPowerUsers(bool value = true);
@@ -607,6 +613,7 @@ signals:
     void maxBookmarksChanged();
     void cameraSettingsOptimizationChanged();
     void useHttpsOnlyForCamerasChanged();
+    void deviceSecureStreamChanged();
     void autoUpdateThumbnailsChanged();
     void maxSceneItemsChanged();
     void useTextEmailFormatChanged();

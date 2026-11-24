@@ -94,6 +94,7 @@ const SaveableSettingsBase kDefaultSaveableSettingsBase{
     .auditTrailEnabled = true,
     .trafficEncryptionForced = true,
     .useHttpsOnlyForCameras = false,
+    .deviceSecureStream = DeviceStreamSecurityPolicy::allowInsecureStream,
     .videoTrafficEncryptionForced = false,
     .storageEncryption = false,
     .showServersInTreeForNonAdmins = true,
