@@ -35,6 +35,41 @@ uint32_t getRtcpSsrc(const uint8_t* data, int size)
     return ntohl(ssrc);
 }
 
+bool isPlainRtcpCompoundPacket(std::span<const uint8_t> data)
+{
+    // The first 8 bytes of an SRTCP packet (version, type, length, SSRC) are not encrypted, so
+    // plain RTCP and SRTCP can't be told apart by the first packet header. The difference is the
+    // SRTCP trailer (E flag + SRTCP index, optional MKI, authentication tag) appended after the
+    // compound packet. So walk all the packets by their length fields and require that they end
+    // exactly at the end of the buffer. Each packet must also have version 2 and an RTCP packet
+    // type, so that a 4-byte aligned SRTCP trailer is not taken for a packet. Per RFC 3550, a
+    // compound packet starts with SR or RR.
+
+    const auto size = std::ssize(data);
+    if (size < kRtcpHeaderSize)
+        return false;
+
+    if (data[1] != kRtcpSenderReport && data[1] != kRtcpReceiverReport)
+        return false;
+
+    std::ptrdiff_t offset = 0;
+    while (offset < size)
+    {
+        if (size - offset < 4 || (data[offset] >> 6) != kRtpVersion)
+            return false;
+
+        // The second byte of an SRTCP trailer (bits 16-23 of the SRTCP index) is never in this
+        // range in practice, so a trailer that happens to be 4-byte aligned is still rejected.
+        if (data[offset + 1] < kRtcpSenderReport || data[offset + 1] > kRtcpExtendedReport)
+            return false;
+
+        const int packetSize = ((data[offset + 2] << 8) + data[offset + 3] + 1) * 4;
+        offset += packetSize;
+    }
+
+    return offset == size;
+}
+
 int buildReceiverReport(
     uint8_t* dstBuffer,
     int bufferLen,

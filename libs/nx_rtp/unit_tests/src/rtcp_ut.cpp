@@ -1,5 +1,8 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <cstring>
+#include <span>
+
 #include <gtest/gtest.h>
 
 #include <QtCore/QtEndian>
@@ -67,4 +70,45 @@ TEST(RtcpReceiverReport, usesProvidedCname)
     EXPECT_EQ(buffer[cnameOffset + 1], cname.size());
     EXPECT_EQ(
         std::string(reinterpret_cast<const char*>(buffer + cnameOffset + 2), cname.size()), cname);
+}
+
+TEST(RtcpCompoundPacket, plainPacketDetection)
+{
+    using namespace nx::rtp;
+
+    constexpr uint32_t kSsrc = 0x12345678;
+    uint8_t buffer[128]{};
+    RtcpSenderReport report;
+    report.ssrc = kSsrc;
+    report.cname = "camera";
+    const int size = report.write(buffer, sizeof(buffer));
+    ASSERT_GT(size, RtcpSenderReport::kSize); //< SR + SDES.
+    const std::span<const uint8_t> packet(buffer, size);
+    EXPECT_TRUE(isPlainRtcpCompoundPacket(packet));
+    EXPECT_TRUE(isPlainRtcpCompoundPacket(packet.first(RtcpSenderReport::kSize))); //< SR only.
+
+    EXPECT_FALSE(isPlainRtcpCompoundPacket({}));
+    EXPECT_FALSE(isPlainRtcpCompoundPacket(packet.first(4)));
+    EXPECT_FALSE(isPlainRtcpCompoundPacket(packet.first(size - 4)));
+    EXPECT_FALSE(isPlainRtcpCompoundPacket(std::span<const uint8_t>(buffer, size + 4)));
+
+    // SRTCP trailer: E flag + index, then the authentication tag.
+    for (const int tagSize: {4, 10, 16})
+    {
+        uint8_t srtcp[128];
+        memcpy(srtcp, buffer, size);
+        const uint32_t eAndIndex = qToBigEndian<uint32_t>(0x80000001);
+        memcpy(srtcp + size, &eAndIndex, sizeof(eAndIndex));
+        memset(srtcp + size + 4, 0x80, tagSize);
+        EXPECT_FALSE(
+            isPlainRtcpCompoundPacket(std::span<const uint8_t>(srtcp, size + 4 + tagSize)))
+            << tagSize;
+    }
+
+    // The first packet must be SR or RR.
+    EXPECT_FALSE(isPlainRtcpCompoundPacket(packet.subspan(RtcpSenderReport::kSize)));
+
+    // Wrong version.
+    buffer[0] = (buffer[0] & 0x3f) | 0x40;
+    EXPECT_FALSE(isPlainRtcpCompoundPacket(packet));
 }

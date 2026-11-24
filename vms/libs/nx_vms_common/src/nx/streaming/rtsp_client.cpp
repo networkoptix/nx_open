@@ -288,33 +288,43 @@ bool QnRtspIoDevice::sendRtcpReport()
 void QnRtspIoDevice::processRtcpData()
 {
     quint8 rtcpBuffer[MAX_RTCP_PACKET_SIZE];
-
     bool rtcpReportAlreadySent = false;
-    while( m_udpSockets.rtcpSocket->hasData() )
+
+    while (m_udpSockets.rtcpSocket->hasData())
     {
         nx::network::SocketAddress senderEndpoint;
         int bytesRead =
             m_udpSockets.rtcpSocket->recvFrom(rtcpBuffer, sizeof(rtcpBuffer), &senderEndpoint);
         if (bytesRead > 0)
         {
-            if (!m_udpSockets.rtcpSocket->isConnected())
+            if (!m_udpSockets.rtcpSocket->isConnected()
+                && !m_udpSockets.rtcpSocket->setDestAddr(senderEndpoint))
             {
-                if (!m_udpSockets.rtcpSocket->setDestAddr(senderEndpoint))
-                {
-                    NX_WARNING(this,
-                        "Cannot set the RTCP destination address: %1",
-                        SystemError::getLastOSErrorText());
-                }
+                NX_WARNING(this,
+                    "Cannot set the RTCP destination address: %1",
+                    SystemError::getLastOSErrorText());
             }
+
             if (m_srtpDecryptor)
             {
-                const auto decryptResult = m_srtpDecryptor->decryptPacket(rtcpBuffer, &bytesRead);
-                if (decryptResult != nx::rtsp::SrtpDecryptor::Result::success)
+                const std::span<const quint8> rtcpPacket(rtcpBuffer, bytesRead);
+                quint8 decryptedBuffer[MAX_RTCP_PACKET_SIZE];
+                int decryptedSize = bytesRead;
+                memcpy(decryptedBuffer, rtcpBuffer, bytesRead);
+                const auto decryptResult =
+                    m_srtpDecryptor->decryptPacket(decryptedBuffer, &decryptedSize);
+                if (decryptResult == nx::rtsp::SrtpDecryptor::Result::success)
+                {
+                    memcpy(rtcpBuffer, decryptedBuffer, decryptedSize);
+                    bytesRead = decryptedSize;
+                }
+                else if (!nx::rtp::isPlainRtcpCompoundPacket(rtcpPacket))
                 {
                     NX_WARNING(this, "Failed to decrypt incoming SRTCP UDP packet");
                     continue;
                 }
             }
+
             nx::rtp::RtcpSenderReport senderReport;
             if (senderReport.read(rtcpBuffer, bytesRead))
                 m_senderReport = senderReport;

@@ -24,8 +24,9 @@ run_test()
     raw_output="/tmp/${test_name}_video.h264"
     video_output="/tmp/${test_name}_video.mp4"
     ready_file="/tmp/${test_name}_rtsp_server.ready"
+    checker_output="/tmp/${test_name}_checker.txt"
 
-    rm -f "$raw_output" "$video_output" "$ready_file"
+    rm -f "$raw_output" "$video_output" "$ready_file" "$checker_output"
 
     python3 "$TEST_DIR/$server_script" \
         --mode "$mode" \
@@ -63,7 +64,8 @@ run_test()
         --duration=15 \
         --frames="$FRAME_COUNT" \
         --raw-output="$raw_output" \
-        --video-output="$video_output" || checker_exit_code=$?
+        --video-output="$video_output" > "$checker_output" || checker_exit_code=$?
+    cat "$checker_output"
 
     server_exit_code=0
     wait "$server_pid" || server_exit_code=$?
@@ -106,6 +108,24 @@ run_test()
     fi
 }
 
+# Checks that the stream used the camera time from RTCP Sender Reports: the last video timestamp
+# must be absolute and close to the current time.
+check_camera_time()
+{
+    test_name=$1
+    max_difference_us=10000000
+
+    last_timestamp_us=$(grep --only-matching "last_video_timestamp_us=[0-9]*" \
+        "/tmp/${test_name}_checker.txt" | cut -d "=" -f 2)
+    now_us=$(date +%s%6N)
+    difference_us=$(( now_us - ${last_timestamp_us:-0} ))
+    if [ "${difference_us#-}" -gt "$max_difference_us" ]; then
+        echo "$test_name did not use the camera time: last video timestamp" \
+            "${last_timestamp_us:-none}us, current time ${now_us}us."
+        return 1
+    fi
+}
+
 # Run a non-secure RTSP/TCP test to obtain the expected checksum.
 run_test gstreamer_rtsp_server.py avp tcp 8553
 EXPECTED_VIDEO_SHA256=$(sha256sum /tmp/avp_tcp_video.h264 | cut -d " " -f 1)
@@ -127,6 +147,10 @@ run_test rtsp_server.py savp_avp_alternatives tcp 8567 "$EXPECTED_VIDEO_SHA256"
 # Secure RTSP tests.
 run_test gstreamer_rtsp_server.py savp tcp 8555 "$EXPECTED_VIDEO_SHA256"
 run_test rtsp_server.py savp udp 8556 "$EXPECTED_VIDEO_SHA256"
+# Pelco Sarix cameras send plain RTCP in SRTP sessions (VMS-63463); its Sender Reports must still
+# be used for the camera time.
+run_test rtsp_server.py savp_plain_rtcp udp 8568 "$EXPECTED_VIDEO_SHA256"
+check_camera_time savp_plain_rtcp_udp
 run_test rtsp_server.py savp_axis tcp 8557 "$EXPECTED_VIDEO_SHA256"
 run_test rtsp_server.py savp_media_level_aes256_cm tcp 8558 "$EXPECTED_VIDEO_SHA256"
 run_test rtsp_server.py savp_axis_gcm tcp 8559 "$EXPECTED_VIDEO_SHA256"

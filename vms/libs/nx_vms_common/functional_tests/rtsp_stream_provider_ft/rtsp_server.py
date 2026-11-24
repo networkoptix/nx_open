@@ -35,6 +35,12 @@ VIDEO_FMTP = (
     "ITk8nyfk/k/J8nm5s00IEkKQnJ5Pk/J/J+T5PNzZprQFAW0qQAAAAwCAAAAPGBAAD0JAAAiVQ"
     "ve+F4RCNQAAAAE=,aO48sA==\r\n")
 
+# I_MESSAGE without TIMESTAMP and RAND payloads, as sent by Pelco Sarix cameras (VMS-63463).
+PELCO_MIKEY = (
+    "AQAKAGO4tqoBAADw38WVAAAAAAEAAAAYAAEBAgEBAQEQAwEUCwEKBwEBCgEBCAEBAAAAIgAgAB4ccB+uiJap"
+    "ENJ++I6p6KF7JkcpDGp529W5qEHQeF8A"
+)
+
 MIKEY_PARAM_ENCRYPTION_ALGORITHM = 0
 MIKEY_PARAM_ENCRYPTION_KEY_LENGTH = 1
 MIKEY_PARAM_AUTHENTICATION_ALGORITHM = 2
@@ -243,6 +249,9 @@ class GstreamerStream:
         # client's SRTP anti-replay window reject the duplicate. None disables this behavior.
         self.replay_packet_index = None
         self._sent_packet_count = 0
+        # RTP timestamp of the last sent packet and the wall clock time it was sent at, in ns.
+        self.last_rtp_timestamp = None
+        self.last_rtp_time_ns = None
 
     def _send_packet(self, packet):
         if self.rtp_socket is not None:
@@ -260,6 +269,9 @@ class GstreamerStream:
                 try:
                     self._send_packet(packet)
                     self._sent_packet_count += 1
+                    # The RTP header is not encrypted by SRTP.
+                    self.last_rtp_timestamp = struct.unpack_from(">I", packet, 4)[0]
+                    self.last_rtp_time_ns = time.time_ns()
                     if self._sent_packet_count == self.replay_packet_index:
                         self._send_packet(packet)
                 except OSError:
@@ -494,6 +506,69 @@ class SrtcpSession:
             raise RuntimeError("Server did not receive an SRTCP Receiver Report")
 
 
+def ntp_timestamp(unix_nanoseconds):
+    ntp_seconds = unix_nanoseconds // 1_000_000_000 + 2_208_988_800
+    ntp_fraction = ((unix_nanoseconds % 1_000_000_000) << 32) // 1_000_000_000
+    return ntp_seconds, ntp_fraction
+
+
+class PlainRtcpSender:
+    """
+    Sends plain RTCP (SR + SDES) in an SRTP session, without SRTCP index, MKI and authentication
+    tag, as Pelco Sarix cameras do (VMS-63463).
+    """
+
+    def __init__(self, stream, rtcp_socket, client_endpoint, ssrc):
+        self.stream = stream
+        self.rtcp_socket = rtcp_socket
+        self.client_endpoint = client_endpoint
+        self.ssrc = ssrc
+        self.stop_event = threading.Event()
+        self.sent_report_count = 0
+        self.error = None
+        self.thread = None
+
+    def _compound_packet(self, rtp_timestamp, rtp_time_ns):
+        ntp_seconds, ntp_fraction = ntp_timestamp(rtp_time_ns)
+        sender_report = struct.pack(
+            ">BBHIIIIII", 0x80, 200, 6, self.ssrc, ntp_seconds, ntp_fraction, rtp_timestamp,
+            0, 0)
+        cname = b"camera"
+        sdes_item = bytes((1, len(cname))) + cname + b"\0"
+        sdes_item += b"\0" * (-len(sdes_item) % 4)
+        sdes = struct.pack(">BBHI", 0x81, 202, len(sdes_item) // 4 + 1, self.ssrc) + sdes_item
+        return sender_report + sdes
+
+    def _send_reports(self):
+        try:
+            while not self.stop_event.wait(0.5):
+                with self.stream.send_lock:
+                    rtp_timestamp = self.stream.last_rtp_timestamp
+                    rtp_time_ns = self.stream.last_rtp_time_ns
+                if rtp_timestamp is None:
+                    continue
+                self.rtcp_socket.sendto(
+                    self._compound_packet(rtp_timestamp, rtp_time_ns), self.client_endpoint)
+                self.sent_report_count += 1
+        except Exception as error:  # pylint: disable=broad-exception-caught
+            self.error = error
+
+    def start(self):
+        self.thread = threading.Thread(target=self._send_reports, daemon=True)
+        self.thread.start()
+
+    def stop(self):
+        self.stop_event.set()
+        if self.thread is not None:
+            self.thread.join()
+
+    def validate(self):
+        if self.error:
+            raise RuntimeError("Sending plain RTCP failed") from self.error
+        if not self.sent_report_count:
+            raise RuntimeError("No plain RTCP Sender Report was sent")
+
+
 def header(request, name):
     prefix = name.lower() + ":"
     for line in request.split("\r\n"):
@@ -535,11 +610,15 @@ def serve(client, mode, video_file):
     udp_sockets = None
     srtcp_session = None
     srtcp_started = False
+    plain_rtcp_sender = None
+    plain_rtcp_started = False
     session = "12345678"
     if mode == "savp_axis_unparseable":
         server_mikey = "unsupported"
     elif mode == "savp_media_level_aes256_cm":
         server_mikey = AES256_CM_MIKEY
+    elif mode == "savp_plain_rtcp":
+        server_mikey = PELCO_MIKEY
     else:
         server_mikey = AXIS_MIKEY
     server_context = parse_mikey_payload(server_mikey)
@@ -660,6 +739,23 @@ def serve(client, mode, video_file):
                     ).encode()
                     client.sendall(response(200, "OK", cseq, f"Content-Base: {uri}\r\n", body))
                     continue
+                if mode == "savp_plain_rtcp":
+                    # As in the camera SDP, the MIKEY is at the media level. The camera also
+                    # offers the same track as RTP/AVP, but RTP/SAVP is selected only for rtsps.
+                    body = (
+                        "v=0\r\n"
+                        "o=- 0 0 IN IP4 127.0.0.1\r\n"
+                        "s=Live\r\n"
+                        "t=0 0\r\n"
+                        "m=video 0 RTP/SAVP 96\r\n"
+                        "c=IN IP4 0.0.0.0\r\n"
+                        "a=control:trackID=49\r\n"
+                        f"a=key-mgmt:mikey {server_mikey}\r\n"
+                        f"{VIDEO_FMTP}"
+                        "a=rtpmap:96 H264/90000\r\n"
+                    ).encode()
+                    client.sendall(response(200, "OK", cseq, f"Content-Base: {uri}/\r\n", body))
+                    continue
                 stream_name = "AES-256-CM" if mode == "savp_media_level_aes256_cm" else "Axis"
                 session_key_management = (
                     "" if mode == "savp_media_level_aes256_cm"
@@ -776,6 +872,46 @@ def serve(client, mode, video_file):
                         f"ssrc={media_ssrc:08x};mode=\"PLAY\"")
                     client.sendall(response(200, "OK", cseq, transport))
                     continue
+                elif mode == "savp_plain_rtcp":
+                    setup_attempt += 1
+                    parsed = parse_client_mikey(header(request, "KeyMgmt"))
+                    client_ports = parse_client_ports(header(request, "Transport"))
+                    transport = header(request, "Transport")
+                    if not re.match(r"RTP/SAVP(/UDP)?;", transport) or client_ports is None:
+                        raise RuntimeError("Expected RTP/SAVP UDP SETUP")
+                    # The camera accepts only a client MIKEY that carries an MKI.
+                    if setup_attempt == 1:
+                        if not is_aes128_cm_mikey(parsed, with_mki=False):
+                            raise RuntimeError("Expected standard AES-CM MIKEY on first SETUP")
+                        client.sendall(response(463, "MIKEY message error", cseq))
+                        continue
+                    if setup_attempt != 2 or not is_aes128_cm_mikey(parsed, with_mki=True):
+                        raise RuntimeError(
+                            "Expected client-managed AES-CM MIKEY on second SETUP")
+                    media_ssrc = 0x12345678
+                    udp_sockets = create_udp_socket_pair()
+                    server_rtp_port = udp_sockets[0].getsockname()[1]
+                    server_rtcp_port = udp_sockets[1].getsockname()[1]
+                    client_address = client.getpeername()[0]
+                    stream = GstreamerStream(
+                        client,
+                        video_file,
+                        udp_sockets[0],
+                        (client_address, client_ports[0]))
+                    stream.start_args = (parsed["key"], parsed["mki"], media_ssrc, False)
+                    plain_rtcp_sender = PlainRtcpSender(
+                        stream,
+                        udp_sockets[1],
+                        (client_address, client_ports[1]),
+                        media_ssrc)
+                    transport = (
+                        f"Session: {session};timeout=60\r\n"
+                        f"Transport: RTP/SAVP;unicast;"
+                        f"client_port={client_ports[0]}-{client_ports[1]};"
+                        f"server_port={server_rtp_port}-{server_rtcp_port};"
+                        f"ssrc={media_ssrc:08x}")
+                    client.sendall(response(200, "OK", cseq, transport))
+                    continue
                 elif mode == "savp_media_level_aes256_cm":
                     parsed = parse_client_mikey(header(request, "KeyMgmt"))
                     if (server_context is None
@@ -840,6 +976,9 @@ def serve(client, mode, video_file):
                 if srtcp_session is not None:
                     srtcp_session.start()
                     srtcp_started = True
+                if plain_rtcp_sender is not None:
+                    plain_rtcp_sender.start()
+                    plain_rtcp_started = True
                 if stream is not None:
                     stream.start(*stream.start_args)
             elif method == "TEARDOWN":
@@ -857,11 +996,15 @@ def serve(client, mode, video_file):
             stream.stop()
         if srtcp_session is not None:
             srtcp_session.stop()
+        if plain_rtcp_sender is not None:
+            plain_rtcp_sender.stop()
         if udp_sockets is not None:
             for udp_socket in udp_sockets:
                 udp_socket.close()
         if srtcp_started:
             srtcp_session.validate()
+        if plain_rtcp_started:
+            plain_rtcp_sender.validate()
 
 
 def main():
@@ -877,6 +1020,7 @@ def main():
             "savp_axis_replayed_packet",
             "savp_media_level_aes256_cm",
             "savp",
+            "savp_plain_rtcp",
             "avp_second_track_transport_rejected",
             "avp_setup_service_unavailable",
             "avp_play_rejected",
@@ -887,8 +1031,9 @@ def main():
     parser.add_argument("--video-file", required=True)
     args = parser.parse_args()
 
-    if (args.mode == "savp") != (args.rtp_transport == "udp"):
-        parser.error("savp mode requires UDP; other modes require TCP")
+    udp_modes = ("savp", "savp_plain_rtcp")
+    if (args.mode in udp_modes) != (args.rtp_transport == "udp"):
+        parser.error(f"{', '.join(udp_modes)} modes require UDP; other modes require TCP")
 
     Gst.init(None)
 

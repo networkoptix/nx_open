@@ -4,6 +4,7 @@
 
 #include <chrono>
 #include <optional>
+#include <span>
 #include <string>
 
 #include <stdint.h>
@@ -17,6 +18,7 @@ constexpr int kRtcpReceiverReportLength = 8;
 constexpr uint8_t kRtcpSenderReport = 200;
 constexpr uint8_t kRtcpReceiverReport = 201;
 constexpr uint8_t kRtcpSourceDesciption = 202;
+constexpr uint8_t kRtcpExtendedReport = 207;
 
 constexpr uint8_t kRtcpGenericFeedback = 205;
 constexpr uint8_t kRtcpPayloadSpecificFeedback = 206;
@@ -90,5 +92,7 @@ struct NX_RTP_API RtcpFirFeedback
 };
 
 NX_RTP_API uint32_t getRtcpSsrc(const uint8_t* data, int size);
+
+NX_RTP_API bool isPlainRtcpCompoundPacket(std::span<const uint8_t> data);
 
 } // namespace nx::rtp
