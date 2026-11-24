@@ -3,13 +3,14 @@
 #pragma once
 
 #include "webrtc_ice.h"
+#include "webrtc_reader.h"
 
 namespace nx::webrtc {
 
 class NX_WEBRTC_API Receiver: public AbstractIceDelegate
 {
 public:
-    Receiver(Session* session);
+    Receiver(Session* session, std::shared_ptr<Reader> reader);
 
     // From AbstractIceDelegate.
     virtual bool start(Ice* ice, Dtls* dtls) override final;
@@ -22,9 +23,12 @@ public:
     // Interface for LiveStreamReader.
     Ice* ice();
 
+    Reader* reader() const { return m_reader.get(); }
+
 private:
     Session* m_session = nullptr;
     Ice* m_ice = nullptr;
+    const std::shared_ptr<Reader> m_reader;
 };
 
 } // namespace nx::webrtc

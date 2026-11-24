@@ -19,6 +19,7 @@
 namespace nx::webrtc {
 
 class IceTcp;
+class Reader;
 
 /**
  * - Owns Session objects.
@@ -42,31 +43,24 @@ public:
     virtual ~SessionPool();
 
     /**
-     * Add new session.
-     * @param session Object ownership is shared between Ice, Tracker and SessionPool instances.
-     * @param purpose Session type: for streaming video or for receiving video.
-     * @param keepAliveTimeoutSec Session will be removed,
-     * if no one uses it for keepAliveTimeoutSec seconds. 0 is treated as no timeout.
-     * @return False, if session with id session->id() already exists. true, otherwise.
+     * Adds a session that streams video out, under a generated id. Its ownership is shared
+     * between Ice, Tracker and SessionPool instances, and it is removed once no one has used it
+     * for the keep-alive timeout.
+     * @return Null, if the session could not be created.
      */
-    std::shared_ptr<Session> create(
-        createDataProviderFactory providerFactory,
-        Purpose purpose,
+    std::shared_ptr<Session> createSendSession(createDataProviderFactory providerFactory,
         const nx::network::SocketAddress& address,
         const SessionConfig& config);
+
     /**
-     * Add new session.
-     * @param session Object ownership is shared between Ice, Tracker and SessionPool instances.
-     * @param purpose Session type: for streaming video or for receiving video.
+     * Adds a session that receives video in, under the given id. Its ownership is shared
+     * between Ice, Tracker and SessionPool instances, and it is removed once no one has used it
+     * for the keep-alive timeout.
+     * @param reader Sink for the received frames, owned by the Device being received from.
      * @param localUfrag Forced session id.
-     * @param keepAliveTimeoutSec Session will be removed,
-     * if no one uses it for keepAliveTimeoutSec seconds. 0 is treated as no timeout.
-     * @return False, if session with id session->id() already exists. true, otherwise.
+     * @return Null, if that id is already taken, or the session could not be created.
      */
-    std::shared_ptr<Session> create(
-        createDataProviderFactory providerFactory,
-        Purpose purpose,
-        const nx::network::SocketAddress& address,
+    std::shared_ptr<Session> createRecvSession(std::shared_ptr<Reader> reader,
         const std::string& localUfrag,
         const SessionConfig& config);
 
@@ -97,12 +91,12 @@ private:
     std::vector<nx::network::SocketAddress> getStunServers();
     std::string emitUfrag();
     bool takeUfrag(const std::string& ufrag);
-    std::shared_ptr<Session> createInternal(
-        createDataProviderFactory providerFactory,
+    std::shared_ptr<Session> createInternal(createDataProviderFactory providerFactory,
         Purpose purpose,
         const nx::network::SocketAddress& address,
         const std::string& localUfrag,
-        const SessionConfig& config);
+        const SessionConfig& config,
+        std::shared_ptr<Reader> reader);
 
     /** Implementation of TimerEventHandler::onTimer. */
     void onTimer(const quint64& timerId);

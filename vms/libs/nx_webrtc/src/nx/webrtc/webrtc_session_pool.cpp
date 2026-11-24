@@ -101,14 +101,13 @@ bool SessionPool::takeUfrag(const std::string& ufrag)
     return true;
 }
 
-std::shared_ptr<Session> SessionPool::createInternal(
-    createDataProviderFactory providerFactory,
+std::shared_ptr<Session> SessionPool::createInternal(createDataProviderFactory providerFactory,
     Purpose purpose,
     const nx::network::SocketAddress& address,
     const std::string& localUfrag,
-    const SessionConfig& config)
+    const SessionConfig& config,
+    std::shared_ptr<Reader> reader)
 {
-
     auto server = systemContext()->resourcePool()->getResourceById<QnMediaServerResource>(
         systemContext()->peerId());
 
@@ -129,15 +128,15 @@ std::shared_ptr<Session> SessionPool::createInternal(
             return nullptr;
         }
 
-        session = std::make_shared<Session>(
-            systemContext(),
+        session = std::make_shared<Session>(systemContext(),
             this,
             std::move(providerFactory),
             localUfrag,
             address,
             config,
             getStunServers(),
-            purpose);
+            purpose,
+            std::move(reader));
 
         m_sessionById[session->id()] = session;
     }
@@ -147,29 +146,32 @@ std::shared_ptr<Session> SessionPool::createInternal(
     return session;
 }
 
-std::shared_ptr<Session> SessionPool::create(
-    createDataProviderFactory providerFactory,
-    Purpose purpose,
-    const nx::network::SocketAddress& address,
-    const std::string& localUfrag,
-    const SessionConfig& config)
+std::shared_ptr<Session> SessionPool::createRecvSession(
+    std::shared_ptr<Reader> reader, const std::string& localUfrag, const SessionConfig& config)
 {
     if (!takeUfrag(localUfrag))
         return nullptr;
 
     return createInternal(
-        std::move(providerFactory), purpose, address, localUfrag, config);
+        /*providerFactory*/ nullptr,
+        Purpose::recv,
+        nx::network::SocketAddress(),
+        localUfrag,
+        config,
+        std::move(reader));
 }
 
-std::shared_ptr<Session> SessionPool::create(
-    createDataProviderFactory providerFactory,
-    Purpose purpose,
+std::shared_ptr<Session> SessionPool::createSendSession(createDataProviderFactory providerFactory,
     const nx::network::SocketAddress& address,
     const SessionConfig& config)
 {
     const auto localUfrag = emitUfrag();
-    return createInternal(
-        std::move(providerFactory), purpose, address, localUfrag, config);
+    return createInternal(std::move(providerFactory),
+        Purpose::send,
+        address,
+        localUfrag,
+        config,
+        /*reader*/ nullptr);
 }
 
 std::weak_ptr<Session> SessionPool::getSession(const std::string& id)

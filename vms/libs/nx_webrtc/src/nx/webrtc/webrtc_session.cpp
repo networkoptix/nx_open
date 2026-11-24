@@ -83,7 +83,8 @@ Session::Session(nx::vms::common::SystemContext* context,
     const nx::network::SocketAddress& address,
     const SessionConfig& config,
     const std::vector<nx::network::SocketAddress>& stunServers,
-    Purpose purpose):
+    Purpose purpose,
+    std::shared_ptr<Reader> reader):
     m_SystemContext(context),
     m_aioThread(nx::network::SocketGlobals::aioService().findLeastUsedAioThread()),
     m_localUfrag(localUfrag),
@@ -101,6 +102,7 @@ Session::Session(nx::vms::common::SystemContext* context,
 
     if (m_purpose == Purpose::send)
     {
+        NX_ASSERT(!reader, "A streaming session has nothing to push into a Reader");
         m_tracks = std::make_unique<TracksForSend>(this);
         m_consumer = std::make_shared<Consumer>(this);
         m_providerFactory = std::move(providerFactory);
@@ -121,7 +123,7 @@ Session::Session(nx::vms::common::SystemContext* context,
         });
         m_tracks->addTrack(std::move(audio));
 
-        m_transceiver = std::make_unique<Receiver>(this);
+        m_transceiver = std::make_unique<Receiver>(this, std::move(reader));
         m_demuxer = std::make_unique<Demuxer>(m_tracks.get());
     }
 }
@@ -130,7 +132,6 @@ Session::~Session()
 {
     m_sessionPool->turnInfoFetcher().removeOauthInfoHandler(id());
     m_transceiver->stop();
-    m_reader.reset();
     releaseTracker(); //< Should be guarded.
 }
 
@@ -639,9 +640,11 @@ bool Session::initializeMuxer(
     return true;
 }
 
-void Session::setReader(std::shared_ptr<Reader> reader)
+Receiver* Session::receiver() const
 {
-    m_reader = std::move(reader);
+    // The Receiver is built in the constructor for Purpose::recv and never replaced, so the
+    // purpose alone tells what m_transceiver holds.
+    return m_purpose == Purpose::recv ? static_cast<Receiver*>(m_transceiver.get()) : nullptr;
 }
 
 void Session::setAddress(const nx::network::SocketAddress& address)

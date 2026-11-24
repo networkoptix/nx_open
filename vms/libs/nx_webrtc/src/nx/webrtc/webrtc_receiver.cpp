@@ -12,13 +12,16 @@
 
 namespace nx::webrtc {
 
-Receiver::Receiver(Session* session): m_session(session)
+Receiver::Receiver(Session* session, std::shared_ptr<Reader> reader):
+    m_session(session),
+    m_reader(std::move(reader))
 {
+    NX_CRITICAL(m_reader, "A receiving session cannot exist without a Reader");
 }
 
 Receiver::~Receiver()
 {
-    NX_ASSERT(!m_session->reader() || !m_session->reader()->isStarted());
+    NX_ASSERT(!m_reader->isStarted());
 }
 
 bool Receiver::start(Ice* ice, Dtls* dtls)
@@ -27,7 +30,7 @@ bool Receiver::start(Ice* ice, Dtls* dtls)
     m_ice = ice;
 
     m_session->demuxer()->setSrtpEncryptionData(dtls->encryptionData());
-    m_session->reader()->onKeyframeNeeded(
+    m_reader->onKeyframeNeeded(
         [this]()
         {
             NX_DEBUG(this, "Send RTCP FIR into source");
@@ -37,13 +40,13 @@ bool Receiver::start(Ice* ice, Dtls* dtls)
                 m_ice->writePacket(output.data(), output.size(), /*foreground*/ false);
         });
 
-    m_session->reader()->start();
+    m_reader->start();
     return true;
 }
 
 void Receiver::stop()
 {
-    m_session->reader()->stop();
+    m_reader->stop();
 
     // Dangerous, object can be destroyed after this call.
     m_session->sessionPool()->drop(m_session->id());
@@ -79,7 +82,7 @@ bool Receiver::onSrtp(std::vector<uint8_t> buffer)
         if (!media)
             break;
         NX_VERBOSE(this, "New data from demuxer: %1", media);
-        m_session->reader()->pushFrame(std::move(media));
+        m_reader->pushFrame(std::move(media));
     }
     return true;
 }

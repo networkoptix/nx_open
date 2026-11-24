@@ -7,6 +7,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 
+#include "webrtc_receiver.h"
 #include "webrtc_session.h"
 #include "webrtc_twcc.h"
 
@@ -211,7 +212,7 @@ bool TracksForRecv::examineSdp(const std::string& sdp)
         auto audioCodecParameters = m_session->demuxer()->audioCodecParameters();
         NX_ASSERT(audioCodecParameters);
         auto layout = std::make_shared<AudioLayout>(audioCodecParameters);
-        m_session->reader()->setAudioLayout(layout);
+        m_session->receiver()->reader()->setAudioLayout(layout);
     }
     return true;
 }

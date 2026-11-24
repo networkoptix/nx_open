@@ -222,7 +222,8 @@ protected:
             nx::network::SocketAddress("127.0.0.1", 7001),
             SessionConfig{},
             /*stunServers*/ std::vector<nx::network::SocketAddress>{},
-            Purpose::send);
+            Purpose::send,
+            /*reader*/ nullptr);
         m_session->setTranscodingParams(
             /*transcodingParams*/ {}, //< Nothing forces transcoding; the codec decides.
             /*resolution*/ std::nullopt,

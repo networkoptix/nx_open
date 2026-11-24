@@ -28,6 +28,7 @@ enum class CodecSwitchResult
 class SessionPool;
 class Tracker;
 class AbstractIceDelegate;
+class Receiver;
 class IceUdp;
 class IceRelay;
 class Srflx;
@@ -39,15 +40,16 @@ class NX_WEBRTC_API Session
 public:
     static std::string generateLocalUfrag();
 
-    Session(
-        nx::vms::common::SystemContext* context,
+    Session(nx::vms::common::SystemContext* context,
         SessionPool* sessionPool,
         createDataProviderFactory providerFactory,
         const std::string& localUfrag,
         const nx::network::SocketAddress& address,
         const SessionConfig& config,
         const std::vector<nx::network::SocketAddress>& m_stunServers,
-        Purpose purpose);
+        Purpose purpose,
+        // Required for Purpose::recv, and must be null for any other purpose.
+        std::shared_ptr<Reader> reader);
     ~Session();
 
     void start(const QList<nx::network::SocketAddress>& addresses);
@@ -76,9 +78,6 @@ public:
     std::shared_ptr<Tracker> tracker();
     void releaseTracker();
 
-    // Should be called in `unlocked` state.
-    void setReader(std::shared_ptr<Reader> reader);
-
     SessionPool* sessionPool() const { return m_sessionPool; }
 
     /**
@@ -99,7 +98,8 @@ public:
         std::optional<nx::vms::api::ResolutionData> resolutionWhenTranscoding,
         std::optional<QString> videoCodec = std::nullopt);
     std::shared_ptr<nx::metric::Storage> metrics() const;
-    Reader* reader() { return m_reader.get(); }
+    // Null unless this is a Purpose::recv session. Owns the Reader the session pushes into.
+    Receiver* receiver() const;
     Demuxer* demuxer() { return m_demuxer.get(); }
     Tracks* tracks() { return m_tracks.get(); }
     Transcoder* muxer() { return m_muxer.get(); }
@@ -211,7 +211,6 @@ private:
     std::unique_ptr<Transcoder> m_muxer; //< Streaming side. Can be null.
     std::shared_ptr<Consumer> m_consumer; //< Streaming side. Can be null.
     std::unique_ptr<Demuxer> m_demuxer; //< Receiving side. Can be null.
-    std::shared_ptr<Reader> m_reader; //< Receiving side. Can be null.
     SdpParseResult m_sdpParseResult;
     nx::network::SocketAddress m_localAddress;
     nx::network::ssl::Pem m_pem;
