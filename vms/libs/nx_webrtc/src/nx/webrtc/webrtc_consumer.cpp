@@ -94,7 +94,7 @@ void Consumer::startProvidersIfNeeded()
                 if (!provider->isStarted())
                 {
                     m_undecryptableTimestampsUs.erase(provider->resource()->getId());
-                    provider->play(provider->getPosition(), false);
+                    provider->play(provider->getPosition());
                 }
             }
         });
@@ -131,9 +131,8 @@ void Consumer::seek(nx::Uuid deviceId, int64_t timestampUs, StatusHandler handle
                     return;
                 }
 
-                auto status = provider && provider->play(timestampUs, /*useAudioLastGop*/ false)
-                    ? StreamStatus::success
-                    : StreamStatus::nodata;
+                auto status = provider && provider->play(timestampUs) ? StreamStatus::success
+                                                                      : StreamStatus::nodata;
                 handler(id, status);
             };
 
@@ -490,7 +489,8 @@ void Consumer::runInMuxingThread(std::function<void()>&& func)
 
 void Consumer::putData(const QnConstAbstractMediaDataPtr& data)
 {
-    m_pollable.dispatch([this, data]()
+    m_pollable.post(
+        [this, data]()
         {
             m_mediaQueue.putData(data);
             if (!m_sendInProgress)

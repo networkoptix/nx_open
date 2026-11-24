@@ -54,7 +54,7 @@ public: // Initialize.
 public: // Playback.
     virtual bool isLiveMode() const = 0;
     virtual bool paused() const = 0;
-    virtual bool play(int64_t positionUs, bool useAudioLastGop) = 0;
+    virtual bool play(int64_t positionUs) = 0;
     virtual bool changeQuality(nx::vms::api::StreamIndex stream) = 0;
     virtual bool pause() = 0;
     virtual bool resume() = 0;

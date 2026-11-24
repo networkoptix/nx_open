@@ -80,7 +80,7 @@ public:
 
     bool isLiveMode() const override { return true; }
     bool paused() const override { return false; }
-    bool play(int64_t, bool) override { return true; }
+    bool play(int64_t) override { return true; }
     bool changeQuality(nx::vms::api::StreamIndex) override { return true; }
     bool pause() override { return true; }
     bool resume() override { return true; }
