@@ -94,7 +94,7 @@ void Consumer::startProvidersIfNeeded()
                 if (!provider->isStarted())
                 {
                     m_undecryptableTimestampsUs.erase(provider->resource()->getId());
-                    provider->play(provider->getPosition(), false);
+                    provider->play(provider->getPosition());
                 }
             }
         });
@@ -108,10 +108,7 @@ void Consumer::seek(nx::Uuid deviceId, int64_t timestampUs, StatusHandler handle
     runInMuxingThread(
         [this, handler, deviceId, timestampUs]()
         {
-            bool useAudioLastGop = //< TODO is it needed?
-                m_session->muxer()->method() == nx::vms::api::WebRtcMethod::mse;
-            auto doSeek = [this, useAudioLastGop, timestampUs](
-                              nx::Uuid id, auto provider, auto handler)
+            auto doSeek = [this, timestampUs](nx::Uuid id, auto provider, auto handler)
             {
                 if (provider && m_seekGuard && !m_seekGuard(provider->resource(), timestampUs))
                 {
@@ -134,9 +131,8 @@ void Consumer::seek(nx::Uuid deviceId, int64_t timestampUs, StatusHandler handle
                     return;
                 }
 
-                auto status = provider && provider->play(timestampUs, useAudioLastGop)
-                    ? StreamStatus::success
-                    : StreamStatus::nodata;
+                auto status = provider && provider->play(timestampUs) ? StreamStatus::success
+                                                                      : StreamStatus::nodata;
                 handler(id, status);
             };
 
@@ -506,7 +502,8 @@ void Consumer::runInMuxingThread(std::function<void()>&& func)
 
 void Consumer::putData(const QnConstAbstractMediaDataPtr& data)
 {
-    m_pollable.dispatch([this, data]()
+    m_pollable.post(
+        [this, data]()
         {
             m_mediaQueue.putData(data);
             if (!m_sendInProgress)

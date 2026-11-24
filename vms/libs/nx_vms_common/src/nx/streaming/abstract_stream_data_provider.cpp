@@ -39,12 +39,17 @@ int QnAbstractStreamDataProvider::processorsCount() const
 
 void QnAbstractStreamDataProvider::addDataProcessor(QnAbstractMediaDataReceptor* dp)
 {
+    addDataProcessorLocked(*m_dataprocessors.lock(), dp);
+}
+
+void QnAbstractStreamDataProvider::addDataProcessorLocked(
+    QList<QnAbstractMediaDataReceptor*>& dataProcessors, QnAbstractMediaDataReceptor* dp)
+{
     NX_CRITICAL(dp);
-    auto dataProcessors = m_dataprocessors.lock();
-    if (!dataProcessors->contains(dp))
+    if (!dataProcessors.contains(dp))
     {
         NX_DEBUG(this, "Add data processor: %1", dp);
-        dataProcessors->push_back(dp);
+        dataProcessors.push_back(dp);
         dp->consumers += 1;
     }
 }

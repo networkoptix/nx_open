@@ -53,6 +53,8 @@ signals:
     void videoLayoutChanged();
 
 protected:
+    void addDataProcessorLocked(
+        QList<QnAbstractMediaDataReceptor*>& dataProcessors, QnAbstractMediaDataReceptor* dp);
     virtual void putData(const QnAbstractDataPacketPtr& data);
 
 protected:
