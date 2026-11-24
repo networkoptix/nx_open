@@ -7756,7 +7756,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraReplacementDialog</name>
     <message>
       <source>Failed to replace camera</source>
-      <translation type="unfinished">Failed to replace camera</translation>
+      <translation>فشل في استبدال الكاميرا</translation>
     </message>
     <message>
       <source>Abort camera replacement?</source>
