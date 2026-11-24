@@ -326,7 +326,7 @@
     </message>
     <message>
       <source>Any Period</source>
-      <translation type="unfinished">Any Period</translation>
+      <translation>Periode Apa Pun</translation>
     </message>
     <message>
       <source>Any</source>
