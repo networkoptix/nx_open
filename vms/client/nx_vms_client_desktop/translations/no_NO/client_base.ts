@@ -13256,10 +13256,6 @@ This web page presented an untrusted certificate. It is not recommended to open 
       </translation>
     </message>
     <message>
-      <source>There is another user with the same name</source>
-      <translation>Det er en annen bruker med samme navn</translation>
-    </message>
-    <message>
       <source>Updating Background...</source>
       <translation>Oppdaterer bakgrunn...</translation>
     </message>

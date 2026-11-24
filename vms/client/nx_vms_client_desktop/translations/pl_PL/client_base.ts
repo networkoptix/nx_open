@@ -13645,10 +13645,6 @@ Ta strona internetowa przedstawiła niezaufany certyfikat. Nie zaleca się otwie
       </translation>
     </message>
     <message>
-      <source>There is another user with the same name</source>
-      <translation>Istnieje już inny użytkownik o tej samej nazwie</translation>
-    </message>
-    <message>
       <source>Updating Background...</source>
       <translation>Aktualizowanie tła...</translation>
     </message>

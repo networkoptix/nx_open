@@ -13259,10 +13259,6 @@ This web page presented an untrusted certificate. It is not recommended to open 
       </translation>
     </message>
     <message>
-      <source>There is another user with the same name</source>
-      <translation>Υπάρχει ένας άλλος χρήστης με το ίδιο όνομα</translation>
-    </message>
-    <message>
       <source>Updating Background...</source>
       <translation>Ενημέρωση Φόντου...</translation>
     </message>

@@ -13065,10 +13065,6 @@ Trang web này hiển thị chứng chỉ không đáng tin cậy. Không nên m
       </translation>
     </message>
     <message>
-      <source>There is another user with the same name</source>
-      <translation>Có một người dùng khác có cùng tên</translation>
-    </message>
-    <message>
       <source>Updating Background...</source>
       <translation>Nền Đang cập nhật...</translation>
     </message>

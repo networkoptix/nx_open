@@ -13259,10 +13259,6 @@ Esta páxina web presentou un certificado non fiable. Non se recomenda abrir est
       </translation>
     </message>
     <message>
-      <source>There is another user with the same name</source>
-      <translation>Hai outra persoa usuaria co mesmo nome</translation>
-    </message>
-    <message>
       <source>Updating Background...</source>
       <translation>Actualizando o fondo...</translation>
     </message>

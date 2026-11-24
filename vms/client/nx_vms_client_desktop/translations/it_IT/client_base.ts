@@ -13259,10 +13259,6 @@ This web page presented an untrusted certificate. It is not recommended to open 
       </translation>
     </message>
     <message>
-      <source>There is another user with the same name</source>
-      <translation>C'è un altro utente con lo stesso nome</translation>
-    </message>
-    <message>
       <source>Updating Background...</source>
       <translation>Aggiornamento dello sfondo...</translation>
     </message>

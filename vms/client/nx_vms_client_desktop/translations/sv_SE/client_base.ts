@@ -13258,10 +13258,6 @@ Den här webbsidan presenterade ett opålitligt certifikat. Det är inte rekomme
       </translation>
     </message>
     <message>
-      <source>There is another user with the same name</source>
-      <translation>Det finns en annan användare med samma namn</translation>
-    </message>
-    <message>
       <source>Updating Background...</source>
       <translation>Uppdaterar bakgrund...</translation>
     </message>

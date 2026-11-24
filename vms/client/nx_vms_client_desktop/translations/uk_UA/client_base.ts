@@ -13647,10 +13647,6 @@ This web page presented an untrusted certificate. It is not recommended to open 
       </translation>
     </message>
     <message>
-      <source>There is another user with the same name</source>
-      <translation>Існує інший користувач з таким же ім'ям</translation>
-    </message>
-    <message>
       <source>Updating Background...</source>
       <translation>Оновлення заднього фону...</translation>
     </message>

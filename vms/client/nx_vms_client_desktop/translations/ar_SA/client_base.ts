@@ -7865,7 +7865,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraReplacementDialog</name>
     <message>
       <source>Failed to replace camera</source>
-      <translation type="unfinished">Failed to replace camera</translation>
+      <translation>فشل في استبدال الكاميرا</translation>
     </message>
     <message>
       <source>Abort camera replacement?</source>
@@ -14033,10 +14033,6 @@ This web page presented an untrusted certificate. It is not recommended to open 
         <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
         <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>There is another user with the same name</source>
-      <translation>There is another user with the same name</translation>
     </message>
     <message>
       <source>Updating Background...</source>

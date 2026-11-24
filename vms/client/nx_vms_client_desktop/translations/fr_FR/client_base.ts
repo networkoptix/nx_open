@@ -13260,10 +13260,6 @@ This web page presented an untrusted certificate. It is not recommended to open 
       </translation>
     </message>
     <message>
-      <source>There is another user with the same name</source>
-      <translation>Il y a un autre utilisateur avec le même nom</translation>
-    </message>
-    <message>
       <source>Updating Background...</source>
       <translation>Mise à jour du fond d'écran...</translation>
     </message>

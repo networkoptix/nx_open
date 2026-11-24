@@ -13062,10 +13062,6 @@ This web page presented an untrusted certificate. It is not recommended to open 
       </translation>
     </message>
     <message>
-      <source>There is another user with the same name</source>
-      <translation>还有另一个具有相同名称的用户</translation>
-    </message>
-    <message>
       <source>Updating Background...</source>
       <translation>更新背景...</translation>
     </message>

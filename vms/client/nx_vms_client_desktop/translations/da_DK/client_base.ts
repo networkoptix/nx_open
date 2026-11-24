@@ -13258,10 +13258,6 @@ Denne webside præsenterede et certifikat, der ikke er tillid til. Det anbefales
       </translation>
     </message>
     <message>
-      <source>There is another user with the same name</source>
-      <translation>Der er en anden bruger med samme navn</translation>
-    </message>
-    <message>
       <source>Updating Background...</source>
       <translation>Opdaterer Baggrund...</translation>
     </message>

@@ -13065,10 +13065,6 @@ This web page presented an untrusted certificate. It is not recommended to open 
       </translation>
     </message>
     <message>
-      <source>There is another user with the same name</source>
-      <translation>มีผู้ใช้รายอื่นที่มีชื่อเดียวกัน</translation>
-    </message>
-    <message>
       <source>Updating Background...</source>
       <translation>กำลังอัพเดทพื้นหลัง...</translation>
     </message>

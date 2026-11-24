@@ -515,7 +515,7 @@
     </message>
     <message>
       <source>Object Actions</source>
-      <translation type="unfinished">Object Actions</translation>
+      <translation>Aksi Objek</translation>
     </message>
     <message>
       <source>Delete from Disk</source>
@@ -13063,10 +13063,6 @@ Integrasi ini menampilkan sertifikat yang tidak tepercaya. Tidak disarankan untu
       <translation>
         <numerusform>Apakah Anda yakin ingin menghapus file %n ini secara permanen?</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>There is another user with the same name</source>
-      <translation>Ada pengguna lain dengan nama yang sama</translation>
     </message>
     <message>
       <source>Updating Background...</source>
