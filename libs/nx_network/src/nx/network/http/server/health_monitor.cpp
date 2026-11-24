@@ -5,6 +5,7 @@
 #include <cstring>
 #include <utility>
 
+#include <nx/utils/system_network_headers.h>
 #include <nx/network/socket_factory.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/log/assert.h>
