@@ -4,6 +4,8 @@ add_executable(push_notification_extension
     "notification_service.h"
     "notification_service.mm")
 
+nx_target_enable_werror(push_notification_extension "")
+
 if(NOT CMAKE_GENERATOR STREQUAL "Xcode")
     target_link_options(push_notification_extension PRIVATE "-e" "_NSExtensionMain")
 endif()

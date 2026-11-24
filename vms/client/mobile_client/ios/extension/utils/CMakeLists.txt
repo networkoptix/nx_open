@@ -6,6 +6,8 @@ add_library(utils STATIC
     push_ipc_data_impl.mm
     ios_secure_storage.mm)
 
+nx_target_enable_werror(utils "")
+
 set(branding_file "branding.h")
 set(target_branding_file ${CMAKE_CURRENT_BINARY_DIR}/${branding_file})
 nx_configure_file(${branding_file}.in ${target_branding_file})

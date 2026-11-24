@@ -1,7 +1,6 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 nx_add_test(mobile_client_ut
-    NO_WERROR
     PUBLIC_LIBS
         nx_vms_common_test_support
         mobile_client_library

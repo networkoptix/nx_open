@@ -4,10 +4,10 @@
 
 namespace nx::vms::client::mobile::details {
 
-static constexpr char* kIpcAccessGroup =
+static constexpr const char* kIpcAccessGroup =
     "${appleTeamId}.${customization.mobile.ios.bundleIdentifier}.SharedItems";
 
-static constexpr char* kApplicationGroup =
+static constexpr const char* kApplicationGroup =
     "${customization.mobile.ios.groupIdentifier}";
 
 } // namespace nx::vms::client::mobile::details

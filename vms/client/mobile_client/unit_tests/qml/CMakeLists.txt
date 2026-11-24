@@ -11,7 +11,6 @@ set_source_files_properties(${fonts} PROPERTIES RESOURCE_ALIAS_PREFIX fonts/)
 
 nx_add_test(mobile_client_qml_ut
     NO_GTEST
-    NO_WERROR
     PUBLIC_LIBS
         mobile_client_library
         Qt6::QuickTest

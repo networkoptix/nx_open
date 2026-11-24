@@ -196,6 +196,8 @@ else()
     add_executable(mobile_client src/main.cpp ${resources})
 endif()
 
+nx_target_enable_werror(mobile_client "")
+
 target_link_libraries(mobile_client PRIVATE mobile_client_library)
 
 nx_process_target_debug_symbols(mobile_client)
@@ -329,6 +331,8 @@ if(ANDROID)
         src/nx/vms/client/mobile/push_notification/details/android/push_notification_storage_android.cpp
         src/nx/vms/client/mobile/push_notification/details/android/jni_helpers_android.cpp)
 
+    nx_target_enable_werror(push_notification_storage "")
+
     target_include_directories(push_notification_storage
         PRIVATE
             src
@@ -422,6 +426,8 @@ if(IOS)
     # Used by ios/extension.
     add_library(push_notification_storage STATIC
         src/nx/vms/client/mobile/push_notification/details/push_notification_storage.cpp)
+
+    nx_target_enable_werror(push_notification_storage "")
 
     target_link_libraries(push_notification_storage PUBLIC nx_reflect utils)
 
