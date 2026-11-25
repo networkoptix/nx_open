@@ -59,6 +59,13 @@ enum class ResourceStatus
      * %caption mismatchedCertificate
      */
     mismatchedCertificate = 6,
+
+    /**%apidoc
+     * Applies only to Devices. The Device is accessible, but the Site requires an encrypted
+     * connection to it, and the encrypted connection cannot be established.
+     * %caption EncryptedConnectionFailed
+     */
+    encryptedConnectionFailed = 7,
 };
 Q_ENUM_NS(ResourceStatus)
 
@@ -66,15 +73,14 @@ template<typename Visitor>
 constexpr auto nxReflectVisitAllEnumItems(ResourceStatus*, Visitor&& visitor)
 {
     using Item = nx::reflect::enumeration::Item<ResourceStatus>;
-    return visitor(
-        Item{ResourceStatus::offline, "Offline"},
+    return visitor(Item{ResourceStatus::offline, "Offline"},
         Item{ResourceStatus::unauthorized, "Unauthorized"},
         Item{ResourceStatus::online, "Online"},
         Item{ResourceStatus::recording, "Recording"},
         Item{ResourceStatus::undefined, "NotDefined"},
         Item{ResourceStatus::incompatible, "Incompatible"},
-        Item{ResourceStatus::mismatchedCertificate, "mismatchedCertificate"}
-    );
+        Item{ResourceStatus::mismatchedCertificate, "mismatchedCertificate"},
+        Item{ResourceStatus::encryptedConnectionFailed, "EncryptedConnectionFailed"});
 }
 
 NX_REFLECTION_ENUM(CameraStatusFlag,
