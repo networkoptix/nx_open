@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include <memory>
+#include <optional>
 
 #include <gtest/gtest.h>
 
@@ -45,6 +46,7 @@ public:
             ownResolver, resourcePool(), /*parent*/ ownResolver);
         const auto layoutResolver = new LayoutItemAccessResolver(
             videowallResolver, resourcePool(), /*parent*/ videowallResolver);
+        baseResolver = layoutResolver;
         return new InheritedResourceAccessResolver(layoutResolver, subjects.get());
     }
 
@@ -111,6 +113,7 @@ public:
     }
 
     std::unique_ptr<TestSubjectHierarchy> subjects;
+    mutable AbstractResourceAccessResolver* baseResolver = nullptr;
 };
 
 TEST_F(InheritedResourceAccessResolverTest, inheritedAccessRights)
@@ -300,6 +303,180 @@ TEST_F(InheritedResourceAccessResolverTest, dynamicPermissionChanges)
 
     ASSERT_EQ(mapToString(resolver->resourceAccessMap(subjects->id("User 1"))),
         mapToString({{id("Camera"), testAccessRights1}}));
+}
+
+TEST_F(InheritedResourceAccessResolverTest, reAddedSubjectDoesNotInheritRemovedSubjectAccess)
+{
+    const AccessRights group2AccessRights{AccessRight::view | AccessRight::viewArchive};
+    const AccessRights group3AccessRights{AccessRight::view};
+
+    manager->setOwnResourceAccessMap(
+        subjects->id("Group 2"), {{ensureId("Camera"), group2AccessRights}});
+
+    ASSERT_EQ(mapToString(resolver->resourceAccessMap(subjects->id("User 1"))),
+        mapToString({{id("Camera"), group2AccessRights}}));
+
+    resolver->notifier()->subscribeSubjects({subjects->id("User 1")});
+    qRegisterMetaType<UuidSet>();
+    QSignalSpy spy(
+        resolver->notifier(), &AbstractResourceAccessResolver::Notifier::resourceAccessChanged);
+
+    subjects->remove("User 1");
+    ASSERT_TRUE(spy.empty());
+
+    subjects->addOrUpdate("User 1", {});
+    ASSERT_EQ(mapToString(resolver->resourceAccessMap(subjects->id("User 1"))), QString());
+
+    subjects->addOrUpdate("User 1", {"Group 3"});
+    ASSERT_EQ(mapToString(resolver->resourceAccessMap(subjects->id("User 1"))), QString());
+
+    manager->setOwnResourceAccessMap(
+        subjects->id("Group 3"), {{id("Camera"), group3AccessRights}});
+    ASSERT_EQ(mapToString(resolver->resourceAccessMap(subjects->id("User 1"))),
+        mapToString({{id("Camera"), group3AccessRights}}));
+}
+
+TEST_F(InheritedResourceAccessResolverTest, reAddedWatchedSubjectNotifications)
+{
+    const AccessRights testAccessRights{AccessRight::view};
+
+    subjects->addOrUpdate("Group 4", {});
+    resolver->notifier()->subscribeSubjects({subjects->id("User 1")});
+    qRegisterMetaType<UuidSet>();
+    QSignalSpy spy(
+        resolver->notifier(), &AbstractResourceAccessResolver::Notifier::resourceAccessChanged);
+
+    const auto lastNames = [&]() -> Names
+    {
+        if (spy.size() != 1)
+            return {};
+        return subjects->names(spy.takeLast()[0].value<UuidSet>());
+    };
+
+    subjects->remove("User 1");
+    ASSERT_TRUE(spy.empty());
+
+    subjects->addOrUpdate("User 1", {"Group 4"});
+    ASSERT_EQ(lastNames(), Names({"User 1"}));
+
+    manager->setOwnResourceAccessMap(
+        subjects->id("Group 4"), {{ensureId("Camera"), testAccessRights}});
+    ASSERT_EQ(lastNames(), Names({"User 1"}));
+}
+
+TEST_F(InheritedResourceAccessResolverTest, removedGroupAccessIsNotCachedForReAddedGroup)
+{
+    const AccessRights testAccessRights{AccessRight::view | AccessRight::edit};
+
+    manager->setOwnResourceAccessMap(
+        subjects->id("Group 1"), {{ensureId("Camera"), testAccessRights}});
+
+    ASSERT_EQ(mapToString(resolver->resourceAccessMap(subjects->id("Group 3"))),
+        mapToString({{id("Camera"), testAccessRights}}));
+
+    subjects->remove("Group 3");
+    subjects->addOrUpdate("Group 3", {});
+
+    ASSERT_EQ(mapToString(resolver->resourceAccessMap(subjects->id("Group 3"))), QString());
+    ASSERT_EQ(mapToString(resolver->resourceAccessMap(subjects->id("User 2"))), QString());
+}
+
+TEST_F(InheritedResourceAccessResolverTest, removedSubjectAccessIsNotCached)
+{
+    const AccessRights testAccessRights{AccessRight::view | AccessRight::viewArchive};
+
+    manager->setOwnResourceAccessMap(
+        subjects->id("Group 2"), {{ensureId("Camera"), testAccessRights}});
+
+    ASSERT_EQ(mapToString(resolver->resourceAccessMap(subjects->id("User 1"))),
+        mapToString({{id("Camera"), testAccessRights}}));
+
+    subjects->remove("User 1");
+    ASSERT_EQ(mapToString(resolver->resourceAccessMap(subjects->id("User 1"))), QString());
+}
+
+TEST_F(InheritedResourceAccessResolverTest, subjectQueriedBeforeAddedInheritsAccess)
+{
+    const AccessRights testAccessRights{AccessRight::view | AccessRight::viewArchive};
+
+    manager->setOwnResourceAccessMap(
+        subjects->id("Group 2"), {{ensureId("Camera"), testAccessRights}});
+
+    ASSERT_EQ(mapToString(resolver->resourceAccessMap(subjects->ensureId("User 3"))), QString());
+
+    subjects->addOrUpdate("User 3", {"Group 2"});
+    ASSERT_EQ(mapToString(resolver->resourceAccessMap(subjects->id("User 3"))),
+        mapToString({{id("Camera"), testAccessRights}}));
+}
+
+TEST_F(InheritedResourceAccessResolverTest, watchedSubjectNotifiedViaLateArrivedParent)
+{
+    subjects->addOrUpdate("User 3", {"Group 4"});
+    resolver->notifier()->subscribeSubjects({subjects->id("User 3")});
+    qRegisterMetaType<UuidSet>();
+    QSignalSpy spy(
+        resolver->notifier(), &AbstractResourceAccessResolver::Notifier::resourceAccessChanged);
+
+    subjects->addOrUpdate("Group 4", {"Group 1"});
+    spy.clear();
+
+    manager->setOwnResourceAccessMap(
+        subjects->id("Group 1"), {{ensureId("Camera"), AccessRight::view}});
+    ASSERT_EQ(spy.size(), 1);
+    ASSERT_EQ(subjects->names(spy.takeLast()[0].value<UuidSet>()), Names({"User 3"}));
+}
+
+TEST_F(InheritedResourceAccessResolverTest, subjectHierarchyReset)
+{
+    const AccessRights testAccessRights{AccessRight::view | AccessRight::viewArchive};
+
+    manager->setOwnResourceAccessMap(
+        subjects->id("Group 2"), {{ensureId("Camera"), testAccessRights}});
+
+    ASSERT_EQ(mapToString(resolver->resourceAccessMap(subjects->id("User 1"))),
+        mapToString({{id("Camera"), testAccessRights}}));
+
+    QSignalSpy spy(
+        resolver->notifier(), &AbstractResourceAccessResolver::Notifier::resourceAccessReset);
+
+    TestSubjectHierarchy rebuilt;
+    for (const auto& name: {"Group 1", "Group 2", "Group 3", "User 1", "User 2"})
+        rebuilt.setId(name, subjects->id(name));
+    rebuilt.addOrUpdate("Group 1", {});
+    rebuilt.addOrUpdate("Group 2", {"Group 1"});
+    rebuilt.addOrUpdate("Group 3", {"Group 1"});
+    rebuilt.addOrUpdate("User 1", {"Group 3"});
+    rebuilt.addOrUpdate("User 2", {"Group 3"});
+    static_cast<SubjectHierarchy&>(*subjects) = rebuilt;
+
+    ASSERT_EQ(spy.size(), 1);
+    ASSERT_EQ(mapToString(resolver->resourceAccessMap(subjects->id("User 1"))), QString());
+}
+
+TEST_F(InheritedResourceAccessResolverTest, watchedParentsUpdatedBeforeResetNotification)
+{
+    resolver->notifier()->subscribeSubjects({subjects->id("User 1")});
+    ASSERT_TRUE(baseResolver->notifier()->watchedSubjectIds().contains(subjects->id("Group 2")));
+
+    std::optional<QSet<nx::Uuid>> baseWatchedOnReset;
+    nx::utils::ScopedConnections connections;
+    connections << QObject::connect(resolver->notifier(),
+        &AbstractResourceAccessResolver::Notifier::resourceAccessReset,
+        [&]() { baseWatchedOnReset = baseResolver->notifier()->watchedSubjectIds(); });
+
+    TestSubjectHierarchy rebuilt;
+    for (const auto& name: {"Group 1", "Group 2", "Group 3", "User 1", "User 2"})
+        rebuilt.setId(name, subjects->id(name));
+    rebuilt.addOrUpdate("Group 1", {});
+    rebuilt.addOrUpdate("Group 2", {"Group 1"});
+    rebuilt.addOrUpdate("Group 3", {"Group 1"});
+    rebuilt.addOrUpdate("User 1", {"Group 3"});
+    rebuilt.addOrUpdate("User 2", {"Group 3"});
+    static_cast<SubjectHierarchy&>(*subjects) = rebuilt;
+
+    ASSERT_TRUE(baseWatchedOnReset);
+    ASSERT_FALSE(baseWatchedOnReset->contains(subjects->id("Group 2")));
+    ASSERT_TRUE(baseWatchedOnReset->contains(subjects->id("Group 3")));
 }
 
 TEST_F(InheritedResourceAccessResolverTest, resourceAccessDetails)
