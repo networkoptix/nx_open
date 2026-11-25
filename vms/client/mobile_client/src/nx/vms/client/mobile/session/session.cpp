@@ -685,8 +685,10 @@ void Session::Private::gatherInitialConnectionInfo(int remainingTriesCount)
             if (!logonData)
                 return {};
 
+            const auto cloudLogin =
+                core::appContext()->cloudStatusWatcher()->cloudLogin().toStdString();
             const auto tokenInfo = details::PushIpcData::accessToken(
-                cloudData.cloudSystemId.toStdString());
+                cloudData.cloudSystemId.toStdString(), cloudLogin);
             logonData->accessToken = tokenInfo.accessToken;
             logonData->tokenExpiresAt = tokenInfo.expiresAt;
 
@@ -708,8 +710,7 @@ void Session::Private::gatherInitialConnectionInfo(int remainingTriesCount)
                     core::appContext()->coreSettings()->digestCloudPassword();
                 if (!lastPassword.empty())
                 {
-                    logonData->credentials.username =
-                        core::appContext()->cloudStatusWatcher()->cloudLogin().toStdString();
+                    logonData->credentials.username = cloudLogin;
                     logonData->credentials.authToken =
                         {lastPassword, nx::network::http::AuthTokenType::password};
                 }

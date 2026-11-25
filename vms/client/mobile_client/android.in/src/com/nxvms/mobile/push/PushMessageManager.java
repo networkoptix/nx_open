@@ -2,7 +2,6 @@
 
 package com.nxvms.mobile.push;
 
-import com.nxvms.mobile.utils.HttpDigestAuth;
 import com.nxvms.mobile.utils.Logger;
 import com.nxvms.mobile.utils.OAuthHelper;
 import com.nxvms.mobile.utils.PushIpcData;
@@ -51,12 +50,6 @@ public class PushMessageManager
         ? NotificationChannel.DEFAULT_CHANNEL_ID
         : "GENERAL_NOTIFICATION_CHANNEL";
     private static int notificationIconResourceId = 0;
-
-    public enum AuthMethod
-    {
-        digest,
-        bearer
-    };
 
     public static class PushContext
     {
@@ -333,52 +326,8 @@ public class PushMessageManager
         PushContext context,
         PushIpcData.LoginInfo data)
     {
-        PushIpcData.TokenInfo tokenInfo =
-            PushIpcData.accessToken(context.context, context.cloudSystemId);
-
-        final String serverUrl = OAuthHelper.hostWithPath(context.imageUrl, null);
-        OAuthHelper.AccessTokenStatus status = tokenInfo == null
-            ? OAuthHelper.AccessTokenStatus.invalid
-            : OAuthHelper.systemAccessTokenStatus(tokenInfo.accessToken, serverUrl);
-
-        if (status == OAuthHelper.AccessTokenStatus.unsupported)
-        {
-            // 4.2 and below servers do not support token authorization.
-            NotificationPresenter presenter =
-                new NotificationPresenter(context, data, AuthMethod.digest);
-            presenter.execute();
-            return;
-        }
-
-        if (status == OAuthHelper.AccessTokenStatus.invalid)
-        {
-            tokenInfo = OAuthHelper.requestSystemAccessToken(
-                data.user, data.cloudRefreshToken, context.cloudSystemId);
-
-            if (tokenInfo != null)
-            {
-                status = OAuthHelper.systemAccessTokenStatus(tokenInfo.accessToken, serverUrl);
-
-                if (!TextUtils.isEmpty(tokenInfo.accessToken) && status != OAuthHelper.AccessTokenStatus.valid)
-                {
-                    Logger.info("gathering token", "resetting new access token since it is not valid.");
-                    tokenInfo = null; //< Most likely it is server with version < 5.0.
-                }
-            }
-        }
-
-        if (tokenInfo != null)
-        {
-            PushIpcData.setAccessToken(
-                context.context, context.cloudSystemId, tokenInfo.accessToken, tokenInfo.expiresAt);
-        }
-
-        if (tokenInfo != null && !TextUtils.isEmpty(tokenInfo.accessToken)) //< Definitely supports OAuth.
-            NotificationPresenter.presentNotification(context, data, AuthMethod.bearer);
-        else if (status == OAuthHelper.AccessTokenStatus.unsupported) //< Try to use digest auth.
-            NotificationPresenter.presentNotification(context, data, AuthMethod.digest);
-        else
-            showNotificationInternal(context, null);
+        NotificationPresenter presenter = new NotificationPresenter(context, data);
+        presenter.execute();
     }
 
     public static final int kHTTPTemporaryRedirect = 307; // Temporary Redirect (since HTTP/1.1)
@@ -388,25 +337,19 @@ public class PushMessageManager
     {
         PushContext context;
         PushIpcData.LoginInfo data;
-        AuthMethod method;
 
-        static public void presentNotification(
-            PushContext context,
-            PushIpcData.LoginInfo data,
-            AuthMethod method)
+        static private class ImageLoadResult
         {
-            NotificationPresenter presenter = new NotificationPresenter(context, data, method);
-            presenter.execute();
-        }
+            Bitmap image;
+            boolean unauthorized = false;
+        };
 
         private NotificationPresenter(
             PushContext targetContext,
-            PushIpcData.LoginInfo targetData,
-            AuthMethod targetMethod)
+            PushIpcData.LoginInfo targetData)
         {
             context = targetContext;
             data = targetData;
-            method = targetMethod;
         }
 
         public void saveNotificationImage(Bitmap image)
@@ -420,12 +363,48 @@ public class PushMessageManager
         @Override
         protected Bitmap doInBackground(Void... dummy)
         {
-            String kLogTag = String.format("%s image loader", method.toString());
+            // Use the saved token without checking it first. A new token is issued only if the
+            // server rejects the saved one.
+            final PushIpcData.TokenInfo savedToken =
+                PushIpcData.accessToken(context.context, context.cloudSystemId, data.user);
+            final boolean hasSavedToken =
+                savedToken != null && !TextUtils.isEmpty(savedToken.accessToken);
+            if (hasSavedToken)
+            {
+                final ImageLoadResult result = loadImage(savedToken.accessToken);
+                if (!result.unauthorized)
+                    return result.image;
+
+                PushIpcData.removeAccessToken(
+                    context.context, context.cloudSystemId, savedToken.accessToken);
+            }
+
+            final PushIpcData.TokenInfo newToken = OAuthHelper.requestSystemAccessToken(
+                data.user, data.cloudRefreshToken, context.cloudSystemId);
+            if (newToken != null)
+            {
+                final ImageLoadResult result = loadImage(newToken.accessToken);
+                if (!result.unauthorized)
+                {
+                    PushIpcData.setAccessToken(context.context, context.cloudSystemId, data.user,
+                        newToken.accessToken, newToken.expiresAt);
+                    return result.image;
+                }
+            }
+
+            return null;
+        }
+
+        private ImageLoadResult loadImage(String accessToken)
+        {
+            String kLogTag = "image loader";
+
+            ImageLoadResult result = new ImageLoadResult();
 
             if (TextUtils.isEmpty(data.user))
             {
                 Logger.info(kLogTag, "can't load an image, user is empty.");
-                return null;
+                return result;
             }
 
             try
@@ -438,44 +417,19 @@ public class PushMessageManager
                     if (TextUtils.isEmpty(context.imageUrl))
                     {
                         Logger.info(kLogTag, "can't load an image, url is empty.");
-                        return null;
+                        return result;
                     }
 
                     Logger.info(kLogTag, "loading image.");
 
                     final URL imageUrl = new URL(context.imageUrl);
                     HttpURLConnection connection = (HttpURLConnection) imageUrl.openConnection();
+                    connection.setConnectTimeout(OAuthHelper.kRequestTimeoutMs);
+                    connection.setReadTimeout(OAuthHelper.kRequestTimeoutMs);
                     connection.setInstanceFollowRedirects(false);
 
-                    if (method == AuthMethod.bearer)
-                    {
-                        final PushIpcData.TokenInfo tokenInfo =
-                            PushIpcData.accessToken(context.context, context.cloudSystemId);
-                        final String accessToken = tokenInfo == null ? null : tokenInfo.accessToken;
-                        if (TextUtils.isEmpty(accessToken))
-                        {
-                            Logger.info(kLogTag, "can't load an image, access token is empty.");
-                            return null;
-                        }
-
-                        String auth = String.format("Bearer %s", accessToken);
-                        connection.setRequestProperty("Authorization", auth);
-                    }
-                    else if (!TextUtils.isEmpty(data.password))
-                    {
-                        connection = HttpDigestAuth.tryAuth(connection, data.user, data.password);
-                    }
-                    else
-                    {
-                        Logger.info(kLogTag, "can't load an image, password is empty.");
-                        return null;
-                    }
-
-                    if (connection == null)
-                    {
-                        Logger.error(kLogTag, "can't load an image, authorization failed.");
-                        return null;
-                    }
+                    String auth = String.format("Bearer %s", accessToken);
+                    connection.setRequestProperty("Authorization", auth);
 
                     final int responseCode = connection.getResponseCode();
                     Logger.info(kLogTag, String.format("Response code is %d", responseCode));
@@ -488,15 +442,18 @@ public class PushMessageManager
                         case HttpURLConnection.HTTP_MOVED_TEMP:
                             context.imageUrl = connection.getHeaderField("Location");
                             continue;
+                        case HttpURLConnection.HTTP_UNAUTHORIZED:
+                            result.unauthorized = true;
+                            return result;
                     }
 
-                    final Bitmap result = BitmapFactory.decodeStream(connection.getInputStream());
-                    Logger.info(kLogTag, result == null
+                    result.image = BitmapFactory.decodeStream(connection.getInputStream());
+                    Logger.info(kLogTag, result.image == null
                         ? "image was not decoded."
                         : "image was decoded.");
 
-                    if (result != null)
-                        saveNotificationImage(result);
+                    if (result.image != null)
+                        saveNotificationImage(result.image);
 
                     return result;
                 }
@@ -504,10 +461,10 @@ public class PushMessageManager
             catch (Exception e)
             {
                 Logger.error(kLogTag, "can't load an image.");
-                return null;
+                return result;
             }
 
-            return null;
+            return result;
         }
 
         @Override

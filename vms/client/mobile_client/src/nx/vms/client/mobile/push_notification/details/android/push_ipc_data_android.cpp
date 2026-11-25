@@ -12,38 +12,27 @@ static constexpr auto kStorageClass = "com/nxvms/mobile/utils/PushIpcData";
 
 namespace nx::vms::client::mobile::details {
 
-void PushIpcData::storeImpl(
-    const std::string& user,
-    const std::string& cloudRefreshToken,
-    const std::string& password)
+void PushIpcData::storeImpl(const std::string& user, const std::string& cloudRefreshToken)
 {
     const auto activity = currentActivity();
     if (!activity.isValid())
         return;
 
-    PushIpcData::clear();
-
-    // Signature for "void store(Context, String, String, String)" function.
-    static const auto kStoreFunctionSignature = makeVoidSignature(
-        {JniSignature::kContext, JniSignature::kString, JniSignature::kString, JniSignature::kString});
+    // Signature for "void store(Context, String, String)" function.
+    static const auto kStoreFunctionSignature =
+        makeVoidSignature({JniSignature::kContext, JniSignature::kString, JniSignature::kString});
 
     const auto userObject = QJniObject::fromString(user.c_str());
     const auto cloudRefreshTokenObject = QJniObject::fromString(cloudRefreshToken.c_str());
-    const auto passwordObject = QJniObject::fromString(password.c_str());
-    QJniObject::callStaticMethod<void>(
-        kStorageClass,
+    QJniObject::callStaticMethod<void>(kStorageClass,
         "store",
         kStoreFunctionSignature.c_str(),
         activity.object(),
         userObject.object<jstring>(),
-        cloudRefreshTokenObject.object<jstring>(),
-        passwordObject.object<jstring>());
+        cloudRefreshTokenObject.object<jstring>());
 }
 
-bool PushIpcData::load(
-    std::string& user,
-    std::string& cloudRefreshToken,
-    std::string& password)
+bool PushIpcData::load(std::string& user, std::string& cloudRefreshToken)
 {
     const auto activity = currentActivity();
     if (!activity.isValid())
@@ -68,10 +57,8 @@ bool PushIpcData::load(
 
     user = object.getObjectField(
         "user", JniSignature::kString).toString().toStdString();
-    cloudRefreshToken = object.getObjectField(
-        "cloudRefreshToken", JniSignature::kString).toString().toStdString();
-    password = object.getObjectField(
-        "password", JniSignature::kString).toString().toStdString();
+    cloudRefreshToken =
+        object.getObjectField("cloudRefreshToken", JniSignature::kString).toString().toStdString();
     return true;
 }
 
@@ -93,7 +80,7 @@ void PushIpcData::clear()
 }
 
 PushIpcData::TokenInfo PushIpcData::accessToken(
-    const std::string& cloudSystemId)
+    const std::string& cloudSystemId, const std::string& user)
 {
     const auto activity = currentActivity();
     if (!activity.isValid())
@@ -102,19 +89,20 @@ PushIpcData::TokenInfo PushIpcData::accessToken(
     static const auto kTokenInfoClassSignature =
         QString("Lcom/nxvms/mobile/utils/PushIpcData$TokenInfo;");
 
-    // Signature for "TokenInfo accessToken(Context, String)" function.
+    // Signature for "TokenInfo accessToken(Context, String, String)" function.
     static const auto kAccessTokenSignature =
-        makeSignature({JniSignature::kContext, JniSignature::kString}, kTokenInfoClassSignature);
+        makeSignature({JniSignature::kContext, JniSignature::kString, JniSignature::kString},
+            kTokenInfoClassSignature);
 
     const auto cloudSystemIdObject = QJniObject::fromString(cloudSystemId.c_str());
+    const auto userObject = QJniObject::fromString(user.c_str());
 
-    const QJniObject object =
-        QJniObject::callStaticObjectMethod(
-            kStorageClass,
-            "accessToken",
-            kAccessTokenSignature.c_str(),
-            activity.object(),
-            cloudSystemIdObject.object<jstring>());
+    const QJniObject object = QJniObject::callStaticObjectMethod(kStorageClass,
+        "accessToken",
+        kAccessTokenSignature.c_str(),
+        activity.object(),
+        cloudSystemIdObject.object<jstring>(),
+        userObject.object<jstring>());
 
     if (!object.isValid())
         return {};
@@ -125,8 +113,8 @@ PushIpcData::TokenInfo PushIpcData::accessToken(
         .expiresAt = std::chrono::milliseconds(object.getField<jlong>("expiresAt"))};
 }
 
-void PushIpcData::setAccessToken(
-    const std::string& cloudSystemId,
+void PushIpcData::setAccessToken(const std::string& cloudSystemId,
+    const std::string& user,
     const std::string& accessToken,
     const std::chrono::milliseconds& expiresAt)
 {
@@ -134,41 +122,63 @@ void PushIpcData::setAccessToken(
     if (!activity.isValid())
         return;
 
-    // Signature for "void setAccessToken(Context, String, String, long)" function.
-    static const auto kSetAccessTokenFunctionSignature = makeVoidSignature(
-        {JniSignature::kContext, JniSignature::kString, JniSignature::kString, JniSignature::kLong});
+    // Signature for "void setAccessToken(Context, String, String, String, long)" function.
+    static const auto kSetAccessTokenFunctionSignature = makeVoidSignature({JniSignature::kContext,
+        JniSignature::kString,
+        JniSignature::kString,
+        JniSignature::kString,
+        JniSignature::kLong});
 
     const auto cloudSystemIdObject = QJniObject::fromString(cloudSystemId.c_str());
+    const auto userObject = QJniObject::fromString(user.c_str());
     const auto accessTokenObject = QJniObject::fromString(accessToken.c_str());
 
-    QJniObject::callStaticMethod<void>(
-        kStorageClass,
+    QJniObject::callStaticMethod<void>(kStorageClass,
         "setAccessToken",
         kSetAccessTokenFunctionSignature.c_str(),
         activity.object(),
         cloudSystemIdObject.object<jstring>(),
+        userObject.object<jstring>(),
         accessTokenObject.object<jstring>(),
         static_cast<jlong>(expiresAt.count()));
 }
 
-void PushIpcData::removeAccessToken(const std::string& cloudSystemId)
+void PushIpcData::removeAccessToken(
+    const std::string& cloudSystemId, const std::string& accessToken)
 {
     const auto activity = currentActivity();
     if (!activity.isValid())
         return;
 
-    // Signature for "void removeAccessToken(Context, String)" function.
-    static const auto kRemoveAccessTokenFunctionSignature = makeVoidSignature(
-        {JniSignature::kContext, JniSignature::kString});
+    // Signature for "void removeAccessToken(Context, String, String)" function.
+    static const auto kRemoveAccessTokenFunctionSignature =
+        makeVoidSignature({JniSignature::kContext, JniSignature::kString, JniSignature::kString});
 
     const auto cloudSystemIdObject = QJniObject::fromString(cloudSystemId.c_str());
+    const auto accessTokenObject = QJniObject::fromString(accessToken.c_str());
 
-    QJniObject::callStaticMethod<void>(
-        kStorageClass,
+    QJniObject::callStaticMethod<void>(kStorageClass,
         "removeAccessToken",
         kRemoveAccessTokenFunctionSignature.c_str(),
         activity.object(),
-        cloudSystemIdObject.object<jstring>());
+        cloudSystemIdObject.object<jstring>(),
+        accessTokenObject.object<jstring>());
+}
+
+void PushIpcData::clearAccessTokens()
+{
+    const auto activity = currentActivity();
+    if (!activity.isValid())
+        return;
+
+    // Signature for "void clearAccessTokens(Context)" function.
+    static const auto kClearAccessTokensFunctionSignature =
+        makeVoidSignature({JniSignature::kContext});
+
+    QJniObject::callStaticMethod<void>(kStorageClass,
+        "clearAccessTokens",
+        kClearAccessTokensFunctionSignature.c_str(),
+        activity.object());
 }
 
 bool PushIpcData::cloudLoggerOptions(

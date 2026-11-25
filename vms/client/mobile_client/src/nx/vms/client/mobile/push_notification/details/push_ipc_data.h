@@ -24,39 +24,40 @@ struct PushIpcData
      *  Stores data to the secured storage.
      *  @user Currently logged cloud user. Converts it to the lowercase while storing.
      *  @refreshToken Refresh token of the current connection to the cloud.
-     *  @password Password for the compatibility with servers with version < 5.0.
      */
-    static void store(
-        const std::string& user,
-        const std::string& cloudRefreshToken,
-        const std::string& password);
+    static void store(const std::string& user, const std::string& cloudRefreshToken);
 
     /** Retrieves data from the secured storage. */
-    static bool load(
-        std::string& user,
-        std::string& cloudRefreshToken,
-        std::string& password);
+    static bool load(std::string& user, std::string& cloudRefreshToken);
 
     /** Clears data in the secured storage. */
     static void clear();
 
     /**
      *  Return stored access token for the specified cloud system to retrieve media data for
-     *  the push notification.
+     *  the push notification. Returns an empty token if the stored one has expired or was issued
+     *  for another user.
      */
-    static TokenInfo accessToken(const std::string& cloudSystemId);
+    static TokenInfo accessToken(const std::string& cloudSystemId, const std::string& user);
 
     /**
-     *  Set access token for the specified cloud system that could be used to retrieve media
-     *  data for the push notification.
+     *  Set access token issued for the specified user and cloud system that could be used to
+     *  retrieve media data for the push notification.
      */
-    static void setAccessToken(
-        const std::string& cloudSystemId,
+    static void setAccessToken(const std::string& cloudSystemId,
+        const std::string& user,
         const std::string& accessToken,
         const std::chrono::milliseconds& expiresAt);
 
-    /** Remove access token for the specified cloud system. */
-    static void removeAccessToken(const std::string& cloudSystemId);
+    /**
+     *  Remove access token for the specified cloud system if it is still the stored one. Another
+     *  token saved after this one was loaded is kept.
+     */
+    static void removeAccessToken(
+        const std::string& cloudSystemId, const std::string& accessToken);
+
+    /** Remove access tokens of all cloud systems. */
+    static void clearAccessTokens();
 
     /** Get parameters of the remote cloud logging session. */
     static bool cloudLoggerOptions(
@@ -71,9 +72,7 @@ struct PushIpcData
 private:
     PushIpcData() = delete;
 
-    static void storeImpl(const std::string& user,
-        const std::string& cloudRefreshToken,
-        const std::string& password);
+    static void storeImpl(const std::string& user, const std::string& cloudRefreshToken);
 };
 
 } // namespace nx::vms::client::mobile::details

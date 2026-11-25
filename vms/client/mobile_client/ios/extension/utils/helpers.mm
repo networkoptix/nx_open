@@ -3,6 +3,8 @@
 #include "helpers.h"
 
 #include <chrono>
+#include <memory>
+#include <mutex>
 
 #include <Foundation/NSURL.h>
 #include <Foundation/NSURLSession.h>
@@ -47,22 +49,34 @@ void syncRequest(
     const PostData& postData,
     SyncRequestCallback callback)
 {
-    bool handled = false;
-    const auto semaphore = dispatch_semaphore_create(0);
+    // The handler can be called after the timeout, when this function has already returned. So
+    // it uses shared state and does nothing after the timeout.
+    struct RequestState
+    {
+        std::mutex mutex;
+        bool finished = false;
+        dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+    };
+    const auto state = std::make_shared<RequestState>();
+
     const auto resultHandler =
-        [&semaphore, &handled, callback](
+        [state, callback](
             NSData* _Nullable data,
             NSURLResponse* _Nullable response,
             NSError* _Nullable error)
         {
-            handled = true;
+            const std::lock_guard<std::mutex> lock(state->mutex);
+            if (state->finished)
+                return;
+
+            state->finished = true;
 
             if (error)
                 callback(-1, data);
             else
                 callback(statusCodeFromResponse(response), data);
 
-            dispatch_semaphore_signal(semaphore);
+            dispatch_semaphore_signal(state->semaphore);
         };
 
     NSURLSession* session = [NSURLSession
@@ -87,11 +101,15 @@ void syncRequest(
 
     static constexpr int64_t kTimeout = std::chrono::duration_cast<std::chrono::nanoseconds>(
         std::chrono::seconds(10)).count();
-    if (dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, kTimeout)))
+    if (dispatch_semaphore_wait(state->semaphore, dispatch_time(DISPATCH_TIME_NOW, kTimeout)))
         [task cancel];
 
-    if (!handled)
+    const std::lock_guard<std::mutex> lock(state->mutex);
+    if (!state->finished)
+    {
+        state->finished = true;
         callback(-1, nullptr);
+    }
 }
 
 } // namespace extension::helpers

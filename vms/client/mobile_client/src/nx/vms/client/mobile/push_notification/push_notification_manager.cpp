@@ -10,9 +10,9 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/std_string_utils.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
-#include <nx/vms/client/core/settings/client_core_settings.h>
 #include <utils/common/delayed.h>
 
 #include "details/push_api_helper.h"
@@ -85,19 +85,16 @@ struct PushNotificationManager::Private
         QJSValue callback);
     void showCannotSubscribeMessage() const;
     void emitSystemsMetricsChanges() const;
-    void updateDigestPassword() const;
     void handleConfirmedSettingsChanged();
 };
 
 PushNotificationManager::Private::Private(PushNotificationManager* q):
     q(q)
 {
-    connect(&remotePushController, &PushSettingsRemoteController::confirmedSettingsChanged,
-        q, [this]() { handleConfirmedSettingsChanged(); });
-
-    using BaseProperty = nx::utils::property_storage::BaseProperty;
-    connect(&core::appContext()->coreSettings()->digestCloudPassword, &BaseProperty::changed,
-        q, [this]() { updateDigestPassword(); });
+    connect(&remotePushController,
+        &PushSettingsRemoteController::confirmedSettingsChanged,
+        q,
+        [this]() { handleConfirmedSettingsChanged(); });
 }
 
 void PushNotificationManager::Private::setTargetSystems(
@@ -161,10 +158,9 @@ void PushNotificationManager::Private::handleConfirmedSettingsChanged()
     }
     else if (!userName.empty())
     {
-        PushIpcData::store(
-            userName,
-            core::appContext()->cloudStatusWatcher()->remoteConnectionCredentials().authToken.value,
-            core::appContext()->coreSettings()->digestCloudPassword.value());
+        const auto credentials =
+            core::appContext()->cloudStatusWatcher()->remoteConnectionCredentials();
+        PushIpcData::store(userName, credentials.authToken.value);
     }
 }
 
@@ -179,16 +175,6 @@ void PushNotificationManager::Private::emitSystemsMetricsChanges() const
 {
     emit q->systemsCountChanged();
     emit q->usedSystemsCountChanged();
-}
-
-void PushNotificationManager::Private::updateDigestPassword() const
-{
-    std::string user, cloudRefreshToken, password;
-    PushIpcData::load(user, cloudRefreshToken, password);
-
-    const auto updatedPassword = core::appContext()->coreSettings()->digestCloudPassword.value();
-    if (password != updatedPassword)
-        PushIpcData::store(user, cloudRefreshToken, updatedPassword);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -220,6 +206,11 @@ void PushNotificationManager::setCredentials(const nx::network::http::Credential
 {
     if (d->remotePushController.credentials() == value)
         return;
+
+    // Access tokens of the previous user are not needed anymore.
+    const auto& previousUser = d->remotePushController.credentials().username;
+    if (!previousUser.empty() && nx::utils::stricmp(previousUser, value.username) != 0)
+        PushIpcData::clearAccessTokens();
 
     const nx::utils::ScopeGuard confirmedSettingsChangedGuard(
         [this]() { d->handleConfirmedSettingsChanged(); });

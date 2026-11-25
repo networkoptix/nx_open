@@ -7,6 +7,8 @@
 #include <UserNotifications/UserNotifications.h>
 
 #include <chrono>
+#include <memory>
+#include <mutex>
 
 #include <nx/vms/client/mobile/push_notification/details/push_ipc_data.h>
 #include <nx/vms/client/mobile/push_notification/details/push_notification_storage.h>
@@ -23,22 +25,15 @@ using PushNotificationStorage = nx::vms::client::mobile::PushNotificationStorage
 namespace {
 
 static const auto kAccessErrorText = @"No access to this information.";
-static const int kNotFoundHttpError = 404;
+static const int kUnauthorizedHttpError = 401;
 
 using namespace extension::helpers;
 
-enum class AuthMethod
+enum class ImageLoadResult
 {
-    invalid,
-    digest,
-    bearer
-};
-
-enum class AccessTokenStatus
-{
-    unsupported,
-    invalid,
-    valid
+    loaded,
+    unauthorized,
+    failed
 };
 
 NSDictionary* extractValuesFromResponse(
@@ -72,78 +67,6 @@ NSDictionary* extractValuesFromResponse(
     return values;
 }
 
-int getIntValue(NSDictionary* dict, NSString* key)
-{
-    id value = [dict objectForKey: key];
-    return value
-        ? [value integerValue]
-        : -1;
-}
-
-AccessTokenStatus systemAccessTokenStatus(
-    const std::string& token,
-    const NSURL* serverUrl)
-{
-    static const NSString* kLogTag = @"access token check";
-
-    extension::Logger::log(kLogTag, @"started.");
-
-    if (token.empty())
-    {
-        extension::Logger::log(kLogTag, @"token is empty, status is invalid.");
-        return AccessTokenStatus::invalid;
-    }
-
-    AccessTokenStatus result = AccessTokenStatus::invalid;
-    const auto handleReply =
-        [&result](int httpErrorCode, NSData* data)
-        {
-            extension::Logger::log(kLogTag, [NSString stringWithFormat: @"HTTP code is %d.", httpErrorCode]);
-
-            if (isSuccessHttpStatus(httpErrorCode))
-            {
-                NSString* message = @"";
-
-                if (NSDictionary* values = extractValuesFromResponse(httpErrorCode, data, kLogTag))
-                {
-                    NSString* resultToken = values[@"token"];
-                    static constexpr int kMinTokenLength = 6;
-                    if (resultToken && resultToken.length >= kMinTokenLength)
-                    {
-                        message = [NSString stringWithFormat: @"****%@ (expires in: %d, age: %d) ",
-                            [resultToken substringFromIndex: [resultToken length] - kMinTokenLength],
-                            getIntValue(values, @"expiresInS"), getIntValue(values, @"ageS")];
-                    }
-                }
-                extension::Logger::log(kLogTag, [NSString stringWithFormat: @"token %@is valid.", message]);
-                result = AccessTokenStatus::valid;
-            }
-            else if (httpErrorCode == kNotFoundHttpError)
-            {
-                extension::Logger::log(kLogTag, @"token functionality is not supported.");
-                result = AccessTokenStatus::unsupported;
-            }
-            else
-            {
-                NSString* message = @"";
-                if (data)
-                {
-                    message = [NSString stringWithFormat: @", response is %@",
-                        [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]];
-                }
-                extension::Logger::log(kLogTag, [NSString stringWithFormat: @"token in invalid%@", message]);
-                result = AccessTokenStatus::invalid;
-            }
-        };
-
-    NSString* path = [NSString stringWithFormat: @"rest/v1/login/sessions/%s", token.c_str()];
-    NSURL* url = urlFromHostAndPath(serverUrl, path);
-    syncRequest(url, /*postData*/ {}, handleReply);
-
-    extension::Logger::log(kLogTag, @"finished.");
-    return result;
-}
-
 PushIpcData::TokenInfo requestSystemAccessToken(
     const std::string& user,
     const std::string& cloudRefreshToken,
@@ -154,6 +77,11 @@ PushIpcData::TokenInfo requestSystemAccessToken(
     extension::Logger::log(kLogTag, @"started.");
 
     PushIpcData::TokenInfo result;
+    if (user.empty() || cloudRefreshToken.empty() || cloudSystemId.empty())
+    {
+        extension::Logger::log(kLogTag, @"invalid parameters.");
+        return result;
+    }
 
     const auto extractToken =
         [&result](int httpErrorCode, NSData* data)
@@ -195,39 +123,15 @@ PushIpcData::TokenInfo requestSystemAccessToken(
     return result;
 }
 
-NSURLSession* createSession(
-    id delegate,
-    const std::string& cloudSystemId,
-    AuthMethod method)
+NSURLSession* createSession(const std::string& accessToken)
 {
-    switch (method)
-    {
-        case AuthMethod::digest:
-        {
-            return [NSURLSession
-                sessionWithConfiguration: [NSURLSessionConfiguration defaultSessionConfiguration]
-                delegate: delegate
-                delegateQueue: [NSOperationQueue mainQueue]];
-        }
-        case AuthMethod::bearer:
-        {
-            NSURLSessionConfiguration* config =
-                [NSURLSessionConfiguration defaultSessionConfiguration];
+    NSURLSessionConfiguration* config = [NSURLSessionConfiguration defaultSessionConfiguration];
 
-            const auto tokenInfo = PushIpcData::accessToken(cloudSystemId);
-            NSString* authString =
-                [NSString stringWithFormat: @"Bearer %s", tokenInfo.accessToken.c_str()];
+    NSString* authString = [NSString stringWithFormat: @"Bearer %s", accessToken.c_str()];
 
-            [config setHTTPAdditionalHeaders: @{@"Authorization": authString}];
+    [config setHTTPAdditionalHeaders: @{@"Authorization": authString}];
 
-            return [NSURLSession
-                sessionWithConfiguration: config
-                delegate: nil
-                delegateQueue: nil];
-        }
-        default:
-            return nil;
-    }
+    return [NSURLSession sessionWithConfiguration: config delegate: nil delegateQueue: nil];
 }
 
 UNNotificationAttachment* makeAttachment(NSURL* source, const NSString* logTag)
@@ -265,17 +169,17 @@ UNNotificationAttachment* makeAttachment(NSURL* source, const NSString* logTag)
 
 using ContentHanlder = void (^)(UNNotificationContent* content);
 
-@interface NotificationService () <NSURLSessionTaskDelegate>
+@interface NotificationService ()
 @property(nonatomic) ContentHanlder handler;
 @property(nonatomic) UNMutableNotificationContent* content;
 @property(nonatomic) std::string user;
-@property(nonatomic) std::string password;
 @property(nonatomic) std::string cloudRefreshToken;
 @property(nonatomic) std::string cloudSystemId;
 @property(nonatomic) NSString* imageUrl;
 - (bool) initialize: (NSString*) targets;
 - (void) showNotification;
-- (void) showNotificatoinWithImage: (AuthMethod) method;
+- (ImageLoadResult) attachImage;
+- (ImageLoadResult) downloadImage: (const std::string&) accessToken;
 - (void) saveNotificationImage: (NSURL*) sourceUrl;
 - (void) saveNotification;
 @end
@@ -332,22 +236,21 @@ using ContentHanlder = void (^)(UNNotificationContent* content);
         return false;
     }
 
-    std::string user, password, cloudRefreshToken;
-    if (!PushIpcData::load(user, cloudRefreshToken, password))
+    std::string user, cloudRefreshToken;
+    if (!PushIpcData::load(user, cloudRefreshToken))
     {
         extension::Logger::log(kLogTag,
             @"can't load current keychain user data, discarding notification");
         return false;
     }
 
-    if (user.empty() || (password.empty() && cloudRefreshToken.empty()))
+    if (user.empty() || cloudRefreshToken.empty())
     {
         extension::Logger::log(kLogTag, @"not enough credentials data, discarding notification");
         return false;
     }
 
     self.user = user;
-    self.password = password;
     self.cloudRefreshToken = cloudRefreshToken;
 
     const auto searchString = [NSString stringWithFormat: @"\"%s\"", self.user.c_str()];
@@ -363,46 +266,7 @@ using ContentHanlder = void (^)(UNNotificationContent* content);
 
 - (void)showNotification
 {
-    auto tokenInfo = PushIpcData::accessToken(self.cloudSystemId);
-
-    const NSURL* serverUrl = urlFromHostAndPath([NSURL URLWithString: self.imageUrl], @"");
-    AccessTokenStatus status = systemAccessTokenStatus(tokenInfo.accessToken, serverUrl);
-
-    if (status == AccessTokenStatus::unsupported)
-    {
-        // 4.2 and below servers do not support token authorization.
-        [self showNotificatoinWithImage: AuthMethod::digest];
-        return;
-    }
-
-    if (status == AccessTokenStatus::invalid)
-    {
-        tokenInfo = requestSystemAccessToken(self.user, self.cloudRefreshToken, self.cloudSystemId);
-
-        status = systemAccessTokenStatus(tokenInfo.accessToken, serverUrl);
-        if (!tokenInfo.accessToken.empty() && status != AccessTokenStatus::valid)
-        {
-            extension::Logger::log(@"resetting new access token since it is not valid.");
-            tokenInfo = {}; //< Most likely it is server with version < 5.0.
-        }
-    }
-
-    PushIpcData::setAccessToken(self.cloudSystemId, tokenInfo.accessToken, tokenInfo.expiresAt);
-
-    if (!tokenInfo.accessToken.empty()) //< Definitely supports OAuth.
-        [self showNotificatoinWithImage: AuthMethod::bearer];
-    else if (status == AccessTokenStatus::unsupported) //< Try to use digest authorization.
-        [self showNotificatoinWithImage: AuthMethod::digest];
-    else
-        [self serviceExtensionTimeWillExpire];
-}
-
-- (void)showNotificatoinWithImage: (AuthMethod) method
-{
     static const NSString* kLogTag = @"show notification with image";
-
-    extension::Logger::log(kLogTag, [NSString stringWithFormat:
-        @"trying to show notification with an image, auth method is %d.", method]);
 
     if (!self.imageUrl || !self.imageUrl.length)
     {
@@ -411,29 +275,82 @@ using ContentHanlder = void (^)(UNNotificationContent* content);
         return;
     }
 
-    NSURLSession* session = createSession(self, self.cloudSystemId, method);
-    if (!session)
+    if ([self attachImage] != ImageLoadResult::loaded)
     {
-        extension::Logger::log(kLogTag, @"can't create session.");
         [self serviceExtensionTimeWillExpire];
         return;
     }
 
-    bool previewLoaded = false;
-    const auto semaphore = dispatch_semaphore_create(0);
-    const auto downloadTaskHandler =
-        [self, method, &semaphore, &previewLoaded]
-            (NSURL* tmpFileName, NSURLResponse* response, NSError* error)
+    extension::Logger::log(kLogTag, @"show custom notification.");
+    [self saveNotification];
+    self.handler(self.content);
+}
+
+- (ImageLoadResult)attachImage
+{
+    // Use the saved token without checking it first. A new token is issued only if the server
+    // rejects the saved one.
+    const auto savedToken = PushIpcData::accessToken(self.cloudSystemId, self.user);
+    if (!savedToken.accessToken.empty())
+    {
+        const auto result = [self downloadImage: savedToken.accessToken];
+        if (result != ImageLoadResult::unauthorized)
+            return result;
+
+        PushIpcData::removeAccessToken(self.cloudSystemId, savedToken.accessToken);
+    }
+
+    const auto newToken =
+        requestSystemAccessToken(self.user, self.cloudRefreshToken, self.cloudSystemId);
+    if (!newToken.accessToken.empty())
+    {
+        const auto result = [self downloadImage: newToken.accessToken];
+        if (result != ImageLoadResult::unauthorized)
         {
+            PushIpcData::setAccessToken(
+                self.cloudSystemId, self.user, newToken.accessToken, newToken.expiresAt);
+            return result;
+        }
+    }
+
+    return ImageLoadResult::failed;
+}
+
+- (ImageLoadResult)downloadImage: (const std::string&) accessToken
+{
+    static const NSString* kLogTag = @"download image";
+
+    extension::Logger::log(kLogTag, @"trying to load an image.");
+
+    NSURLSession* session = createSession(accessToken);
+
+    // The handler can be called after the timeout, when this method has already returned and the
+    // content may be already shown. So it uses shared state and does nothing after the timeout.
+    struct DownloadState
+    {
+        std::mutex mutex;
+        bool finished = false;
+        ImageLoadResult result = ImageLoadResult::failed;
+        dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+    };
+    const auto state = std::make_shared<DownloadState>();
+
+    const auto downloadTaskHandler =
+        [self, state](NSURL* tmpFileName, NSURLResponse* response, NSError* error)
+        {
+            const std::lock_guard<std::mutex> lock(state->mutex);
+            if (state->finished)
+                return;
+
             const auto checkError =
-                [&semaphore](bool error, const NSString* message = nil)
+                [&state](bool error, const NSString* message = nil)
                 {
                     if (!error)
                         return false;;
 
                     extension::Logger::log(kLogTag, message);
 
-                    dispatch_semaphore_signal(semaphore);
+                    dispatch_semaphore_signal(state->semaphore);
                     return true;
                 };
 
@@ -441,8 +358,11 @@ using ContentHanlder = void (^)(UNNotificationContent* content);
                 return;
 
             const long statusCode = statusCodeFromResponse(response);
+            if (statusCode == kUnauthorizedHttpError)
+                state->result = ImageLoadResult::unauthorized;
+
             if (checkError(!isSuccessHttpStatus(statusCode), [NSString stringWithFormat:
-                @"can't download image: HTTP error %ld, method %d", statusCode, method]))
+                @"can't download image: HTTP error %ld", statusCode]))
             {
                 return;
             }
@@ -453,10 +373,10 @@ using ContentHanlder = void (^)(UNNotificationContent* content);
                 return;
 
             extension::Logger::log(kLogTag, @"image downloaded and attached.");
-            previewLoaded = true;
+            state->result = ImageLoadResult::loaded;
             self.content.attachments = @[attachment];
 
-            dispatch_semaphore_signal(semaphore);
+            dispatch_semaphore_signal(state->semaphore);
         };
 
     NSURL* url = [NSURL URLWithString: self.imageUrl];
@@ -469,18 +389,12 @@ using ContentHanlder = void (^)(UNNotificationContent* content);
     [task resume];
     static const int64_t kTimeout = std::chrono::duration_cast<std::chrono::nanoseconds>(
         std::chrono::seconds(10)).count();
-    if (dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, kTimeout)))
+    if (dispatch_semaphore_wait(state->semaphore, dispatch_time(DISPATCH_TIME_NOW, kTimeout)))
         [task cancel];
 
-    if (!previewLoaded)
-    {
-        [self serviceExtensionTimeWillExpire];
-        return;
-    }
-
-    extension::Logger::log(kLogTag, @"show custom notification.");
-    [self saveNotification];
-    self.handler(self.content);
+    const std::lock_guard<std::mutex> lock(state->mutex);
+    state->finished = true;
+    return state->result;
 }
 
 - (void)saveNotificationImage: (NSURL*) sourceUrl
@@ -532,36 +446,6 @@ using ContentHanlder = void (^)(UNNotificationContent* content);
     NSMutableDictionary* userInfo = [self.content.userInfo mutableCopy];
     userInfo[@"url"] = newUrl.string;
     self.content.userInfo = userInfo;
-}
-
-- (void)URLSession:(NSURLSession*) session
-    task: (NSURLSessionTask*) task
-    didReceiveChallenge: (NSURLAuthenticationChallenge*) challenge
-    completionHandler:
-        (void (^)(NSURLSessionAuthChallengeDisposition, NSURLCredential*)) completionHandler
-{
-    static const NSString* kLogTag = @"digest authorization challenge";
-    if (self.password.empty())
-    {
-        extension::Logger::log(kLogTag, @"can't load image because the password is empty.");
-        completionHandler(NSURLSessionAuthChallengeCancelAuthenticationChallenge, {});
-        return;
-    }
-
-    if ([challenge previousFailureCount] > 0)
-    {
-        extension::Logger::log(kLogTag, @"can't load image.");
-        completionHandler(NSURLSessionAuthChallengeCancelAuthenticationChallenge, {});
-        return;
-    }
-
-    const auto credentials = [NSURLCredential
-        credentialWithUser: [NSString stringWithUTF8String: self.user.c_str()]
-        password: [NSString stringWithUTF8String: self.password.c_str()]
-        persistence: NSURLCredentialPersistenceNone];
-
-    [[challenge sender] useCredential: credentials forAuthenticationChallenge: challenge];
-    completionHandler(NSURLSessionAuthChallengeUseCredential, credentials);
 }
 
 @end

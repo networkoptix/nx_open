@@ -19,12 +19,8 @@ import org.json.JSONObject;
 
 public class OAuthHelper
 {
-    public enum AccessTokenStatus
-    {
-        unsupported,
-        invalid,
-        valid
-    };
+    /** Connect and read timeout of the push requests, 10s as in the iOS extension. */
+    public static final int kRequestTimeoutMs = 10000;
 
     static public boolean isSuccessHttpCode(int code)
     {
@@ -49,79 +45,6 @@ public class OAuthHelper
         {
             Logger.info("host with path", "can't change of the url.");
             return null;
-        }
-    }
-
-    static public AccessTokenStatus systemAccessTokenStatus(
-        String token,
-        String serverUrl)
-    {
-        final String kLogTag = "access token check";
-
-        try
-        {
-            Logger.info(kLogTag, "started.");
-
-            if (TextUtils.isEmpty(token))
-            {
-                Logger.info(kLogTag, "token is empty, status is invalid.");
-                return AccessTokenStatus.invalid;
-            }
-
-            final URL url = new URL(hostWithPath(serverUrl,
-                String.format("rest/v1/login/sessions/%s", token)));
-
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.connect();
-
-            final int httpCode = connection.getResponseCode();
-            Logger.info(kLogTag, String.format("response code is %d", httpCode));
-            if (isSuccessHttpCode(httpCode))
-            {
-                try
-                {
-                    final int kMinTokenLength = 6;
-                    final JSONObject data = new JSONObject(
-                        extractResponse(connection.getInputStream(), kLogTag));
-                    final String resultToken = data.optString("token", null);
-                    String message = "";
-                    if (!TextUtils.isEmpty(resultToken) && resultToken.length() >= kMinTokenLength)
-                    {
-                        final int expiresIn = data.optInt("expiresInS", -1);
-                        final int age = data.optInt("ageS", -1);
-                        message = String.format("****%s (expires in: %d, age: %d) ",
-                            resultToken.substring(resultToken.length() - kMinTokenLength),
-                            expiresIn, age);
-                    }
-                    Logger.info(kLogTag, String.format("token %sis valid.", message));
-                }
-                catch (Exception e)
-                {
-                    Logger.info(kLogTag, "token is valid.");
-                }
-
-                return AccessTokenStatus.valid;
-            }
-            else if (httpCode == HttpURLConnection.HTTP_NOT_FOUND)
-            {
-                Logger.info(kLogTag, "token functionality is not supported.");
-                return AccessTokenStatus.unsupported;
-            }
-
-            final String answer = extractResponse(connection.getErrorStream(), kLogTag);
-
-            String message = "";
-            if (answer != null)
-                message = String.format(", response is %s", answer);
-
-            Logger.info(kLogTag, String.format("token is invalid%s", message));
-            return AccessTokenStatus.invalid;
-        }
-        catch (Exception e)
-        {
-            Logger.info(kLogTag, "error while requesting the status of the token: " + e.toString());
-            return AccessTokenStatus.invalid;
         }
     }
 
@@ -150,6 +73,8 @@ public class OAuthHelper
 
             final URL url = new URL(hostWithPath(Branding.kCloudHost, "cdb/oauth2/token"));
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setConnectTimeout(kRequestTimeoutMs);
+            connection.setReadTimeout(kRequestTimeoutMs);
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setDoOutput(true);
