@@ -99,6 +99,11 @@ struct NX_VMS_COMMON_API SystemSettingNames
     DECLARE_SETTING_NAME(secureCookieStorageKey);
     DECLARE_SETTING_NAME(integrationProcessMode);
     DECLARE_SETTING_NAME(deviceSecureStream);
+    DECLARE_SETTING_NAME(auditTrailEnabled);
+    DECLARE_SETTING_NAME(useHttpsOnlyForCameras);
+    DECLARE_SETTING_NAME(watermarkSettings);
+    DECLARE_SETTING_NAME(storageEncryption);
+    DECLARE_SETTING_NAME(showServersInTreeForNonAdmins);
 
     static const inline std::set<QString> kReadOnlyNames = {
         cloudAccountName,
@@ -140,6 +145,13 @@ struct NX_VMS_COMMON_API SystemSettingNames
         trafficEncryptionForced,
         webSocketEnabled,
         pixelationSettings,
+        auditTrailEnabled,
+        useHttpsOnlyForCameras,
+        videoTrafficEncryptionForced,
+        watermarkSettings,
+        storageEncryption,
+        showServersInTreeForNonAdmins,
+        proxyConnectionAccessPolicy,
     };
 
     static const inline std::set<QString> kHiddenNames = {
