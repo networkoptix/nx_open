@@ -162,15 +162,13 @@ public:
     template<typename Func>
     auto executeInAioThreadSync(Func func) -> decltype(func())
     {
-        using Result = decltype(func());
-
         if (isInSelfAioThread())
         {
             return func();
         }
         else
         {
-            std::promise<Result> done;
+            std::promise<decltype(func())> done;
             post(
                 [this, &func, &done]()
                 {
@@ -211,9 +209,7 @@ private:
     template<typename Func, typename Promise>
     void executeAndSetResultToPromise(Func& func, Promise& promise)
     {
-        using Result = decltype(func());
-
-        if constexpr (std::is_void<Result>::value)
+        if constexpr (std::is_void_v<decltype(func())>)
         {
             func();
             promise.set_value();
