@@ -1,5 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <atomic>
 #include <chrono>
 #include <thread>
 
@@ -7,11 +8,14 @@
 #include <gtest/gtest.h>
 
 #include <QtCore/QThread>
+#include <QtCore/QTimer>
 
 #include <nx/utils/qobject.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/rules/action_builder.h>
 #include <nx/vms/rules/action_builder_fields/optional_time_field.h>
+#include <nx/vms/rules/aggregated_event.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/manifest.h>
@@ -568,7 +572,7 @@ TEST_F(EngineTest, eventsAreDiscardedAfterProcessingIsStopped)
 
     const auto action = executor.actions.front();
 
-    engine->stopProcessing();
+    engine->pleaseStop();
 
     EXPECT_EQ(engine->processEvent(event), 0);
     EXPECT_EQ(engine->processAnalyticsEvents({event, event}), 0);
@@ -622,7 +626,7 @@ TEST_F(EngineTest, timerThread)
 
     ASSERT_EQ(executor.actions.size(), 1);
 
-    // Timer will be stopped on rule removal in engine's thread.
+    // Timer will stop itself in engine's thread once the rule is removed.
     engine->removeRule(ruleId);
 
     executeInThread(
@@ -634,6 +638,168 @@ TEST_F(EngineTest, timerThread)
         });
 
     thread.wait();
+}
+
+/**
+ * The aggregation timer builds the actions in the engine thread, and the action field waits for a
+ * callback delivered in the server thread. Meanwhile the server thread reads and changes the
+ * rules, like AnalyticsRulesCache does, so the timer must not hold the rule mutex while building.
+ */
+TEST_F(EngineTest, aggregationTimerDoesNotLockRulesWhileBuildingActions)
+{
+    static constexpr auto kTestTimeout = 30s;
+    static constexpr int kAggregatedBuilds = 3;
+
+    QThread engineThread;
+    engineThread.setObjectName("Engine thread");
+    QThread serverThread;
+    serverThread.setObjectName("Server thread");
+
+    std::atomic<int> callbackTimeouts = 0;
+    auto plugin = TestPlugin(engine.get());
+    ASSERT_TRUE(CallbackWaitingField::registerIn(engine.get(), &serverThread, &callbackTimeouts));
+    ASSERT_TRUE(engine->registerAction(
+        TestWaitingAction::manifest(), [] { return new TestWaitingAction; }));
+
+    auto executor = TestActionExecutor();
+    auto connector = TestEventConnector();
+    engine->addActionExecutor(utils::type<TestWaitingAction>(), &executor);
+    engine->addEventConnector(&connector);
+
+    const auto makeRuleData = [this](nx::Uuid id)
+    {
+        auto rule = std::make_unique<Rule>(id, engine.get());
+        rule->addEventFilter(engine->buildEventFilter(utils::type<TestEvent>()));
+        auto builder = engine->buildActionBuilder(utils::type<TestWaitingAction>());
+        builder->fieldByType<OptionalTimeField>()->setValue(1s);
+        rule->addActionBuilder(std::move(builder));
+        return serialize(rule.get());
+    };
+
+    const auto ruleId = nx::Uuid::createUuid();
+    engine->updateRule(makeRuleData(ruleId));
+
+    // The first event of the rule is built at once, the rest are built by the aggregation timer.
+    std::atomic<int> ruleBuilds = 0;
+    QObject::connect(
+        engine.get(),
+        &Engine::actionBuilt,
+        engine.get(),
+        [&ruleBuilds, ruleId](const AggregatedEventPtr& event, const ActionPtr&)
+        {
+            if (event->ruleId() == ruleId)
+                ++ruleBuilds;
+        },
+        Qt::DirectConnection);
+
+    engineThread.start();
+    engine->moveToThread(&engineThread);
+    serverThread.start();
+
+    // Replaces and removes another rule, so the rules are changed while the timer is building.
+    std::atomic<bool> serverStopped = false;
+    const auto changingRuleId = nx::Uuid::createUuid();
+    const auto changingRuleData = makeRuleData(changingRuleId);
+    QTimer serverTimer;
+    serverTimer.setInterval(0);
+    serverTimer.moveToThread(&serverThread);
+    QObject::connect(&serverTimer,
+        &QTimer::timeout,
+        &serverTimer,
+        [&]()
+        {
+            for (int i = 0; i < 100 && !serverStopped; ++i)
+            {
+                engine->rules();
+                if (i % 10 == 0)
+                    engine->updateRule(changingRuleData);
+                else if (i % 10 == 5)
+                    engine->removeRule(changingRuleId);
+            }
+        });
+    QMetaObject::invokeMethod(&serverTimer, qOverload<>(&QTimer::start));
+
+    const auto deadline = steady_clock::now() + kTestTimeout;
+    while (
+        ruleBuilds <= kAggregatedBuilds && callbackTimeouts == 0 && steady_clock::now() < deadline)
+    {
+        connector.process(TestEventPtr::create(syncTime.currentTimePoint(), State::instant));
+        std::this_thread::sleep_for(10ms);
+    }
+
+    // Stop changing the rules, but keep delivering the callbacks until the engine is destroyed.
+    serverStopped = true;
+    QMetaObject::invokeMethod(&serverTimer, &QTimer::stop, Qt::BlockingQueuedConnection);
+    engine->removeRule(ruleId);
+    engine->removeRule(changingRuleId);
+
+    executeInThread(&engineThread,
+        [this, &engineThread]
+        {
+            engine.reset();
+            engineThread.quit();
+        });
+    engineThread.wait();
+
+    serverThread.quit();
+    serverThread.wait();
+
+    EXPECT_EQ(callbackTimeouts, 0);
+    EXPECT_GT(ruleBuilds, kAggregatedBuilds);
+}
+
+TEST_F(EngineTest, aggregationTimerDoesNotBuildActionsAfterProcessingIsStopped)
+{
+    auto plugin = TestPlugin(engine.get());
+    auto executor = TestActionExecutor();
+    auto connector = TestEventConnector();
+    engine->addActionExecutor(utils::type<TestActionWithInterval>(), &executor);
+    engine->addEventConnector(&connector);
+
+    std::atomic<int> builds = 0;
+    QObject::connect(
+        engine.get(),
+        &Engine::actionBuilt,
+        engine.get(),
+        [&builds] { ++builds; },
+        Qt::DirectConnection);
+
+    auto rule = std::make_unique<Rule>(nx::Uuid::createUuid(), engine.get());
+    rule->addEventFilter(engine->buildEventFilter(utils::type<TestEvent>()));
+    auto builder = engine->buildActionBuilder(utils::type<TestActionWithInterval>());
+    ASSERT_TRUE(builder);
+    builder->fieldByType<OptionalTimeField>()->setValue(1s);
+    rule->addActionBuilder(std::move(builder));
+    engine->updateRule(serialize(rule.get()));
+
+    QThread thread;
+    thread.setObjectName("Engine thread");
+    thread.start();
+    engine->moveToThread(&thread);
+    const auto threadGuard = nx::utils::makeScopeGuard(
+        [this, &thread]()
+        {
+            executeInThread(&thread,
+                [this, &thread]
+                {
+                    engine.reset();
+                    thread.quit();
+                });
+            thread.wait();
+        });
+
+    // The first event is built at once, the second one is aggregated and starts the timer.
+    connector.process(TestEventPtr::create(syncTime.currentTimePoint(), State::instant));
+    connector.process(TestEventPtr::create(syncTime.currentTimePoint(), State::instant));
+    for (int i = 0; i < 100 && builds == 0; ++i)
+        std::this_thread::sleep_for(50ms);
+    ASSERT_EQ(builds, 1);
+
+    // From another thread, like EngineHolder::stop() does.
+    engine->pleaseStop();
+    std::this_thread::sleep_for(2500ms); //< Past the aggregation interval.
+
+    EXPECT_EQ(builds, 1);
 }
 
 } // namespace nx::vms::rules::test

@@ -4,6 +4,8 @@
 
 #include <set>
 #include <unordered_map>
+#include <unordered_set>
+#include <utility>
 #include <vector>
 
 #include <QtCore/QString>
@@ -12,12 +14,15 @@
 
 #include "rules_fwd.h"
 
+namespace nx::utils { class TimerEventHandler; }
+
 namespace nx::vms::rules {
 
 /**
  * Caches the rule properties which are immutable during the rule lifetime, so the engine does not
  * have to calculate them for the every incoming event. Additionally indexes the rules by their
- * event types, so only the rules which are able to match the event are considered.
+ * event types, so only the rules which are able to match the event are considered. Also keeps the
+ * action builders which wait for the aggregation timer.
  *
  * The class is not thread safe. All the methods must be called with the engine rule mutex locked.
  */
@@ -55,6 +60,16 @@ public:
      */
     const std::vector<Entry>& byEventType(const QString& eventType) const;
 
+    void toggleTimer(ActionBuilder* builder, bool on);
+
+    using TimerHandlers = std::vector<std::pair<ConstRulePtr, nx::utils::TimerEventHandler*>>;
+
+    /**
+     * Builders of the cached rules which wait for the aggregation timer. Each one is paired with
+     * its rule, which keeps the builder alive once the engine rule mutex is unlocked.
+     */
+    TimerHandlers timerHandlers() const;
+
 private:
     struct RuleInfo
     {
@@ -74,6 +89,8 @@ private:
 private:
     std::unordered_map<nx::Uuid, RuleInfo> m_ruleInfo;
     std::unordered_map<QString, std::vector<Entry>> m_byEventType;
+
+    std::unordered_set<ActionBuilder*> m_timerHandlers;
 };
 
 } // namespace nx::vms::rules

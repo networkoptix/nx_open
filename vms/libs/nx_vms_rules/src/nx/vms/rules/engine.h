@@ -15,7 +15,7 @@
 #include <QtCore/QSet>
 #include <QtCore/QTimer>
 
-#include <nx/utils/time/timer_event_handler.h>
+#include <nx/utils/thread/stoppable.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/rules/rules_fwd.h>
 #include <nx/vms/common/system_context_aware.h>
@@ -41,7 +41,8 @@ namespace api = ::nx::vms::api::rules;
  */
 class NX_VMS_RULES_API Engine:
     public QObject,
-    public common::SystemContextAware
+    public common::SystemContextAware,
+    public QnStoppable
 {
     Q_OBJECT
 
@@ -197,11 +198,11 @@ public:
 
     // Discards incoming events and actions instead of processing them, so that a queued backlog
     // is dropped rather than drained on shutdown. May be called from any thread.
-    void stopProcessing();
+    virtual void pleaseStop() override;
 
     RunningEventWatcher runningEventWatcher(nx::Uuid ruleId);
 
-    void toggleTimer(nx::utils::TimerEventHandler* handler, bool on);
+    void toggleTimer(ActionBuilder* builder, bool on);
 
 signals:
     void ruleAddedOrUpdated(nx::Uuid ruleId, bool added);
@@ -240,6 +241,7 @@ private:
 
     void onEventReceived(const EventPtr& event, const std::vector<ConstRulePtr>& triggeredRules);
     void processAcceptedEvent(const EventPtr& event, const ConstRulePtr& rule);
+    void onAggregationTimer();
 
     void processAction(const ActionPtr& action) const;
     void processAcceptedAction(const ActionPtr& action);
@@ -293,7 +295,6 @@ private:
     mutable nx::Mutex m_ruleMutex;
     RuleSet m_rules;
     RuleCache m_ruleCache;
-    QSet<nx::utils::TimerEventHandler*> m_timerHandlers;
 
 private: // All the fields below should be used by Engine's thread only.
     QHash<nx::Uuid, RunningRuleInfo> m_runningRules;

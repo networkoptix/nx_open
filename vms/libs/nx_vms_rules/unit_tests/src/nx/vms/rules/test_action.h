@@ -12,6 +12,8 @@
 #include <nx/vms/rules/utils/type.h>
 #include <utils/email/message.h>
 
+#include "test_field.h"
+
 namespace nx::vms::rules::test {
 
 class TestAction: public nx::vms::rules::BasicAction
@@ -265,6 +267,37 @@ public:
     }
 
     nx::email::Message m_message;
+};
+
+/** Aggregates the events, and its field waits for another thread like the email screenshot. */
+class TestWaitingAction: public nx::vms::rules::BasicAction
+{
+    Q_OBJECT
+    Q_CLASSINFO("type", "testWaiting")
+
+    Q_PROPERTY(std::chrono::microseconds interval MEMBER m_interval)
+    Q_PROPERTY(QString screenshot MEMBER m_screenshot)
+
+public:
+    static ItemDescriptor manifest()
+    {
+        return ItemDescriptor{
+            .id = utils::type<TestWaitingAction>(),
+            .displayName = TranslatableString("Test waiting action"),
+            .flags = ItemFlag::instant,
+            .fields =
+                {
+                    utils::makeIntervalFieldDescriptor(TranslatableString("Throttle")),
+                    FieldDescriptor{.type = utils::type<CallbackWaitingField>(),
+                        .fieldName = "screenshot",
+                        .displayName = TranslatableString("Screenshot")},
+                },
+        };
+    }
+
+private:
+    std::chrono::microseconds m_interval{};
+    QString m_screenshot;
 };
 
 } // namespace nx::vms::rules::test

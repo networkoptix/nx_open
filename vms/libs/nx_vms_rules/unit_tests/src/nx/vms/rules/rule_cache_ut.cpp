@@ -278,6 +278,40 @@ TEST_F(RuleCacheTest, taxonomyChangeDoesNotAffectNonAnalyticsRules)
     EXPECT_TRUE(cache()->isCompatible(ruleId));
 }
 
+TEST_F(RuleCacheTest, timerHandlerIsReturnedWithItsRuleWhileTimerIsOn)
+{
+    auto rule = makeRule<TestEventInstant, TestAction>();
+    const auto cachedRule = engine->rule(add(rule.get()));
+    const auto builder = cachedRule->actionBuilders().front();
+
+    cache()->toggleTimer(builder, true);
+    const auto handlers = cache()->timerHandlers();
+    cache()->toggleTimer(builder, false);
+
+    ASSERT_EQ(handlers.size(), 1U);
+    EXPECT_EQ(handlers.front().first, cachedRule);
+    EXPECT_EQ(handlers.front().second, builder);
+    EXPECT_TRUE(cache()->timerHandlers().empty());
+}
+
+/** The builder of a replaced rule may be destroyed in another thread along with its rule. */
+TEST_F(RuleCacheTest, timerHandlerOfReplacedRuleIsNotReturned)
+{
+    auto rule = makeRule<TestEventInstant, TestAction>();
+    const auto ruleId = add(rule.get());
+
+    // The copy keeps the replaced rule alive, like the event processing does.
+    const auto replacedRule = engine->rule(ruleId);
+    const auto builder = replacedRule->actionBuilders().front();
+    cache()->toggleTimer(builder, true);
+
+    add(rule.get());
+    const auto handlers = cache()->timerHandlers();
+    cache()->toggleTimer(builder, false); //< Like the builder destructor does.
+
+    EXPECT_TRUE(handlers.empty());
+}
+
 /**
  * Rule compatibility of the analytics events depends on the taxonomy state, so it must be
  * recalculated once the taxonomy is changed. The realistic startup order is the rules arriving

@@ -6,7 +6,6 @@
 #include <memory>
 
 #include <QtCore/QObject>
-#include <QtCore/QTimer>
 #include <QtCore/QVariant>
 
 #include <nx/utils/time/timer_event_handler.h>

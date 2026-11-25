@@ -6,6 +6,7 @@
 
 #include <nx/utils/log/assert.h>
 
+#include "action_builder.h"
 #include "event_filter.h"
 #include "events/analytics_event.h"
 #include "rule.h"
@@ -98,6 +99,34 @@ const std::vector<RuleCache::Entry>& RuleCache::byEventType(const QString& event
     const auto it = m_byEventType.find(eventType);
 
     return it == m_byEventType.end() ? kEmptyEntryList : it->second;
+}
+
+void RuleCache::toggleTimer(ActionBuilder* builder, bool on)
+{
+    if (on)
+        m_timerHandlers.insert(builder);
+    else
+        m_timerHandlers.erase(builder);
+}
+
+RuleCache::TimerHandlers RuleCache::timerHandlers() const
+{
+    TimerHandlers result;
+    result.reserve(m_timerHandlers.size());
+
+    for (const auto builder: m_timerHandlers)
+    {
+        // Builders of the replaced or removed rules may be destroyed in other threads.
+        const auto rule = builder->rule();
+        if (!NX_ASSERT(rule))
+            continue;
+
+        const auto it = m_ruleInfo.find(rule->id());
+        if (it != m_ruleInfo.end() && it->second.rule.get() == rule)
+            result.emplace_back(it->second.rule, builder);
+    }
+
+    return result;
 }
 
 void RuleCache::addToIndex(const RuleInfo& info)
