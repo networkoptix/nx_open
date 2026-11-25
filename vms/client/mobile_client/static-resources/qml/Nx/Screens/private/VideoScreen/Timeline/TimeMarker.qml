@@ -22,11 +22,6 @@ Rectangle
     property real topRoundingRadius: 6
     property real bottomRoundingRadius: topRoundingRadius
 
-    function hitTest(positionInParent)
-    {
-        return relevant && contains(mapFromItem(parent, positionInParent))
-    }
-
     visible: relevant
     color: ColorTheme.colors.mobileTimeline.timeMarker.background
 

@@ -20,11 +20,8 @@ Rectangle
 
     required property real widthAtLive
 
-    property bool interactive: true
     property real margin: 12
     property real topRoundingRadius: 6
-
-    signal tapped()
 
     visible: relevant
     color: ColorTheme.colors.mobileTimeline.timeMarker.background
@@ -78,14 +75,5 @@ Rectangle
         sourcePath: "image://skin/16x16/Solid/play_arrow.svg"
         sourceSize: Qt.size(16, 16)
         primaryColor: textItem.color
-    }
-
-    TapHandler
-    {
-        acceptedButtons: Qt.LeftButton
-        enabled: externalTimeMarker.interactive
-
-        onTapped:
-            externalTimeMarker.tapped()
     }
 }

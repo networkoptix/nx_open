@@ -19,7 +19,7 @@ Rectangle
 
     property real positionMs: NxGlobals.syncNowMs()
     property bool positionAtLive: true //< Position marker is at live.
-    readonly property bool positioning: dragHandler.draggingTimeMarker
+    readonly property alias positioning: timeMarkers.positioning
 
     readonly property alias startTimeMs: timeScale.startTimeMs
     readonly property alias durationMs: timeScale.durationMs
@@ -47,6 +47,11 @@ Rectangle
     property real timeScaleWidth: 76
 
     property bool interactive: true
+
+    // Whether external time markers can be pulled in into the window by dragging them inwards for
+    // `pullInThreshold` pixels; otherwise they are only tappable.
+    property bool pullInEnabled: false
+    property real pullInThreshold: 64
 
     signal detailsRequested(Timeline.MultiObjectData data, Item item)
 
@@ -306,21 +311,21 @@ Rectangle
                 baseVelocity: 10
                 sensitiveAreaLength: inset + outset
 
-                readonly property real inset: timeMarker.height / 2.0
+                readonly property real inset: timeMarkers.markerHeight / 2.0
                 readonly property real outset: 64
 
                 property real lastTimeMs: 0
 
                 function scrollByTimeMarker(currentTimeMs)
                 {
-                    if (!dragHandler.draggingTimeMarker)
+                    if (!timeMarkers.positioning)
                         return
 
                     const geometry = Qt.rect(
                         0, -outset, timeScale.width, timeScale.height + outset * 2)
 
-                    const velocity = -proximityScrollHelper.velocity(
-                        geometry, dragHandler.centroid.position)
+                    const velocity = -proximityScrollHelper.velocity(geometry,
+                        timeScale.mapFromItem(null, timeMarkers.dragScenePosition))
 
                     if (!velocity)
                         return
@@ -336,7 +341,6 @@ Rectangle
                     timeline.windowAtLive = timeScale.startTimeMs === maxStartTimeMs
 
                     lastTimeMs = currentTimeMs
-                    dragHandler.updatePosition(dragHandler.centroid.position.y)
                 }
             }
         }
@@ -660,137 +664,88 @@ Rectangle
             enabled: timeline.objectsType === Timeline.ObjectsLoader.ObjectsType.analytics
         }
 
-        // A line to mark current position inside of the current timeline window.
-        Rectangle
+        Timeline.TimeMarkersLayer
         {
-            id: timeMarkerLine
+            id: timeMarkers
 
-            color: ColorTheme.colors.mobileTimeline.timeMarker.background
-            visible: !timeMarker.isOutside
-
-            y: timeScale.y + timeScale.timeToPosition(timeline.positionMs)
-            width: content.width
-            height: 1
-        }
-
-        // Time marker to display position inside of the current timeline window.
-        Timeline.TimeMarker
-        {
-            id: timeMarker
-
-            readonly property bool isAhead: timeline.positionAtLive
-                || (timeline.positionMs >= timeScale.startTimeMs + timeScale.durationMs)
-
-            readonly property bool isBehind:
-                timeline.positionMs < timeScale.startTimeMs
-
-            readonly property bool isOutside: isAhead || isBehind
-
-            property real horizontalOffset: dragHandler.draggingTimeMarker ? timeScale.width : 0
-            Behavior on horizontalOffset { NumberAnimation { duration: 100 }}
-
-            readonly property real verticalOffset: //< To avoid extending down out of `content`.
-                Math.max(0, timeMarkerLine.y + height * 0.5 - content.height)
-
-            anchors.right: timeScale.right
-            anchors.rightMargin: horizontalOffset
-            anchors.verticalCenter: timeMarkerLine.verticalCenter
-            anchors.verticalCenterOffset: -verticalOffset
-            width: timeScale.width - recordingChunks.width
+            anchors.fill: content
             z: 1
 
-            bottomRoundingRadius: //< Reduce to avoid timeMarkerLine crossing the rounding arc.
-                MathUtils.bound(0, height * 0.5 - verticalOffset, topRoundingRadius)
+            timeScale: timeScale
+            lineParent: content
 
-            relevant: !timeMarker.isOutside
-
-            labelFormatter: timeScale.labelFormatter
-            timeZone: timeScale.timeZone
             positionMs: timeline.positionMs
-        }
+            positionAtLive: timeline.positionAtLive
+            windowAtLive: timeline.windowAtLive
 
-        // Header or footer time marker to display position outside of the current timeline window.
-        Timeline.ExternalTimeMarker
-        {
-            id: externalTimeMarker
+            // Not while a gesture is already in progress on the timeline.
+            interactive: timeline.interactive && !tapHandler.pressed && !dragHandler.active
+                && !pinchHandler.active
 
-            anchors.bottom: timeMarker.isAhead ? timeScale.top : timeScale.bottom
-            anchors.right: timeScale.right
-            anchors.rightMargin: timeMarker.horizontalOffset
+            pullInEnabled: timeline.pullInEnabled
+            pullInThreshold: timeline.pullInThreshold
 
-            widthAtLive: timeMarker.width
-            height: header.height
-            z: 1
-            topRoundingRadius: timeMarker.topRoundingRadius
+            markerWidth: timeScale.width - recordingChunks.width
+            externalMarkerHeight: header.height
 
-            relevant: timeMarker.isOutside
-            interactive: timeline.interactive
-
-            labelFormatter: timeScale.labelFormatter
-            timeZone: timeScale.timeZone
-            positionMs: timeline.positionAtLive ? -1 : timeline.positionMs
-
-            onTapped:
+            onPressedChanged:
             {
-                timeline.scrollTo(timeline.positionAtLive
-                    ? NxGlobals.syncNowMs()
-                    : timeline.positionMs)
+                if (timeMarkers.pressed)
+                    content.cancelAnimations()
             }
+
+            onPositioningChanged:
+            {
+                if (timeMarkers.positioning)
+                    proximityScrollHelper.lastTimeMs = NxGlobals.syncNowMs()
+            }
+
+            onPositionRequested: (timeMs) =>
+                timeline.setPosition(timeMs)
+
+            onScrollRequested: (timeMs) =>
+                timeline.scrollTo(timeMs)
         }
 
-        // Seeks new position when the timeline area is tapped outside of the time marker.
+        // Seeks new position when the timeline area is tapped outside of the time markers.
         TapHandler
         {
             id: tapHandler
 
-            property bool pressedInsideTimeMarker: false
-
             acceptedButtons: Qt.LeftButton
-            enabled: timeline.interactive
 
-            onGrabChanged: (transition, point) =>
-            {
-                if (transition === PointerDevice.GrabPassive)
-                    pressedInsideTimeMarker = timeMarker.hitTest(point.pressPosition)
-            }
+            // Time markers are delivered the press first, so this handler doesn't take presses on
+            // them.
+            enabled: timeline.interactive && !timeMarkers.pressed
 
             onTapped: (point) =>
             {
-                if (pressedInsideTimeMarker)
-                    return
-
                 content.cancelAnimations()
                 timeScale.setPosition(point.position.y)
             }
         }
 
-        // Drags the time marker and/or scrolls the timeline.
+        // Scrolls the timeline.
         DragHandler
         {
             id: dragHandler
 
             acceptedButtons: Qt.LeftButton
-            enabled: timeline.interactive && !pinchHandler.active
+
+            // Being a QML subtype, this handler would otherwise be allowed to take a grab over
+            // from the time marker drag handler. Time markers are delivered the press first.
+            enabled: timeline.interactive && !pinchHandler.active && !timeMarkers.pressed
             maximumPointCount: 1
             dragThreshold: 4
             target: null
 
-            property bool draggingTimeMarker: false
             property bool draggingTimeline: false
 
             property real startTimeMs: 0
 
             function updatePosition(y)
             {
-                if (active && draggingTimeMarker)
-                {
-                    // Don't let the time marker go outside of the window, except for Live.
-                    const minPos = timeline.windowAtLive ? 0 : 0.5
-
-                    timeScale.setPosition(
-                        Math.max(minPos, Math.min(timeScale.height - 1, y)))
-                }
-                else if (kineticScroll.state === KineticAnimation.Running || draggingTimeline)
+                if (kineticScroll.state === KineticAnimation.Running || draggingTimeline)
                 {
                     timeScale.setStartTimeMs(startTimeMs + (timeScale.millisecondsPerPixel
                         * (y - kineticScroll.startPosition.y)))
@@ -823,16 +778,7 @@ Rectangle
                 {
                     case PointerDevice.GrabPassive:
                     {
-                        if (timeMarker.hitTest(centroid.pressPosition))
-                        {
-                            proximityScrollHelper.lastTimeMs = NxGlobals.syncNowMs()
-                            draggingTimeMarker = !timeMarker.isOutside
-                        }
-                        else
-                        {
-                            draggingTimeline = true
-                        }
-
+                        draggingTimeline = true
                         content.cancelAnimations()
                         break
                     }
@@ -841,7 +787,6 @@ Rectangle
                     case PointerDevice.CancelGrabPassive:
                     {
                         draggingTimeline = false
-                        draggingTimeMarker = false
                         break
                     }
                 }
@@ -862,7 +807,7 @@ Rectangle
             id: pinchHandler
 
             target: null
-            enabled: timeline.interactive && !dragHandler.draggingTimeMarker
+            enabled: timeline.interactive
             dragThreshold: 1
 
             onScaleChanged: (delta) =>
@@ -997,7 +942,7 @@ Rectangle
 
             if (timeline.positionAtLive)
                 timeline.positionMs = nowMs
-            else if (dragHandler.draggingTimeMarker)
+            else if (timeMarkers.positioning)
                 proximityScrollHelper.scrollByTimeMarker(nowMs)
 
             if (timeline.windowAtLive)
@@ -1006,9 +951,6 @@ Rectangle
                     nowMs - timeScale.durationMs,
                     timeScale.startTimeMs,
                     objects.topBoundMs - timeScale.durationMs)
-
-                if (dragHandler.draggingTimeMarker)
-                    dragHandler.updatePosition(dragHandler.centroid.position.y)
             }
         }
     }
