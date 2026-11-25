@@ -6,8 +6,8 @@
 #include <QtGui/QStandardItemModel>
 
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/cloud_features/cloud_feature_watcher.h>
 #include <nx/vms/client/core/skin/color_theme.h>
-#include <nx/vms/client/core/watchers/cloud_service_checker.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/combo_box_utils.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -42,8 +42,8 @@ ActionTypePickerWidget::ActionTypePickerWidget(SystemContext* context, QWidget* 
     auto updateActionTypeComboBox = [this]()
     {
         auto itemFilters = defaultItemFilters();
-        if (!appContext()->cloudServiceChecker()->hasService(
-            nx::vms::client::core::CloudService::push_notifications))
+        if (!appContext()->cloudFeatureWatcher()->hasFeature(
+                nx::vms::client::core::CloudFeature::vmsClientPushNotifications))
         {
             const auto customFilter = [](const nx::vms::common::SystemContext* /*systemContext*/,
                 const nx::vms::rules::ItemDescriptor& description)
@@ -65,13 +65,13 @@ ActionTypePickerWidget::ActionTypePickerWidget(SystemContext* context, QWidget* 
     updateActionTypeComboBox();
     combo_box_utils::installPopupEnterKeyHandlerIfRequired(ui->actionTypeComboBox);
 
-    connect(
-        appContext()->cloudServiceChecker(),
-        &nx::vms::client::core::CloudServiceChecker::supportedServicesChanged,
+    connect(appContext()->cloudFeatureWatcher(),
+        &nx::vms::client::core::CloudFeatureWatcher::featuresChanged,
         this,
-        [this, updateActionTypeComboBox](auto changedServices)
+        [this, updateActionTypeComboBox](auto changedFeatures)
         {
-            if (changedServices.testFlag(nx::vms::client::core::CloudService::push_notifications))
+            if (changedFeatures.testFlag(
+                    nx::vms::client::core::CloudFeature::vmsClientPushNotifications))
             {
                 const auto currentText = ui->actionTypeComboBox->currentText();
                 updateActionTypeComboBox();
@@ -79,14 +79,10 @@ ActionTypePickerWidget::ActionTypePickerWidget(SystemContext* context, QWidget* 
             }
         });
 
-    connect(
-        ui->actionTypeComboBox,
+    connect(ui->actionTypeComboBox,
         &QComboBox::activated,
         this,
-        [this]
-        {
-            emit actionTypePicked(actionType());
-        });
+        [this] { emit actionTypePicked(actionType()); });
 }
 
 // Non-inline destructor is required for member scoped pointers to forward declared classes.

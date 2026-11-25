@@ -2,6 +2,8 @@
 
 #include "mock_cloud_status_watcher.h"
 
+#include <nx/network/http/auth_tools.h>
+
 namespace nx::vms::client::core::test {
 
 MockCloudStatusWatcher::MockCloudStatusWatcher(QObject* parent):
@@ -17,6 +19,11 @@ AbstractCloudStatusWatcher::Status MockCloudStatusWatcher::status() const
 QnCloudSystemList MockCloudStatusWatcher::cloudSystems() const
 {
     return m_systems;
+}
+
+nx::network::http::Credentials MockCloudStatusWatcher::credentials() const
+{
+    return {};
 }
 
 void MockCloudStatusWatcher::setMockStatus(Status status)

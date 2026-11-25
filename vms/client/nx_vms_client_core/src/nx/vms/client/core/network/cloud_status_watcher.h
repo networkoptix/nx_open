@@ -28,11 +28,11 @@ struct CloudAuthData;
 
 class NX_VMS_CLIENT_CORE_API CloudStatusWatcher: public AbstractCloudStatusWatcher
 {
-    using Credentials = nx::network::http::Credentials;
     using base_type = AbstractCloudStatusWatcher;
 
     Q_OBJECT
-    Q_PROPERTY(Credentials credentials READ credentials NOTIFY credentialsChanged)
+    Q_PROPERTY(
+        nx::network::http::Credentials credentials READ credentials NOTIFY credentialsChanged)
     Q_PROPERTY(ErrorCode error READ error NOTIFY errorChanged)
     Q_PROPERTY(bool isCloudEnabled READ isCloudEnabled NOTIFY isCloudEnabledChanged)
     Q_PROPERTY(QString cloudLogin READ cloudLogin NOTIFY cloudLoginChanged)
@@ -53,10 +53,9 @@ public:
     explicit CloudStatusWatcher(QObject* parent = nullptr);
     virtual ~CloudStatusWatcher() override;
 
-    // Username and access token with global scope.
-    Credentials credentials() const;
+    virtual nx::network::http::Credentials credentials() const override;
     // Special credentials for RemoteConnectionFactory.
-    Credentials remoteConnectionCredentials() const;
+    nx::network::http::Credentials remoteConnectionCredentials() const;
 
     /** Resets current cloud credentials. */
     Q_INVOKABLE void resetAuthData();
@@ -137,8 +136,6 @@ public:
 
 signals:
     void activationEmailResent(bool success);
-    void credentialsChanged();
-    void cloudLoginChanged();
     void forcedLogout();
     void loggedOutWithError();
 

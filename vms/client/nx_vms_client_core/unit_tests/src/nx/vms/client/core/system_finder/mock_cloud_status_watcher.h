@@ -15,6 +15,7 @@ public:
 
     Status status() const override;
     QnCloudSystemList cloudSystems() const override;
+    nx::network::http::Credentials credentials() const override;
 
     void setMockStatus(Status status);
     void setMockCloudSystems(const QnCloudSystemList& systems);

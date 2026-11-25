@@ -48,6 +48,7 @@ extern "C" {
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/rlimit.h>
 #include <nx/utils/timer_manager.h>
+#include <nx/vms/client/core/cloud_features/cloud_feature_watcher.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/core/network/cloud_auth_data.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
@@ -56,7 +57,6 @@ extern "C" {
 #include <nx/vms/client/core/testkit/http_server.h>
 #include <nx/vms/client/core/testkit/testkit.h>
 #include <nx/vms/client/core/utils/font_loader.h>
-#include <nx/vms/client/core/watchers/cloud_features_watcher.h>
 #include <nx/vms/client/mobile/application_context.h>
 #include <nx/vms/client/mobile/push_notification/push_notification_image_provider.h>
 #include <nx/vms/client/mobile/session/session_manager.h>
@@ -430,7 +430,7 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
     processStartupParams(startupParams);
 
     using Feature = nx::vms::client::core::CloudFeature;
-    const auto featureWatcher = context->cloudFeaturesWatcher();
+    const auto featureWatcher = context->cloudFeatureWatcher();
 
     const bool enabledFromCloud = featureWatcher->hasFeature(Feature::vmsClientCrashReporting);
     const bool forcedByUser = context->clientSettings()->crashReportingEnabled();

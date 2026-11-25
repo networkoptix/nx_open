@@ -130,7 +130,7 @@ void initialize(Manager* manager, Action* root)
     factory(ReopenLayoutAsCloudAction)
         .flags(ResourceTarget | SingleTarget)
         .mode(DesktopMode)
-        .condition(condition::isLoggedInAsCloudUser() && condition::hasDocDBService()
+        .condition(condition::isLoggedInAsCloudUser() && condition::hasCloudLayoutsFeature()
             && condition::canSaveLayoutAs()
             && condition::hasFlags(Qn::cross_system, MatchMode::none));
 
@@ -589,13 +589,10 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .flags(Scene | NoTarget)
         .text(ContextMenu::tr("Save Current Layout As Cloud..."))
-        .condition(
-            condition::isLoggedInAsCloudUser()
-            && condition::applyToCurrentLayout(
-                condition::canSaveLayoutAs()
+        .condition(condition::isLoggedInAsCloudUser()
+            && condition::applyToCurrentLayout(condition::canSaveLayoutAs()
                 && condition::hasFlags(Qn::cross_system, MatchMode::none))
-            && condition::hasDocDBService()
-            && !condition::isShowreelReviewMode()
+            && condition::hasCloudLayoutsFeature() && !condition::isShowreelReviewMode()
             && !condition::showreelIsRunning());
 
     factory(SaveCurrentVideoWallReviewAction)
@@ -1386,12 +1383,9 @@ void initialize(Manager* manager, Action* root)
     factory(SaveLayoutAsCloudAction)
         .flags(TitleBar | Tree | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Save Layout As Cloud..."))
-        .condition(
-            condition::canSaveLayoutAs()
-            && condition::isLoggedInAsCloudUser()
-            && condition::hasDocDBService()
-            && condition::hasFlags(Qn::cross_system, MatchMode::none)
-        );
+        .condition(condition::canSaveLayoutAs() && condition::isLoggedInAsCloudUser()
+            && condition::hasCloudLayoutsFeature()
+            && condition::hasFlags(Qn::cross_system, MatchMode::none));
 
     factory(ConvertLayoutToSharedAction)
         .flags(Tree | SingleTarget | ResourceTarget)

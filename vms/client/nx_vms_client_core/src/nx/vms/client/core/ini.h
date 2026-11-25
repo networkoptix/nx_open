@@ -137,26 +137,17 @@ struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
         "[Dev] Control using keychain to simplify development of modules which call the keychain"
         " each time after rebuilding.");
 
-    // VMS-59730
-    NX_INI_STRING(
-        "",
-        unsupportedCloudServices,
-        "[Dev] Disables UI for specific cloud services. Allows to hide UI elements related to\n"
-        "certain cloud services, marking them as unavailable. Possible values:\n"
-        " * \"cloud_notifications\" - disables UI for cross-site notifications service.\n"
-        " * \"push_notifications\" - disables UI for push notifications service.\n"
-        " * \"docdb\" - disables UI for Document Database service.\n"
-        "Services can be combined using space, comma or semicolon.");
-
     // MOBILE-2539
-    NX_INI_STRING(
-        "",
+    NX_INI_STRING("",
         forcefullyDisabledFeatures,
-        "[Dev] Disables UI for specific cloud features. Allows to hide UI elements related to\n"
-        "certain cloud features, marking them as disabled. Possible values:\n"
+        "[Dev] Disables UI for specific client features whatever the cloud instance reports\n"
+        "about them or their services. Takes feature names only. Possible values:\n"
+        " * \"vmsClientCloudLayouts\" - disables UI for cloud layouts (needs the docdb service).\n"
+        " * \"vmsClientPushNotifications\" - disables UI for push notifications service.\n"
+        " * \"vmsClientCrossSiteNotifications\" - disables UI for cross-site notifications.\n"
         " * \"vmsClientQrCodeDeployment\" - disables QR code deployment feature.\n"
         " * \"vmsClientCrashReporting\" - disables crash reporting feature.\n"
-        "Features can be combined using space, comma or semicolon when implemented.");
+        "Features can be combined using space, comma or semicolon.");
 
     // MOBILE-2733
     // Enabling cross-site module discovery may not scale for organizations with many sites. Each

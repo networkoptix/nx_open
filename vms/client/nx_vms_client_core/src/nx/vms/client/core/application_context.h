@@ -24,9 +24,8 @@ namespace nx::vms::client::core {
 
 class ApplicationWakeNotifier;
 class ColorTheme;
-class CloudFeaturesWatcher;
+class CloudFeatureWatcher;
 class CloudCrossSystemManager;
-class CloudServiceChecker;
 class CloudLayoutsManager;
 class CloudStatusWatcher;
 class FontConfig;
@@ -226,9 +225,7 @@ public:
 
     NetworkModule* networkModule() const;
 
-    CloudServiceChecker* cloudServiceChecker() const;
-
-    CloudFeaturesWatcher* cloudFeaturesWatcher() const;
+    CloudFeatureWatcher* cloudFeatureWatcher() const;
 
     ResourceIconCache* resourceIconCache() const;
 

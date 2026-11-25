@@ -3,10 +3,10 @@
 #include "feature_access_watcher.h"
 
 #include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/cloud_features/cloud_feature_watcher.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/system_context.h>
-#include <nx/vms/client/core/watchers/cloud_features_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 
 namespace nx::vms::client::core {
@@ -67,8 +67,8 @@ void FeatureAccessWatcher::Private::updateCanUseShareBookmark()
 
 void FeatureAccessWatcher::Private::updateCanUseDeployByQrFeature()
 {
-    const bool allowedByFeatureFlag = appContext()->cloudFeaturesWatcher()->hasFeature(
-        CloudFeature::vmsClientQrCodeDeployment);
+    const bool allowedByFeatureFlag =
+        appContext()->cloudFeatureWatcher()->hasFeature(CloudFeature::vmsClientQrCodeDeployment);
     const bool newValue =
         (allowedByFeatureFlag || appContext()->coreSettings()->forceDeployByQrCodeFeature())
         && isAcceptableCloudSite({.minSiteVersion = kSite61Version, .belongsToOrganization = false})
@@ -108,7 +108,9 @@ FeatureAccessWatcher::FeatureAccessWatcher(SystemContext* context, QObject* pare
                 d->updateCanUseDeployByQrFeature();
         });
 
-    connect(appContext()->cloudFeaturesWatcher(), &CloudFeaturesWatcher::featuresChanged, this,
+    connect(appContext()->cloudFeatureWatcher(),
+        &CloudFeatureWatcher::featuresChanged,
+        this,
         [this](auto changedFeatures)
         {
             if (changedFeatures.testFlag(CloudFeature::vmsClientQrCodeDeployment))

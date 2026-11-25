@@ -23,12 +23,12 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/metatypes.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/cloud_features/cloud_feature_watcher.h>
 #include <nx/vms/client/core/cross_system/cloud_layouts_manager.h>
 #include <nx/vms/client/core/cross_system/cross_system_layout_resource.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/resource/unified_resource_pool.h>
-#include <nx/vms/client/core/watchers/cloud_service_checker.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
@@ -573,9 +573,11 @@ void LayoutActionHandler::saveLayoutAsCloud(const core::LayoutResourcePtr& layou
     if (!NX_ASSERT(layout))
         return;
 
-    if (!NX_ASSERT(appContext()->cloudServiceChecker()->hasService(
-        nx::vms::client::core::CloudService::docdb)))
+    const bool hasCloudLayouts =
+        appContext()->cloudFeatureWatcher()->hasFeature(core::CloudFeature::vmsClientCloudLayouts);
+    if (!hasCloudLayouts) //< The feature can be disabled at run time.
     {
+        NX_WARNING(this, "Cannot save a layout as cloud, cloud layouts are not available");
         return;
     }
 
@@ -608,12 +610,10 @@ void LayoutActionHandler::saveLayoutAsCloud(const core::LayoutResourcePtr& layou
                     return suggestedName == layout->getName().toLower();
                 });
 
-            if (!existing.isEmpty())
+            if (!existing.isEmpty()
+                && !ui::messages::Resources::overrideLayout(mainWindowWidget()))
             {
-                if (!ui::messages::Resources::overrideLayout(mainWindowWidget()))
-                    return;
-
-                removeLayouts(existing);
+                return;
             }
 
             // Convert common layout to cloud one. The layout is saved when its background image
@@ -625,9 +625,14 @@ void LayoutActionHandler::saveLayoutAsCloud(const core::LayoutResourcePtr& layou
                     {
                         saveLayout(cloudLayout);
                     }));
+            if (!cloudLayout) //< The feature can be disabled while the dialog is open.
+                return;
+
             cloudLayout->setName(name);
 
             cloneRadassModes(system()->radassResourceManager(), layout, cloudLayout, itemsRemapHash);
+
+            removeLayouts(existing);
 
             workbench()->replaceLayout(layout, cloudLayout);
         });

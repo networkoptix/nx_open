@@ -25,7 +25,7 @@ public:
     CloudLayoutsManager(QObject* parent = nullptr);
     virtual ~CloudLayoutsManager() override;
 
-    /** Convert layout to the cloud one. */
+    /** Convert layout to the cloud one; null when cloud layouts are not available. */
     LayoutResourcePtr convertLocalLayout(
         const LayoutResourcePtr& layout,
         LayoutResource::ItemsRemapHash* itemsRemapHash = nullptr);

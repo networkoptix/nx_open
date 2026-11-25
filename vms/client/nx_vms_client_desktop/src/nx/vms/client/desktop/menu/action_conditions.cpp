@@ -29,6 +29,7 @@
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/client/core/bookmarks/bookmark_utils.h>
 #include <nx/vms/client/core/camera/camera_data_manager.h>
+#include <nx/vms/client/core/cloud_features/cloud_feature_watcher.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/core/cross_system/cross_system_layout_resource.h>
@@ -40,7 +41,6 @@
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
 #include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/core/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
-#include <nx/vms/client/core/watchers/cloud_service_checker.h>
 #include <nx/vms/client/desktop/access/access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/condition/generic_condition.h>
@@ -2664,13 +2664,13 @@ ConditionWrapper parentServerHasActiveBackupStorage()
         });
 }
 
-ConditionWrapper hasDocDBService()
+ConditionWrapper hasCloudLayoutsFeature()
 {
     return new CustomBoolCondition(
         [](const Parameters& /*parameters*/, WindowContext* /*context*/)
         {
-            return appContext()->cloudServiceChecker()->hasService(
-                nx::vms::client::core::CloudService::docdb);
+            return appContext()->cloudFeatureWatcher()->hasFeature(
+                core::CloudFeature::vmsClientCloudLayouts);
         });
 }
 

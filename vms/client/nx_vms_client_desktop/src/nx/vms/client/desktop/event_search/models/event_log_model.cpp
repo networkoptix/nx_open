@@ -15,9 +15,9 @@
 #include <nx/utils/math/math.h>
 #include <nx/vms/api/rules/event_log.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/cloud_features/cloud_feature_watcher.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/skin/resource_icon_cache.h>
-#include <nx/vms/client/core/watchers/cloud_service_checker.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/rules/helpers/help_id.h>
@@ -334,12 +334,12 @@ public:
     {
         m_events.clear();
         m_events.reserve(records.size());
-        const auto hasPushNotificationsService = appContext()->cloudServiceChecker()->hasService(
-            nx::vms::client::core::CloudService::push_notifications);
+        const auto hasPushNotifications = appContext()->cloudFeatureWatcher()->hasFeature(
+            core::CloudFeature::vmsClientPushNotifications);
         for (auto&& record: records)
         {
-            if (!hasPushNotificationsService
-                && record.actionData.value(kType).toString()== kPushNotificationActionType)
+            if (!hasPushNotifications
+                && record.actionData.value(kType).toString() == kPushNotificationActionType)
             {
                 continue;
             }

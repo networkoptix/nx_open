@@ -3,6 +3,8 @@
 #include "application_context.h"
 
 #include <memory>
+#include <utility>
+#include <vector>
 
 #include <QtCore/QCoreApplication>
 #include <QtQml/QQmlContext>
@@ -20,6 +22,9 @@
 #include <nx/utils/i18n/translation_manager.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/analytics/object_display_settings.h>
+#include <nx/vms/client/core/cloud_features/cloud_feature_watcher.h>
+#include <nx/vms/client/core/cloud_features/cloud_service_checker.h>
+#include <nx/vms/client/core/cloud_features/ini_cloud_feature_source.h>
 #include <nx/vms/client/core/common/utils/private/thread_pool_manager_p.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
@@ -48,8 +53,6 @@
 #include <nx/vms/client/core/thumbnails/remote_async_image_provider.h>
 #include <nx/vms/client/core/thumbnails/thumbnail_image_provider.h>
 #include <nx/vms/client/core/utils/application_wake_notifier.h>
-#include <nx/vms/client/core/watchers/cloud_features_watcher.h>
-#include <nx/vms/client/core/watchers/cloud_service_checker.h>
 #include <nx/vms/client/core/watchers/known_server_connections.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <nx/vms/discovery/manager.h>
@@ -226,8 +229,7 @@ struct ApplicationContext::Private
     std::unique_ptr<CloudCrossSystemManager> cloudCrossSystemManager;
     std::unique_ptr<CloudLayoutsManager> cloudLayoutsManager;
     std::unique_ptr<CrossSystemLayoutsWatcher> crossSystemLayoutsWatcher;
-    std::unique_ptr<CloudServiceChecker> cloudServiceChecker;
-    std::unique_ptr<CloudFeaturesWatcher> cloudFeaturesWatcher;
+    std::unique_ptr<CloudFeatureWatcher> cloudFeatureWatcher;
 
     QString customExternalResourceFile;
 };
@@ -273,10 +275,14 @@ ApplicationContext::ApplicationContext(
     switch (mode)
     {
         case Mode::unitTests:
+        {
             // For the resources tree tests.
             d->cloudStatusWatcher = std::make_unique<CloudStatusWatcher>();
-            d->cloudServiceChecker = std::make_unique<CloudServiceChecker>();
+            std::vector<std::unique_ptr<AbstractCloudFeatureSource>> sources;
+            sources.push_back(std::make_unique<IniCloudFeatureSource>());
+            d->cloudFeatureWatcher = std::make_unique<CloudFeatureWatcher>(std::move(sources));
             break;
+        }
 
         case Mode::desktopClient:
         case Mode::mobileClient:
@@ -359,8 +365,11 @@ void ApplicationContext::initializeNetworkModules(bool udpHolePunchingEnabled)
     if (d->knownServerConnectionsWatcher)
         d->knownServerConnectionsWatcher->start();
 
-    d->cloudServiceChecker = std::make_unique<CloudServiceChecker>();
-    d->cloudFeaturesWatcher = std::make_unique<CloudFeaturesWatcher>();
+    std::vector<std::unique_ptr<AbstractCloudFeatureSource>> sources;
+    sources.push_back(std::make_unique<IniCloudFeatureSource>());
+    sources.push_back(
+        std::make_unique<CloudServiceChecker>(d->cloudStatusWatcher.get(), coreSettings()));
+    d->cloudFeatureWatcher = std::make_unique<CloudFeatureWatcher>(std::move(sources));
 }
 
 void ApplicationContext::initializeCrossSystemModules()
@@ -615,14 +624,9 @@ NetworkModule* ApplicationContext::networkModule() const
     return d->networkModule.get();
 }
 
-CloudServiceChecker* ApplicationContext::cloudServiceChecker() const
+CloudFeatureWatcher* ApplicationContext::cloudFeatureWatcher() const
 {
-    return d->cloudServiceChecker.get();
-}
-
-CloudFeaturesWatcher* ApplicationContext::cloudFeaturesWatcher() const
-{
-    return d->cloudFeaturesWatcher.get();
+    return d->cloudFeatureWatcher.get();
 }
 
 ResourceIconCache* ApplicationContext::resourceIconCache() const

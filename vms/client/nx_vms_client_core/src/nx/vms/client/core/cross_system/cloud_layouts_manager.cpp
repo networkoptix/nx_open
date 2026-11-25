@@ -16,7 +16,6 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/http/http_types.h>
 #include <nx/utils/async_handler_executor.h>
-#include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/serialization/format.h>
 #include <nx/utils/string.h>
@@ -25,12 +24,12 @@
 #include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/cloud_features/cloud_feature_watcher.h>
 #include <nx/vms/client/core/cross_system/cross_system_layout_data.h>
 #include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/system_context.h>
-#include <nx/vms/client/core/watchers/cloud_service_checker.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <utils/common/delayed.h>
 
@@ -108,13 +107,12 @@ struct CloudLayoutsManager::Private
         timer->setInterval(kRequestInterval);
         timer->callOnTimeout([this](){ updateLayouts(); });
 
-        connect(
-            appContext()->cloudServiceChecker(),
-            &nx::vms::client::core::CloudServiceChecker::supportedServicesChanged,
+        connect(appContext()->cloudFeatureWatcher(),
+            &CloudFeatureWatcher::featuresChanged,
             q,
-            [this](auto changedServices)
+            [this](CloudFeatures changedFeatures)
             {
-                if (changedServices.testFlag(nx::vms::client::core::CloudService::docdb))
+                if (changedFeatures.testFlag(CloudFeature::vmsClientCloudLayouts))
                     updateLayouts();
             });
     }
@@ -246,14 +244,24 @@ struct CloudLayoutsManager::Private
         systemContext->accessController()->setUser(user);
     }
 
+    // The own status is stale during a forced logout: the watcher emits forcedLogout(), whose
+    // handler may run a modal dialog, before statusChanged(), and the timer keeps firing.
+    bool isOnline() const
+    {
+        return status == CloudStatus::Online && cloudStatusWatcher
+            && cloudStatusWatcher->status() == CloudStatus::Online;
+    }
+
     void updateLayouts()
     {
-        if (!appContext()->cloudServiceChecker()->hasService(
-            nx::vms::client::core::CloudService::docdb))
+        if (!appContext()->cloudFeatureWatcher()->hasFeature(CloudFeature::vmsClientCloudLayouts))
         {
             addLayoutsToResourcePool({});
             return;
         }
+
+        if (!isOnline())
+            return;
 
         QUrlQuery query;
         query.addQueryItem("matchPrefix", "");
@@ -263,10 +271,8 @@ struct CloudLayoutsManager::Private
             network::http::Method::get,
             kLayoutsPath,
             UrlQuery(query),
-            utils::guarded(
-                q,
-                [this](
-                    cloud::db::api::ResultCode resultCode,
+            nx::utils::AsyncHandlerExecutor(q).bind(
+                [this](cloud::db::api::ResultCode resultCode,
                     std::vector<core::CrossSystemLayoutData> layoutsData)
                 {
                     if (resultCode != nx::cloud::db::api::ResultCode::ok)
@@ -274,6 +280,13 @@ struct CloudLayoutsManager::Private
                         NX_WARNING(this, "Layouts request failed with code %1", resultCode);
                         return;
                     }
+
+                    // The feature may have been withdrawn or the user logged out while the
+                    // request was in flight.
+                    const bool stillAvailable = appContext()->cloudFeatureWatcher()->hasFeature(
+                        CloudFeature::vmsClientCloudLayouts);
+                    if (!stillAvailable || !isOnline())
+                        return;
 
                     addLayoutsToResourcePool(std::move(layoutsData));
                 }));
@@ -365,10 +378,11 @@ struct CloudLayoutsManager::Private
         const LayoutResourcePtr& layout,
         LayoutResource::ItemsRemapHash* itemsRemapHash)
     {
-        if (!NX_ASSERT(appContext()->cloudServiceChecker()->hasService(
-            nx::vms::client::core::CloudService::docdb), "It is not possible to convert a regular "
-            "layout into a cloud layout if docdb is not available."))
+        const bool hasCloudLayouts =
+            appContext()->cloudFeatureWatcher()->hasFeature(CloudFeature::vmsClientCloudLayouts);
+        if (!hasCloudLayouts) //< The feature can be disabled at run time.
         {
+            NX_WARNING(this, "Cannot convert a layout, cloud layouts are not available");
             return LayoutResourcePtr();
         }
 
@@ -508,7 +522,7 @@ struct CloudLayoutsManager::Private
         if (value == status)
             return;
 
-        const auto oldStatus = value;
+        const auto oldStatus = status;
         status = value;
 
         if (status == CloudStatus::Online)

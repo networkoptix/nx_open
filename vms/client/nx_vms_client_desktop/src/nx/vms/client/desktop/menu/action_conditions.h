@@ -796,9 +796,9 @@ ConditionWrapper hardwareVideoDecodingDisabled();
 ConditionWrapper parentServerHasActiveBackupStorage();
 
 /**
- * Check whether Document Database service is enabled.
+ * Check whether the cloud layouts feature is available.
  */
-ConditionWrapper hasDocDBService();
+ConditionWrapper hasCloudLayoutsFeature();
 
 } // namespace condition
 

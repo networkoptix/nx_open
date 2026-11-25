@@ -21,12 +21,12 @@
 #include <nx/vms/api/rules/event_log.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/analytics/analytics_entities_tree.h>
+#include <nx/vms/client/core/cloud_features/cloud_feature_watcher.h>
 #include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/log_strings_format.h>
-#include <nx/vms/client/core/watchers/cloud_service_checker.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/common/widgets/item_view_auto_hider.h>
@@ -260,13 +260,12 @@ EventLogDialog::EventLogDialog(QWidget* parent):
     connect(ui->eventComboBox, QnComboboxCurrentIndexChanged, this, &EventLogDialog::updateData);
     connect(ui->actionComboBox, QnComboboxCurrentIndexChanged, this, &EventLogDialog::updateData);
     connect(ui->refreshButton, &QAbstractButton::clicked, this, &EventLogDialog::updateData);
-    connect(
-        appContext()->cloudServiceChecker(),
-        &nx::vms::client::core::CloudServiceChecker::supportedServicesChanged,
+    connect(appContext()->cloudFeatureWatcher(),
+        &core::CloudFeatureWatcher::featuresChanged,
         this,
-        [this](nx::vms::client::core::CloudServiceChecker::CloudServices changedServices)
+        [this](core::CloudFeatures changedFeatures)
         {
-            if (changedServices.testFlag(nx::vms::client::core::CloudService::push_notifications))
+            if (changedFeatures.testFlag(core::CloudFeature::vmsClientPushNotifications))
                 updateData();
         });
     connect(ui->eventRulesButton, &QAbstractButton::clicked,

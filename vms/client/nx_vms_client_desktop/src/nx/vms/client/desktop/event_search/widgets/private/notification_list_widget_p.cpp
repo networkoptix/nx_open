@@ -19,10 +19,10 @@
 #include <health/system_health_strings_helper.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/cloud_features/cloud_feature_watcher.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
-#include <nx/vms/client/core/watchers/cloud_service_checker.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/models/subset_list_model.h>
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
@@ -178,13 +178,12 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
         this,
         [this] { changeHeaderItemsVisibilityIfNeeded(); });
 
-    connect(
-        appContext()->cloudServiceChecker(),
-        &nx::vms::client::core::CloudServiceChecker::supportedServicesChanged,
+    connect(appContext()->cloudFeatureWatcher(),
+        &core::CloudFeatureWatcher::featuresChanged,
         this,
-        [this](auto changedServices)
+        [this](auto changedFeatures)
         {
-            if (changedServices.testFlag(nx::vms::client::core::CloudService::cloud_notifications))
+            if (changedFeatures.testFlag(core::CloudFeature::vmsClientCrossSiteNotifications))
                 changeHeaderItemsVisibilityIfNeeded();
         });
 
@@ -326,8 +325,8 @@ void NotificationListWidget::Private::changeHeaderItemsVisibilityIfNeeded()
     if (auto user = system()->user(); user && user->isCloud()
         && qnCloudStatusWatcher->cloudSystems().size() > 1
         && saas::crossSiteNotificationsAllowed(system()->saasServiceManager())
-        && appContext()->cloudServiceChecker()->hasService(
-            nx::vms::client::core::CloudService::cloud_notifications))
+        && appContext()->cloudFeatureWatcher()->hasFeature(
+            core::CloudFeature::vmsClientCrossSiteNotifications))
     {
         m_filterSystemsButton->setVisible(true);
     }

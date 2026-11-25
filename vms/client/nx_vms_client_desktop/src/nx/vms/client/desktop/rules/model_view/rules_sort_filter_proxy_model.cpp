@@ -6,7 +6,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/client/core/watchers/cloud_service_checker.h>
+#include <nx/vms/client/core/cloud_features/cloud_feature_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/search_helper.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -74,14 +74,16 @@ RulesSortFilterProxyModel::RulesSortFilterProxyModel(QObject* parent):
     setSortRole(RulesTableModel::SortDataRole);
     setFilterCaseSensitivity(Qt::CaseInsensitive);
     setFilterKeyColumn(-1);
-    connect(
-        appContext()->cloudServiceChecker(),
-        &nx::vms::client::core::CloudServiceChecker::supportedServicesChanged,
+    connect(appContext()->cloudFeatureWatcher(),
+        &nx::vms::client::core::CloudFeatureWatcher::featuresChanged,
         this,
-        [this](nx::vms::client::core::CloudServiceChecker::CloudServices changedServices)
+        [this](nx::vms::client::core::CloudFeatures changedFeatures)
         {
-            if (changedServices.testFlag(nx::vms::client::core::CloudService::push_notifications))
+            if (changedFeatures.testFlag(
+                    nx::vms::client::core::CloudFeature::vmsClientPushNotifications))
+            {
                 invalidateFilter();
+            }
         });
 }
 
@@ -100,8 +102,8 @@ bool RulesSortFilterProxyModel::filterAcceptsRow(
 
     if (actionColumnIndex.data(RulesTableModel::ActionTypeRole).toString()
             == kPushNotificationActionType
-        && !appContext()->cloudServiceChecker()->hasService(
-            nx::vms::client::core::CloudService::push_notifications))
+        && !appContext()->cloudFeatureWatcher()->hasFeature(
+            nx::vms::client::core::CloudFeature::vmsClientPushNotifications))
     {
         return false;
     }
