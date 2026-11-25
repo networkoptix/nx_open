@@ -30,6 +30,7 @@ ListView
 
     signal itemClicked(var nodeId, string systemId)
     signal itemEditClicked(var nodeId, string systemId)
+    signal itemLogInClicked(var nodeId)
 
     spacing: cellsInRow == 1 ? 8 : 12
 
@@ -354,9 +355,24 @@ ListView
                 wrongCustomization: modelData.wrongCustomization ? modelData.wrongCustomization : false
                 invalidVersion: modelData.wrongVersion ? modelData.wrongVersion.toString() : ""
                 editEnabled: modelData.type == OrganizationsModel.System && !cloudSystem
+                menu: modelData.type === OrganizationsModel.Organization
+                    && appContext.settings.useLogInToOrganizationFeature
+                    && modelData.canLogInToOrg
+                        ? organizationMenu
+                        : null
 
                 onClicked: siteList.itemClicked(modelData.nodeId, modelData.systemId)
                 onEditClicked: siteList.itemEditClicked(modelData.nodeId, modelData.systemId)
+
+                OrganizationMenu
+                {
+                    id: organizationMenu
+
+                    name: modelData.display
+
+                    onStructureClicked: siteList.itemClicked(modelData.nodeId, modelData.systemId)
+                    onLogInClicked: siteList.itemLogInClicked(modelData.nodeId)
+                }
             }
         }
     }

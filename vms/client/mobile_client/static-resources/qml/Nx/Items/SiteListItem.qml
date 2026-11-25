@@ -7,6 +7,7 @@ import QtQuick.Layouts
 import Nx.Core
 import Nx.Core.Controls
 import Nx.Controls
+import Nx.Mobile.Controls
 import Nx.Models
 
 Item
@@ -37,6 +38,10 @@ Item
 
     readonly property bool active: control.type != OrganizationsModel.System || running
     property bool editEnabled: false
+
+    property var menu: null
+
+    property bool highlighted: menu?.anchored ?? false
 
     signal clicked()
     signal editClicked()
@@ -77,7 +82,9 @@ Item
     Rectangle
     {
         anchors.fill: parent
-        color: control.active ? ColorTheme.colors.dark8 : ColorTheme.colors.dark6
+        color: control.active && !control.highlighted
+            ? ColorTheme.colors.dark8
+            : ColorTheme.colors.dark6
         radius: 8
 
         Item
@@ -264,6 +271,31 @@ Item
                     }
                 }
             }
+        }
+
+        ToolBarButton
+        {
+            id: menuButton
+
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.topMargin: 12
+            anchors.rightMargin: 2
+
+            visible: !!control.menu
+
+            icon.source: "image://skin/24x24/Outline/more.svg?primary=dark16"
+            icon.color: ColorTheme.colors.dark16
+
+            Item
+            {
+                id: menuAnchor
+
+                x: menuButton.width / 2
+                y: menuButton.height - menuButton.icon.height / 2
+            }
+
+            onClicked: control.menu.open(menuAnchor)
         }
 
         TapHandler

@@ -14,28 +14,10 @@ MenuSeparator
     topPadding: 0
     bottomPadding: 0
 
-    contentItem: Item
+    contentItem: Rectangle
     {
-        implicitWidth: parent ? parent.width : 100
-        implicitHeight: 2
-
-        Rectangle
-        {
-            id: baseline
-
-            width: parent.width
-            height: 1
-            anchors.centerIn: parent
-            color: ColorTheme.colors.dark9
-        }
-
-        Rectangle
-        {
-            y: baseline.y - 1
-            anchors.horizontalCenter: parent.horizontalCenter
-            width: parent.width
-            height: 1
-            color: ColorTheme.colors.dark5
-        }
+        implicitWidth: 100
+        implicitHeight: 1
+        color: ColorTheme.colors.dark17
     }
 }
