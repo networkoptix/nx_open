@@ -5,19 +5,19 @@
     <name>AccessRightHelper</name>
     <message>
       <source>View Live</source>
-      <translation type="unfinished">View Live</translation>
+      <translation>Live-Ansicht</translation>
     </message>
     <message>
       <source>Play Audio</source>
-      <translation type="unfinished">Play Audio</translation>
+      <translation>Audio abspielen</translation>
     </message>
     <message>
       <source>View Archive</source>
-      <translation type="unfinished">View Archive</translation>
+      <translation>Archiv ansehen</translation>
     </message>
     <message>
       <source>Export Archive</source>
-      <translation type="unfinished">Export Archive</translation>
+      <translation>Archiv exportieren</translation>
     </message>
     <message>
       <source>View Bookmarks</source>
@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>Edit Settings</source>
-      <translation type="unfinished">Edit Settings</translation>
+      <translation>Einstellungen bearbeiten</translation>
     </message>
   </context>
   <context>
@@ -60,14 +60,14 @@
     <message>
       <source>Site Event</source>
       <comment>Shows that the bookmark was created by a site event</comment>
-      <translation type="unfinished">Site Event</translation>
+      <translation>Site-Ereignis</translation>
     </message>
   </context>
   <context>
     <name>CustomerSupport</name>
     <message>
       <source>your Regional / License support</source>
-      <translation type="unfinished">your Regional / License support</translation>
+      <translation>Regional- / Lizenzsupport</translation>
     </message>
   </context>
   <context>
@@ -106,7 +106,7 @@
       <source>Bytes</source>
       <comment>Numerus: Full suffix for displaying bytes</comment>
       <translation>
-        <numerusform>Bytes</numerusform>
+        <numerusform>Byte</numerusform>
         <numerusform>Bytes</numerusform>
       </translation>
     </message>
@@ -114,7 +114,7 @@
       <source>Kilobytes</source>
       <comment>Numerus: Full suffix for displaying kilobytes</comment>
       <translation>
-        <numerusform>Kilobytes</numerusform>
+        <numerusform>Kilobyte</numerusform>
         <numerusform>Kilobytes</numerusform>
       </translation>
     </message>
@@ -122,7 +122,7 @@
       <source>Megabytes</source>
       <comment>Numerus: Full suffix for displaying megabytes</comment>
       <translation>
-        <numerusform>Megabytes</numerusform>
+        <numerusform>Megabyte</numerusform>
         <numerusform>Megabytes</numerusform>
       </translation>
     </message>
@@ -130,7 +130,7 @@
       <source>Gigabytes</source>
       <comment>Numerus: Full suffix for displaying gigabytes</comment>
       <translation>
-        <numerusform>Gigabytes</numerusform>
+        <numerusform>Gigabyte</numerusform>
         <numerusform>Gigabytes</numerusform>
       </translation>
     </message>
@@ -138,7 +138,7 @@
       <source>Terabytes</source>
       <comment>Numerus: Full suffix for displaying terabytes</comment>
       <translation>
-        <numerusform>Terabytes</numerusform>
+        <numerusform>Terabyte</numerusform>
         <numerusform>Terabytes</numerusform>
       </translation>
     </message>
@@ -146,7 +146,7 @@
       <source>Petabytes</source>
       <comment>Numerus: Full suffix for displaying petabytes</comment>
       <translation>
-        <numerusform>Petabytes</numerusform>
+        <numerusform>Petabyte</numerusform>
         <numerusform>Petabytes</numerusform>
       </translation>
     </message>
@@ -155,11 +155,11 @@
     <name>PredefinedUserGroups</name>
     <message>
       <source>Administrators</source>
-      <translation type="unfinished">Administrators</translation>
+      <translation>Administratoren</translation>
     </message>
     <message>
       <source>Power Users</source>
-      <translation type="unfinished">Power Users</translation>
+      <translation>Power-User</translation>
     </message>
     <message>
       <source>Advanced Viewers</source>
@@ -1243,7 +1243,7 @@
     <message>
       <source>Days</source>
       <comment>Numerus: Capitalized long suffix for displaying days</comment>
-      <translation type="unfinished">Days</translation>
+      <translation>Tage</translation>
     </message>
     <message>
       <source>Wks</source>
@@ -1295,9 +1295,9 @@
     <message numerus="yes">
       <source>Days</source>
       <comment>Numerus: Capitalized full suffix for displaying days</comment>
-      <translation type="unfinished">
-        <numerusform>Days</numerusform>
-        <numerusform>Days</numerusform>
+      <translation>
+        <numerusform>Tag</numerusform>
+        <numerusform>Tage</numerusform>
       </translation>
     </message>
     <message numerus="yes">
