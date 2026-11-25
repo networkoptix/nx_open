@@ -124,7 +124,7 @@
     </message>
     <message>
       <source>Change of the User with readonly attribute is forbidden for VMS.</source>
-      <translation type="unfinished">Change of the User with readonly attribute is forbidden for VMS.</translation>
+      <translation>Die Änderung des Benutzers mit dem Attribut "readonly" ist für VMS nicht zulässig.</translation>
     </message>
     <message>
       <source>Creation of the User with readonly attribute is forbidden for VMS.</source>
@@ -177,7 +177,7 @@
     </message>
     <message>
       <source>Server %1 does not exist.</source>
-      <translation type="unfinished">Server %1 does not exist.</translation>
+      <translation>Der Server %1 existiert nicht.</translation>
     </message>
     <message>
       <source>Storage %1 does not belong to this Server.</source>
