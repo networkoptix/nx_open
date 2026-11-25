@@ -106,7 +106,7 @@
       <source>Bytes</source>
       <comment>Numerus: Full suffix for displaying bytes</comment>
       <translation>
-        <numerusform>Bytes</numerusform>
+        <numerusform>Byte</numerusform>
         <numerusform>Bytes</numerusform>
       </translation>
     </message>
@@ -114,7 +114,7 @@
       <source>Kilobytes</source>
       <comment>Numerus: Full suffix for displaying kilobytes</comment>
       <translation>
-        <numerusform>Kilobytes</numerusform>
+        <numerusform>Kilobyte</numerusform>
         <numerusform>Kilobytes</numerusform>
       </translation>
     </message>
@@ -122,7 +122,7 @@
       <source>Megabytes</source>
       <comment>Numerus: Full suffix for displaying megabytes</comment>
       <translation>
-        <numerusform>Megabytes</numerusform>
+        <numerusform>Megabyte</numerusform>
         <numerusform>Megabytes</numerusform>
       </translation>
     </message>
@@ -130,7 +130,7 @@
       <source>Gigabytes</source>
       <comment>Numerus: Full suffix for displaying gigabytes</comment>
       <translation>
-        <numerusform>Gigabytes</numerusform>
+        <numerusform>Gigabyte</numerusform>
         <numerusform>Gigabytes</numerusform>
       </translation>
     </message>
@@ -138,7 +138,7 @@
       <source>Terabytes</source>
       <comment>Numerus: Full suffix for displaying terabytes</comment>
       <translation>
-        <numerusform>Terabytes</numerusform>
+        <numerusform>Terabyte</numerusform>
         <numerusform>Terabytes</numerusform>
       </translation>
     </message>
@@ -146,7 +146,7 @@
       <source>Petabytes</source>
       <comment>Numerus: Full suffix for displaying petabytes</comment>
       <translation>
-        <numerusform>Petabytes</numerusform>
+        <numerusform>Petabyte</numerusform>
         <numerusform>Petabytes</numerusform>
       </translation>
     </message>
@@ -1295,9 +1295,9 @@
     <message numerus="yes">
       <source>Days</source>
       <comment>Numerus: Capitalized full suffix for displaying days</comment>
-      <translation type="unfinished">
-        <numerusform>Days</numerusform>
-        <numerusform>Days</numerusform>
+      <translation>
+        <numerusform>Tag</numerusform>
+        <numerusform>Tage</numerusform>
       </translation>
     </message>
     <message numerus="yes">

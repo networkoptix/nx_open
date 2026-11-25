@@ -5,7 +5,7 @@
     <name>ActionSheet</name>
     <message>
       <source>Actions</source>
-      <translation type="unfinished">Actions</translation>
+      <translation>Aktionen</translation>
     </message>
     <message>
       <source>Disabled by schedule</source>
@@ -17,7 +17,7 @@
     </message>
     <message>
       <source>Press and hold</source>
-      <translation type="unfinished">Press and hold</translation>
+      <translation>Drücken und halten</translation>
     </message>
     <message>
       <source>Error</source>
@@ -28,7 +28,7 @@
     <name>AnalyticSelectors</name>
     <message>
       <source>ADVANCED SEARCH</source>
-      <translation type="unfinished">ADVANCED SEARCH</translation>
+      <translation>ERWEITERTE SUCHE</translation>
     </message>
   </context>
   <context>
@@ -46,7 +46,7 @@
     <name>ArchivePlaceholder</name>
     <message>
       <source>Not Available</source>
-      <translation type="unfinished">Not Available</translation>
+      <translation>Nicht verfügbar</translation>
     </message>
     <message>
       <source>No Archive</source>
@@ -54,15 +54,15 @@
     </message>
     <message>
       <source>You do not have permission to view the archive</source>
-      <translation type="unfinished">You do not have permission to view the archive</translation>
+      <translation>Sie haben keine Berechtigung, das Archiv einzusehen</translation>
     </message>
     <message>
       <source>You do not have any recorded video in the archive</source>
-      <translation type="unfinished">You do not have any recorded video in the archive</translation>
+      <translation>Sie haben keine Videoaufzeichnungen im Archiv</translation>
     </message>
     <message>
       <source>Timeline is loading...</source>
-      <translation type="unfinished">Timeline is loading...</translation>
+      <translation>Die Zeitleiste wird geladen...</translation>
     </message>
   </context>
   <context>
@@ -80,39 +80,39 @@
     <name>BetaFeaturesPage</name>
     <message>
       <source>Beta Features</source>
-      <translation type="unfinished">Beta Features</translation>
+      <translation>Beta-Funktionen</translation>
     </message>
     <message>
       <source>Video Download</source>
-      <translation type="unfinished">Video Download</translation>
+      <translation>Video-Download</translation>
     </message>
     <message>
       <source>Download video to this device</source>
-      <translation type="unfinished">Download video to this device</translation>
+      <translation>Video auf dieses Gerät herunterladen</translation>
     </message>
     <message>
       <source>Optimize Network</source>
-      <translation type="unfinished">Optimize Network</translation>
+      <translation>Netzwerk optimieren</translation>
     </message>
     <message>
       <source>Apply network optimization methods</source>
-      <translation type="unfinished">Apply network optimization methods</translation>
+      <translation>Netzwerkoptimierungsmethoden anwenden</translation>
     </message>
     <message>
       <source>Parallel Decoding</source>
-      <translation type="unfinished">Parallel Decoding</translation>
+      <translation>Parallele Dekodierung</translation>
     </message>
     <message>
       <source>Use multiple decoders to improve performance</source>
-      <translation type="unfinished">Use multiple decoders to improve performance</translation>
+      <translation>Verwenden Sie mehrere Decoder, um die Leistung zu verbessern</translation>
     </message>
     <message>
       <source>Mirror Timeline</source>
-      <translation type="unfinished">Mirror Timeline</translation>
+      <translation>Zeitleiste spiegeln</translation>
     </message>
     <message>
       <source>Flip the timeline for left-handed use. Applies to phone-sized screens only.</source>
-      <translation type="unfinished">Flip the timeline for left-handed use. Applies to phone-sized screens only.</translation>
+      <translation>Zeitleiste für Linkshänder spiegeln. Gilt nur für Smartphone-Bildschirme.</translation>
     </message>
   </context>
   <context>
@@ -150,22 +150,22 @@
     <name>CameraSwitcherTutorial</name>
     <message>
       <source>Swipe Between Resources</source>
-      <translation type="unfinished">Swipe Between Resources</translation>
+      <translation>Zwischen Ressourcen wischen</translation>
     </message>
     <message>
       <source>Switch between cameras on a layout</source>
-      <translation type="unfinished">Switch between cameras on a layout</translation>
+      <translation>Wechseln Sie zwischen Kameras in einem Layout</translation>
     </message>
     <message>
       <source>Swipe right to switch to next Camera</source>
-      <translation type="unfinished">Swipe right to switch to next Camera</translation>
+      <translation>Wischen Sie nach rechts, um zur nächsten Kamera zu wechseln</translation>
     </message>
   </context>
   <context>
     <name>ChannelPartner</name>
     <message>
       <source>Channel Partner</source>
-      <translation type="unfinished">Channel Partner</translation>
+      <translation>Vertriebspartner</translation>
     </message>
   </context>
   <context>
@@ -190,7 +190,7 @@
     </message>
     <message>
       <source>How to Connect?</source>
-      <translation type="unfinished">How to Connect?</translation>
+      <translation>Wie kann ich mich verbinden?</translation>
     </message>
     <message>
       <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
@@ -606,11 +606,11 @@
     </message>
     <message>
       <source>Tutorials</source>
-      <translation type="unfinished">Tutorials</translation>
+      <translation>Anleitungen</translation>
     </message>
     <message>
       <source>See the interface walkthrough</source>
-      <translation type="unfinished">See the interface walkthrough</translation>
+      <translation>Siehe die Benutzeroberflächen-Übersicht</translation>
     </message>
   </context>
   <context>
@@ -750,7 +750,7 @@
     </message>
     <message>
       <source>Edit sharing</source>
-      <translation type="unfinished">Edit sharing</translation>
+      <translation>Teilen bearbeiten</translation>
     </message>
   </context>
   <context>
@@ -764,15 +764,15 @@
     <name>ObjectTypesTutorial</name>
     <message>
       <source>View Mode</source>
-      <translation type="unfinished">View Mode</translation>
+      <translation>Ansichtsmodus</translation>
     </message>
     <message>
       <source>Switch the Timeline between Motion, Objects, and Bookmarks</source>
-      <translation type="unfinished">Switch the Timeline between Motion, Objects, and Bookmarks</translation>
+      <translation>Wechseln Sie in der Zeitleiste zwischen Bewegung, Objekten und Lesezeichen</translation>
     </message>
     <message>
       <source>Tap to choose desired data type</source>
-      <translation type="unfinished">Tap to choose desired data type</translation>
+      <translation>Tippen Sie hier, um den gewünschten Datentyp auszuwählen</translation>
     </message>
   </context>
   <context>
@@ -809,15 +809,15 @@
     <name>PanelButtonTutorial</name>
     <message>
       <source>Floating Panel Button</source>
-      <translation type="unfinished">Floating Panel Button</translation>
+      <translation>Schwebende Panel-Schaltfläche</translation>
     </message>
     <message>
       <source>Reopen a collapsed panel</source>
-      <translation type="unfinished">Reopen a collapsed panel</translation>
+      <translation>Ein eingeklapptes Panel erneut öffnen</translation>
     </message>
     <message>
       <source>Tap the floating button to open the panel</source>
-      <translation type="unfinished">Tap the floating button to open the panel</translation>
+      <translation>Tippen Sie auf die schwebende Schaltfläche, um das Bedienfeld zu öffnen</translation>
     </message>
   </context>
   <context>
@@ -1059,15 +1059,15 @@
     </message>
     <message>
       <source>No Devices</source>
-      <translation type="unfinished">No Devices</translation>
+      <translation>Keine Geräte</translation>
     </message>
     <message>
       <source>No devices were found on this layout</source>
-      <translation type="unfinished">No devices were found on this layout</translation>
+      <translation>Auf diesem Layout wurden keine Geräte gefunden</translation>
     </message>
     <message>
       <source>No devices were found on this site. Add devices with the desktop client, or request access to existing devices</source>
-      <translation type="unfinished">No devices were found on this site. Add devices with the desktop client, or request access to existing devices</translation>
+      <translation>Auf dieser Site wurden keine Geräte gefunden. Fügen Sie Geräte mit dem Desktop-Client hinzu oder fordern Sie Zugriff auf vorhandene Geräte an</translation>
     </message>
     <message>
       <source>All Devices</source>
@@ -1078,14 +1078,14 @@
     <name>RestartRequiredPopup</name>
     <message>
       <source>Please restart the app to apply changes</source>
-      <translation type="unfinished">Please restart the app to apply changes</translation>
+      <translation>Bitte starten Sie die App neu, um die Änderungen zu übernehmen</translation>
     </message>
   </context>
   <context>
     <name>SaasPromoBanner</name>
     <message>
       <source>Unlock exclusive features for actionable video intelligence and data-driven operations at scale</source>
-      <translation type="unfinished">Unlock exclusive features for actionable video intelligence and data-driven operations at scale</translation>
+      <translation>Schalten Sie exklusive Funktionen für umsetzbare Videoanalysen und datengesteuerte Abläufe in großem Umfang frei</translation>
     </message>
     <message>
       <source>Learn more</source>
@@ -1107,7 +1107,7 @@
     </message>
     <message>
       <source>Save Passwords</source>
-      <translation type="unfinished">Save Passwords</translation>
+      <translation>Passwörter speichern</translation>
     </message>
     <message>
       <source>Automatically log in to servers</source>
@@ -1115,7 +1115,7 @@
     </message>
     <message>
       <source>How to handle saved passwords?</source>
-      <translation type="unfinished">How to handle saved passwords?</translation>
+      <translation>Wie werden gespeicherte Passwörter verwaltet?</translation>
     </message>
     <message>
       <source>Keep</source>
@@ -1127,7 +1127,7 @@
     </message>
     <message>
       <source>Server Certificate Check</source>
-      <translation type="unfinished">Server Certificate Check</translation>
+      <translation>Serverzertifikatprüfung</translation>
     </message>
     <message>
       <source>Recommended</source>
@@ -1166,7 +1166,7 @@
     </message>
     <message>
       <source>Host: Port</source>
-      <translation type="unfinished">Host: Port</translation>
+      <translation>Host: Port</translation>
     </message>
   </context>
   <context>
@@ -1193,7 +1193,7 @@
     </message>
     <message>
       <source>No Organizations</source>
-      <translation type="unfinished">No Organizations</translation>
+      <translation>Keine Organisationen</translation>
     </message>
     <message>
       <source>Log In</source>
@@ -1201,15 +1201,15 @@
     </message>
     <message>
       <source>Failed to access site</source>
-      <translation>Zugriff auf die Site fehlgeschlagen</translation>
+      <translation>Fehler beim Zugriff auf die Site</translation>
     </message>
     <message>
       <source>Failed to access channel partner</source>
-      <translation>Fehler beim Zugriff auf den Channel-Partner</translation>
+      <translation>Fehler beim Zugriff auf den Vertriebs-Partner</translation>
     </message>
     <message>
       <source>Failed to access organization</source>
-      <translation type="unfinished">Failed to access organization</translation>
+      <translation>Zugriff auf die Organisation fehlgeschlagen</translation>
     </message>
     <message>
       <source>Partners</source>
@@ -1217,43 +1217,43 @@
     </message>
     <message>
       <source>No Sites</source>
-      <translation type="unfinished">No Sites</translation>
+      <translation>Keine Sites</translation>
     </message>
     <message>
       <source>How to connect?</source>
-      <translation type="unfinished">How to connect?</translation>
+      <translation>Wie kann ich mich verbinden?</translation>
     </message>
     <message>
       <source>Folder is empty</source>
-      <translation type="unfinished">Folder is empty</translation>
+      <translation>Der Ordner ist leer</translation>
     </message>
     <message>
       <source>Access to Resources Denied</source>
-      <translation type="unfinished">Access to Resources Denied</translation>
+      <translation>Zugriff auf Ressourcen verweigert</translation>
     </message>
     <message>
       <source>Create an organization in the Cloud Portal to access it here</source>
-      <translation type="unfinished">Create an organization in the Cloud Portal to access it here</translation>
+      <translation>Erstellen Sie eine Organisation im Cloud-Portal, um hier darauf zuzugreifen</translation>
     </message>
     <message>
       <source>The resources in this organization are not available to your permission group</source>
-      <translation type="unfinished">The resources in this organization are not available to your permission group</translation>
+      <translation>Die Ressourcen dieser Organisation stehen Ihrer Berechtigungsgruppe nicht zur Verfügung</translation>
     </message>
     <message>
       <source>Connect a site to the organization to access it here</source>
-      <translation type="unfinished">Connect a site to the organization to access it here</translation>
+      <translation>Verbinden Sie hier eine Site mit der Organisation, um darauf zuzugreifen</translation>
     </message>
     <message>
       <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
-      <translation type="unfinished">No accessible sites were found. Log in into the cloud account or connect to a local server</translation>
+      <translation>Es wurden keine erreichbaren Sites gefunden. Melden Sie sich in Ihrem Cloud-Konto an oder stellen Sie eine Verbindung zu einem lokalen Server her</translation>
     </message>
     <message>
       <source>No accessible sites were found. Request access to existing sites or connect to a local server</source>
-      <translation type="unfinished">No accessible sites were found. Request access to existing sites or connect to a local server</translation>
+      <translation>Es wurden keine zugänglichen Sites gefunden. Fordern Sie Zugriff auf bestehende Websites an oder stellen Sie eine Verbindung zu einem lokalen Server her</translation>
     </message>
     <message>
       <source>Welcome, %1!</source>
-      <translation type="unfinished">Welcome, %1!</translation>
+      <translation>Willkommen, %1!</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -1271,7 +1271,7 @@
     <name>ShareAction</name>
     <message>
       <source>Shared</source>
-      <translation type="unfinished">Shared</translation>
+      <translation>Freigeben</translation>
     </message>
     <message>
       <source>Share</source>
@@ -1279,7 +1279,7 @@
     </message>
     <message>
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
-      <translation type="unfinished">Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</translation>
+      <translation>Durch die Freigabe wird der Dialog für das neue Lesezeichen geöffnet, um nach dem Festlegen der Freigabeoptionen einen Wiedergabelink zu generieren</translation>
     </message>
     <message>
       <source>Bookmark created</source>
@@ -1287,14 +1287,14 @@
     </message>
     <message>
       <source>Cannot share bookmark</source>
-      <translation type="unfinished">Cannot share bookmark</translation>
+      <translation>Lesezeichen kann nicht freigegeben werden</translation>
     </message>
   </context>
   <context>
     <name>ShareBookmarkSheet</name>
     <message>
       <source>New Bookmark</source>
-      <translation type="unfinished">New Bookmark</translation>
+      <translation>Neues Lesezeichen</translation>
     </message>
     <message>
       <source>Name</source>
@@ -1306,7 +1306,7 @@
     </message>
     <message>
       <source>Protect with Password (optional)</source>
-      <translation type="unfinished">Protect with Password (optional)</translation>
+      <translation>Mit einem Passwort schützen (optional)</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1314,47 +1314,47 @@
     </message>
     <message>
       <source>Create &amp; Share</source>
-      <translation type="unfinished">Create &amp; Share</translation>
+      <translation>Erstellen &amp; Teilen</translation>
     </message>
     <message>
       <source>Save &amp; Share</source>
-      <translation type="unfinished">Save &amp; Share</translation>
+      <translation>Speichern &amp; Teilen</translation>
     </message>
     <message>
       <source>Expires in an hour</source>
-      <translation type="unfinished">Expires in an hour</translation>
+      <translation>Läuft in einer Stunde ab</translation>
     </message>
     <message>
       <source>Expires in a day</source>
-      <translation type="unfinished">Expires in a day</translation>
+      <translation>Läuft in einem Tag ab</translation>
     </message>
     <message>
       <source>Expires in a month</source>
-      <translation type="unfinished">Expires in a month</translation>
+      <translation>Läuft in einem Monat ab</translation>
     </message>
     <message>
       <source>Never expires</source>
-      <translation type="unfinished">Never expires</translation>
+      <translation>Läuft nie ab</translation>
     </message>
     <message>
       <source>Shared link options</source>
-      <translation type="unfinished">Shared link options</translation>
+      <translation>Optionen für geteilte Links</translation>
     </message>
     <message>
       <source>Sharing</source>
-      <translation type="unfinished">Sharing</translation>
+      <translation>Teilen</translation>
     </message>
     <message>
       <source>Share Link</source>
-      <translation type="unfinished">Share Link</translation>
+      <translation>Link teilen</translation>
     </message>
     <message>
       <source>Select Expiration</source>
-      <translation type="unfinished">Select Expiration</translation>
+      <translation>Ablaufdatum auswählen</translation>
     </message>
     <message>
       <source>Expiration</source>
-      <translation type="unfinished">Expiration</translation>
+      <translation>Ablaufdatum</translation>
     </message>
   </context>
   <context>
@@ -1393,7 +1393,7 @@
     </message>
     <message>
       <source>Host:Port</source>
-      <translation type="unfinished">Host:Port</translation>
+      <translation>Host:Port</translation>
     </message>
   </context>
   <context>
@@ -1404,7 +1404,7 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Versuchen Sie, die Suchparameter zu ändern</translation>
     </message>
     <message>
       <source>Cloud</source>
@@ -1416,7 +1416,7 @@
     </message>
     <message>
       <source>Log In to Cloud</source>
-      <translation type="unfinished">Log In to Cloud</translation>
+      <translation>Bei Cloud anmelden</translation>
     </message>
   </context>
   <context>
@@ -1435,45 +1435,45 @@
     </message>
     <message>
       <source>NEW</source>
-      <translation type="unfinished">NEW</translation>
+      <translation>NEU</translation>
     </message>
     <message>
       <source>SUSPENDED</source>
-      <translation type="unfinished">SUSPENDED</translation>
+      <translation>AUSGESETZT</translation>
     </message>
     <message>
       <source>SHUTDOWN</source>
-      <translation type="unfinished">SHUTDOWN</translation>
+      <translation>HERUNTERFAHREN</translation>
     </message>
     <message>
       <source>PENDING</source>
-      <translation type="unfinished">PENDING</translation>
+      <translation>AUSSTEHEND</translation>
     </message>
   </context>
   <context>
     <name>SitePlaceholderScreen</name>
     <message>
       <source>Access to Resources Denied</source>
-      <translation type="unfinished">Access to Resources Denied</translation>
+      <translation>Zugriff auf Ressourcen verweigert</translation>
     </message>
     <message>
       <source>Sites in the Suspended or Shutdown state are not available</source>
-      <translation type="unfinished">Sites in the Suspended or Shutdown state are not available</translation>
+      <translation>Sites im Status „Ausgesetzt“ oder „Heruntergefahren“ sind nicht verfügbar</translation>
     </message>
   </context>
   <context>
     <name>SoftTriggersTutorial</name>
     <message>
       <source>Soft Triggers</source>
-      <translation type="unfinished">Soft Triggers</translation>
+      <translation>Soft-Trigger</translation>
     </message>
     <message>
       <source>Open Soft Trigger camera actions</source>
-      <translation type="unfinished">Open Soft Trigger camera actions</translation>
+      <translation>Kameraaktionen mit Soft-Trigger öffnen</translation>
     </message>
     <message>
       <source>Tap to invoke soft triggers panel</source>
-      <translation type="unfinished">Tap to invoke soft triggers panel</translation>
+      <translation>Tippen Sie, um das Bedienfeld für Soft-Trigger aufzurufen</translation>
     </message>
   </context>
   <context>
@@ -1516,44 +1516,44 @@
     <message>
       <source>Open %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Open %1</translation>
+      <translation>Offen %1</translation>
     </message>
   </context>
   <context>
     <name>TimeSelector</name>
     <message>
       <source>Period</source>
-      <translation type="unfinished">Period</translation>
+      <translation>Zeitraum</translation>
     </message>
   </context>
   <context>
     <name>TimelinePreviewTutorial</name>
     <message>
       <source>Timeline Cards and Player</source>
-      <translation type="unfinished">Timeline Cards and Player</translation>
+      <translation>Zeitleistenkarten und Player</translation>
     </message>
     <message>
       <source>View event details with a long tap</source>
-      <translation type="unfinished">View event details with a long tap</translation>
+      <translation>Ereignis-Details mit einem langen Tippen anzeigen</translation>
     </message>
     <message>
       <source>Long tap to invoke preview with more details</source>
-      <translation type="unfinished">Long tap to invoke preview with more details</translation>
+      <translation>Langes Tippen öffnet eine Vorschau mit weiteren Details</translation>
     </message>
   </context>
   <context>
     <name>TimelineZoomTutorial</name>
     <message>
       <source>Zoom Timeline In/Out</source>
-      <translation type="unfinished">Zoom Timeline In/Out</translation>
+      <translation>Zeitleiste ein-/auszoomen</translation>
     </message>
     <message>
       <source>Pinch or spread to zoom the Timeline</source>
-      <translation type="unfinished">Pinch or spread to zoom the Timeline</translation>
+      <translation>Durch Zusammen- oder Auseinanderziehen der Finger kann die Zeitleiste vergrößert werden</translation>
     </message>
     <message>
       <source>Pinch to Zoom Out and Spread to Zoom In</source>
-      <translation type="unfinished">Pinch to Zoom Out and Spread to Zoom In</translation>
+      <translation>Zum Verkleinern zusammenziehen, zum Vergrößern auseinanderziehen</translation>
     </message>
   </context>
   <context>
@@ -1564,14 +1564,14 @@
     </message>
     <message>
       <source>Ok, I got it</source>
-      <translation type="unfinished">Ok, I got it</translation>
+      <translation>Okay, ich hab's verstanden</translation>
     </message>
   </context>
   <context>
     <name>TutorialsSettingsPage</name>
     <message>
       <source>Tutorials</source>
-      <translation type="unfinished">Tutorials</translation>
+      <translation>Anleitungen</translation>
     </message>
   </context>
   <context>
@@ -1582,7 +1582,7 @@
     </message>
     <message>
       <source>Open account settings</source>
-      <translation type="unfinished">Open account settings</translation>
+      <translation>Kontoeinstellungen öffnen</translation>
     </message>
   </context>
   <context>
@@ -1646,7 +1646,7 @@
     </message>
     <message>
       <source>Set Up 2FA</source>
-      <translation type="unfinished">Set Up 2FA</translation>
+      <translation>2FA einrichten</translation>
     </message>
     <message>
       <source>Archive encrypted</source>
@@ -1666,7 +1666,7 @@
     </message>
     <message>
       <source>2FA disabled</source>
-      <translation type="unfinished">2FA disabled</translation>
+      <translation>2FA deaktiviert</translation>
     </message>
     <message>
       <source>Unauthorized</source>
@@ -1674,7 +1674,7 @@
     </message>
     <message>
       <source>Unsupported</source>
-      <translation type="unfinished">Unsupported</translation>
+      <translation>Nicht unterstützt</translation>
     </message>
     <message>
       <source>No data</source>
@@ -1709,27 +1709,27 @@
     </message>
     <message>
       <source>PTZ Mode</source>
-      <translation type="unfinished">PTZ Mode</translation>
+      <translation>PTZ-Modus</translation>
     </message>
     <message>
       <source>Export...</source>
-      <translation type="unfinished">Export...</translation>
+      <translation>Export...</translation>
     </message>
     <message>
       <source>Live mode only</source>
-      <translation type="unfinished">Live mode only</translation>
+      <translation>Nur Live-Modus</translation>
     </message>
     <message>
       <source>Archive mode only</source>
-      <translation type="unfinished">Archive mode only</translation>
+      <translation>Nur Archiv-Modus</translation>
     </message>
     <message>
       <source>Camera Info</source>
-      <translation type="unfinished">Camera Info</translation>
+      <translation>Kamerainformationen</translation>
     </message>
     <message>
       <source>Go to Live to activate soft triggers</source>
-      <translation type="unfinished">Go to Live to activate soft triggers</translation>
+      <translation>Gehen Sie zu „Live“, um die Soft-Trigger zu aktivieren</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -1737,11 +1737,11 @@
     </message>
     <message>
       <source>Calendar</source>
-      <translation type="unfinished">Calendar</translation>
+      <translation>Kalender</translation>
     </message>
     <message>
       <source>Actions</source>
-      <translation type="unfinished">Actions</translation>
+      <translation>Aktionen</translation>
     </message>
   </context>
   <context>
@@ -1753,11 +1753,11 @@
     </message>
     <message>
       <source>Connection lost. Reconnecting...</source>
-      <translation type="unfinished">Connection lost. Reconnecting...</translation>
+      <translation>Verbindung unterbrochen. Verbindung wird wiederhergestellt...</translation>
     </message>
     <message>
       <source>Back to Welcome Screen</source>
-      <translation type="unfinished">Back to Welcome Screen</translation>
+      <translation>Zurück zum Willkommensbildschirm</translation>
     </message>
     <message>
       <source>Log out</source>
@@ -1765,7 +1765,7 @@
     </message>
     <message>
       <source>Press back again to exit</source>
-      <translation type="unfinished">Press back again to exit</translation>
+      <translation>Drücken Sie erneut auf Zurück, um das Programm zu beenden</translation>
     </message>
   </context>
 </TS>
