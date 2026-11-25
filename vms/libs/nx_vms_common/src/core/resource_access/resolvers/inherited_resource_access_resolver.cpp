@@ -172,8 +172,16 @@ InheritedResourceAccessResolver::Private::Private(
     connect(subjectHierarchy, &SubjectHierarchy::changed,
         this, &Private::handleSubjectHierarchyChanged, Qt::DirectConnection);
 
-    connect(subjectHierarchy, &SubjectHierarchy::reset,
-        this, &Private::handleReset, Qt::DirectConnection);
+    connect(
+        subjectHierarchy,
+        &SubjectHierarchy::reset,
+        this,
+        [this]()
+        {
+            updateWatchedSubset();
+            handleReset();
+        },
+        Qt::DirectConnection);
 }
 
 InheritedResourceAccessResolver::Private::ResourceAccessData
@@ -320,19 +328,50 @@ void InheritedResourceAccessResolver::Private::handleReset()
 }
 
 void InheritedResourceAccessResolver::Private::handleSubjectHierarchyChanged(
-    const QSet<nx::Uuid>& /*added*/,
-    const QSet<nx::Uuid>& /*removed*/,
+    const QSet<nx::Uuid>& added,
+    const QSet<nx::Uuid>& removed,
     const QSet<nx::Uuid>& /*groupsWithChangedMembers*/,
     const QSet<nx::Uuid>& subjectsWithChangedParents)
 {
-    if (subjectsWithChangedParents.empty())
+    if (added.empty() && removed.empty() && subjectsWithChangedParents.empty())
         return;
 
-    NX_VERBOSE(q, "Subject hierarchy changed, subjects with changed parents: %1",
+    NX_VERBOSE(q,
+        "Subject hierarchy changed, added: %1, removed: %2, subjects with changed parents: %3",
+        added,
+        removed,
         subjectsWithChangedParents);
 
-    handleBaseAccessChanged(subjectsWithChangedParents);
-    updateWatchedSubset();
+    const auto addedOrRemoved = added + removed;
+    QSet<nx::Uuid> uncachedSubjectIds;
+    {
+        NX_MUTEX_LOCKER lk(&mutex);
+        for (const auto& subjectId: addedOrRemoved)
+        {
+            if (cachedAccessData.remove(subjectId))
+                uncachedSubjectIds.insert(subjectId);
+        }
+    }
+
+    if (!uncachedSubjectIds.empty())
+    {
+        NX_DEBUG(q,
+            "Cache invalidated for %1 added or removed subjects: %2",
+            uncachedSubjectIds.size(),
+            uncachedSubjectIds);
+        baseResolver->notifier()->releaseSubjects(uncachedSubjectIds);
+    }
+
+    if (!subjectsWithChangedParents.empty())
+        handleBaseAccessChanged(subjectsWithChangedParents);
+
+    const auto watchedSubjectIds = q->notifier()->watchedSubjectIds();
+
+    if (!subjectsWithChangedParents.empty() || watchedSubjectIds.intersects(addedOrRemoved))
+        updateWatchedSubset();
+
+    if (const auto watchedAdded = added & watchedSubjectIds; !watchedAdded.empty())
+        q->notifyAccessChanged(watchedAdded);
 }
 
 void InheritedResourceAccessResolver::Private::updateWatchedSubset()
