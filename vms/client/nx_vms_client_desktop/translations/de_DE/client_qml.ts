@@ -1803,11 +1803,11 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     <name>ObjectTypeSelectionDialog</name>
     <message>
       <source>Select Objects</source>
-      <translation type="unfinished">Select Objects</translation>
+      <translation>Objekte auswählen</translation>
     </message>
     <message>
       <source>All Objects</source>
-      <translation type="unfinished">All Objects</translation>
+      <translation>Alle Objekte</translation>
     </message>
     <message>
       <source>Objects</source>

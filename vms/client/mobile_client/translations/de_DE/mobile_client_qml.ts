@@ -158,15 +158,15 @@
     <name>CameraSwitcherTutorial</name>
     <message>
       <source>Swipe Between Resources</source>
-      <translation type="unfinished">Swipe Between Resources</translation>
+      <translation>Zwischen Ressourcen wischen</translation>
     </message>
     <message>
       <source>Switch between cameras on a layout</source>
-      <translation type="unfinished">Switch between cameras on a layout</translation>
+      <translation>Wechseln Sie zwischen Kameras in einem Layout</translation>
     </message>
     <message>
       <source>Swipe right to switch to next Camera</source>
-      <translation type="unfinished">Swipe right to switch to next Camera</translation>
+      <translation>Wischen Sie nach rechts, um zur nächsten Kamera zu wechseln</translation>
     </message>
   </context>
   <context>
@@ -198,7 +198,7 @@
     </message>
     <message>
       <source>How to Connect?</source>
-      <translation type="unfinished">How to Connect?</translation>
+      <translation>Wie kann ich mich verbinden?</translation>
     </message>
     <message>
       <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
@@ -614,11 +614,11 @@
     </message>
     <message>
       <source>Tutorials</source>
-      <translation type="unfinished">Tutorials</translation>
+      <translation>Anleitungen</translation>
     </message>
     <message>
       <source>See the interface walkthrough</source>
-      <translation type="unfinished">See the interface walkthrough</translation>
+      <translation>Siehe die Benutzeroberflächen-Übersicht</translation>
     </message>
   </context>
   <context>
@@ -758,7 +758,7 @@
     </message>
     <message>
       <source>Edit sharing</source>
-      <translation type="unfinished">Edit sharing</translation>
+      <translation>Teilen bearbeiten</translation>
     </message>
   </context>
   <context>
@@ -772,15 +772,15 @@
     <name>ObjectTypesTutorial</name>
     <message>
       <source>View Mode</source>
-      <translation type="unfinished">View Mode</translation>
+      <translation>Ansichtsmodus</translation>
     </message>
     <message>
       <source>Switch the Timeline between Motion, Objects, and Bookmarks</source>
-      <translation type="unfinished">Switch the Timeline between Motion, Objects, and Bookmarks</translation>
+      <translation>Wechseln Sie in der Zeitleiste zwischen Bewegung, Objekten und Lesezeichen</translation>
     </message>
     <message>
       <source>Tap to choose desired data type</source>
-      <translation type="unfinished">Tap to choose desired data type</translation>
+      <translation>Tippen Sie hier, um den gewünschten Datentyp auszuwählen</translation>
     </message>
   </context>
   <context>
@@ -817,15 +817,15 @@
     <name>PanelButtonTutorial</name>
     <message>
       <source>Floating Panel Button</source>
-      <translation type="unfinished">Floating Panel Button</translation>
+      <translation>Schwebende Panel-Schaltfläche</translation>
     </message>
     <message>
       <source>Reopen a collapsed panel</source>
-      <translation type="unfinished">Reopen a collapsed panel</translation>
+      <translation>Ein eingeklapptes Panel erneut öffnen</translation>
     </message>
     <message>
       <source>Tap the floating button to open the panel</source>
-      <translation type="unfinished">Tap the floating button to open the panel</translation>
+      <translation>Tippen Sie auf die schwebende Schaltfläche, um das Bedienfeld zu öffnen</translation>
     </message>
   </context>
   <context>
@@ -1093,7 +1093,7 @@
     <name>SaasPromoBanner</name>
     <message>
       <source>Unlock exclusive features for actionable video intelligence and data-driven operations at scale</source>
-      <translation type="unfinished">Unlock exclusive features for actionable video intelligence and data-driven operations at scale</translation>
+      <translation>Schalten Sie exklusive Funktionen für umsetzbare Videoanalysen und datengesteuerte Abläufe in großem Umfang frei</translation>
     </message>
     <message>
       <source>Learn more</source>
@@ -1209,15 +1209,15 @@
     </message>
     <message>
       <source>Failed to access site</source>
-      <translation>Zugriff auf die Site fehlgeschlagen</translation>
+      <translation>Fehler beim Zugriff auf die Site</translation>
     </message>
     <message>
       <source>Failed to access channel partner</source>
-      <translation>Fehler beim Zugriff auf den Channel-Partner</translation>
+      <translation>Fehler beim Zugriff auf den Vertriebs-Partner</translation>
     </message>
     <message>
       <source>Failed to access organization</source>
-      <translation type="unfinished">Failed to access organization</translation>
+      <translation>Zugriff auf die Organisation fehlgeschlagen</translation>
     </message>
     <message>
       <source>Partners</source>
@@ -1473,15 +1473,15 @@
     <name>SoftTriggersTutorial</name>
     <message>
       <source>Soft Triggers</source>
-      <translation type="unfinished">Soft Triggers</translation>
+      <translation>Soft-Trigger</translation>
     </message>
     <message>
       <source>Open Soft Trigger camera actions</source>
-      <translation type="unfinished">Open Soft Trigger camera actions</translation>
+      <translation>Kameraaktionen mit Soft-Trigger öffnen</translation>
     </message>
     <message>
       <source>Tap to invoke soft triggers panel</source>
-      <translation type="unfinished">Tap to invoke soft triggers panel</translation>
+      <translation>Tippen Sie, um das Bedienfeld für Soft-Trigger aufzurufen</translation>
     </message>
   </context>
   <context>
@@ -1538,30 +1538,30 @@
     <name>TimelinePreviewTutorial</name>
     <message>
       <source>Timeline Cards and Player</source>
-      <translation type="unfinished">Timeline Cards and Player</translation>
+      <translation>Zeitleistenkarten und Player</translation>
     </message>
     <message>
       <source>View event details with a long tap</source>
-      <translation type="unfinished">View event details with a long tap</translation>
+      <translation>Ereignis-Details mit einem langen Tippen anzeigen</translation>
     </message>
     <message>
       <source>Long tap to invoke preview with more details</source>
-      <translation type="unfinished">Long tap to invoke preview with more details</translation>
+      <translation>Langes Tippen öffnet eine Vorschau mit weiteren Details</translation>
     </message>
   </context>
   <context>
     <name>TimelineZoomTutorial</name>
     <message>
       <source>Zoom Timeline In/Out</source>
-      <translation type="unfinished">Zoom Timeline In/Out</translation>
+      <translation>Zeitleiste ein-/auszoomen</translation>
     </message>
     <message>
       <source>Pinch or spread to zoom the Timeline</source>
-      <translation type="unfinished">Pinch or spread to zoom the Timeline</translation>
+      <translation>Durch Zusammen- oder Auseinanderziehen der Finger kann die Zeitleiste vergrößert werden</translation>
     </message>
     <message>
       <source>Pinch to Zoom Out and Spread to Zoom In</source>
-      <translation type="unfinished">Pinch to Zoom Out and Spread to Zoom In</translation>
+      <translation>Zum Verkleinern zusammenziehen, zum Vergrößern auseinanderziehen</translation>
     </message>
   </context>
   <context>
@@ -1579,7 +1579,7 @@
     <name>TutorialsSettingsPage</name>
     <message>
       <source>Tutorials</source>
-      <translation type="unfinished">Tutorials</translation>
+      <translation>Anleitungen</translation>
     </message>
   </context>
   <context>
@@ -1654,7 +1654,7 @@
     </message>
     <message>
       <source>Set Up 2FA</source>
-      <translation type="unfinished">Set Up 2FA</translation>
+      <translation>2FA einrichten</translation>
     </message>
     <message>
       <source>Archive encrypted</source>
@@ -1777,7 +1777,7 @@
     </message>
     <message>
       <source>Press back again to exit</source>
-      <translation type="unfinished">Press back again to exit</translation>
+      <translation>Drücken Sie erneut auf Zurück, um das Programm zu beenden</translation>
     </message>
   </context>
 </TS>

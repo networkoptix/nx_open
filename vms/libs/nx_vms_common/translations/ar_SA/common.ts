@@ -2255,6 +2255,10 @@
       <translation>استخدم بروتوكول HTTPS فقط للكاميرات.</translation>
     </message>
     <message>
+      <source>Encryption of video streams received from devices (e.g. RTSPS, SRTP): &quot;allowInsecureStream&quot; (not required), &quot;preferSecureStream&quot; (used if supported by the device), &quot;requireSecureStream&quot; (always used).</source>
+      <translation type="unfinished">Encryption of video streams received from devices (e.g. RTSPS, SRTP): &quot;allowInsecureStream&quot; (not required), &quot;preferSecureStream&quot; (used if supported by the device), &quot;requireSecureStream&quot; (always used).</translation>
+    </message>
+    <message>
       <source>Allow Power User editing Security Settings.</source>
       <translation>السماح للمستخدمين المتقدمين بتعديل إعدادات الأمان.</translation>
     </message>

@@ -1597,11 +1597,11 @@
     <name>UiContainer</name>
     <message>
       <source>Screen size is too small</source>
-      <translation type="unfinished">Screen size is too small</translation>
+      <translation>O tamaño da pantalla é demasiado pequeno</translation>
     </message>
     <message>
       <source>There isn&apos;t enough screen space. Resize the window or use a larger screen.</source>
-      <translation type="unfinished">There isn&apos;t enough screen space. Resize the window or use a larger screen.</translation>
+      <translation>Non hai espazo de pantalla suficiente. Cambia o tamaño da ventá ou usa unha pantalla máis grande.</translation>
     </message>
   </context>
   <context>

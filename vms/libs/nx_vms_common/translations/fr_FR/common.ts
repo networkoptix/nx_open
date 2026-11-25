@@ -1975,6 +1975,10 @@
       <translation>Utiliser uniquement HTTPS pour les caméras.</translation>
     </message>
     <message>
+      <source>Encryption of video streams received from devices (e.g. RTSPS, SRTP): &quot;allowInsecureStream&quot; (not required), &quot;preferSecureStream&quot; (used if supported by the device), &quot;requireSecureStream&quot; (always used).</source>
+      <translation type="unfinished">Encryption of video streams received from devices (e.g. RTSPS, SRTP): &quot;allowInsecureStream&quot; (not required), &quot;preferSecureStream&quot; (used if supported by the device), &quot;requireSecureStream&quot; (always used).</translation>
+    </message>
+    <message>
       <source>Allow Power User editing Security Settings.</source>
       <translation>Autoriser les utilisateurs expérimentés à modifier les paramètres de sécurité.</translation>
     </message>

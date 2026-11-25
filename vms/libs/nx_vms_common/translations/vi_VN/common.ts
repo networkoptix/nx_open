@@ -1905,6 +1905,10 @@
       <translation>Chỉ sử dụng HTTPS cho camera.</translation>
     </message>
     <message>
+      <source>Encryption of video streams received from devices (e.g. RTSPS, SRTP): &quot;allowInsecureStream&quot; (not required), &quot;preferSecureStream&quot; (used if supported by the device), &quot;requireSecureStream&quot; (always used).</source>
+      <translation type="unfinished">Encryption of video streams received from devices (e.g. RTSPS, SRTP): &quot;allowInsecureStream&quot; (not required), &quot;preferSecureStream&quot; (used if supported by the device), &quot;requireSecureStream&quot; (always used).</translation>
+    </message>
+    <message>
       <source>Allow Power User editing Security Settings.</source>
       <translation>Cho phép Người dùng cấp cao chỉnh sửa Cài đặt bảo mật.</translation>
     </message>
