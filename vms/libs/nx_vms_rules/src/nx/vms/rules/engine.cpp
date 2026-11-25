@@ -81,14 +81,7 @@ Engine::Engine(
     systemContext->setVmsRulesEngine(this);
 
     m_aggregationTimer->setInterval(1s);
-    connect(m_aggregationTimer, &QTimer::timeout, this,
-        [this]()
-        {
-            NX_MUTEX_LOCKER lock(&m_ruleMutex);
-
-            for (auto handler: m_timerHandlers)
-                handler->onTimer(0);
-        });
+    connect(m_aggregationTimer, &QTimer::timeout, this, &Engine::onAggregationTimer);
 
     if (m_router) //< Router may be absent in test scenarios.
     {
@@ -954,7 +947,7 @@ size_t Engine::processAnalyticsEvents(const std::vector<EventPtr>& events)
     return matchedRules;
 }
 
-void Engine::stopProcessing()
+void Engine::pleaseStop()
 {
     m_processingStopped = true;
 }
@@ -991,6 +984,32 @@ void Engine::processAcceptedEvent(const EventPtr& event, const ConstRulePtr& rul
 
     for (const auto builder: rule->actionBuilders())
         builder->process(event);
+}
+
+void Engine::onAggregationTimer()
+{
+    if (m_processingStopped)
+    {
+        m_aggregationTimer->stop();
+        return;
+    }
+
+    // Building an action may wait for another thread, which accesses the rules, so the builders
+    // are called without the rule mutex. The rule copies keep the builders alive meanwhile.
+    RuleCache::TimerHandlers handlers;
+    {
+        NX_MUTEX_LOCKER lock(&m_ruleMutex);
+        handlers = m_ruleCache.timerHandlers();
+    }
+
+    if (handlers.empty())
+    {
+        m_aggregationTimer->stop();
+        return;
+    }
+
+    for (const auto& [rule, handler]: handlers)
+        handler->onTimer(/*timerId*/ 0);
 }
 
 void Engine::processAction(const ActionPtr& action) const
@@ -1066,26 +1085,21 @@ RunningEventWatcher Engine::runningEventWatcher(nx::Uuid ruleId)
     return RunningEventWatcher(m_runningRules[ruleId]);
 }
 
-void Engine::toggleTimer(nx::utils::TimerEventHandler* handler, bool on)
+void Engine::toggleTimer(ActionBuilder* builder, bool on)
 {
     {
         NX_MUTEX_LOCKER lock(&m_ruleMutex);
-
-        if (on)
-            m_timerHandlers.insert(handler);
-        else
-            m_timerHandlers.remove(handler);
-
-        on = !m_timerHandlers.empty();
+        m_ruleCache.toggleTimer(builder, on);
     }
 
-    executeInThread(
-        this->thread(),
-        [this, on]()
+    // The timer stops itself once there is nothing to handle.
+    if (!on)
+        return;
+
+    executeInThread(this->thread(),
+        [this]()
         {
-            if (!on)
-                m_aggregationTimer->stop();
-            else if (!m_aggregationTimer->isActive())
+            if (!m_aggregationTimer->isActive())
                 m_aggregationTimer->start();
         });
 }

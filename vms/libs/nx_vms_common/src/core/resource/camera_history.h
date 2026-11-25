@@ -7,6 +7,7 @@
 #include <api/server_rest_connection_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/stoppable.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/camera_history_data.h>
@@ -34,13 +35,20 @@ namespace nx::vms::api { struct ServerRuntimeEventData; }
  *  All methods that require camera history to operate are non-reliable.
  *
  */
-class NX_VMS_COMMON_API QnCameraHistoryPool: public QObject
+class NX_VMS_COMMON_API QnCameraHistoryPool: public QObject, public QnStoppable
 {
     Q_OBJECT
 
 public:
     QnCameraHistoryPool(QnResourcePool* resourcePool, QObject* parent = nullptr);
     virtual ~QnCameraHistoryPool() override;
+
+    /**
+     * Wakes up the threads waiting in updateCameraHistorySync(), and makes the further calls
+     * return at once. The request callbacks are delivered in the thread of this object, so the
+     * waiting would never end once that thread stops running its event loop.
+     */
+    virtual void pleaseStop() override;
 
     /** Reset information about camera footage presence on different servers. */
     void resetServerFootageData(const nx::vms::api::ServerFootageDataList& serverFootageDataList);
@@ -117,7 +125,8 @@ public:
      * Update camera history for the given camera. Function returns immediately if currently loaded
      * information is up to date
      * @param camera Target camera
-     * @return True if no error, false otherwise.
+     * @return True if no error, false otherwise. False if pleaseStop() has been called before
+     *     the history is loaded.
      */
     bool updateCameraHistorySync(const QnVirtualCameraResourcePtr& camera);
 
@@ -206,6 +215,7 @@ private:
     std::map<nx::Uuid, AsyncRequestInfo> m_asyncRunningRequests;
 
     QSet<nx::Uuid> m_syncRunningRequests;
+    bool m_syncLoadStopped = false;
     mutable nx::Mutex m_syncLoadMutex;
     nx::WaitCondition m_syncLoadWaitCond;
     QSet<nx::Uuid> m_camerasToCheck;

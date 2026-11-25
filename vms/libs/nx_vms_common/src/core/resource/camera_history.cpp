@@ -92,6 +92,19 @@ QnCameraHistoryPool::QnCameraHistoryPool(QnResourcePool* resourcePool, QObject *
 
 QnCameraHistoryPool::~QnCameraHistoryPool() {}
 
+void QnCameraHistoryPool::pleaseStop()
+{
+    NX_MUTEX_LOCKER lock(&m_syncLoadMutex);
+    if (m_syncLoadStopped)
+        return;
+
+    NX_DEBUG(this,
+        "Stopping, interrupting %1 synchronous history requests",
+        m_syncRunningRequests.size());
+    m_syncLoadStopped = true;
+    m_syncLoadWaitCond.wakeAll();
+}
+
 void QnCameraHistoryPool::setHistoryCheckDelay(int value)
 {
     m_historyCheckDelay = value;
@@ -693,12 +706,22 @@ bool QnCameraHistoryPool::updateCameraHistorySync(const QnVirtualCameraResourceP
     if (!camera)
         return true;
 
+    const auto cameraId = camera->getId();
     NX_MUTEX_LOCKER lock(&m_syncLoadMutex);
-    while (m_syncRunningRequests.contains(camera->getId()))
-        m_syncLoadWaitCond.wait(&m_syncLoadMutex);
 
+    // An interrupted request stays in m_syncRunningRequests, as its callback may never come.
+    const auto waitForRunningRequest = [this, &cameraId]()
+    {
+        while (!m_syncLoadStopped && m_syncRunningRequests.contains(cameraId))
+            m_syncLoadWaitCond.wait(&m_syncLoadMutex);
+    };
+
+    waitForRunningRequest();
     if (isCameraHistoryValid(camera))
         return true;
+
+    if (m_syncLoadStopped)
+        return false;
 
     StartResult result = updateCameraHistoryAsync(camera, [this, camera] (bool /*success*/)
     {
@@ -708,9 +731,10 @@ bool QnCameraHistoryPool::updateCameraHistorySync(const QnVirtualCameraResourceP
     });
 
     if (result == StartResult::started) {
-        m_syncRunningRequests.insert(camera->getId());
-        while (m_syncRunningRequests.contains(camera->getId()))
-            m_syncLoadWaitCond.wait(&m_syncLoadMutex);
+        m_syncRunningRequests.insert(cameraId);
+        waitForRunningRequest();
+        if (m_syncLoadStopped)
+            return isCameraHistoryValid(camera);
     }
     return result != StartResult::failed;
 }
