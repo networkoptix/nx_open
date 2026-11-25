@@ -40,7 +40,7 @@
     </message>
     <message>
       <source>Invalid certificate</source>
-      <translation type="unfinished">Invalid certificate</translation>
+      <translation>شهادة غير صالحة</translation>
     </message>
     <message>
       <source>Restore the connection to %1 and try again</source>
@@ -49,7 +49,7 @@
     </message>
     <message>
       <source>The server is incompatible.</source>
-      <translation type="unfinished">The server is incompatible.</translation>
+      <translation>الخادم غير متوافق.</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
@@ -65,7 +65,7 @@
     </message>
     <message>
       <source>Session expired. Re-enter your password.</source>
-      <translation type="unfinished">Session expired. Re-enter your password.</translation>
+      <translation>انتهت صلاحية الجلسة. أعد إدخال كلمة المرور.</translation>
     </message>
     <message>
       <source>Invalid login or password</source>
@@ -89,16 +89,16 @@
     </message>
     <message>
       <source>Internal error. Please try again later.</source>
-      <translation type="unfinished">Internal error. Please try again later.</translation>
+      <translation>حدث خطأ داخلي. يرجى المحاولة مرة أخرى لاحقاً.</translation>
     </message>
     <message>
       <source>Connection to %1 is not ready yet. Check your internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check your internet connection or try again later.</translation>
+      <translation>الاتصال بـ %1 غير جاهز بعد. تحقق من اتصالك بالإنترنت أو حاول مرة أخرى لاحقاً.</translation>
     </message>
     <message>
       <source>Connection to the server could not be established. Try again later.</source>
-      <translation type="unfinished">Connection to the server could not be established. Try again later.</translation>
+      <translation>تعذر إنشاء الاتصال بالخادم. حاول مرة أخرى لاحقاً.</translation>
     </message>
     <message>
       <source>Your session has expired</source>
@@ -107,11 +107,11 @@
     <message>
       <source>Please log in to %1 again.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Please log in to %1 again.</translation>
+      <translation>الرجاء تسجيل الدخول إلى %1 مرة أخرى.</translation>
     </message>
     <message>
       <source>Too many login attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many login attempts. Try again in a minute.</translation>
+      <translation>عدد محاولات تسجيل الدخول كبير جدًا. حاول مرة أخرى بعد دقيقة.</translation>
     </message>
     <message>
       <source>Two-factor authentication is required.</source>
@@ -124,42 +124,42 @@
     <message>
       <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</translation>
+      <translation>الاتصال بـ %1 غير جاهز بعد. تحقق من اتصال الإنترنت الخاص بالخادم&apos;أو حاول مرة أخرى لاحقًا.</translation>
     </message>
     <message>
       <source>The server&apos;s certificate was rejected.</source>
-      <translation type="unfinished">The server&apos;s certificate was rejected.</translation>
+      <translation>تم رفض شهادة الخادم&apos;.</translation>
     </message>
     <message>
       <source>If this error persists, please contact your site administrator.</source>
-      <translation type="unfinished">If this error persists, please contact your site administrator.</translation>
+      <translation>إذا استمر هذا الخطأ فاتصل بمدير الموقع.</translation>
     </message>
     <message>
       <source>Log in as a %1 user to the site in a shutdown state is forbidden. You can still connect as local user.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in as a %1 user to the site in a shutdown state is forbidden. You can still connect as local user.</translation>
+      <translation>يُمنع تسجيل الدخول إلى الموقع في حالة إيقاف التشغيل كمستخدم من نوع %1 . يمكنك الاتصال كمستخدم محلي.</translation>
     </message>
     <message>
       <source>Log in as a %1 user to the site in a suspended state is forbidden. You can still connect as local user.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in as a %1 user to the site in a suspended state is forbidden. You can still connect as local user.</translation>
+      <translation>يُمنع تسجيل الدخول إلى الموقع كمستخدم %1 في حالة تعليق الحساب. يمكنك الاتصال كمستخدم محلي.</translation>
     </message>
     <message>
       <source>Log in to %1 to log in to this site with %2 user</source>
       <comment>%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in to %1 to log in to this site with %2 user</translation>
+      <translation>سجّل الدخول إلى %1 للدخول إلى هذا الموقع باستخدام اسم المستخدم %2</translation>
     </message>
     <message>
       <source>Session duration limit can be changed by a site administrator.</source>
-      <translation type="unfinished">Session duration limit can be changed by a site administrator.</translation>
+      <translation>يمكن تغيير حد مدة الجلسة من قبل مسؤول الموقع.</translation>
     </message>
     <message>
       <source>Your access to this site has expired.</source>
-      <translation type="unfinished">Your access to this site has expired.</translation>
+      <translation>انتهت صلاحية وصولك إلى هذا الموقع.</translation>
     </message>
     <message>
       <source>Please contact the site administrator to regain access.</source>
-      <translation type="unfinished">Please contact the site administrator to regain access.</translation>
+      <translation>الرجاء الاتصال بمسؤول الموقع لاستعادة الوصول.</translation>
     </message>
     <message>
       <source>This user has been disabled by a site administrator.</source>
@@ -255,7 +255,7 @@
     </message>
     <message>
       <source>This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</source>
-      <translation type="unfinished">This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</translation>
+      <translation>قد يرجع هذا إلى شهادة خادم منتهية الصلاحية أو شهادة غير صالحة. اتصل بمسؤول موقعك لمزيد من التحقيق.</translation>
     </message>
   </context>
   <context>
@@ -270,7 +270,7 @@
     </message>
     <message>
       <source>Click to Show Cameras</source>
-      <translation type="unfinished">Click to Show Cameras</translation>
+      <translation>انقر لعرض الكاميرات</translation>
     </message>
   </context>
   <context>
@@ -278,19 +278,19 @@
     <message>
       <source>%1 (Copy)</source>
       <comment>Original name will be substituted</comment>
-      <translation type="unfinished">%1 (Copy)</translation>
+      <translation>%1 (نسخة)</translation>
     </message>
     <message>
       <source>%1 (Copy %2)</source>
       <comment>Original name will be substituted as %1, counter as %2</comment>
-      <translation type="unfinished">%1 (Copy %2)</translation>
+      <translation>%1 (نسخ %2)</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::core::CrossSystemCameraResource</name>
     <message>
       <source>Unknown camera</source>
-      <translation type="unfinished">Unknown camera</translation>
+      <translation>كاميرا غير معروفة</translation>
     </message>
   </context>
   <context>
@@ -313,7 +313,7 @@
     <message>
       <source>Site (%1)</source>
       <comment>%1 is ip and port of the site</comment>
-      <translation type="unfinished">Site (%1)</translation>
+      <translation>الموقع (%1)</translation>
     </message>
   </context>
   <context>
@@ -324,11 +324,11 @@
     </message>
     <message>
       <source>Last 7 days</source>
-      <translation type="unfinished">Last 7 days</translation>
+      <translation>آخر 7 أيام</translation>
     </message>
     <message>
       <source>Last 30 days</source>
-      <translation type="unfinished">Last 30 days</translation>
+      <translation>آخر 30 يوم</translation>
     </message>
     <message>
       <source>Any time</source>
@@ -355,11 +355,11 @@
     <name>nx::vms::client::core::ExtendedOutputCameraButtonController</name>
     <message>
       <source>Heater</source>
-      <translation type="unfinished">Heater</translation>
+      <translation>سخان</translation>
     </message>
     <message>
       <source>Wiper</source>
-      <translation type="unfinished">Wiper</translation>
+      <translation>ممسحة</translation>
     </message>
     <message>
       <source>Open Door</source>
