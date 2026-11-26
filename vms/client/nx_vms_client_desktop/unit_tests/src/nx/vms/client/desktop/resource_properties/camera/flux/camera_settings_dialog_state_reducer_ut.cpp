@@ -42,16 +42,12 @@ QnScheduleTaskList makeSchedule(
     QnScheduleTaskList result;
     for (qint8 day = 1; day <= 7; ++day)
     {
-        result.push_back({
-            /*startTime*/ 0,
-            /*endTime*/ seconds(24h).count(),
-            /*dayOfWeek*/ day,
+        result.push_back({{/*startTime*/ 0, /*endTime*/ seconds(24h).count(), /*dayOfWeek*/ day},
             /*recordingType*/ recordingType,
             /*streamQuality*/ streamQuality,
             /*fps*/ fps,
             /*bitrateKbps*/ bitrateKbps,
-            metadataTypes
-        });
+            metadataTypes});
     }
     return result;
 }

@@ -68,7 +68,7 @@ public:
         }
 
         QFile file(directory.absoluteFilePath(filename));
-        file.open(QIODevice::WriteOnly);
+        NX_ASSERT(file.open(QIODevice::WriteOnly));
         file.write(data);
         file.close();
     }

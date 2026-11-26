@@ -253,20 +253,13 @@ TEST_F(ResourceTreeModelSortingGroupingTest, videoWallChildrenGrouping)
     const auto videoWallIndex =
         firstMatchingIndex(allOf(videoWallNodeCondition(), hasChildren()));
 
-    const auto kVideoWallScreenCondition =
-        allOf(
-            directChildOf(videoWallIndex),
-            iconTypeMatch(ResourceIconCache::VideoWallItem));
-
-    const auto kVideoWallMatrixCondition =
-        allOf(
-            directChildOf(videoWallIndex),
-            iconTypeMatch(ResourceIconCache::VideoWallMatrix));
+    const auto screenCondition = allOf(directChildOf(videoWallIndex), kVideoWallScreenCondition);
+    const auto matrixCondition = allOf(directChildOf(videoWallIndex), kVideoWallMatrixCondition);
 
     // Check that Video Wall children are grouped exactly in the following order:
     // 1. Video Wall Screens
     // 2. Video Wall Matrices
-    ASSERT_TRUE(checkGrouping({kVideoWallScreenCondition, kVideoWallMatrixCondition}));
+    ASSERT_TRUE(checkGrouping({screenCondition, matrixCondition}));
 }
 
 TEST_F(ResourceTreeModelSortingGroupingTest, serverCamerasIoModulesVirtualCamerasSorting)

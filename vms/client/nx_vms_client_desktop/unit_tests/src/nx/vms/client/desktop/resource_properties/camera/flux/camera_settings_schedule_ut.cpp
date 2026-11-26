@@ -77,16 +77,13 @@ protected:
         QnScheduleTaskList schedule;
         for (qint8 day = 1; day <= 7; ++day)
         {
-            schedule.push_back({
-                /*startTime*/ 0,
-                /*endTime*/ seconds(24h).count(),
-                /*dayOfWeek*/ day,
-                /*recordingType*/ recordingType,
-                /*streamQuality*/ streamQuality,
-                /*fps*/ fps,
-                /*bitrateKbps*/ bitrateKbps,
-                metadataTypes
-            });
+            schedule.push_back(
+                {{/*startTime*/ 0, /*endTime*/ seconds(24h).count(), /*dayOfWeek*/ day},
+                    /*recordingType*/ recordingType,
+                    /*streamQuality*/ streamQuality,
+                    /*fps*/ fps,
+                    /*bitrateKbps*/ bitrateKbps,
+                    metadataTypes});
         }
         return schedule;
     }

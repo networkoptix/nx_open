@@ -2,7 +2,6 @@
 
 nx_add_target(cloud_db_client
     LIBRARY NO_MOC NO_API_MACROS
-    WERROR_IF NOT WINDOWS
     PUBLIC_LIBS nx_network
     FOLDER common/libs
 )

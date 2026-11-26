@@ -184,9 +184,10 @@ function(nx_add_target name type)
         message(FATAL_ERROR "Only one of NO_WERROR, WERROR, WERROR_IF can be defined for target.")
     endif()
 
+    # With WERROR_IF <condition>, warnings are errors only where the condition holds, e.g.
+    # WERROR_IF NOT WINDOWS; nx_target_enable_werror() evaluates it.
     if(NOT NX_NO_WERROR AND
-        (nx_enable_werror OR NX_WERROR) AND
-        "${NX_WERROR_IF}" STREQUAL "" # If NX_WERROR_IF defined enable WERROR only for "IF" condition after.
+        (nx_enable_werror OR NX_WERROR OR NOT "${NX_WERROR_IF}" STREQUAL "")
     )
         nx_target_enable_werror(${name} "${NX_WERROR_IF}")
     endif()

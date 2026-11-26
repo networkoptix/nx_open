@@ -35,6 +35,8 @@ protected:
         ContextBasedTest::TearDown();
     }
 
+    using ContextBasedTest::createLayout;
+
     QnLayoutResourcePtr createLayout(
         Qn::ResourceFlags flags, bool locked = false, const nx::Uuid& parentId = nx::Uuid())
     {
