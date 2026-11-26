@@ -97,7 +97,7 @@
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation>Seleccione pelo menos um utilizador</translation>
+      <translation>Selecione pelo menos um utilizador</translation>
     </message>
     <message>
       <source>Select exactly one camera</source>
