@@ -89,7 +89,7 @@
     </message>
     <message>
       <source>Cannot share bookmark.</source>
-      <translation type="unfinished">Cannot share bookmark.</translation>
+      <translation>Lesezeichen kann nicht freigegeben werden.</translation>
     </message>
   </context>
   <context>
