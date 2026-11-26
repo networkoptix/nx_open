@@ -6,29 +6,24 @@
 #include <QtCore/QThread>
 #include <QtWidgets/QPushButton>
 
-#include <api/runtime_info_manager.h>
-#include <client/client_runtime_settings.h>
 #include <client/client_startup_parameters.h>
-#include <client/self_updater.h>
 #include <nx/branding.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
-#include <nx/network/http/http_types.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/protocol_version.h>
 #include <nx/vms/client/core/network/remote_connection_error_strings.h>
-#include <nx/vms/client/core/settings/client_core_settings.h>
-#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/system_update/compatibility_version_installation_dialog.h>
+#include <nx/vms/client/desktop/utils/mime_data.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/html/html.h>
-#include <nx/vms/common/network/server_compatibility_validator.h>
+#include <nx/vms/common/resource/resource_descriptor.h>
+#include <nx/vms/utils/system_uri.h>
 #include <ui/dialogs/common/message_box.h>
-#include <ui/workbench/workbench_context.h>
 #include <utils/applauncher_utils.h>
 
 using namespace nx::vms::client;
@@ -38,6 +33,9 @@ using namespace nx::vms::common;
 using RemoteConnectionErrorCode = nx::vms::client::core::RemoteConnectionErrorCode;
 
 namespace {
+
+/** The first version which opens resources from a Cloud System URI without credentials. */
+const nx::utils::SoftwareVersion kSystemUriWithoutCredentialsVersion(6, 1, 4);
 
 QString getDiffVersionsText()
 {
@@ -212,6 +210,43 @@ bool agreeToTryAgain(
 
 } // namespace
 
+std::pair<QStringList, QString> QnConnectionDiagnosticsHelper::compatibleClientParameters(
+    const nx::vms::api::ModuleInformation& moduleInformation,
+    const nx::vms::client::core::LogonData& logonData)
+{
+    using namespace nx::vms::utils;
+
+    const auto& drops = logonData.delayedDrops;
+    if (!drops || drops->resourceIds.empty())
+        return {};
+
+    // Newer clients connect to the Cloud System using the URI without credentials and the stored
+    // Cloud authorization data, and open its resources at the timestamp.
+    if (logonData.userType == nx::vms::api::UserType::cloud
+        && !moduleInformation.cloudSystemId.isEmpty()
+        && moduleInformation.version >= kSystemUriWithoutCredentialsVersion)
+    {
+        SystemUri uri;
+        uri.protocol = SystemUri::Protocol::Native;
+        uri.cloudHost = QString::fromStdString(nx::network::SocketGlobals::cloud().cloudHost());
+        uri.clientCommand = SystemUri::ClientCommand::Client;
+        uri.systemAddress = moduleInformation.cloudSystemId;
+        uri.resourceIds = drops->resourceIds;
+        uri.timestamp = drops->timestamp.count();
+        return {/*params*/ {}, uri.toString()};
+    }
+
+    // Older clients open resources passed as delayed drops after connecting. The timestamp cannot
+    // be passed this way.
+    QList<ResourceDescriptor> descriptors;
+    for (const auto& id: drops->resourceIds)
+        descriptors.push_back({.id = id});
+
+    MimeData mimeData;
+    mimeData.setResourceDescriptors(descriptors);
+    return {{"--delayed-drop", mimeData.serialized()}, /*systemUri*/ QString()};
+}
+
 bool QnConnectionDiagnosticsHelper::downloadAndRunCompatibleVersion(
     QWidget* parentWidget,
     const nx::vms::api::ModuleInformation& moduleInformation,
@@ -240,6 +275,7 @@ bool QnConnectionDiagnosticsHelper::downloadAndRunCompatibleVersion(
 
     const QString authString = QnStartupParameters::createAuthenticationString(
         logonData, moduleInformation.version);
+    const auto [params, systemUri] = compatibleClientParameters(moduleInformation, logonData);
 
     while (true)
     {
@@ -257,7 +293,7 @@ bool QnConnectionDiagnosticsHelper::downloadAndRunCompatibleVersion(
             return false;
 
         // Version is installed, trying to run.
-        switch (restartClient(moduleInformation.version, authString, /*params*/{}))
+        switch (restartClient(moduleInformation.version, authString, params, systemUri))
         {
             case ResultType::ok:
             {

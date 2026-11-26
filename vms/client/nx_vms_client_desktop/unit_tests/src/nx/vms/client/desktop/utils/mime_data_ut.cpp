@@ -9,6 +9,7 @@
 #include <nx/vms/client/desktop/test_support/test_context.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <nx/vms/common/resource/camera_resource_stub.h>
+#include <nx/vms/common/resource/resource_descriptor.h>
 
 namespace nx::vms::client::desktop {
 
@@ -68,6 +69,20 @@ TEST_F(MimeDataTest, mimeDataConversionsAreCorrect)
     ASSERT_EQ(restoredMimeData.entities(), entities);
     ASSERT_EQ(restoredMimeData.arguments(), arguments);
     ASSERT_EQ(restoredMimeData.data(kTestMimeType), kTestMimeData);
+}
+
+TEST_F(MimeDataTest, resourceDescriptorsAreDeserializedAsResources)
+{
+    const auto serverResource = addServer();
+    const auto cameraResource = createCameraResource(serverResource->getId());
+
+    MimeData mimeData;
+    mimeData.setResourceDescriptors({{.id = cameraResource->getId()}});
+    ASSERT_FALSE(mimeData.isEmpty());
+
+    // Restore the same way as the delayed drop command line parameter.
+    const MimeData restoredMimeData(QByteArray::fromBase64(mimeData.serialized().toLatin1()));
+    ASSERT_EQ(restoredMimeData.resources(), QnResourceList({cameraResource}));
 }
 
 } // namespace test

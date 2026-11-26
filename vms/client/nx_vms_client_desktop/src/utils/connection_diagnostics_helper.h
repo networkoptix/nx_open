@@ -2,12 +2,14 @@
 
 #pragma once
 
+#include <utility>
+
 #include <QtCore/QObject>
+#include <QtCore/QStringList>
 
 #include <nx/utils/software_version.h>
 #include <nx/vms/client/core/network/logon_data.h>
 #include <nx/vms/client/core/network/remote_connection_error.h>
-#include <nx_ec/ec_api_fwd.h>
 
 namespace nx::vms::api { struct ModuleInformation; }
 namespace nx::vms::client::desktop { class WindowContext; }
@@ -49,6 +51,13 @@ public:
     static QString developerModeText(
         const nx::vms::api::ModuleInformation& moduleInformation,
         const nx::utils::SoftwareVersion& engineVersion);
+
+public: // For testing.
+    /** Creates command line params to transfer delayed drops. */
+    NX_VMS_CLIENT_DESKTOP_API
+    static std::pair<QStringList /*params*/, QString /*systemUri*/> compatibleClientParameters(
+        const nx::vms::api::ModuleInformation& moduleInformation,
+        const nx::vms::client::core::LogonData& logonData);
 
 private:
     static bool getInstalledVersions(QList<nx::utils::SoftwareVersion>* versions);

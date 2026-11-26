@@ -53,6 +53,9 @@ public:
     QnResourceList resources() const;
     void setResources(const QnResourceList& resources);
 
+    /** Use to pass resource ids when system context is not available, e.g. on client restart. */
+    void setResourceDescriptors(const QList<nx::vms::common::ResourceDescriptor>& descriptors);
+
     /**
      * Get list of dragged entities (not resources), e.g. Showreels or videowall items.
      */

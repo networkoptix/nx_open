@@ -1171,6 +1171,7 @@ void ConnectActionsHandler::connectToCloudSystem(
 
     // To make sure the cache is valid for the user.
     connectionInfo->credentials.username = qnCloudStatusWatcher->cloudLogin().toStdString();
+    connectionInfo->delayedDrops = connectData.delayedDrops;
 
     if (anyServer && nx::network::SocketGlobals::addressResolver().isCloudHostname(
         connectionInfo->address.address.toString()))

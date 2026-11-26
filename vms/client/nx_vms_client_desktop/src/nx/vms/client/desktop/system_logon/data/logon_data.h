@@ -68,6 +68,9 @@ struct CloudSystemConnectData
     QString systemId;
     std::optional<ConnectScenario> connectScenario;
     bool useCache = true;
+
+    /** Resources to open after connecting. */
+    std::optional<core::DelayedDrops> delayedDrops;
 };
 
 } // namespace nx::vms::client::desktop

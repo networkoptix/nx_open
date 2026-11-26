@@ -2,12 +2,27 @@
 
 #pragma once
 
+#include <chrono>
+#include <optional>
+
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/socket_common.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/api/data/user_data.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 
 namespace nx::vms::client::core {
+
+/**
+ * Resources to open once the connection is established, e.g. passed in the System URI.
+ */
+struct DelayedDrops
+{
+    UuidList resourceIds;
+
+    /** Playback position. Negative value means it is not set, same as in the System URI. */
+    std::chrono::milliseconds timestamp{-1};
+};
 
 /**
  * Parameters to establish client-server connection.
@@ -70,6 +85,11 @@ struct NX_VMS_CLIENT_CORE_API LogonData
      * Token expiration time for the cloud connection.
      */
     std::chrono::milliseconds tokenExpiresAt = {};
+
+    /**
+     * Resources to open after connecting, passed to the compatible client in case of restart.
+     */
+    std::optional<DelayedDrops> delayedDrops;
 };
 
 } // namespace nx::vms::client::core

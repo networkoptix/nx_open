@@ -791,3 +791,31 @@ TEST_F(SystemUriTest, openTwoCameras)
         .arg(kEncodedAuthKey)
     );
 }
+
+//-------------------------------------------------------------------------------------------------
+// Compatible client restart tests.
+// The client passes a Cloud System URI without credentials to the compatible client to open the
+// resources after the restart (see QnConnectionDiagnosticsHelper). The compatible client connects
+// using its stored Cloud authorization data, so the URI must be valid without credentials only.
+
+TEST_F(SystemUriTest, cloudSystemLinkWithoutCredentials)
+{
+    static const QString kResourceId1("ed93120e-0f50-3cdf-39c8-dd52a640688c");
+    static const QString kResourceId2("04762367-751f-2727-25ca-9ae0dc6727de");
+    static const qint64 kTimestamp(1520110800000);
+
+    m_uri.protocol = SystemUri::Protocol::Native;
+    m_uri.cloudHost = kCloudHost;
+    m_uri.clientCommand = SystemUri::ClientCommand::Client;
+    m_uri.systemAddress = kCloudSystemAddress;
+    m_uri.resourceIds = {
+        nx::Uuid::fromStringSafe(kResourceId1), nx::Uuid::fromStringSafe(kResourceId2)};
+    m_uri.timestamp = kTimestamp;
+
+    const SystemUri parsed(m_uri.toString());
+    assertEqual(m_uri, parsed);
+    EXPECT_EQ(SystemUri::Scope::generic, parsed.scope);
+    EXPECT_TRUE(parsed.hasCloudSystemAddress());
+    EXPECT_TRUE(parsed.isValid(/*requireAuthForCloudSystemConnection*/ false)) << parsed;
+    EXPECT_FALSE(parsed.isValid()) << parsed;
+}

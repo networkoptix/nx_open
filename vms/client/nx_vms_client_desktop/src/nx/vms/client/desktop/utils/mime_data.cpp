@@ -60,6 +60,7 @@ struct MimeData::Private
     QHash<QString, QByteArray> data;
     QList<nx::Uuid> entities;
     QnResourceList resources;
+    QList<nx::vms::common::ResourceDescriptor> resourceDescriptors;
     QHash<int, QVariant> arguments;
 
     /** Deserialize from the raw data.*/
@@ -70,6 +71,7 @@ struct MimeData::Private
     {
         entities.clear();
         resources.clear();
+        resourceDescriptors.clear();
         arguments.clear();
 
         QDataStream stream(&data, QIODevice::ReadOnly);
@@ -236,12 +238,14 @@ struct MimeData::Private
         stream << static_cast<quint32>(RESOURCES_BINARY_V51_TAG);
 
         // Resources.
-        stream << static_cast<quint32>(resources.size());
+        stream << static_cast<quint32>(resources.size() + resourceDescriptors.size());
         for (const auto& resource: resources)
         {
             auto d = core::descriptor(resource);
             stream << d.id << d.path << d.name;
         }
+        for (const auto& d: resourceDescriptors)
+            stream << d.id << d.path << d.name;
 
         // Entities.
         stream << static_cast<quint32>(entities.size());
@@ -346,6 +350,13 @@ void MimeData::setResources(const QnResourceList& resources)
     d->updateInternalStorage();
 }
 
+void MimeData::setResourceDescriptors(
+    const QList<nx::vms::common::ResourceDescriptor>& descriptors)
+{
+    d->resourceDescriptors = descriptors;
+    d->updateInternalStorage();
+}
+
 QList<nx::Uuid> MimeData::entities() const
 {
     return d->entities;
@@ -367,7 +378,7 @@ QString MimeData::serialized() const
 
 bool MimeData::isEmpty() const
 {
-    return d->entities.empty() && d->resources.empty();
+    return d->entities.empty() && d->resources.empty() && d->resourceDescriptors.empty();
 }
 
 void MimeData::load(

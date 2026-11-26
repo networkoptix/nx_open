@@ -138,8 +138,10 @@ struct StartupActionsHandler::Private
             && delayedLogonParameters->credentials == nx::network::http::Credentials{})
         {
             CloudSystemConnectData connectData = {
-                .systemId = QString::fromStdString(delayedLogonParameters->address.address.toString()),
-                .connectScenario = ConnectScenario::connectUsingCommand};
+                .systemId =
+                    QString::fromStdString(delayedLogonParameters->address.address.toString()),
+                .connectScenario = ConnectScenario::connectUsingCommand,
+                .delayedDrops = delayedLogonParameters->delayedDrops};
             q->menu()->trigger(
                 menu::ConnectToCloudSystemAction, {Qn::CloudSystemConnectDataRole, connectData});
 
@@ -515,6 +517,13 @@ bool StartupActionsHandler::connectUsingCustomUri(const nx::vms::utils::SystemUr
     logonData.storeSession = false;
     logonData.secondaryInstance = true;
     logonData.connectScenario = ConnectScenario::connectUsingCommand;
+
+    // Keep resources to pass them to the compatible client in case of restart.
+    if (!uri.resourceIds.empty())
+    {
+        logonData.delayedDrops = core::DelayedDrops{
+            .resourceIds = uri.resourceIds, .timestamp = milliseconds(uri.timestamp)};
+    }
 
     if (uri.userAuthType == SystemUri::UserAuthType::cloud
         || (uri.userAuthType != SystemUri::UserAuthType::temporary && uri.hasCloudSystemAddress()))
