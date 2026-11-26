@@ -58,7 +58,7 @@
   <String Id="FilesInUseOkButton">OK</String>
   <String Id="FilesInUseCancelButton">Cancelar</String>
   <String Id="Options">Opções</String>
-  <String Id="SelectApps">Seleccione as aplicações a serem instaladas:</String>
+  <String Id="SelectApps">Selecione as aplicações a serem instaladas:</String>
   <String Id="msierrFirewallCannotConnect">Não é possível conectar ao Firewall do Windows. ([2]   [3]   [4]   [5])</String>
   <String Id="WixSchedFirewallExceptionsInstall">Configurando o Firewall do Windows</String>
   <String Id="WixSchedFirewallExceptionsUninstall">Configurando o Firewall do Windows</String>

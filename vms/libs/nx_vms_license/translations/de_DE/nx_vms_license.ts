@@ -7,7 +7,7 @@
       <source>%n %2 are used out of %1.</source>
       <translation>
         <numerusform>%n %2 von %1 ist in Verwendung.</numerusform>
-        <numerusform>%n %2 von %1 ist in Verwendung.</numerusform>
+        <numerusform>%n %2 von %1 sind in Verwendung.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -15,7 +15,7 @@
       <comment>Numerus: %2 is substituted with the required license type</comment>
       <translation>
         <numerusform>%n %2 von %1 wird verwendet werden.</numerusform>
-        <numerusform>%n %2 von %1 wird verwendet werden.</numerusform>
+        <numerusform>%n %2 von %1 werden verwendet werden.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -30,8 +30,8 @@
       <source>%n more %1 will be used.</source>
       <comment>Numerus: %1 is substituted with the required license type</comment>
       <translation>
-        <numerusform>%n %1 wird verwendet.</numerusform>
-        <numerusform>%n %1 wird verwendet.</numerusform>
+        <numerusform>%n mehr %1 wird verwendet.</numerusform>
+        <numerusform>%n mehr %1 werden verwendet.</numerusform>
       </translation>
     </message>
   </context>
@@ -84,15 +84,15 @@
     </message>
     <message>
       <source>Only one Starter license is allowed per Site.</source>
-      <translation type="unfinished">Only one Starter license is allowed per Site.</translation>
+      <translation>Pro Site ist nur eine Starter-Lizenz erlaubt.</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per Site.</source>
-      <translation type="unfinished">Only one NVR license is allowed per Site.</translation>
+      <translation>Pro Site ist nur eine NVR-Lizenz erlaubt.</translation>
     </message>
     <message>
       <source>Only one license of this type is allowed per Site.</source>
-      <translation type="unfinished">Only one license of this type is allowed per Site.</translation>
+      <translation>Pro Site ist nur eine Lizenz dieses Typs erlaubt.</translation>
     </message>
   </context>
 </TS>

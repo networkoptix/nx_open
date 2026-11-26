@@ -6152,7 +6152,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Preset</source>
-      <translation type="unfinished">Preset</translation>
+      <translation>إعدادات مسبقة</translation>
     </message>
     <message>
       <source>Undefined</source>
@@ -6782,11 +6782,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Last 7 days</source>
-      <translation type="unfinished">Last 7 days</translation>
+      <translation>آخر 7 أيام</translation>
     </message>
     <message>
       <source>Last 30 days</source>
-      <translation type="unfinished">Last 30 days</translation>
+      <translation>آخر 30 يوم</translation>
     </message>
     <message>
       <source>Selected on Timeline</source>
@@ -8311,7 +8311,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ConnectToCloudTool</name>
     <message>
       <source>Internal error. Please try again later.</source>
-      <translation type="unfinished">Internal error. Please try again later.</translation>
+      <translation>حدث خطأ داخلي. يرجى المحاولة مرة أخرى لاحقاً.</translation>
     </message>
     <message>
       <source>None of your Servers has connection to %1.</source>
@@ -9463,7 +9463,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cannot connect to LDAP server</source>
-      <translation type="unfinished">Cannot connect to LDAP server</translation>
+      <translation>لا يوجد اتصال بخادم LDAP</translation>
     </message>
     <message>
       <source>All LDAP users and groups will be deleted.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</source>
