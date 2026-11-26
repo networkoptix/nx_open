@@ -9,6 +9,7 @@
 #include <QtCore/QSet>
 #include <QtQml/QQmlContext>
 #include <QtQml/QQmlEngine>
+#include <QtQml/private/qqmlcontextdata_p.h>
 #include <QtQml/qqml.h>
 
 #include <nx/utils/log/format.h>
@@ -161,25 +162,111 @@ void collectMismatches(
     collectMethodMismatches(mock, type, path, result);
 }
 
+/** Contexts which have `root` as the context object. */
+struct Contexts
+{
+    QQmlContext* outermost = nullptr;
+
+    /** The context of the type of `root`, null when the type is not declared in QML. */
+    QQmlContext* type = nullptr;
+};
+
+/** The child context which has `object` as the context object. */
+QQmlContext* childContextOf(const QQmlContext* context, const QObject* object)
+{
+    for (const auto child: context->childContexts())
+    {
+        if (child->contextObject() == object)
+            return child;
+    }
+
+    return nullptr;
+}
+
+/**
+ * The context of a Component holds the ids declared where its root object is instantiated. It
+ * belongs to the same file as its parent, unlike the context of a type created from its file.
+ */
+bool isComponentContext(QQmlContext* context)
+{
+    const auto data = QQmlContextData::get(context);
+    const auto parent = data->parent();
+    return parent && parent->typeCompilationUnit()
+        && parent->typeCompilationUnit().data() == data->typeCompilationUnit().data();
+}
+
+Contexts contextsOf(QObject* root)
+{
+    const auto context = qmlContext(root);
+    if (!context)
+        return {};
+
+    // An object declared next to others shares their context, and the root object of a Component
+    // has the context of the Component. The context of the type is among the children then.
+    const bool isShared = context->contextObject() != root;
+    if (isShared || isComponentContext(context))
+    {
+        const auto type = childContextOf(context, root);
+        return {.outermost = isShared ? type : context, .type = type};
+    }
+
+    return {.outermost = context, .type = context};
+}
+
+/** The object which has this id in the context itself. */
+QObject* objectWithId(QQmlContext* context, const QString& id)
+{
+    // The lookup alone is not enough: without such an id it returns the value of the property of
+    // the context object with this name.
+    const bool hasId = QQmlContextData::get(context)->propertyIndex(id) >= 0;
+    return hasId ? context->objectForName(id) : nullptr;
+}
+
+/**
+ * Looks in the contexts of the type of `root` and of its base types: they are nested into each
+ * other and all have `root` as the context object.
+ */
+QObject* findTypeId(QQmlContext* typeContext, const QObject* root, const QString& id)
+{
+    for (auto context = typeContext; context; context = childContextOf(context, root))
+    {
+        if (const auto object = objectWithId(context, id))
+            return object;
+    }
+
+    return nullptr;
+}
+
+/** Breadth-first, starting from the context itself. */
+QObject* findIdRecursively(QQmlContext* context, const QString& id)
+{
+    QList<QQmlContext*> contexts{context};
+    for (qsizetype i = 0; i < contexts.size(); ++i)
+    {
+        if (const auto object = objectWithId(contexts[i], id))
+            return object;
+
+        contexts += contexts[i]->childContexts();
+    }
+
+    return nullptr;
+}
+
 } // namespace
 
 QObject* TestUtils::findById(QObject* root, const QString& id) const
 {
-    const auto context = qmlContext(root);
-    if (!context)
+    const auto contexts = contextsOf(root);
+    if (!contexts.outermost)
         return nullptr;
 
-    if (context->contextObject() == root)
-        return context->findObjectRecursively(id);
-
-    // An object declared next to others shares their context, its own one is among the children.
-    for (const auto child: context->childContexts())
+    if (contexts.type)
     {
-        if (child->contextObject() == root)
-            return child->findObjectRecursively(id);
+        if (const auto object = findTypeId(contexts.type, root, id))
+            return object;
     }
 
-    return nullptr;
+    return findIdRecursively(contexts.outermost, id);
 }
 
 QStringList TestUtils::mockMismatches(QObject* mock, const QString& typeName) const

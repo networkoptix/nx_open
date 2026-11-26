@@ -104,7 +104,7 @@ Subpages under `private/SettingsScreen/`: InterfaceSettingsPage, PerformanceSett
 
 ### Non-obvious shared controls
 
-- Sheet (bottom/right) -> `Mobile/Controls/AdaptiveSheet.qml`, `Mobile/Controls/Sheet.qml`
+- Sheet (bottom/right) -> `Mobile/Controls/AdaptiveSheet.qml`
 - Spinner -> `Controls/ActivityPreloader.qml`, `Controls/CircleBusyIndicator.qml`
 - Skeleton loader -> `Items/Skeleton.qml`
 - Popup -> `Mobile/Popups/PopupBase.qml`, `Mobile/Popups/StandardPopup.qml`

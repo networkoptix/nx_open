@@ -11,7 +11,12 @@ class TestUtils: public QObject
     Q_OBJECT
 
 public:
-    /** Finds an object by QML id in the type of `root`, its base types and nested components. */
+    /**
+     * Finds an object by QML id. Looks first in the type of `root` and in its base types, then
+     * in the Component which `root` is the root object of, then in the nested components.
+     * Properties are ignored: a property with the name of the id neither hides the id nor is
+     * found instead of it.
+     */
     Q_INVOKABLE QObject* findById(QObject* root, const QString& id) const;
 
     /**

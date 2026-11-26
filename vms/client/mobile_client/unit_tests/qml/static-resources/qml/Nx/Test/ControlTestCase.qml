@@ -42,6 +42,8 @@ TestCase
     {
         failOnWarning(/.?/)
         windowContext.reset()
+        mainWindow.reset()
+        mainWindow.contentItem = test
         control = createTemporaryObject(component, test)
         signals.reset()
     }

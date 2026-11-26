@@ -23,7 +23,6 @@ Controls.ApplicationWindow
 
     readonly property bool hasNavigationBar: !!windowContext.ui.windowHelpers.navigationBarSize()
 
-    property alias windowParams: windowParams
     property alias uiContainer: uiContainer
     property alias banner: windowBanner
     property alias tutorials: tutorialsLoader.item
@@ -59,45 +58,30 @@ Controls.ApplicationWindow
 
         Rectangle
         {
-            y: windowParams.topMargin - height
+            y: mainWindow.topPadding - height
             width: parent.width
             height: 1
             color: ColorTheme.colors.dark7
-            visible: windowParams.topMargin > 0
+            visible: mainWindow.topPadding > 0
         }
 
         Rectangle
         {
-            y: parent.height - windowParams.bottomMargin
+            y: parent.height - mainWindow.bottomPadding
             width: parent.width
             height: 1
             color: ColorTheme.colors.dark7
-            visible: windowParams.bottomMargin > 0
+            visible: mainWindow.bottomPadding > 0
         }
     }
 
-    // Workaround object for Qt bug. On iOS main window padding (which should be equal to
+    // Workaround for Qt bug. On iOS main window padding (which should be equal to
     // SafeArea.margins) are not updated, but SafeArea works as expected.
-    QtObject
-    {
-        id: windowParams
-
-        readonly property int topMargin: mainWindow.SafeArea.margins.top
-        readonly property int bottomMargin: mainWindow.SafeArea.margins.bottom
-        readonly property int leftMargin: mainWindow.SafeArea.margins.left
-        readonly property int rightMargin: mainWindow.SafeArea.margins.right
-
-        readonly property real availableWidth: width - windowParams.leftMargin - windowParams.rightMargin
-        readonly property real availableHeight: height
-            - windowParams.topMargin
-            - windowParams.bottomMargin
-    }
-
-    // For consistency explicitly set all paddings for the main window to our windowParams values.
-    Binding { target: mainWindow; property: "topPadding"; value: windowParams.topMargin }
-    Binding { target: mainWindow; property: "bottomPadding"; value: windowParams.bottomMargin }
-    Binding { target: mainWindow; property: "leftPadding"; value: windowParams.leftMargin }
-    Binding { target: mainWindow; property: "rightPadding"; value: windowParams.rightMargin }
+    // So explicitly set all paddings for the main window to the SafeArea values, in whole pixels.
+    Binding { target: mainWindow; property: "topPadding"; value: Math.floor(mainWindow.SafeArea.margins.top) }
+    Binding { target: mainWindow; property: "bottomPadding"; value: Math.floor(mainWindow.SafeArea.margins.bottom) }
+    Binding { target: mainWindow; property: "leftPadding"; value: Math.floor(mainWindow.SafeArea.margins.left) }
+    Binding { target: mainWindow; property: "rightPadding"; value: Math.floor(mainWindow.SafeArea.margins.right) }
 
     Rectangle
     {
@@ -118,7 +102,7 @@ Controls.ApplicationWindow
 
         parent: Controls.Overlay.overlay
         y: mainWindow.height
-            - windowParams.bottomMargin
+            - mainWindow.bottomPadding
             - 16
             - (!uiContainer.navigationBar.visible || LayoutController.hasSidePanels
                 ? 0

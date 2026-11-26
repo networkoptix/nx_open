@@ -228,11 +228,16 @@ T.ComboBox
         readonly property int kMaxPopupWidth: 328
         readonly property int kMargin: 20
 
+        // SafeArea attached to the popup itself is not recalculated on device rotation while the
+        // popup is open, the overlay's one is.
+        readonly property int safeLeftMargin: parent.Q.SafeArea.margins.left
+        readonly property int safeRightMargin: parent.Q.SafeArea.margins.right
+        readonly property int safeBottomMargin: parent.Q.SafeArea.margins.bottom
+
         parent: Overlay.overlay
 
         y: parent.height - height - bottomMargin
-        x: (parent.width - width - windowParams.rightMargin - windowParams.leftMargin) / 2
-            + windowParams.leftMargin
+        x: (parent.width - width - safeRightMargin - safeLeftMargin) / 2 + safeLeftMargin
         width: Math.min(kMaxPopupWidth, parent.width - kMargin * 2)
         height:
         {
@@ -242,7 +247,7 @@ T.ComboBox
         }
 
         topMargin: windowContext.ui.measurements.deviceStatusBarHeight + kMargin
-        bottomMargin: kMargin + windowParams.bottomMargin
+        bottomMargin: kMargin + safeBottomMargin
 
         Overlay.modal: Q.Rectangle
         {

@@ -21,6 +21,24 @@
 
 namespace nx::vms::client::mobile::test {
 
+namespace {
+
+/** Makes a mock from the Nx.Test module available in QML as a context property. */
+void addMock(QQmlEngine* engine, const QString& propertyName, const char* typeName)
+{
+    // Loaded from the module, since QML_IMPORT_PATH may override the resources.
+    QQmlComponent component(engine);
+    component.loadFromModule("Nx.Test", typeName);
+    const auto mock = component.create();
+    if (!NX_ASSERT(mock, component.errorString()))
+        return;
+
+    mock->setParent(engine);
+    engine->rootContext()->setContextProperty(propertyName, mock);
+}
+
+} // namespace
+
 void QmlTestSetup::applicationAvailable()
 {
     // Keep the settings in a temporary directory, since the default one persists between runs.
@@ -50,15 +68,8 @@ void QmlTestSetup::qmlEngineAvailable(QQmlEngine* engine)
     engine->addImageProvider("skin", new core::SkinImageProvider());
     engine->rootContext()->setContextProperty("appContext", m_appContext.get());
 
-    // Loaded from the module, since QML_IMPORT_PATH may override the resources.
-    QQmlComponent windowContextMock(engine);
-    windowContextMock.loadFromModule("Nx.Test", "WindowContextMock");
-    const auto windowContext = windowContextMock.create();
-    if (NX_ASSERT(windowContext, windowContextMock.errorString()))
-    {
-        windowContext->setParent(engine);
-        engine->rootContext()->setContextProperty("windowContext", windowContext);
-    }
+    addMock(engine, "windowContext", "WindowContextMock");
+    addMock(engine, "mainWindow", "MainWindowMock");
 }
 
 void QmlTestSetup::cleanupTestCase()

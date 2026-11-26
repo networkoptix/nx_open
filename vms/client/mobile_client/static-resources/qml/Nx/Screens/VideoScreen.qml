@@ -1654,8 +1654,8 @@ Page
             {
                 VideoDummy
                 {
-                    rightPadding: 8 + windowParams.rightMargin
-                    leftPadding: 8 + windowParams.leftMargin
+                    rightPadding: 8 + mainWindow.rightPadding
+                    leftPadding: 8 + mainWindow.leftPadding
                     state: controller.dummyState
 
                     onLogInClicked:

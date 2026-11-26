@@ -27,7 +27,7 @@ FocusScope
             : ""
     }
 
-    implicitWidth: row.width
+    implicitWidth: textInput.implicitWidth
     implicitHeight: row.height
 
     signal accepted()

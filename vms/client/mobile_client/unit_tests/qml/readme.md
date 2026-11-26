@@ -19,6 +19,13 @@ and `ControlTestCase` resets them before every test function. `tst_WindowContext
 when the mock has a member which the `WindowContext` class does not have: another name, another
 type or another number of parameters.
 
+Note: `mainWindow` is a mock too, `MainWindowMock` from `Nx.Test`: main.qml is not loaded in the
+unit tests mode. `ControlTestCase` resets it before every test function and sets its `contentItem`
+to itself. A test of a component which shows banners sets `mainWindow.banner`. Unlike
+`WindowContextMock`, no test compares this mock with main.qml: when a member of the main window is
+renamed or removed, the mock must be changed by hand, otherwise the tests keep passing while the
+component fails in the application.
+
 Note: Settings are shared by all test files and some persist between runs, so a test restores the
 ones it changes in `cleanup()`.
 

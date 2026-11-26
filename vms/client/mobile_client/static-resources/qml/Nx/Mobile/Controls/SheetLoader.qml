@@ -24,6 +24,8 @@ NxObject
         d.sheet.open()
     }
 
+    Component.onDestruction: d.sheet?.destroy()
+
     NxObject
     {
         id: d

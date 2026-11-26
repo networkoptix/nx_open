@@ -16,8 +16,6 @@ BaseOption
 {
     id: control
 
-    property Item openedScreen: null
-
     property Component visualDelegate //< Visual delegate for the selector control.
     property Component screenDelegate //< Visual delegate for the option selector screen.
 
@@ -55,20 +53,6 @@ BaseOption
         value: control.valueToTextFunc
             ? control.valueToTextFunc(control.value)
             : d.defaultValueToText(control.value)
-    }
-
-    function setValue(newValue)
-    {
-        const delegate = openedScreen && openedScreen.delegateItem
-        if (delegate && delegate.hasOwnProperty("setValue"))
-        {
-            if (delegate.value !== newValue)
-                delegate.setValue(newValue)
-        }
-        else if (compareFunc(newValue, value))
-        {
-            value = newValue
-        }
     }
 
     textItem.color: isDefaultValue ? ColorTheme.colors.light10 : ColorTheme.colors.light1

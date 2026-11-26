@@ -136,6 +136,8 @@ T.AbstractButton
 
         SpinnerBusyIndicator
         {
+            id: busyIndicator
+
             visible: control.showBusyIndicator
 
             anchors.centerIn: parent

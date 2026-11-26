@@ -17,6 +17,8 @@ Item
 
     Rectangle
     {
+        id: circle
+
         width: 24
         height: 24
         radius: 12
@@ -33,6 +35,8 @@ Item
 
         Rectangle
         {
+            id: dot
+
             width: 12
             height: 12
             radius: 6

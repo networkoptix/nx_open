@@ -60,6 +60,8 @@ Container
 
             Repeater
             {
+                id: spacerRepeater
+
                 model: control.spacerDelegate ? control.count : 0
 
                 delegate: Component

@@ -1,4 +1,5 @@
 module Nx.Test
 
 ControlTestCase 1.0 ControlTestCase.qml
+MainWindowMock 1.0 MainWindowMock.qml
 WindowContextMock 1.0 WindowContextMock.qml
