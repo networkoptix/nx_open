@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>Site Servers</source>
-      <translation type="unfinished">Site Servers</translation>
+      <translation>Site-Server</translation>
     </message>
   </context>
   <context>
@@ -127,23 +127,23 @@
     </message>
     <message>
       <source>Open Files Folder</source>
-      <translation type="unfinished">Open Files Folder</translation>
+      <translation>Dateien-Ordner öffnen</translation>
     </message>
     <message>
       <source>with</source>
-      <translation type="unfinished">with</translation>
+      <translation>mit</translation>
     </message>
     <message>
       <source>Simultaneous Streams</source>
-      <translation type="unfinished">Simultaneous Streams</translation>
+      <translation>Gleichzeitige Streams</translation>
     </message>
     <message>
       <source>Disable multi-threaded decoding if unchecked, enable auto selection if checked.</source>
-      <translation type="unfinished">Disable multi-threaded decoding if unchecked, enable auto selection if checked.</translation>
+      <translation>Multithread-Decodierung deaktivieren, falls nicht ausgewählt; automatische Auswahl aktivieren, falls ausgewählt.</translation>
     </message>
     <message>
       <source>Allow Multi-Threaded Decoding</source>
-      <translation type="unfinished">Allow Multi-Threaded Decoding</translation>
+      <translation>Multithread-Dekodierung zulassen</translation>
     </message>
   </context>
   <context>
@@ -236,7 +236,7 @@
     </message>
     <message>
       <source>Site actions</source>
-      <translation type="unfinished">Site actions</translation>
+      <translation>Site-Aktionen</translation>
     </message>
   </context>
   <context>
@@ -542,11 +542,11 @@
     </message>
     <message>
       <source>Secondary Stream Profile</source>
-      <translation type="unfinished">Secondary Stream Profile</translation>
+      <translation>Sekundäres Stream-Profil</translation>
     </message>
     <message>
       <source>Primary Stream Profile</source>
-      <translation type="unfinished">Primary Stream Profile</translation>
+      <translation>Primäres Stream-Profil</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -554,38 +554,38 @@
     </message>
     <message>
       <source>Web Page Port</source>
-      <translation type="unfinished">Web Page Port</translation>
+      <translation>Webseiten-Port</translation>
     </message>
     <message>
       <source>Do not send Stop PTZ command</source>
-      <translation type="unfinished">Do not send Stop PTZ command</translation>
+      <translation>PTZ-Stopp-Befehl nicht senden</translation>
     </message>
     <message>
       <source>Do not record audio</source>
-      <translation type="unfinished">Do not record audio</translation>
+      <translation>Audio nicht aufzeichnen</translation>
     </message>
     <message>
       <source>Import from Device</source>
-      <translation type="unfinished">Import from Device</translation>
+      <translation>Vom Gerät importieren</translation>
     </message>
     <message>
       <source>Import video automatically</source>
-      <translation type="unfinished">Import video automatically</translation>
+      <translation>Video automatisch importieren</translation>
     </message>
     <message>
       <source>Use site presets</source>
-      <translation type="unfinished">Use site presets</translation>
+      <translation>Site-Voreinstellungen verwenden</translation>
     </message>
     <message>
       <source>Native camera presets will not be available.</source>
-      <translation type="unfinished">Native camera presets will not be available.</translation>
+      <translation>Native Kameravoreinstellungen werden nicht verfügbar sein.</translation>
     </message>
   </context>
   <context>
     <name>CameraHotspotsSettingsWidget</name>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>Hotspots</translation>
     </message>
     <message>
       <source>Add</source>
@@ -652,7 +652,7 @@
     </message>
     <message>
       <source>Restreaming Link</source>
-      <translation type="unfinished">Restreaming Link</translation>
+      <translation>Restreaming-Link</translation>
     </message>
   </context>
   <context>
@@ -713,7 +713,7 @@
     </message>
     <message>
       <source>New Device</source>
-      <translation type="unfinished">New Device</translation>
+      <translation>Neues Gerät</translation>
     </message>
   </context>
   <context>
@@ -806,7 +806,7 @@
     </message>
     <message>
       <source>This site is connected to</source>
-      <translation type="unfinished">This site is connected to</translation>
+      <translation>Diese Site ist verbunden mit</translation>
     </message>
   </context>
   <context>
@@ -865,11 +865,11 @@
     </message>
     <message>
       <source>Open Folder</source>
-      <translation type="unfinished">Open Folder</translation>
+      <translation>Ordner öffnen</translation>
     </message>
     <message>
       <source>Create a backup of Site management data, or restore Site management data from an existing backup</source>
-      <translation type="unfinished">Create a backup of Site management data, or restore Site management data from an existing backup</translation>
+      <translation>Erstellen Sie eine Sicherungskopie der Site-Verwaltungsdaten oder stellen Sie Site-Verwaltungsdaten aus einer vorhandenen Sicherung wieder her</translation>
     </message>
   </context>
   <context>
@@ -1133,7 +1133,7 @@
     </message>
     <message>
       <source>Server Location ID:</source>
-      <translation type="unfinished">Server Location ID:</translation>
+      <translation>Serverstandort-ID:</translation>
     </message>
     <message>
       <source>Failover Priority...</source>
@@ -1218,18 +1218,18 @@
     </message>
     <message>
       <source>Allow the computer to enter sleep mode on idle</source>
-      <translation type="unfinished">Allow the computer to enter sleep mode on idle</translation>
+      <translation>Erlauben Sie dem Computer, im Leerlauf in den Energiesparmodus zu wechseln</translation>
     </message>
     <message>
       <source>Connect to the previous site on startup</source>
-      <translation type="unfinished">Connect to the previous site on startup</translation>
+      <translation>Beim Start eine Verbindung zur vorherigen Site herstellen</translation>
     </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
       <source>Site Settings</source>
-      <translation type="unfinished">Site Settings</translation>
+      <translation>Site-Einstellungen</translation>
     </message>
   </context>
   <context>
@@ -1405,7 +1405,7 @@
     </message>
     <message>
       <source>User&apos;s local layouts</source>
-      <translation type="unfinished">User&apos;s local layouts</translation>
+      <translation>Benutzer&apos;s lokale Layouts</translation>
     </message>
   </context>
   <context>
@@ -1496,19 +1496,19 @@
     </message>
     <message>
       <source>Logging Level</source>
-      <translation type="unfinished">Logging Level</translation>
+      <translation>Protokollierungsstufe</translation>
     </message>
     <message>
       <source>Split File by Size</source>
-      <translation type="unfinished">Split File by Size</translation>
+      <translation>Datei nach Größe aufteilen</translation>
     </message>
     <message>
       <source>Split File by Time</source>
-      <translation type="unfinished">Split File by Time</translation>
+      <translation>Datei nach Zeit aufteilen</translation>
     </message>
     <message>
       <source>Limit Max Volume</source>
-      <translation type="unfinished">Limit Max Volume</translation>
+      <translation>Maximale Größe begrenzen</translation>
     </message>
   </context>
   <context>
@@ -1535,15 +1535,15 @@
     </message>
     <message>
       <source>Use Credentials</source>
-      <translation type="unfinished">Use Credentials</translation>
+      <translation>Anmeldeinformationen verwenden</translation>
     </message>
     <message>
       <source>Use Link</source>
-      <translation type="unfinished">Use Link</translation>
+      <translation>Link verwenden</translation>
     </message>
     <message>
       <source>Link</source>
-      <translation type="unfinished">Link</translation>
+      <translation>Link</translation>
     </message>
   </context>
   <context>
@@ -1633,11 +1633,11 @@
     </message>
     <message>
       <source>Show timestamp on LIVE</source>
-      <translation type="unfinished">Show timestamp on LIVE</translation>
+      <translation>Zeitstempel bei Livebild anzeigen</translation>
     </message>
     <message>
       <source>Custom Background Image</source>
-      <translation type="unfinished">Custom Background Image</translation>
+      <translation>Benutzerdefiniertes Hintergrundbild</translation>
     </message>
   </context>
   <context>
@@ -1711,11 +1711,11 @@
     </message>
     <message>
       <source>Get Update File</source>
-      <translation type="unfinished">Get Update File</translation>
+      <translation>Update-Datei abrufen</translation>
     </message>
     <message>
       <source>Check Again</source>
-      <translation type="unfinished">Check Again</translation>
+      <translation>Erneut prüfen</translation>
     </message>
     <message>
       <source>Try Again</source>
@@ -1745,7 +1745,7 @@
     </message>
     <message>
       <source>Address or Subnet Mask</source>
-      <translation type="unfinished">Address or Subnet Mask</translation>
+      <translation>Adresse oder Subnetzmaske</translation>
     </message>
     <message>
       <source>Port</source>
@@ -1773,7 +1773,7 @@
     </message>
     <message>
       <source>Find Devices</source>
-      <translation type="unfinished">Find Devices</translation>
+      <translation>Geräte suchen</translation>
     </message>
     <message>
       <source>Enter address, subnet range or subnet mask, login and password
@@ -1832,11 +1832,11 @@ und klicken Sie auf die Schaltfläche &quot;Suchen&quot;</translation>
     </message>
     <message>
       <source>Mail from</source>
-      <translation type="unfinished">Mail from</translation>
+      <translation>Email von</translation>
     </message>
     <message>
       <source>Signature</source>
-      <translation type="unfinished">Signature</translation>
+      <translation>Signatur</translation>
     </message>
   </context>
   <context>
@@ -1851,7 +1851,7 @@ und klicken Sie auf die Schaltfläche &quot;Suchen&quot;</translation>
     </message>
     <message>
       <source>Sign in to web page</source>
-      <translation type="unfinished">Sign in to web page</translation>
+      <translation>Auf der Webseite anmelden</translation>
     </message>
   </context>
   <context>
@@ -1866,7 +1866,7 @@ und klicken Sie auf die Schaltfläche &quot;Suchen&quot;</translation>
     </message>
     <message>
       <source>Site Notifications</source>
-      <translation type="unfinished">Site Notifications</translation>
+      <translation>Site-Benachrichtigungen</translation>
     </message>
   </context>
   <context>
@@ -2002,7 +2002,7 @@ und klicken Sie auf die Schaltfläche &quot;Suchen&quot;</translation>
     </message>
     <message>
       <source>Removing this connection option could lead to Site malfunction.</source>
-      <translation type="unfinished">Removing this connection option could lead to Site malfunction.</translation>
+      <translation>Das Entfernen dieser Verbindungsoption könnte zu Fehlfunktionen der Site führen.</translation>
     </message>
   </context>
   <context>
@@ -2142,7 +2142,7 @@ und klicken Sie auf die Schaltfläche &quot;Suchen&quot;</translation>
     <name>SaasInfoWidget</name>
     <message>
       <source>No services found</source>
-      <translation type="unfinished">No services found</translation>
+      <translation>Keine Dienste gefunden</translation>
     </message>
     <message>
       <source>Contact your Channel Partner to add services</source>
@@ -2296,7 +2296,7 @@ und klicken Sie auf die Schaltfläche &quot;Suchen&quot;</translation>
     </message>
     <message>
       <source>Administrators</source>
-      <translation type="unfinished">Administrators</translation>
+      <translation>Administratoren</translation>
     </message>
     <message>
       <source>Available to</source>
@@ -2304,7 +2304,7 @@ und klicken Sie auf die Schaltfläche &quot;Suchen&quot;</translation>
     </message>
     <message>
       <source>Power Users</source>
-      <translation type="unfinished">Power Users</translation>
+      <translation>Power-User</translation>
     </message>
   </context>
   <context>

@@ -813,6 +813,25 @@
     </message>
   </context>
   <context>
+    <name>OrganizationMenu</name>
+    <message>
+      <source>BETA</source>
+      <translation type="unfinished">BETA</translation>
+    </message>
+    <message>
+      <source>Organization Structure</source>
+      <translation type="unfinished">Organization Structure</translation>
+    </message>
+    <message>
+      <source>Log In</source>
+      <translation type="unfinished">Log In</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
+    </message>
+  </context>
+  <context>
     <name>PanelButtonTutorial</name>
     <message>
       <source>Floating Panel Button</source>

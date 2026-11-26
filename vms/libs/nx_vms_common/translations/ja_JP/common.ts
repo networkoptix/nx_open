@@ -1906,7 +1906,7 @@
     </message>
     <message>
       <source>Encryption of video streams received from devices (e.g. RTSPS, SRTP): &quot;allowInsecureStream&quot; (not required), &quot;preferSecureStream&quot; (used if supported by the device), &quot;requireSecureStream&quot; (always used).</source>
-      <translation type="unfinished">Encryption of video streams received from devices (e.g. RTSPS, SRTP): &quot;allowInsecureStream&quot; (not required), &quot;preferSecureStream&quot; (used if supported by the device), &quot;requireSecureStream&quot; (always used).</translation>
+      <translation>デバイスから受信する映像ストリームの暗号化 (例: RTSPS、SRTP): &quot;allowInsecureStream&quot; (暗号化を求めない)、 &quot;preferSecureStream&quot; (デバイス側で対応している場合に暗号化)、 &quot;requireSecureStream&quot; (常に暗号化)。</translation>
     </message>
     <message>
       <source>Allow Power User editing Security Settings.</source>
