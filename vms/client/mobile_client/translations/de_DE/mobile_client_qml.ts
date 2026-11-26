@@ -12,7 +12,7 @@
     <name>AnalyticSelectors</name>
     <message>
       <source>ADVANCED SEARCH</source>
-      <translation type="unfinished">ADVANCED SEARCH</translation>
+      <translation>ERWEITERTE SUCHE</translation>
     </message>
   </context>
   <context>
@@ -37,35 +37,35 @@
     <name>BetaFeaturesScreen</name>
     <message>
       <source>Beta Features</source>
-      <translation type="unfinished">Beta Features</translation>
+      <translation>Beta-Funktionen</translation>
     </message>
     <message>
       <source>Video Download</source>
-      <translation type="unfinished">Video Download</translation>
+      <translation>Video-Download</translation>
     </message>
     <message>
       <source>Download video to this device</source>
-      <translation type="unfinished">Download video to this device</translation>
+      <translation>Video auf dieses Gerät herunterladen</translation>
     </message>
     <message>
       <source>Optimize Network</source>
-      <translation type="unfinished">Optimize Network</translation>
+      <translation>Netzwerk optimieren</translation>
     </message>
     <message>
       <source>Apply network optimization methods</source>
-      <translation type="unfinished">Apply network optimization methods</translation>
+      <translation>Netzwerkoptimierungsmethoden anwenden</translation>
     </message>
     <message>
       <source>Parallel Decoding</source>
-      <translation type="unfinished">Parallel Decoding</translation>
+      <translation>Parallele Dekodierung</translation>
     </message>
     <message>
       <source>Use multiple decoders to improve performance</source>
-      <translation type="unfinished">Use multiple decoders to improve performance</translation>
+      <translation>Verwenden Sie mehrere Decoder, um die Leistung zu verbessern</translation>
     </message>
     <message>
       <source>Please restart the app to apply changes</source>
-      <translation type="unfinished">Please restart the app to apply changes</translation>
+      <translation>Bitte starten Sie die App neu, um die Änderungen zu übernehmen</translation>
     </message>
   </context>
   <context>
@@ -129,7 +129,7 @@
     <name>ChannelPartner</name>
     <message>
       <source>Channel Partner</source>
-      <translation type="unfinished">Channel Partner</translation>
+      <translation>Vertriebspartner</translation>
     </message>
   </context>
   <context>
@@ -227,7 +227,7 @@
     </message>
     <message>
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
-      <translation type="unfinished">Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</translation>
+      <translation>Durch die Freigabe wird der Dialog für das neue Lesezeichen geöffnet, um nach dem Festlegen der Freigabeoptionen einen Wiedergabelink zu generieren</translation>
     </message>
   </context>
   <context>
@@ -396,7 +396,7 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Versuchen Sie, die Suchparameter zu ändern</translation>
     </message>
     <message>
       <source>No New Notifications</source>
@@ -844,15 +844,15 @@
     </message>
     <message>
       <source>Save Passwords</source>
-      <translation type="unfinished">Save Passwords</translation>
+      <translation>Passwörter speichern</translation>
     </message>
     <message>
       <source>How to handle saved passwords?</source>
-      <translation type="unfinished">How to handle saved passwords?</translation>
+      <translation>Wie werden gespeicherte Passwörter verwaltet?</translation>
     </message>
     <message>
       <source>Server Certificate Check</source>
-      <translation type="unfinished">Server Certificate Check</translation>
+      <translation>Serverzertifikatprüfung</translation>
     </message>
   </context>
   <context>
@@ -875,7 +875,7 @@
     </message>
     <message>
       <source>Host: Port</source>
-      <translation type="unfinished">Host: Port</translation>
+      <translation>Host: Port</translation>
     </message>
   </context>
   <context>
@@ -898,11 +898,11 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Versuchen Sie, die Suchparameter zu ändern</translation>
     </message>
     <message>
       <source>No Organizations</source>
-      <translation type="unfinished">No Organizations</translation>
+      <translation>Keine Organisationen</translation>
     </message>
     <message>
       <source>Log In</source>
@@ -914,39 +914,39 @@
     </message>
     <message>
       <source>No Sites</source>
-      <translation type="unfinished">No Sites</translation>
+      <translation>Keine Sites</translation>
     </message>
     <message>
       <source>How to connect?</source>
-      <translation type="unfinished">How to connect?</translation>
+      <translation>Wie kann ich mich verbinden?</translation>
     </message>
     <message>
       <source>Folder is empty</source>
-      <translation type="unfinished">Folder is empty</translation>
+      <translation>Der Ordner ist leer</translation>
     </message>
     <message>
       <source>Access to Resources Denied</source>
-      <translation type="unfinished">Access to Resources Denied</translation>
+      <translation>Zugriff auf Ressourcen verweigert</translation>
     </message>
     <message>
       <source>Create an organization in the Cloud Portal to access it here</source>
-      <translation type="unfinished">Create an organization in the Cloud Portal to access it here</translation>
+      <translation>Erstellen Sie eine Organisation im Cloud-Portal, um hier darauf zuzugreifen</translation>
     </message>
     <message>
       <source>The resources in this organization are not available to your permission group</source>
-      <translation type="unfinished">The resources in this organization are not available to your permission group</translation>
+      <translation>Die Ressourcen dieser Organisation stehen Ihrer Berechtigungsgruppe nicht zur Verfügung</translation>
     </message>
     <message>
       <source>Connect a site to the organization to access it here</source>
-      <translation type="unfinished">Connect a site to the organization to access it here</translation>
+      <translation>Verbinden Sie hier eine Site mit der Organisation, um darauf zuzugreifen</translation>
     </message>
     <message>
       <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
-      <translation type="unfinished">No accessible sites were found. Log in into the cloud account or connect to a local server</translation>
+      <translation>Es wurden keine erreichbaren Sites gefunden. Melden Sie sich in Ihrem Cloud-Konto an oder stellen Sie eine Verbindung zu einem lokalen Server her</translation>
     </message>
     <message>
       <source>No accessible sites were found. Request access to existing sites or connect to a local server</source>
-      <translation type="unfinished">No accessible sites were found. Request access to existing sites or connect to a local server</translation>
+      <translation>Es wurden keine zugänglichen Sites gefunden. Fordern Sie Zugriff auf bestehende Websites an oder stellen Sie eine Verbindung zu einem lokalen Server her</translation>
     </message>
   </context>
   <context>
@@ -969,7 +969,7 @@
     </message>
     <message>
       <source>Beta Features</source>
-      <translation type="unfinished">Beta Features</translation>
+      <translation>Beta-Funktionen</translation>
     </message>
     <message>
       <source>Interface</source>
@@ -996,7 +996,7 @@
     <name>ShareBookmarkSheet</name>
     <message>
       <source>New Bookmark</source>
-      <translation type="unfinished">New Bookmark</translation>
+      <translation>Neues Lesezeichen</translation>
     </message>
     <message>
       <source>Name</source>
@@ -1008,7 +1008,7 @@
     </message>
     <message>
       <source>Protect with Password (optional)</source>
-      <translation type="unfinished">Protect with Password (optional)</translation>
+      <translation>Mit einem Passwort schützen (optional)</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1016,47 +1016,47 @@
     </message>
     <message>
       <source>Create &amp; Share</source>
-      <translation type="unfinished">Create &amp; Share</translation>
+      <translation>Erstellen &amp; Teilen</translation>
     </message>
     <message>
       <source>Save &amp; Share</source>
-      <translation type="unfinished">Save &amp; Share</translation>
+      <translation>Speichern &amp; Teilen</translation>
     </message>
     <message>
       <source>Expires in an hour</source>
-      <translation type="unfinished">Expires in an hour</translation>
+      <translation>Läuft in einer Stunde ab</translation>
     </message>
     <message>
       <source>Expires in a day</source>
-      <translation type="unfinished">Expires in a day</translation>
+      <translation>Läuft in einem Tag ab</translation>
     </message>
     <message>
       <source>Expires in a month</source>
-      <translation type="unfinished">Expires in a month</translation>
+      <translation>Läuft in einem Monat ab</translation>
     </message>
     <message>
       <source>Never expires</source>
-      <translation type="unfinished">Never expires</translation>
+      <translation>Läuft nie ab</translation>
     </message>
     <message>
       <source>Shared link options</source>
-      <translation type="unfinished">Shared link options</translation>
+      <translation>Optionen für geteilte Links</translation>
     </message>
     <message>
       <source>Sharing</source>
-      <translation type="unfinished">Sharing</translation>
+      <translation>Teilen</translation>
     </message>
     <message>
       <source>Share Link</source>
-      <translation type="unfinished">Share Link</translation>
+      <translation>Link teilen</translation>
     </message>
     <message>
       <source>Select Expiration</source>
-      <translation type="unfinished">Select Expiration</translation>
+      <translation>Ablaufdatum auswählen</translation>
     </message>
     <message>
       <source>Expiration</source>
-      <translation type="unfinished">Expiration</translation>
+      <translation>Ablaufdatum</translation>
     </message>
   </context>
   <context>
@@ -1099,7 +1099,7 @@
     </message>
     <message>
       <source>Host:Port</source>
-      <translation type="unfinished">Host:Port</translation>
+      <translation>Host:Port</translation>
     </message>
   </context>
   <context>
@@ -1110,7 +1110,7 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Versuchen Sie, die Suchparameter zu ändern</translation>
     </message>
     <message>
       <source>Cloud</source>
@@ -1137,30 +1137,30 @@
     </message>
     <message>
       <source>NEW</source>
-      <translation type="unfinished">NEW</translation>
+      <translation>NEU</translation>
     </message>
     <message>
       <source>SUSPENDED</source>
-      <translation type="unfinished">SUSPENDED</translation>
+      <translation>AUSGESETZT</translation>
     </message>
     <message>
       <source>SHUTDOWN</source>
-      <translation type="unfinished">SHUTDOWN</translation>
+      <translation>HERUNTERFAHREN</translation>
     </message>
     <message>
       <source>PENDING</source>
-      <translation type="unfinished">PENDING</translation>
+      <translation>AUSSTEHEND</translation>
     </message>
   </context>
   <context>
     <name>SitePlaceholderScreen</name>
     <message>
       <source>Access to Resources Denied</source>
-      <translation type="unfinished">Access to Resources Denied</translation>
+      <translation>Zugriff auf Ressourcen verweigert</translation>
     </message>
     <message>
       <source>Sites in the Suspended or Shutdown state are not available</source>
-      <translation type="unfinished">Sites in the Suspended or Shutdown state are not available</translation>
+      <translation>Sites im Status „Ausgesetzt“ oder „Heruntergefahren“ sind nicht verfügbar</translation>
     </message>
   </context>
   <context>
@@ -1196,7 +1196,7 @@
     <message>
       <source>Open %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Open %1</translation>
+      <translation>Offen %1</translation>
     </message>
   </context>
   <context>
@@ -1222,7 +1222,7 @@
     <name>TimeSelector</name>
     <message>
       <source>Period</source>
-      <translation type="unfinished">Period</translation>
+      <translation>Zeitraum</translation>
     </message>
   </context>
   <context>
@@ -1376,7 +1376,7 @@
     </message>
     <message>
       <source>Connection lost. Reconnecting...</source>
-      <translation type="unfinished">Connection lost. Reconnecting...</translation>
+      <translation>Verbindung unterbrochen. Verbindung wird wiederhergestellt...</translation>
     </message>
   </context>
 </TS>
