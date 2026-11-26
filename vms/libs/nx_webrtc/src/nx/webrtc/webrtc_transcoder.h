@@ -46,7 +46,7 @@ public:
 
     // Lets go of the encoder of a single track of `deviceId`, leaving the other one, which the
     // Device still streams with. See removeEncoders().
-    void removeEncoder(nx::Uuid deviceId, QnAbstractMediaData::DataType videoOrAudio);
+    void removeEncoder(nx::Uuid deviceId, QnAbstractMediaData::DataType mediaType);
     void setSrtpEncryptionData(const rtsp::EncryptionData& data);
     rtsp::SrtpDecryptor* getDecryptor() const;
     bool isVideoCodecSupported(AVCodecID codecId);
@@ -67,9 +67,9 @@ public:
      * the old encoder without its SRTP context.
      */
     QnUniversalRtpEncoder::Continuity takeContinuity(
-        nx::Uuid deviceId, QnAbstractMediaData::DataType videoOrAudio);
+        nx::Uuid deviceId, QnAbstractMediaData::DataType mediaType);
     void restoreContinuity(nx::Uuid deviceId,
-        QnAbstractMediaData::DataType videoOrAudio,
+        QnAbstractMediaData::DataType mediaType,
         QnUniversalRtpEncoder::Continuity continuity);
     FfmpegMuxer::PacketTimestamp getLastTimestamps() const;
     int64_t getLastTimestampMs() const { return m_lastTimestampMs; } //< Required for reconnection.

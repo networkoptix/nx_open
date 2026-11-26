@@ -590,6 +590,7 @@ TEST_F(WebRtcSession, CommandForUnknownDevice)
         { consumer->changeQuality(unknown, nx::vms::api::StreamIndex::secondary, handler); },
         [&](auto handler) { consumer->pause(unknown, handler); },
         [&](auto handler) { consumer->resume(unknown, handler); },
+        [&](auto handler) { consumer->nextFrame(unknown, handler); },
     };
     for (const auto& command: commands)
     {

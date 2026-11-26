@@ -150,7 +150,7 @@ public:
     bool removeProvider(nx::Uuid deviceId);
 
     /**
-     * Rebuilds the `videoOrAudio` encoder of a streaming Device around the codec its media now
+     * Rebuilds the `mediaType` encoder of a streaming Device around the codec its media now
      * carries -- a live-to-archive seek, a camera reconfiguration -- and leaves everything the
      * client knows about the track untouched: the m-line, its mid and its SSRC stay as they are,
      * and so do the sequence numbers, the timestamps and the SRTP context of the stream, which
@@ -163,7 +163,7 @@ public:
      *     left then is to tell it so, since no offer of ours can add a codec it cannot decode;
      *     failed if the encoder could not be built at all, which leaves a reconnect.
      */
-    CodecSwitchResult switchCodec(nx::Uuid deviceId, QnAbstractMediaData::DataType videoOrAudio);
+    CodecSwitchResult switchCodec(nx::Uuid deviceId, QnAbstractMediaData::DataType mediaType);
 
     /**
      * Whether the client took the payload type every active track of `deviceId` streams under.
@@ -185,7 +185,7 @@ private:
     // are meant to be rebuilt -- it re-opens the transcoder of the Device, which is what a codec
     // change asks for and what an ordinary caller does not.
     bool initializeMuxer(AbstractCameraDataProvider* provider,
-        QnAbstractMediaData::DataType videoOrAudio = QnAbstractMediaData::UNKNOWN);
+        QnAbstractMediaData::DataType mediaType = QnAbstractMediaData::UNKNOWN);
     const QnUniversalRtpEncoder* encoderForTrack(const Track* track) const;
     void addProvider(std::shared_ptr<AbstractCameraDataProvider> provider);
     // Detaches the provider of `deviceId` from the session and stops it, leaving its tracks alone.

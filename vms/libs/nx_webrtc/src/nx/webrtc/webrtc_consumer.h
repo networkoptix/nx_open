@@ -6,12 +6,10 @@
 #include <deque>
 #include <map>
 
-#include <nx/media/annexb_to_mp4.h>
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/http/http_types.h>
 #include <nx/rtp/rtcp.h>
 #include <nx/rtp/rtp.h>
-#include <nx/vms/api/types/motion_types.h>
 
 #include "abstract_camera_data_provider.h"
 
@@ -57,7 +55,7 @@ public:
 
     // API for Streamer.
     void startStream(Streamer* streamer);
-    bool handleSrtp(std::vector<uint8_t> buffer);
+    void handleSrtp(std::vector<uint8_t> buffer);
     void seek(nx::Uuid deviceId, int64_t timestampUs, StatusHandler handler);
     void startProvidersIfNeeded();
     void changeQuality(
@@ -68,8 +66,8 @@ public:
     void resume(nx::Uuid deviceId, StatusHandler handler);
     void nextFrame(nx::Uuid deviceId, StatusHandler handler);
     void onDataSent(bool success);
-    void clearQueueForDevice(nx::Uuid deviceId);
-    int64_t lastReportedTimestampUs() { return m_lastReportedTimestampUs; }
+    // Drops what is queued for a Device that sends no more.
+    void forgetDevice(nx::Uuid deviceId);
     void setSendTimestampInterval(std::chrono::milliseconds interval);
 
     bool canAcceptData() const;
@@ -88,9 +86,14 @@ private:
     // Streaming related.
     void processNextData();
     void sendMetadata(const QnConstCompressedMetadataPtr& metadata);
+    void sendCannotDecryptMedia(const QnConstCompressedMetadataPtr& metadata);
+    // Applies `action` to the provider of `deviceId`, or to every provider for a null one, in the
+    // session thread, and reports `success`, or `nodata` if it fails or there is no provider.
+    void forDevices(nx::Uuid deviceId,
+        StatusHandler handler,
+        std::function<bool(AbstractCameraDataProvider&)> action);
     void handleRtcp(uint8_t* data, int size);
     void stopUnsafe();
-    void sendMediaBuffer();
 
 private:
     // Main.

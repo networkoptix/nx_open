@@ -46,7 +46,7 @@ bool Consumer::canAcceptData() const
     return m_mediaQueue.size() < kMediaQueueSize;
 }
 
-void Consumer::clearQueueForDevice(nx::Uuid deviceId)
+void Consumer::forgetDevice(nx::Uuid deviceId)
 {
     m_mediaQueue.clearDataForDevice(deviceId);
 }
@@ -82,8 +82,6 @@ void Consumer::stopUnsafe()
 
 void Consumer::startProvidersIfNeeded()
 {
-    if (!NX_ASSERT(m_session))
-        return;
     if (!m_streamer)
         return; //< It is not started yet.
     runInMuxingThread(
@@ -100,11 +98,31 @@ void Consumer::startProvidersIfNeeded()
         });
 }
 
+void Consumer::forDevices(nx::Uuid deviceId,
+    StatusHandler handler,
+    std::function<bool(AbstractCameraDataProvider&)> action)
+{
+    runInMuxingThread(
+        [this, deviceId, handler = std::move(handler), action = std::move(action)]()
+        {
+            const auto apply = [&](nx::Uuid id, const AbstractCameraDataProviderPtr& provider)
+            {
+                handler(id,
+                    provider && action(*provider) ? StreamStatus::success : StreamStatus::nodata);
+            };
+
+            if (!deviceId.isNull())
+            {
+                apply(deviceId, m_session->provider(deviceId));
+                return;
+            }
+            for (const auto& provider: m_session->allProviders())
+                apply(provider->resource()->getId(), provider);
+        });
+}
+
 void Consumer::seek(nx::Uuid deviceId, int64_t timestampUs, StatusHandler handler)
 {
-    if (!NX_ASSERT(m_session))
-        return;
-
     runInMuxingThread(
         [this, handler, deviceId, timestampUs]()
         {
@@ -151,103 +169,35 @@ void Consumer::seek(nx::Uuid deviceId, int64_t timestampUs, StatusHandler handle
 }
 
 void Consumer::changeQuality(
-    nx::Uuid deviceId,
-    nx::vms::api::StreamIndex stream,
-    StatusHandler handler)
+    nx::Uuid deviceId, nx::vms::api::StreamIndex stream, StatusHandler handler)
 {
-    if (!NX_ASSERT(m_session))
-        return;
-
-    runInMuxingThread(
-        [this, handler, deviceId, stream]()
-        {
-            auto doChangeQuality = [](nx::Uuid id, auto provider, auto stream, auto handler)
-            {
-                auto status = provider && provider->changeQuality(stream) ? StreamStatus::success
-                                                                          : StreamStatus::nodata;
-                handler(id, status);
-            };
-
-            if (!deviceId.isNull())
-            {
-                doChangeQuality(deviceId, m_session->provider(deviceId), stream, handler);
-            }
-            else
-            {
-                for (const auto& provider: m_session->allProviders())
-                    doChangeQuality(provider->resource()->getId(), provider, stream, handler);
-            }
-        });
+    forDevices(deviceId,
+        std::move(handler),
+        [stream](AbstractCameraDataProvider& provider) { return provider.changeQuality(stream); });
 }
 
 void Consumer::pause(nx::Uuid deviceId, StatusHandler handler)
 {
-    if (!NX_ASSERT(m_session))
-        return;
-
-    runInMuxingThread(
-        [this, handler = std::move(handler), deviceId]()
-        {
-            auto doPause = [](nx::Uuid id, auto provider, auto handler)
-            {
-                auto status =
-                    provider && provider->pause() ? StreamStatus::success : StreamStatus::nodata;
-                handler(id, status);
-            };
-
-            if (!deviceId.isNull())
-            {
-                doPause(deviceId, m_session->provider(deviceId), handler);
-            }
-            else
-            {
-                for (const auto& provider: m_session->allProviders())
-                    doPause(provider->resource()->getId(), provider, handler);
-            }
-        });
+    forDevices(deviceId,
+        std::move(handler),
+        [](AbstractCameraDataProvider& provider) { return provider.pause(); });
 }
 
 void Consumer::resume(nx::Uuid deviceId, StatusHandler handler)
 {
-    runInMuxingThread(
-        [this, handler = std::move(handler), deviceId]()
-        {
-            auto doResume = [](nx::Uuid id, auto provider, auto handler)
-            {
-                auto status =
-                    provider && provider->resume() ? StreamStatus::success : StreamStatus::nodata;
-                handler(id, status);
-            };
-
-            if (!deviceId.isNull())
-            {
-                doResume(deviceId, m_session->provider(deviceId), handler);
-            }
-            else
-            {
-                for (const auto& provider: m_session->allProviders())
-                    doResume(provider->resource()->getId(), provider, handler);
-            }
-        });
+    forDevices(deviceId,
+        std::move(handler),
+        [](AbstractCameraDataProvider& provider) { return provider.resume(); });
 }
 
 void Consumer::nextFrame(nx::Uuid deviceId, StatusHandler handler)
 {
-    if (!NX_ASSERT(m_session))
-        return;
-
-    runInMuxingThread(
-        [this, handler, deviceId]()
-        {
-            auto provider = m_session->provider(deviceId);
-            auto status = provider && provider->nextFrame()
-                ? StreamStatus::success
-                : StreamStatus::nodata;
-            handler(deviceId, status);
-        });
+    forDevices(deviceId,
+        std::move(handler),
+        [](AbstractCameraDataProvider& provider) { return provider.nextFrame(); });
 }
 
-bool Consumer::handleSrtp(std::vector<uint8_t> buffer)
+void Consumer::handleSrtp(std::vector<uint8_t> buffer)
 {
     runInMuxingThread(
         [this, buffer = std::move(buffer)]() mutable
@@ -269,8 +219,6 @@ bool Consumer::handleSrtp(std::vector<uint8_t> buffer)
                 // TODO Handle incoming RTP packet.
             }
         });
-
-    return true;
 }
 
 void Consumer::handleRtcp(uint8_t* data, int size)
@@ -309,10 +257,6 @@ void Consumer::handleRtcp(uint8_t* data, int size)
                 buffer.clear();
             }
         }
-        else
-        {
-            // Some RTCP feedbacks should be demuxed by payloadType.
-        }
         size -= packetLength;
         data += packetLength;
     }
@@ -343,6 +287,27 @@ void Consumer::sendMetadata(const QnConstCompressedMetadataPtr& metadata)
     m_streamer->ice()->writeDataChannelString(ctx.composer.take());
 }
 
+void Consumer::sendCannotDecryptMedia(const QnConstCompressedMetadataPtr& metadata)
+{
+    // Report each packet once, see m_undecryptableTimestampsUs.
+    const auto [reported, isNew] =
+        m_undecryptableTimestampsUs.try_emplace(metadata->deviceId, metadata->timestamp);
+    if (!isNew && reported->second == metadata->timestamp)
+        return;
+
+    reported->second = metadata->timestamp;
+    nx::reflect::json::SerializationContext ctx;
+    ctx.flags = 0; //< Device id without braces, as in the other messages.
+    ctx.composer.startObject();
+    ctx.composer.writeAttributeName("cannotDecryptMedia");
+    nx::reflect::json::serialize(&ctx,
+        CannotDecryptMedia{.deviceId = metadata->deviceId,
+            .timestampMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::microseconds(metadata->timestamp))});
+    ctx.composer.endObject(1);
+    m_streamer->ice()->writeDataChannelString(ctx.composer.take());
+}
+
 void Consumer::processNextData()
 {
     while (!m_needStop)
@@ -358,7 +323,7 @@ void Consumer::processNextData()
         if (metadata && metadata->metadataType == MetadataType::ObjectDetection)
         {
             sendMetadata(metadata);
-            return;
+            continue;
         }
 
         if (metadata && metadata->metadataType == MetadataType::MediaStreamEvent)
@@ -366,23 +331,7 @@ void Consumer::processNextData()
             if (metadata->toMediaEventPacket().code != nx::media::StreamEvent::cannotDecryptMedia)
                 continue;
 
-            // Report each packet once, see m_undecryptableTimestampsUs.
-            const auto [reported, isNew] =
-                m_undecryptableTimestampsUs.try_emplace(metadata->deviceId, metadata->timestamp);
-            if (!isNew && reported->second == metadata->timestamp)
-                continue;
-
-            reported->second = metadata->timestamp;
-            nx::reflect::json::SerializationContext ctx;
-            ctx.flags = 0; //< Device id without braces, as in the other messages.
-            ctx.composer.startObject();
-            ctx.composer.writeAttributeName("cannotDecryptMedia");
-            nx::reflect::json::serialize(&ctx,
-                CannotDecryptMedia{.deviceId = metadata->deviceId,
-                    .timestampMs = std::chrono::duration_cast<std::chrono::milliseconds>(
-                        std::chrono::microseconds(metadata->timestamp))});
-            ctx.composer.endObject(1);
-            m_streamer->ice()->writeDataChannelString(ctx.composer.take());
+            sendCannotDecryptMedia(metadata);
             continue;
         }
 
@@ -437,7 +386,7 @@ void Consumer::processNextData()
                         deviceId);
                     if (auto provider = m_session->provider(deviceId))
                         provider->suspend();
-                    clearQueueForDevice(deviceId);
+                    forgetDevice(deviceId);
                     m_streamer->handleStreamStatus(deviceId, StreamStatus::codecNotSupported);
                     return;
 
@@ -480,11 +429,7 @@ void Consumer::processNextData()
 
 void Consumer::runInMuxingThread(std::function<void()>&& func)
 {
-    m_pollable.dispatch(
-        [func = std::move(func)]()
-        {
-            func();
-        });
+    m_pollable.dispatch(std::move(func));
 }
 
 void Consumer::putData(const QnConstAbstractMediaDataPtr& data)

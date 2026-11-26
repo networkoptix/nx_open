@@ -67,7 +67,8 @@ void Streamer::stop()
 
 bool Streamer::onSrtp(std::vector<uint8_t> buffer)
 {
-    return m_session->consumer()->handleSrtp(std::move(buffer));
+    m_session->consumer()->handleSrtp(std::move(buffer));
+    return true;
 }
 
 static nx::Uuid parseDeviceId(const rapidjson::Value& obj)

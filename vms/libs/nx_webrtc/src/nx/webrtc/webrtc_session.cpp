@@ -320,11 +320,10 @@ void Session::removeDevice(nx::Uuid deviceId, Consumer::StatusHandler handler)
         });
 }
 
-CodecSwitchResult Session::switchCodec(
-    nx::Uuid deviceId, QnAbstractMediaData::DataType videoOrAudio)
+CodecSwitchResult Session::switchCodec(nx::Uuid deviceId, QnAbstractMediaData::DataType mediaType)
 {
-    const bool isVideo = videoOrAudio == QnAbstractMediaData::VIDEO;
-    if (!NX_ASSERT(isVideo || videoOrAudio == QnAbstractMediaData::AUDIO))
+    const bool isVideo = mediaType == QnAbstractMediaData::VIDEO;
+    if (!NX_ASSERT(isVideo || mediaType == QnAbstractMediaData::AUDIO))
         return CodecSwitchResult::failed;
 
     auto provider = this->provider(deviceId);
@@ -337,31 +336,31 @@ CodecSwitchResult Session::switchCodec(
     Track* track = isVideo ? m_tracks->videoTrack(deviceId) : m_tracks->audioTrack(deviceId);
     if (!track || track->offerState != TrackState::active)
     {
-        NX_DEBUG(this, "No %1 track of device %2 is being streamed", videoOrAudio, deviceId);
+        NX_DEBUG(this, "No %1 track of device %2 is being streamed", mediaType, deviceId);
         return CodecSwitchResult::failed;
     }
 
     const auto* oldEncoder = encoderForTrack(track);
     if (!oldEncoder)
     {
-        NX_DEBUG(this, "No %1 encoder of device %2 to replace", videoOrAudio, deviceId);
+        NX_DEBUG(this, "No %1 encoder of device %2 to replace", mediaType, deviceId);
         return CodecSwitchResult::failed;
     }
     const AVCodecID oldCodec = oldEncoder->sourceCodec();
 
-    auto continuity = m_muxer->takeContinuity(deviceId, videoOrAudio);
+    auto continuity = m_muxer->takeContinuity(deviceId, mediaType);
 
     // The old encoder has given up the SRTP context of the stream and must not packetize
     // anything any more -- without one it would send the stream in the clear. Nothing but the
     // encoder built right below may take its place.
     nx::utils::ScopeGuard dropEncoder(
-        [this, deviceId, videoOrAudio]() { m_muxer->removeEncoder(deviceId, videoOrAudio); });
+        [this, deviceId, mediaType]() { m_muxer->removeEncoder(deviceId, mediaType); });
 
     // One track only, so that the other one of the Device keeps the encoder it is streaming
     // with, RTP sequence numbers included.
-    if (!initializeMuxer(provider.get(), videoOrAudio))
+    if (!initializeMuxer(provider.get(), mediaType))
     {
-        NX_DEBUG(this, "No encoder for the new %1 codec of device %2", videoOrAudio, deviceId);
+        NX_DEBUG(this, "No encoder for the new %1 codec of device %2", mediaType, deviceId);
         return CodecSwitchResult::failed;
     }
 
@@ -374,7 +373,7 @@ CodecSwitchResult Session::switchCodec(
         NX_DEBUG(this,
             "No encoder for the new %1 codec of device %2, codec %3 is still what its media "
             "reports",
-            videoOrAudio,
+            mediaType,
             deviceId,
             oldCodec);
         return CodecSwitchResult::failed;
@@ -388,7 +387,7 @@ CodecSwitchResult Session::switchCodec(
         NX_DEBUG(this,
             "Device %1 changed the %2 codec before the client answered its m-line",
             deviceId,
-            videoOrAudio);
+            mediaType);
         return CodecSwitchResult::failed;
     }
 
@@ -407,7 +406,7 @@ CodecSwitchResult Session::switchCodec(
 
     // From here the new encoder owns the stream of the old one: its numbering, its timestamps
     // and its SRTP context. Only the payload type of the packets changes.
-    m_muxer->restoreContinuity(deviceId, videoOrAudio, std::move(continuity));
+    m_muxer->restoreContinuity(deviceId, mediaType, std::move(continuity));
     dropEncoder.disarm();
 
     NX_DEBUG(this,
@@ -480,7 +479,7 @@ bool Session::dropProvider(nx::Uuid deviceId)
     // packetized under the ssrc of an m-line that is not its own by then, and its encoders would
     // outlive it for the rest of the session.
     if (m_consumer)
-        m_consumer->clearQueueForDevice(deviceId);
+        m_consumer->forgetDevice(deviceId);
     if (m_muxer)
         m_muxer->removeEncoders(deviceId);
 
@@ -539,7 +538,7 @@ void Session::setTranscodingParams(const nx::core::transcoding::Settings& transc
 }
 
 bool Session::initializeMuxer(
-    AbstractCameraDataProvider* provider, QnAbstractMediaData::DataType videoOrAudio)
+    AbstractCameraDataProvider* provider, QnAbstractMediaData::DataType mediaType)
 {
     // Ignore aspect ratio if user specifies the full resolution.
     if (m_resolution && m_resolution->size.width() > 0)
@@ -547,8 +546,8 @@ bool Session::initializeMuxer(
 
     // A single track is rebuilt on a codec change, so that the other one keeps the encoder it
     // already streams with, RTP sequence numbers included. See switchCodec().
-    const bool doVideo = videoOrAudio != QnAbstractMediaData::AUDIO;
-    const bool doAudio = videoOrAudio != QnAbstractMediaData::VIDEO;
+    const bool doVideo = mediaType != QnAbstractMediaData::AUDIO;
+    const bool doAudio = mediaType != QnAbstractMediaData::VIDEO;
 
     auto videoCodecParamaters = doVideo ? provider->getVideoCodecParameters() : nullptr;
     if (videoCodecParamaters)

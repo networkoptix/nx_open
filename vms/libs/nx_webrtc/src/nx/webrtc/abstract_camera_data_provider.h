@@ -20,11 +20,6 @@ class NX_WEBRTC_API AbstractCameraDataProvider:
     public QnAbstractMediaDataReceptor
 {
 public:
-
-    // Data handler, will put nullptr on EOF.
-    using OnDataHandler =
-        std::function<void (const QnConstAbstractMediaDataPtr& packet)>;
-
     int64_t getPosition() const { return m_positionUs; }
     void setPosition(int64_t positionUs)
     {
@@ -35,7 +30,6 @@ public:
     void setDataConsumer(std::weak_ptr<Consumer> consumer);
 
 public: // Initialize.
-
     void setAuditHandle(const AuditHandle& handle) { m_auditHandle = handle; }
 
     virtual bool addVideoTranscoder(

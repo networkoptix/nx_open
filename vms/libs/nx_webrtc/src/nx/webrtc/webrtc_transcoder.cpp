@@ -251,20 +251,19 @@ void Transcoder::removeEncoders(nx::Uuid deviceId)
     m_audioEncoders.erase(deviceId);
 }
 
-void Transcoder::removeEncoder(nx::Uuid deviceId, QnAbstractMediaData::DataType videoOrAudio)
+void Transcoder::removeEncoder(nx::Uuid deviceId, QnAbstractMediaData::DataType mediaType)
 {
-    if (videoOrAudio == QnAbstractMediaData::VIDEO)
+    if (mediaType == QnAbstractMediaData::VIDEO)
         m_videoEncoders.erase(deviceId);
-    else if (videoOrAudio == QnAbstractMediaData::AUDIO)
+    else if (mediaType == QnAbstractMediaData::AUDIO)
         m_audioEncoders.erase(deviceId);
 }
 
 QnUniversalRtpEncoder::Continuity Transcoder::takeContinuity(
-    nx::Uuid deviceId, QnAbstractMediaData::DataType videoOrAudio)
+    nx::Uuid deviceId, QnAbstractMediaData::DataType mediaType)
 {
-    auto* encoder = getRtpEncoder(deviceId, videoOrAudio);
-    if (!NX_ASSERT(
-            encoder, "No %1 encoder of device %2 to take over from", videoOrAudio, deviceId))
+    auto* encoder = getRtpEncoder(deviceId, mediaType);
+    if (!NX_ASSERT(encoder, "No %1 encoder of device %2 to take over from", mediaType, deviceId))
     {
         return {};
     }
@@ -273,11 +272,11 @@ QnUniversalRtpEncoder::Continuity Transcoder::takeContinuity(
 }
 
 void Transcoder::restoreContinuity(nx::Uuid deviceId,
-    QnAbstractMediaData::DataType videoOrAudio,
+    QnAbstractMediaData::DataType mediaType,
     QnUniversalRtpEncoder::Continuity continuity)
 {
-    auto* encoder = getRtpEncoder(deviceId, videoOrAudio);
-    if (!NX_ASSERT(encoder, "No %1 encoder of device %2 to continue with", videoOrAudio, deviceId))
+    auto* encoder = getRtpEncoder(deviceId, mediaType);
+    if (!NX_ASSERT(encoder, "No %1 encoder of device %2 to continue with", mediaType, deviceId))
         return;
 
     encoder->restoreContinuity(std::move(continuity));
