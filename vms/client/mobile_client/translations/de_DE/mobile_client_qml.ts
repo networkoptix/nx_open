@@ -459,7 +459,7 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Versuchen Sie, die Suchparameter zu ändern</translation>
     </message>
     <message>
       <source>No New Notifications</source>
@@ -502,7 +502,7 @@
     </message>
     <message>
       <source>Period</source>
-      <translation type="unfinished">Period</translation>
+      <translation>Zeitraum</translation>
     </message>
   </context>
   <context>
@@ -1189,7 +1189,7 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Versuchen Sie, die Suchparameter zu ändern</translation>
     </message>
     <message>
       <source>No Organizations</source>

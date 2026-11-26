@@ -5,19 +5,19 @@
     <name>AccessRightHelper</name>
     <message>
       <source>View Live</source>
-      <translation type="unfinished">View Live</translation>
+      <translation>Live-Ansicht</translation>
     </message>
     <message>
       <source>Play Audio</source>
-      <translation type="unfinished">Play Audio</translation>
+      <translation>Audio abspielen</translation>
     </message>
     <message>
       <source>View Archive</source>
-      <translation type="unfinished">View Archive</translation>
+      <translation>Archiv ansehen</translation>
     </message>
     <message>
       <source>Export Archive</source>
-      <translation type="unfinished">Export Archive</translation>
+      <translation>Archiv exportieren</translation>
     </message>
     <message>
       <source>View Bookmarks</source>
@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>Edit Settings</source>
-      <translation type="unfinished">Edit Settings</translation>
+      <translation>Einstellungen bearbeiten</translation>
     </message>
   </context>
   <context>
@@ -60,14 +60,14 @@
     <message>
       <source>Site Event</source>
       <comment>Shows that the bookmark was created by a site event</comment>
-      <translation type="unfinished">Site Event</translation>
+      <translation>Site-Ereignis</translation>
     </message>
   </context>
   <context>
     <name>CustomerSupport</name>
     <message>
       <source>your Regional / License support</source>
-      <translation type="unfinished">your Regional / License support</translation>
+      <translation>Regional- / Lizenzsupport</translation>
     </message>
   </context>
   <context>
@@ -155,11 +155,11 @@
     <name>PredefinedUserGroups</name>
     <message>
       <source>Administrators</source>
-      <translation type="unfinished">Administrators</translation>
+      <translation>Administratoren</translation>
     </message>
     <message>
       <source>Power Users</source>
-      <translation type="unfinished">Power Users</translation>
+      <translation>Power-User</translation>
     </message>
     <message>
       <source>Advanced Viewers</source>
@@ -1243,7 +1243,7 @@
     <message>
       <source>Days</source>
       <comment>Numerus: Capitalized long suffix for displaying days</comment>
-      <translation type="unfinished">Days</translation>
+      <translation>Tage</translation>
     </message>
     <message>
       <source>Wks</source>
@@ -1374,7 +1374,7 @@
     </message>
     <message>
       <source>Days</source>
-      <translation type="unfinished">Days</translation>
+      <translation>Tage</translation>
     </message>
     <message>
       <source>Weeks</source>
@@ -2024,11 +2024,11 @@
     </message>
     <message>
       <source>HTTP header: Access-Control-Allow-Origin.</source>
-      <translation type="unfinished">HTTP header: Access-Control-Allow-Origin.</translation>
+      <translation>HTTP header: Access-Control-Allow-Origin.</translation>
     </message>
     <message>
       <source>HTTP header: Access-Control-Allow-Credentials.</source>
-      <translation type="unfinished">HTTP header: Access-Control-Allow-Credentials.</translation>
+      <translation>HTTP header: Access-Control-Allow-Credentials.</translation>
     </message>
     <message>
       <source>JSON RPC subscription update interval (milliseconds, 0 = disabled).</source>
