@@ -5,7 +5,7 @@
     <name>AddLookupListEntryDialog</name>
     <message>
       <source>Add Entry</source>
-      <translation type="unfinished">Add Entry</translation>
+      <translation>إضافة مدخل</translation>
     </message>
     <message>
       <source>Add</source>
@@ -16,7 +16,7 @@
     <name>AdvancedSettingsDialog</name>
     <message>
       <source>LDAP - Advanced Settings</source>
-      <translation type="unfinished">LDAP - Advanced Settings</translation>
+      <translation>LDAP - الإعدادات المتقدمة</translation>
     </message>
     <message>
       <source>Users</source>
@@ -24,31 +24,31 @@
     </message>
     <message>
       <source>Login Attribute</source>
-      <translation type="unfinished">Login Attribute</translation>
+      <translation>سمة تسجيل الدخول</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>المجموعات</translation>
     </message>
     <message>
       <source>Membership</source>
-      <translation type="unfinished">Membership</translation>
+      <translation>العضوية</translation>
     </message>
     <message>
       <source>Search Timeout</source>
-      <translation type="unfinished">Search Timeout</translation>
+      <translation>مهلة البحث</translation>
     </message>
     <message>
       <source>To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</source>
-      <translation type="unfinished">To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</translation>
+      <translation>لتفعيل المصادقة الموجزة لمستخدمي LDAP الذين تم إضافتهم بالفعل إلى قاعدة بيانات VMS، تحتاج إلى تمكينه مباشرة في هؤلاء المستخدمين&apos; الإعدادات.</translation>
     </message>
     <message>
       <source>To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</source>
-      <translation type="unfinished">To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</translation>
+      <translation>لتعطيل المصادقة الموجزة لمستخدمي LDAP الذين تم إضافتهم بالفعل إلى قاعدة بيانات VMS، تحتاج إلى تعطيله مباشرة في هؤلاء المستخدمين&apos; الإعدادات.</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication for imported users</source>
-      <translation type="unfinished">Allow insecure (digest) authentication for imported users</translation>
+      <translation>السماح بالمصادقة (ملخص) غير آمنة للمستخدمين المستوردين</translation>
     </message>
     <message>
       <source>General</source>
@@ -56,38 +56,38 @@
     </message>
     <message>
       <source>Synchronize Users</source>
-      <translation type="unfinished">Synchronize Users</translation>
+      <translation>مزامنة المستخدمين</translation>
     </message>
     <message>
       <source>Sync Interval</source>
-      <translation type="unfinished">Sync Interval</translation>
+      <translation>فاصل التزامن</translation>
     </message>
     <message>
       <source>Group Members Attribute</source>
-      <translation type="unfinished">Group Members Attribute</translation>
+      <translation>سمة أعضاء المجموعة</translation>
     </message>
     <message>
       <source>Proxy LDAP requests via server</source>
-      <translation type="unfinished">Proxy LDAP requests via server</translation>
+      <translation>توجيه طلبات LDAP عبر الخادم</translation>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>لغة الإشعارات</translation>
     </message>
     <message>
       <source>User ID Attribute</source>
-      <translation type="unfinished">User ID Attribute</translation>
+      <translation>سمة معرف المستخدم</translation>
     </message>
     <message>
       <source>Group ID Attribute</source>
-      <translation type="unfinished">Group ID Attribute</translation>
+      <translation>سمة معرف المجموعة</translation>
     </message>
   </context>
   <context>
     <name>AdvancedUpdateSettings</name>
     <message>
       <source>Advanced Update Settings</source>
-      <translation type="unfinished">Advanced Update Settings</translation>
+      <translation>إعدادات التحديث المتقدمة</translation>
     </message>
     <message>
       <source>Notifications</source>
@@ -95,23 +95,23 @@
     </message>
     <message>
       <source>Notify about available updates</source>
-      <translation type="unfinished">Notify about available updates</translation>
+      <translation>إشعار حول التحديثات المتاحة</translation>
     </message>
     <message>
       <source>Automatic client updates</source>
-      <translation type="unfinished">Automatic client updates</translation>
+      <translation>تحديثات تلقائية للعميل</translation>
     </message>
     <message>
       <source>Turn this option on to make connected clients update automatically to the latest compatible version.</source>
-      <translation type="unfinished">Turn this option on to make connected clients update automatically to the latest compatible version.</translation>
+      <translation>قم بتفعيل هذا الخيار لجعل العملاء المتصلين يقومون بالتحديث تلقائيًا إلى أحدث إصدار متوافق.</translation>
     </message>
     <message>
       <source>Connecting clients will be automatically updated to the new version when it’s available.</source>
-      <translation type="unfinished">Connecting clients will be automatically updated to the new version when it’s available.</translation>
+      <translation>سيتم تحديث العملاء المتصلين تلقائيًا إلى الإصدار الجديد عند توفره.</translation>
     </message>
     <message>
       <source>All connecting clients are updating to version %1.</source>
-      <translation type="unfinished">All connecting clients are updating to version %1.</translation>
+      <translation>يتم تحديث جميع العملاء المتصلين إلى الإصدار %1.</translation>
     </message>
     <message>
       <source>Connecting clients will be updated to version %1 on %2.</source>
@@ -2882,11 +2882,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Last 7 days</source>
-      <translation type="unfinished">Last 7 days</translation>
+      <translation>آخر 7 أيام</translation>
     </message>
     <message>
       <source>Last 30 days</source>
-      <translation type="unfinished">Last 30 days</translation>
+      <translation>آخر 30 يوم</translation>
     </message>
     <message>
       <source>Selected on Timeline</source>

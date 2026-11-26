@@ -1679,7 +1679,7 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     </message>
     <message>
       <source>New List...</source>
-      <translation type="unfinished">New List...</translation>
+      <translation>Neue Liste...</translation>
     </message>
     <message>
       <source>Could not save file</source>
@@ -2868,7 +2868,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Globale Berechtigungen</translation>
     </message>
     <message>
       <source>Add User</source>
@@ -2923,7 +2923,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Berechtigungsgruppen</translation>
     </message>
     <message>
       <source>Access</source>
@@ -2970,7 +2970,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Globale Berechtigungen</translation>
     </message>
     <message>
       <source>This user has not yet signed up for %1</source>
@@ -3033,7 +3033,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Berechtigungsgruppen</translation>
     </message>
     <message>
       <source>Access expires</source>

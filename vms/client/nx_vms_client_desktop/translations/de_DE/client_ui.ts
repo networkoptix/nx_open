@@ -2234,7 +2234,7 @@ und klicken Sie auf die Schaltfläche &quot;Suchen&quot;</translation>
     </message>
     <message>
       <source>Administrators</source>
-      <translation type="unfinished">Administrators</translation>
+      <translation>Administratoren</translation>
     </message>
     <message>
       <source>Available to</source>
@@ -2242,7 +2242,7 @@ und klicken Sie auf die Schaltfläche &quot;Suchen&quot;</translation>
     </message>
     <message>
       <source>Power Users</source>
-      <translation type="unfinished">Power Users</translation>
+      <translation>Power-User</translation>
     </message>
   </context>
   <context>
