@@ -62,3 +62,33 @@ function(nx_add_server_plugin target)
         INTERFACE NX_PLUGIN_API=${API_IMPORT_MACRO}
     )
 endfunction()
+
+# Creates `${plugin}_test_library`: an interface library that passes the object files of the Server
+# plugin target `plugin`, together with its include directories, link libraries, compile
+# definitions and compile options, to the unit tests linked to it. The tests link the plugin code
+# statically without compiling it a second time.
+function(nx_add_server_plugin_test_library plugin)
+    set(target ${plugin}_test_library)
+
+    add_library(${target} INTERFACE)
+    set_target_properties(${target} PROPERTIES FOLDER server/plugins)
+
+    target_sources(${target}
+        INTERFACE $<TARGET_OBJECTS:${plugin}>
+    )
+    target_include_directories(${target}
+        INTERFACE $<TARGET_PROPERTY:${plugin},INCLUDE_DIRECTORIES>
+    )
+    target_link_libraries(${target}
+        INTERFACE $<TARGET_PROPERTY:${plugin},LINK_LIBRARIES>
+    )
+    # Filtering out the export macro, which is not needed when linking statically.
+    target_compile_definitions(${target}
+        INTERFACE
+            NX_PLUGIN_API=
+            $<FILTER:$<TARGET_PROPERTY:${plugin},COMPILE_DEFINITIONS>,EXCLUDE,^NX_PLUGIN_API=>
+    )
+    target_compile_options(${target}
+        INTERFACE $<TARGET_PROPERTY:${plugin},COMPILE_OPTIONS>
+    )
+endfunction()
