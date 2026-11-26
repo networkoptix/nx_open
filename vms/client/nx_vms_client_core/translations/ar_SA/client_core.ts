@@ -193,66 +193,66 @@
     <name>nx::vms::client::core::AnalyticsSearchListModel</name>
     <message>
       <source>Unknown track</source>
-      <translation type="unfinished">Unknown track</translation>
+      <translation>مسار غير معروف</translation>
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>تم حذف الكاميرا</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::core::BookmarkSearchListModel</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>تم حذف الكاميرا</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
     <message>
       <source>Server certificate is invalid.</source>
-      <translation type="unfinished">Server certificate is invalid.</translation>
+      <translation>شهادة الخادم غير صالحة.</translation>
     </message>
     <message>
       <source>Connecting to %1 for the first time?</source>
-      <translation type="unfinished">Connecting to %1 for the first time?</translation>
+      <translation>هل تتصل بـ %1 لأول مرة؟</translation>
     </message>
     <message>
       <source>help article</source>
-      <translation type="unfinished">help article</translation>
+      <translation>مقالة مساعدة</translation>
     </message>
     <message>
       <source>Read this %1 to learn more about certificate validation.</source>
       <comment>%1 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">Read this %1 to learn more about certificate validation.</translation>
+      <translation>اقرأ هذا %1 لمعرفة المزيد حول التحقق من صحة الشهادة.</translation>
     </message>
     <message numerus="yes">
       <source>Cannot verify the identity of %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Cannot verify the identity of %n servers</numerusform>
-        <numerusform>Cannot verify the identity of %n servers</numerusform>
-        <numerusform>Cannot verify the identity of %n servers</numerusform>
-        <numerusform>Cannot verify the identity of %n servers</numerusform>
-        <numerusform>Cannot verify the identity of %n servers</numerusform>
-        <numerusform>Cannot verify the identity of %n servers</numerusform>
+      <translation>
+        <numerusform>لا يمكن التحقق من هوية الخوادم %n</numerusform>
+        <numerusform>لا يمكن التحقق من هوية الخوادم %n</numerusform>
+        <numerusform>لا يمكن التحقق من هوية الخوادم %n</numerusform>
+        <numerusform>لا يمكن التحقق من هوية الخوادم %n</numerusform>
+        <numerusform>لا يمكن التحقق من هوية الخوادم %n</numerusform>
+        <numerusform>لا يمكن التحقق من هوية الخوادم %n</numerusform>
       </translation>
     </message>
     <message>
       <source>To learn more about the current problem read this %1.</source>
       <comment>%1 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
+      <translation>لمعرفة المزيد عن المشكلة الحالية، اقرأ هذا %1.</translation>
     </message>
     <message>
       <source>Cannot verify the identity of %1</source>
-      <translation type="unfinished">Cannot verify the identity of %1</translation>
+      <translation>لا يمكن التحقق من هوية %1</translation>
     </message>
     <message>
       <source>Review the certificate to ensure you trust the server you are connecting to.</source>
-      <translation type="unfinished">Review the certificate to ensure you trust the server you are connecting to.</translation>
+      <translation>راجع الشهادة للتأكد من أنك تثق بالخادم الذي تتصل به.</translation>
     </message>
     <message>
       <source>Review the certificates of the servers to ensure you trust the site you are connecting to.</source>
-      <translation type="unfinished">Review the certificates of the servers to ensure you trust the site you are connecting to.</translation>
+      <translation>راجع شهادات الخوادم للتأكد من أنك تثق بالموقع الذي تتصل به.</translation>
     </message>
     <message>
       <source>This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</source>
@@ -321,7 +321,7 @@
     <name>nx::vms::client::core::EventSearchUtils</name>
     <message>
       <source>Last day</source>
-      <translation type="unfinished">Last day</translation>
+      <translation>آخر يوم</translation>
     </message>
     <message>
       <source>Last 7 days</source>
@@ -364,11 +364,11 @@
     </message>
     <message>
       <source>Open Door</source>
-      <translation type="unfinished">Open Door</translation>
+      <translation>فتح الباب</translation>
     </message>
     <message>
       <source>Stop Object Tracking</source>
-      <translation type="unfinished">Stop Object Tracking</translation>
+      <translation>إيقاف تتبع الكائن</translation>
     </message>
   </context>
   <context>
@@ -382,7 +382,7 @@
     <name>nx::vms::client::core::OrganizationsFilterModel</name>
     <message>
       <source>Other results</source>
-      <translation type="unfinished">Other results</translation>
+      <translation>نتائج أخرى</translation>
     </message>
   </context>
   <context>
@@ -416,7 +416,7 @@
     </message>
     <message>
       <source>Recording motion and objects</source>
-      <translation type="unfinished">Recording motion and objects</translation>
+      <translation>تسجيل الحركة والأجسام</translation>
     </message>
     <message>
       <source>Recording motion only</source>
@@ -424,11 +424,11 @@
     </message>
     <message>
       <source>Recording objects only</source>
-      <translation type="unfinished">Recording objects only</translation>
+      <translation>تسجيل الأجسام فقط</translation>
     </message>
     <message>
       <source>Recording motion, objects and low quality</source>
-      <translation type="unfinished">Recording motion, objects and low quality</translation>
+      <translation>تسجيل الحركة والأجسام بالجودة المنخفضة</translation>
     </message>
     <message>
       <source>Recording motion and low quality</source>
@@ -436,7 +436,7 @@
     </message>
     <message>
       <source>Recording objects and low quality</source>
-      <translation type="unfinished">Recording objects and low quality</translation>
+      <translation>تسجيل الأجسام بجودة منخفضة</translation>
     </message>
     <message>
       <source>Continuous</source>
@@ -444,7 +444,7 @@
     </message>
     <message>
       <source>Motion, Objects</source>
-      <translation type="unfinished">Motion, Objects</translation>
+      <translation>الحركة، الأجسام</translation>
     </message>
     <message>
       <source>Motion only</source>
@@ -452,11 +452,11 @@
     </message>
     <message>
       <source>Objects only</source>
-      <translation type="unfinished">Objects only</translation>
+      <translation>الأجسام/الكائنات فقط</translation>
     </message>
     <message>
       <source>Motion, Objects + Lo-Res</source>
-      <translation type="unfinished">Motion, Objects + Lo-Res</translation>
+      <translation>الحركة، الأجسام + دقة منخفضة</translation>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
@@ -464,14 +464,14 @@
     </message>
     <message>
       <source>Objects + Lo-Res</source>
-      <translation type="unfinished">Objects + Lo-Res</translation>
+      <translation>كائنات + دقة منخفضة</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::core::SingleSystemDescription</name>
     <message>
       <source>Unnamed Site</source>
-      <translation type="unfinished">Unnamed Site</translation>
+      <translation>موقع غير مسمى</translation>
     </message>
   </context>
   <context>

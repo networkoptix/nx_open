@@ -13,7 +13,7 @@
     <message>
       <source>On %1 --&gt; %2</source>
       <comment>%1 is the event name, %2 is the action name</comment>
-      <translation type="unfinished">On %1 --&gt; %2</translation>
+      <translation>Auf %1 --&gt; %2</translation>
     </message>
   </context>
   <context>
@@ -45,7 +45,7 @@
     </message>
     <message>
       <source>Unknown action</source>
-      <translation type="unfinished">Unknown action</translation>
+      <translation>Unbekannte Aktion</translation>
     </message>
     <message>
       <source>Any event</source>
@@ -85,7 +85,7 @@
     </message>
     <message>
       <source>Invalid field type is provided</source>
-      <translation type="unfinished">Invalid field type is provided</translation>
+      <translation>Ungültiger Feldtyp ist angegeben</translation>
     </message>
     <message>
       <source>Unexpected validation policy</source>
@@ -113,7 +113,7 @@
     </message>
     <message>
       <source>Not all servers are suitable</source>
-      <translation type="unfinished">Not all servers are suitable</translation>
+      <translation>Nicht alle Server sind geeignet</translation>
     </message>
     <message>
       <source>There are no suitable servers</source>
@@ -129,11 +129,11 @@
     </message>
     <message>
       <source>Occurs At</source>
-      <translation type="unfinished">Occurs At</translation>
+      <translation>Ereignet sich um</translation>
     </message>
     <message>
       <source>Begin When</source>
-      <translation type="unfinished">Begin When</translation>
+      <translation>Beginnt wenn</translation>
     </message>
     <message>
       <source>Duration</source>
@@ -161,44 +161,44 @@
     </message>
     <message>
       <source>Rewind</source>
-      <translation type="unfinished">Rewind</translation>
+      <translation>Zurückspulen</translation>
     </message>
     <message>
       <source>On Layout</source>
-      <translation type="unfinished">On Layout</translation>
+      <translation>Auf dem Layout</translation>
     </message>
     <message>
       <source>Event Devices</source>
-      <translation type="unfinished">Event Devices</translation>
+      <translation>Ereignis-Geräte</translation>
     </message>
     <message>
       <source>Of Type</source>
-      <translation type="unfinished">Of Type</translation>
+      <translation>Vom Typ</translation>
     </message>
     <message>
       <source>And Caption</source>
-      <translation type="unfinished">And Caption</translation>
+      <translation>Und Caption</translation>
     </message>
     <message>
       <source>And Description</source>
-      <translation type="unfinished">And Description</translation>
+      <translation>Und Beschreibung</translation>
     </message>
     <message>
       <source>Field %1 value must be provided for the given validation policy</source>
       <comment>API error message when event rule cannot be created due to incomplete fields set</comment>
-      <translation type="unfinished">Field %1 value must be provided for the given validation policy</translation>
+      <translation>Für die angegebene Validierungsrichtlinie muss ein Wert für das Feld %1 angegeben werden</translation>
     </message>
     <message>
       <source>Chosen local layout can only be shown to its owner %1</source>
-      <translation type="unfinished">Chosen local layout can only be shown to its owner %1</translation>
+      <translation>Das ausgewählte lokale Layout kann nur seinem Besitzer angezeigt werden %1</translation>
     </message>
     <message>
       <source>None of selected users have access to the selected layout</source>
-      <translation type="unfinished">None of selected users have access to the selected layout</translation>
+      <translation>Keiner der ausgewählten Benutzer hat Zugriff auf das ausgewählte Layout</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout</source>
-      <translation type="unfinished">Some users do not have access to the selected layout</translation>
+      <translation>Einige Benutzer haben keinen Zugriff auf das ausgewählte Layout</translation>
     </message>
     <message>
       <source>For</source>
@@ -206,23 +206,23 @@
     </message>
     <message>
       <source>Time value cannot be less than zero</source>
-      <translation type="unfinished">Time value cannot be less than zero</translation>
+      <translation>Der Zeitwert darf nicht kleiner als Null sein</translation>
     </message>
     <message>
       <source>Duration cannot be less than zero</source>
-      <translation type="unfinished">Duration cannot be less than zero</translation>
+      <translation>Die Dauer darf nicht kleiner als Null sein</translation>
     </message>
     <message>
       <source>Value cannot be less than %1</source>
-      <translation type="unfinished">Value cannot be less than %1</translation>
+      <translation>Der Wert darf nicht kleiner als %1 sein</translation>
     </message>
     <message>
       <source>Value cannot be more than %1</source>
-      <translation type="unfinished">Value cannot be more than %1</translation>
+      <translation>Der Wert darf nicht größer als %1 sein</translation>
     </message>
     <message>
       <source>To Users</source>
-      <translation type="unfinished">To Users</translation>
+      <translation>An Benutzer</translation>
     </message>
     <message>
       <source>Soft Trigger</source>
@@ -230,23 +230,23 @@
     </message>
     <message>
       <source>Field &quot;%1&quot; should be an object</source>
-      <translation type="unfinished">Field &quot;%1&quot; should be an object</translation>
+      <translation>Das Feld &quot;%1&quot; sollte ein Objekt sein</translation>
     </message>
     <message>
       <source>Unable to deserialize properties for field: %1</source>
-      <translation type="unfinished">Unable to deserialize properties for field: %1</translation>
+      <translation>Eigenschaften für Feld %1 konnten nicht deserialisiert werden</translation>
     </message>
     <message>
       <source>Event: %1 is not registered</source>
-      <translation type="unfinished">Event: %1 is not registered</translation>
+      <translation>Ereignis: %1 ist nicht registriert</translation>
     </message>
     <message>
       <source>Action: %1 is not registered</source>
-      <translation type="unfinished">Action: %1 is not registered</translation>
+      <translation>Aktion: %1 ist nicht registriert</translation>
     </message>
     <message>
       <source>Rule validation failed: %1</source>
-      <translation type="unfinished">Rule validation failed: %1</translation>
+      <translation>Regelvalidierung fehlgeschlagen: %1</translation>
     </message>
     <message>
       <source>Caption</source>
@@ -266,28 +266,28 @@
     </message>
     <message>
       <source>Select Integration Action</source>
-      <translation type="unfinished">Select Integration Action</translation>
+      <translation>Integrationsaktion auswählen</translation>
     </message>
     <message>
       <source>Integration not found for Integration Action %1</source>
-      <translation type="unfinished">Integration not found for Integration Action %1</translation>
+      <translation>Integration für Integrationsaktion %1 nicht gefunden</translation>
     </message>
     <message>
       <source>Unsupported JSON value type in key %1</source>
-      <translation type="unfinished">Unsupported JSON value type in key %1</translation>
+      <translation>Nicht unterstützter JSON-Werttyp im Schlüssel %1</translation>
     </message>
     <message>
       <source>Total number of events</source>
-      <translation type="unfinished">Total number of events</translation>
+      <translation>Gesamtzahl der Ereignisse</translation>
     </message>
     <message>
       <source>Removed subject</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">Removed subject</translation>
+      <translation>Betreff entfernt</translation>
     </message>
     <message>
       <source>Removed device</source>
-      <translation type="unfinished">Removed device</translation>
+      <translation>Gerät entfernt</translation>
     </message>
     <message>
       <source>Removed camera</source>
@@ -295,34 +295,34 @@
     </message>
     <message>
       <source>Removed server</source>
-      <translation type="unfinished">Removed server</translation>
+      <translation>Server entfernt</translation>
     </message>
     <message>
       <source>Removed layout</source>
-      <translation type="unfinished">Removed layout</translation>
+      <translation>Layout entfernt</translation>
     </message>
     <message numerus="yes">
       <source>Selected devices were removed</source>
       <comment>Numerus form depend on devices count</comment>
-      <translation type="unfinished">
-        <numerusform>Selected devices were removed</numerusform>
-        <numerusform>Selected devices were removed</numerusform>
+      <translation>
+        <numerusform>Ausgewähltes Gerät wurde entfernt</numerusform>
+        <numerusform>Ausgewähltes Gerät wurde entfernt</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected cameras were removed</source>
       <comment>Numerus form depend on cameras count</comment>
-      <translation type="unfinished">
-        <numerusform>Selected cameras were removed</numerusform>
-        <numerusform>Selected cameras were removed</numerusform>
+      <translation>
+        <numerusform>Ausgewählte Kamera wurde entfernt</numerusform>
+        <numerusform>Ausgewählte Kamera wurde entfernt</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected servers were removed</source>
       <comment>Numerus form depend on servers count</comment>
-      <translation type="unfinished">
-        <numerusform>Selected servers were removed</numerusform>
-        <numerusform>Selected servers were removed</numerusform>
+      <translation>
+        <numerusform>Ausgewählter Server wurde entfernt</numerusform>
+        <numerusform>Ausgewählter Server wurde entfernt</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -345,7 +345,7 @@
     <name>nx::vms::rules::ActionTextFieldValidator</name>
     <message>
       <source>Empty text is not allowed</source>
-      <translation type="unfinished">Empty text is not allowed</translation>
+      <translation>Leerer Text ist nicht zulässig</translation>
     </message>
     <message>
       <source>Invalid email address %1</source>
@@ -372,14 +372,14 @@
     </message>
     <message>
       <source>And attributes</source>
-      <translation type="unfinished">And attributes</translation>
+      <translation>Und Attribute</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::AnalyticsEventTypeFieldValidator</name>
     <message>
       <source>Analytics event type is not selected</source>
-      <translation type="unfinished">Analytics event type is not selected</translation>
+      <translation>Der Analyse-Ereignistyp ist nicht ausgewählt</translation>
     </message>
   </context>
   <context>
@@ -394,7 +394,7 @@
     </message>
     <message>
       <source>And Object</source>
-      <translation type="unfinished">And Object</translation>
+      <translation>Und Objekt</translation>
     </message>
     <message>
       <source>%1 at %2</source>
@@ -406,18 +406,18 @@
     <name>nx::vms::rules::AnalyticsObjectTypeFieldValidator</name>
     <message>
       <source>Analytics object type is not selected</source>
-      <translation type="unfinished">Analytics object type is not selected</translation>
+      <translation>Der Analyse-Objekttyp ist nicht ausgewählt</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::BookmarkAction</name>
     <message>
       <source>Create Bookmark</source>
-      <translation type="unfinished">Create Bookmark</translation>
+      <translation>Lesezeichen erstellen</translation>
     </message>
     <message>
       <source>Add Tags</source>
-      <translation type="unfinished">Add Tags</translation>
+      <translation>Tags hinzufügen</translation>
     </message>
   </context>
   <context>
@@ -428,7 +428,7 @@
     </message>
     <message>
       <source>Action Throttling</source>
-      <translation type="unfinished">Action Throttling</translation>
+      <translation>Aktionsdrosselung</translation>
     </message>
   </context>
   <context>
@@ -443,11 +443,11 @@
     </message>
     <message>
       <source>Input Signal on Device</source>
-      <translation type="unfinished">Input Signal on Device</translation>
+      <translation>Eingangssignal am Gerät</translation>
     </message>
     <message>
       <source>With ID</source>
-      <translation type="unfinished">With ID</translation>
+      <translation>Mit ID</translation>
     </message>
     <message>
       <source>Input Signal on Camera</source>
@@ -474,7 +474,7 @@
     </message>
     <message>
       <source>Device disconnected</source>
-      <translation type="unfinished">Device disconnected</translation>
+      <translation>Gerät getrennt</translation>
     </message>
     <message>
       <source>Camera disconnected</source>
@@ -649,7 +649,7 @@
     </message>
     <message>
       <source>Custom headers</source>
-      <translation type="unfinished">Custom headers</translation>
+      <translation>Benutzerdefinierte Header</translation>
     </message>
   </context>
   <context>
@@ -693,11 +693,11 @@
     <name>nx::vms::rules::IntegrationAction</name>
     <message>
       <source>Integration Action</source>
-      <translation type="unfinished">Integration Action</translation>
+      <translation>Integrationsaktion</translation>
     </message>
     <message>
       <source>Integration Action Parameters</source>
-      <translation type="unfinished">Integration Action Parameters</translation>
+      <translation>Integrationsaktions-Parameter</translation>
     </message>
   </context>
   <context>
@@ -944,30 +944,30 @@
     </message>
     <message>
       <source>Current power consumption: %1 watts</source>
-      <translation type="unfinished">Current power consumption: %1 watts</translation>
+      <translation>Aktuelle Leistungsaufnahme: %1 Watt</translation>
     </message>
     <message>
       <source>Upper consumption limit: %1 watts</source>
-      <translation type="unfinished">Upper consumption limit: %1 watts</translation>
+      <translation>Obere Leistungsgrenze: %1 Watt</translation>
     </message>
     <message>
       <source>Lower consumption limit: %1 watts</source>
-      <translation type="unfinished">Lower consumption limit: %1 watts</translation>
+      <translation>Untere Leistungsgrenze: %1 Watt</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::PtzPresetAction</name>
     <message>
       <source>Execute PTZ Preset</source>
-      <translation type="unfinished">Execute PTZ Preset</translation>
+      <translation>PTZ-Preset ausführen</translation>
     </message>
     <message>
       <source>PTZ Preset</source>
-      <translation type="unfinished">PTZ Preset</translation>
+      <translation>PTZ-Preset</translation>
     </message>
     <message>
       <source>Execute to users</source>
-      <translation type="unfinished">Execute to users</translation>
+      <translation>Für Benutzer ausführen</translation>
     </message>
   </context>
   <context>
@@ -982,7 +982,7 @@
     </message>
     <message>
       <source>Send Mobile Notification</source>
-      <translation type="unfinished">Send Mobile Notification</translation>
+      <translation>Mobile Benachrichtigung senden</translation>
     </message>
   </context>
   <context>
@@ -993,66 +993,66 @@
     </message>
     <message>
       <source>Repeat Sound</source>
-      <translation type="unfinished">Repeat Sound</translation>
+      <translation>Ton wiederholen</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::Rule</name>
     <message>
       <source>`%1` event filter field alerts:</source>
-      <translation type="unfinished">`%1` event filter field alerts:</translation>
+      <translation>`%1` Ereignis-Filterfeld-Warnungen:</translation>
     </message>
     <message>
       <source>`%1` action builder field alerts:</source>
-      <translation type="unfinished">`%1` action builder field alerts:</translation>
+      <translation>`%1` Aktions-Filterfeld-Warnungen:</translation>
     </message>
     <message>
       <source>Rule is not completed. One filter and one builder are required</source>
-      <translation type="unfinished">Rule is not completed. One filter and one builder are required</translation>
+      <translation>Die Regel ist unvollständig. Es werden ein Filter und ein Builder benötigt</translation>
     </message>
     <message>
       <source>The given filter is not compatible with the given builder</source>
-      <translation type="unfinished">The given filter is not compatible with the given builder</translation>
+      <translation>Der angegebene Filter ist nicht mit dem angegebenen Builder kompatibel</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::SaasIssueEvent</name>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Die Aufzeichnung auf %n Kanälen wurde aufgrund von Überlastung des Dienstes gestoppt.</numerusform>
+        <numerusform>Die Aufzeichnung auf %n Kanälen wurde aufgrund von Überlastung des Dienstes gestoppt.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Die Cloud-Speichersicherung auf %n Kanal wurde aufgrund von Überlastung des Dienstes gestoppt.</numerusform>
+        <numerusform>Die Cloud-Speichersicherung auf %n Kanal wurde aufgrund von Überlastung des Dienstes gestoppt.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Die Nutzung des kostenpflichtigen Integrationsdienstes auf %n Kanälen wurde aufgrund von Überbeanspruchung eingestellt.</numerusform>
+        <numerusform>Die Nutzung des kostenpflichtigen Integrationsdienstes auf %n Kanälen wurde aufgrund von Überbeanspruchung eingestellt.</numerusform>
       </translation>
     </message>
     <message>
       <source>Services Issue</source>
-      <translation type="unfinished">Services Issue</translation>
+      <translation>Serviceproblem</translation>
     </message>
     <message>
       <source>Failed to migrate licenses.</source>
-      <translation type="unfinished">Failed to migrate licenses.</translation>
+      <translation>Lizenzmigration fehlgeschlagen.</translation>
     </message>
     <message>
       <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
-      <translation type="unfinished">Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</translation>
+      <translation>Der Import der Lizenzen wurde übersprungen. Ein weiterer Migrationsversuch wird automatisch zu einem späteren Zeitpunkt geplant.</translation>
     </message>
     <message>
       <source>Services Issue on %1</source>
-      <translation type="unfinished">Services Issue on %1</translation>
+      <translation>Serviceproblem auf %1</translation>
     </message>
   </context>
   <context>
@@ -1079,7 +1079,7 @@
     <message>
       <source>%1 certificate error</source>
       <comment>Server name will be substituted</comment>
-      <translation type="unfinished">%1 certificate error</translation>
+      <translation>%1 Zertifikatsfehler</translation>
     </message>
   </context>
   <context>
@@ -1091,19 +1091,19 @@
     <message>
       <source>%1 Conflict</source>
       <comment>Server name will be substituted</comment>
-      <translation type="unfinished">%1 Conflict</translation>
+      <translation>%1 Konflikt</translation>
     </message>
     <message>
       <source>Discovered a server with the same ID in the same local network</source>
-      <translation type="unfinished">Discovered a server with the same ID in the same local network</translation>
+      <translation>Einen Server mit der gleichen ID im gleichen lokalen Netzwerk entdeckt</translation>
     </message>
     <message>
       <source>Servers in the same local network have conflict on the following devices</source>
-      <translation type="unfinished">Servers in the same local network have conflict on the following devices</translation>
+      <translation>Server im selben lokalen Netzwerk weisen Konflikte auf folgenden Geräten auf</translation>
     </message>
     <message>
       <source>Server: %1</source>
-      <translation type="unfinished">Server: %1</translation>
+      <translation>Server: %1</translation>
     </message>
   </context>
   <context>
@@ -1122,11 +1122,11 @@
     </message>
     <message>
       <source>%1 Failure</source>
-      <translation type="unfinished">%1 Failure</translation>
+      <translation>%1 Fehler</translation>
     </message>
     <message>
       <source>The local database was found to be corrupted and could not be recovered. A new empty database has been initialized. A backup copy of the corrupted database has been saved for reference.</source>
-      <translation type="unfinished">The local database was found to be corrupted and could not be recovered. A new empty database has been initialized. A backup copy of the corrupted database has been saved for reference.</translation>
+      <translation>Die lokale Datenbank war beschädigt und konnte nicht wiederhergestellt werden. Eine neue, leere Datenbank wurde initialisiert. Eine Sicherungskopie der beschädigten Datenbank wurde zu Referenzzwecken gespeichert.</translation>
     </message>
   </context>
   <context>
@@ -1137,7 +1137,7 @@
     </message>
     <message>
       <source>%1 Started</source>
-      <translation type="unfinished">%1 Started</translation>
+      <translation>%1 Gestartet</translation>
     </message>
   </context>
   <context>
@@ -1152,14 +1152,14 @@
     </message>
     <message>
       <source>Force Alarm Layout Opening</source>
-      <translation type="unfinished">Force Alarm Layout Opening</translation>
+      <translation>Alarm-Layout öffnen erzwingen</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::SiteHttpAction</name>
     <message>
       <source>Endpoint</source>
-      <translation type="unfinished">Endpoint</translation>
+      <translation>Endpunkt</translation>
     </message>
     <message>
       <source>Content</source>
@@ -1167,7 +1167,7 @@
     </message>
     <message>
       <source>Internal HTTPS Request</source>
-      <translation type="unfinished">Internal HTTPS Request</translation>
+      <translation>Interne HTTPS-Anfrage</translation>
     </message>
   </context>
   <context>
@@ -1190,14 +1190,14 @@
     </message>
     <message>
       <source>User: %1</source>
-      <translation type="unfinished">User: %1</translation>
+      <translation>Benutzer: %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::SoundFieldValidator</name>
     <message>
       <source>Sound is not selected</source>
-      <translation type="unfinished">Sound is not selected</translation>
+      <translation>Ton ist nicht ausgewählt</translation>
     </message>
   </context>
   <context>
@@ -1212,14 +1212,14 @@
     </message>
     <message>
       <source>At Device</source>
-      <translation type="unfinished">At Device</translation>
+      <translation>Am Gerät</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::StateFieldValidator</name>
     <message>
       <source>`%1` state is not valid for the `%2` event and `%3` action with the given parameters</source>
-      <translation type="unfinished">`%1` state is not valid for the `%2` event and `%3` action with the given parameters</translation>
+      <translation>Der Zustand `%1` ist für das Ereignis `%2` und die Aktion `%3` mit den angegebenen Parametern ungültig</translation>
     </message>
   </context>
   <context>
@@ -1258,37 +1258,37 @@
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+      <translation>Analytics-Speicher &quot;%1&quot; Datenbankfehler: Unzureichende Berechtigungen für den Mountpunkt.</translation>
     </message>
     <message>
       <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+      <translation>Die AES-Verschlüsselung kann nicht initialisiert werden, während die Aufzeichnung im Medienarchiv aktiviert ist. Die Daten werden unverschlüsselt geschrieben.</translation>
     </message>
     <message>
       <source>RAID error: %1.</source>
-      <translation type="unfinished">RAID error: %1.</translation>
+      <translation>RAID-Fehler: %1.</translation>
     </message>
     <message>
       <source>Not enough HDD/SSD/Network speed for recording to %1.</source>
-      <translation type="unfinished">Not enough HDD/SSD/Network speed for recording to %1.</translation>
+      <translation>Nicht genügend HDD/SSD/Netzwerkgeschwindigkeit für die Aufnahme nach %1.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TargetDeviceFieldValidator</name>
     <message>
       <source>Failed to get event descriptor</source>
-      <translation type="unfinished">Failed to get event descriptor</translation>
+      <translation>Ereignisbeschreibung konnte nicht abgerufen werden</translation>
     </message>
     <message>
       <source>Event does not have source camera</source>
-      <translation type="unfinished">Event does not have source camera</translation>
+      <translation>Das Ereignis verfügt über keine Quellkamera</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TargetLayoutFieldValidator</name>
     <message>
       <source>Select at least one layout</source>
-      <translation type="unfinished">Select at least one layout</translation>
+      <translation>Wählen Sie mindestens ein Layout aus.</translation>
     </message>
   </context>
   <context>

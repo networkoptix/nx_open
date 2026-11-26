@@ -574,7 +574,7 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     <name>ConnectionSettingsDialog</name>
     <message>
       <source>LDAP - Connection Settings</source>
-      <translation type="unfinished">LDAP - Connection Settings</translation>
+      <translation>LDAP – Verbindungseinstellungen</translation>
     </message>
     <message>
       <source>Host</source>
@@ -582,7 +582,7 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     </message>
     <message>
       <source>Login DN</source>
-      <translation type="unfinished">Login DN</translation>
+      <translation>Login DN</translation>
     </message>
     <message>
       <source>Password</source>
@@ -590,7 +590,7 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     </message>
     <message>
       <source>Ignore LDAP server certificate errors</source>
-      <translation type="unfinished">Ignore LDAP server certificate errors</translation>
+      <translation>LDAP-Serverzertifikatfehler ignorieren</translation>
     </message>
     <message>
       <source>Test</source>
@@ -602,15 +602,15 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     </message>
     <message>
       <source>Use StartTLS</source>
-      <translation type="unfinished">Use StartTLS</translation>
+      <translation>Verwenden Sie StartTLS</translation>
     </message>
     <message>
       <source>Host cannot be empty</source>
-      <translation type="unfinished">Host cannot be empty</translation>
+      <translation>Der Host darf nicht leer sein</translation>
     </message>
     <message>
       <source>Login DN cannot be empty</source>
-      <translation type="unfinished">Login DN cannot be empty</translation>
+      <translation>Der Login-DN darf nicht leer sein</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
@@ -618,7 +618,7 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     </message>
     <message>
       <source>To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</source>
-      <translation type="unfinished">To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</translation>
+      <translation>Um LDAP-Benutzern die Anmeldung bei %1 zu ermöglichen, ist es notwendig, eine Verbindung zwischen %1 und einem unternehmensweiten LDAP-Server herzustellen.</translation>
     </message>
   </context>
   <context>
@@ -658,7 +658,7 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     <name>CustomHttpHeadersDialog</name>
     <message>
       <source>Custom HTTP headers</source>
-      <translation type="unfinished">Custom HTTP headers</translation>
+      <translation>Benutzerdefinierte HTTP-Header</translation>
     </message>
     <message>
       <source>Add</source>
@@ -715,11 +715,11 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     <name>EditLookupListDialog</name>
     <message>
       <source>List Settings</source>
-      <translation type="unfinished">List Settings</translation>
+      <translation>Listeneinstellungen</translation>
     </message>
     <message>
       <source>New List</source>
-      <translation type="unfinished">New List</translation>
+      <translation>Neue Liste</translation>
     </message>
     <message>
       <source>Name</source>
@@ -727,7 +727,7 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     </message>
     <message>
       <source>Column Name</source>
-      <translation type="unfinished">Column Name</translation>
+      <translation>Spaltenname</translation>
     </message>
     <message>
       <source>OK</source>
@@ -755,25 +755,25 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     </message>
     <message>
       <source>Select type</source>
-      <translation type="unfinished">Select type</translation>
+      <translation>Typ auswählen</translation>
     </message>
     <message>
       <source>Removing attributes will delete all associated data</source>
-      <translation type="unfinished">Removing attributes will delete all associated data</translation>
+      <translation>Durch das Entfernen von Attributen werden alle zugehörigen Daten gelöscht</translation>
     </message>
     <message>
       <source>Deleting the list will erase all the data inside it.</source>
-      <translation type="unfinished">Deleting the list will erase all the data inside it.</translation>
+      <translation>Durch das Löschen der Liste werden alle darin enthaltenen Daten gelöscht.</translation>
     </message>
     <message>
       <source>Delete List?</source>
-      <translation type="unfinished">Delete List?</translation>
+      <translation>Liste löschen?</translation>
     </message>
     <message numerus="yes">
       <source>This list is associated with %n Event Rules. Are you sure you want to delete it?</source>
-      <translation type="unfinished">
-        <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
-        <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
+      <translation>
+        <numerusform>Diese Liste ist mit %n Ereignisregeln verknüpft. Möchten Sie sie wirklich löschen?</numerusform>
+        <numerusform>Diese Liste ist mit %n Ereignisregeln verknüpft. Möchten Sie sie wirklich löschen?</numerusform>
       </translation>
     </message>
     <message>
@@ -785,7 +785,7 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     <name>EventTestDialog</name>
     <message>
       <source>Event Test</source>
-      <translation type="unfinished">Event Test</translation>
+      <translation>Ereignistest</translation>
     </message>
     <message>
       <source>Test</source>
@@ -814,15 +814,15 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     <name>ExportEntriesProgressDialog</name>
     <message>
       <source>Export Lists</source>
-      <translation type="unfinished">Export Lists</translation>
+      <translation>Listen exportieren</translation>
     </message>
     <message>
       <source>Exporting</source>
-      <translation type="unfinished">Exporting</translation>
+      <translation>Exportieren</translation>
     </message>
     <message>
       <source>Open File Folder...</source>
-      <translation type="unfinished">Open File Folder...</translation>
+      <translation>Dateiordner öffnen...</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -878,11 +878,11 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     </message>
     <message>
       <source>Base DN</source>
-      <translation type="unfinished">Base DN</translation>
+      <translation>BASIS-DN</translation>
     </message>
     <message>
       <source>Base DN cannot be empty</source>
-      <translation type="unfinished">Base DN cannot be empty</translation>
+      <translation>Basis-DN darf nicht leer sein</translation>
     </message>
     <message>
       <source>Filter</source>
@@ -890,15 +890,15 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     </message>
     <message>
       <source>The Base DN sets the starting point for LDAP searches and synchronization.</source>
-      <translation type="unfinished">The Base DN sets the starting point for LDAP searches and synchronization.</translation>
+      <translation>Der Basis-DN legt den Ausgangspunkt für LDAP-Suchen und die Synchronisierung fest.</translation>
     </message>
     <message>
       <source>Edit Search Base</source>
-      <translation type="unfinished">Edit Search Base</translation>
+      <translation>Suchbasis bearbeiten</translation>
     </message>
     <message>
       <source>Filters help control access to the site and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
-      <translation type="unfinished">Filters help control access to the site and synchronization by specifying which users and/or groups from the Base DN are allowed.</translation>
+      <translation>Filter helfen dabei, den Zugriff auf die Website und die Synchronisierung zu steuern, indem sie festlegen, welche Benutzer und/oder Gruppen aus dem Basis-DN zugelassen werden.</translation>
     </message>
   </context>
   <context>
@@ -995,7 +995,7 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     <name>FixLookupListImportPage</name>
     <message>
       <source>Some values could not be automatically matched. Please map them manually.</source>
-      <translation type="unfinished">Some values could not be automatically matched. Please map them manually.</translation>
+      <translation>Einige Werte konnten nicht automatisch zugeordnet werden. Bitte ordnen Sie diese manuell zu.</translation>
     </message>
     <message>
       <source>Back</source>
@@ -1017,11 +1017,11 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     <name>GlobalPermissionsTab</name>
     <message>
       <source>At the site level, group members have permissions to:</source>
-      <translation type="unfinished">At the site level, group members have permissions to:</translation>
+      <translation>Auf Site-Ebene haben Gruppenmitglieder folgende Berechtigungen:</translation>
     </message>
     <message>
       <source>At the site level, the user has permissions to:</source>
-      <translation type="unfinished">At the site level, the user has permissions to:</translation>
+      <translation>Auf Site-Ebene hat der Benutzer folgende Berechtigungen:</translation>
     </message>
   </context>
   <context>
@@ -1044,11 +1044,11 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Globale Berechtigungen</translation>
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Mitglieder</translation>
     </message>
     <message>
       <source>Add Group</source>
@@ -1071,14 +1071,14 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Berechtigungsgruppen</translation>
     </message>
   </context>
   <context>
     <name>GroupEditDialog</name>
     <message>
       <source>Group - %1</source>
-      <translation type="unfinished">Group - %1</translation>
+      <translation>Gruppe - %1</translation>
     </message>
     <message>
       <source>General</source>
@@ -1094,11 +1094,11 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Globale Berechtigungen</translation>
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Mitglieder</translation>
     </message>
   </context>
   <context>
@@ -1121,7 +1121,7 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Mitglieder</translation>
     </message>
     <message>
       <source>Users</source>
@@ -1129,23 +1129,23 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Berechtigungsgruppen</translation>
     </message>
     <message>
       <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
-      <translation type="unfinished">The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</translation>
+      <translation>Die Gruppe hat eine andere Gruppe sowohl als übergeordnete Gruppe als auch als untergeordnetes Mitglied oder ist Teil einer solchen Zirkelreferenzkette. Lösen Sie diese Kette auf, um eine fehlerhafte Berechnung der Berechtigungen zu verhindern.</translation>
     </message>
     <message>
       <source>When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
-      <translation type="unfinished">When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</translation>
+      <translation>Wenn die kontinuierliche Synchronisierung mit dem LDAP-Server deaktiviert ist, werden Gruppen nicht automatisch synchronisiert. Um diese Gruppe zu aktualisieren, starten Sie eine manuelle Synchronisierung.</translation>
     </message>
     <message>
       <source>This group is not found in the LDAP database.</source>
-      <translation type="unfinished">This group is not found in the LDAP database.</translation>
+      <translation>Diese Gruppe wurde in der LDAP-Datenbank nicht gefunden.</translation>
     </message>
     <message>
       <source>Another group with the same name exists. It is recommended to assign unique names to the groups.</source>
-      <translation type="unfinished">Another group with the same name exists. It is recommended to assign unique names to the groups.</translation>
+      <translation>Es existiert bereits eine andere Gruppe mit demselben Namen. Es wird empfohlen, den Gruppen eindeutige Namen zu geben.</translation>
     </message>
   </context>
   <context>
@@ -1160,19 +1160,19 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     </message>
     <message>
       <source>No members</source>
-      <translation type="unfinished">No members</translation>
+      <translation>Keine Mitglieder</translation>
     </message>
     <message>
       <source>Use controls on the left to add members</source>
-      <translation type="unfinished">Use controls on the left to add members</translation>
+      <translation>Verwenden Sie die Steuerelemente auf der linken Seite, um Mitglieder hinzuzufügen</translation>
     </message>
     <message>
       <source>Members summary</source>
-      <translation type="unfinished">Members summary</translation>
+      <translation>Mitgliederübersicht</translation>
     </message>
     <message>
       <source>Inherits membership in current group</source>
-      <translation type="unfinished">Inherits membership in current group</translation>
+      <translation>Übernimmt die Mitgliedschaft in der aktuellen Gruppe</translation>
     </message>
   </context>
   <context>
@@ -1193,12 +1193,12 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     <message>
       <source>BUILT-IN</source>
       <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
-      <translation type="unfinished">BUILT-IN</translation>
+      <translation>BUILT-IN</translation>
     </message>
     <message>
       <source>CUSTOM</source>
       <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
-      <translation type="unfinished">CUSTOM</translation>
+      <translation>Benutzerdefiniert</translation>
     </message>
   </context>
   <context>
@@ -1249,7 +1249,7 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     <name>IntegrationHeader</name>
     <message>
       <source>Insufficient services</source>
-      <translation type="unfinished">Insufficient services</translation>
+      <translation>Unzureichende Dienste</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable integration services are required to turn on the integration</source>
@@ -1671,7 +1671,7 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     </message>
     <message>
       <source>New List...</source>
-      <translation type="unfinished">New List...</translation>
+      <translation>Neue Liste...</translation>
     </message>
     <message>
       <source>Could not save file</source>
@@ -2860,7 +2860,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Globale Berechtigungen</translation>
     </message>
     <message>
       <source>Add User</source>
@@ -2915,7 +2915,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Berechtigungsgruppen</translation>
     </message>
     <message>
       <source>Access</source>
@@ -2962,7 +2962,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Globale Berechtigungen</translation>
     </message>
     <message>
       <source>This user has not yet signed up for %1</source>
@@ -3025,7 +3025,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Berechtigungsgruppen</translation>
     </message>
     <message>
       <source>Access expires</source>
