@@ -5,6 +5,13 @@ include_guard(GLOBAL)
 include(utils)
 include(${PROJECT_SOURCE_DIR}/cmake/windows_signing.cmake)
 
+# See nx_wix_light(). CMake ignores CMAKE_JOB_POOLS once the property is set, so it is kept here.
+get_property(job_pools_set GLOBAL PROPERTY JOB_POOLS SET)
+if(NOT job_pools_set)
+    set_property(GLOBAL PROPERTY JOB_POOLS ${CMAKE_JOB_POOLS})
+endif()
+set_property(GLOBAL APPEND PROPERTY JOB_POOLS nx_wix_payload_signing=1)
+
 find_program(heat_executable heat HINTS ${CONAN_WIX_ROOT}/bin NO_DEFAULT_PATH)
 if(NOT heat_executable)
     message(FATAL_ERROR "Cannot find heat.")
@@ -137,15 +144,19 @@ function(nx_wix_heat target_file)
 endfunction()
 
 
-# Call Wix linker (light) for the source files.
+# Call Wix linker (light) for the source files. With STRENGTHEN, light and the payload signing
+# rerun on a change of any transitive dependency (see nx_add_targets_to_strengthened()); the
+# payload signing must rerun whenever light does, or light packs a relinked unsigned file.
 function(nx_wix_light target_file)
+    set(options
+        STRENGTHEN)
     set(oneValueArgs
         LOCALIZATION_FILE)
     set(multiValueArgs
         SOURCE_FILES
         EXTENSIONS
         DEPENDS)
-    cmake_parse_arguments(WXS "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+    cmake_parse_arguments(WXS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
     set(light_command ${light_executable}
         -nologo
@@ -164,16 +175,53 @@ function(nx_wix_light target_file)
         list(APPEND light_command -ext ${extension})
     endforeach()
 
+    set(light_depends
+        ${WXS_SOURCE_FILES}
+        ${WXS_LOCALIZATION_FILE}
+        ${WXS_DEPENDS})
+
+    # Sign the payload right before light packs it, in a step of its own: the payloads of the
+    # installers overlap, so the signing steps run one at a time, while the lights run in
+    # parallel. wix_signing_package_type is set by the distribution directories for the signing
+    # statistics.
+    if(codeSigning)
+        if(NOT CMAKE_GENERATOR MATCHES "Ninja")
+            message(FATAL_ERROR
+                "Signing the WiX payload requires a Ninja generator, which supports job pools.")
+        endif()
+
+        set(sign_payload_commands "")
+        nx_get_wix_payload_sign_commands(sign_payload_commands
+            PACKAGE_TYPE ${wix_signing_package_type}
+            WIXOBJ_FILES ${WXS_SOURCE_FILES})
+
+        get_filename_component(target_name ${target_file} NAME)
+        set(stamp_file ${CMAKE_CURRENT_BINARY_DIR}/${target_name}.payload_signed)
+        add_custom_command(
+            COMMENT "[Wix] Sign the payload of ${target_file}"
+            DEPENDS ${light_depends}
+            ${sign_payload_commands}
+            COMMAND ${CMAKE_COMMAND} -E touch ${stamp_file}
+            OUTPUT ${stamp_file}
+            JOB_POOL nx_wix_payload_signing
+            VERBATIM
+        )
+        list(APPEND light_depends ${stamp_file})
+        if(WXS_STRENGTHEN)
+            nx_add_targets_to_strengthened(${stamp_file})
+        endif()
+    endif()
+
     add_custom_command(
         COMMENT "[Wix] Light ${target_file}"
-        DEPENDS
-            ${WXS_SOURCE_FILES}
-            ${WXS_LOCALIZATION_FILE}
-            ${WXS_DEPENDS}
+        DEPENDS ${light_depends}
         COMMAND ${light_command}
         OUTPUT ${target_file}
         VERBATIM
     )
+    if(WXS_STRENGTHEN)
+        nx_add_targets_to_strengthened(${target_file})
+    endif()
 endfunction()
 
 
@@ -186,11 +234,12 @@ endfunction()
 
 function(nx_wix_sign_msi target_file)
     set(oneValueArgs
-        SOURCE_FILE)
+        SOURCE_FILE
+        PACKAGE_TYPE)
     cmake_parse_arguments(WXS "" "${oneValueArgs}" "" ${ARGN})
 
     set(signCommand "")
-    nx_get_windows_sign_command(signCommand)
+    nx_get_windows_sign_command(signCommand PACKAGE_TYPE ${WXS_PACKAGE_TYPE})
 
     add_custom_command(
         COMMENT "[Wix] Signing ${target_file}"
@@ -207,14 +256,15 @@ endfunction()
 function(nx_wix_add_signed_exe_target target)
     set(oneValueArgs
         SOURCE_FILE
-        TARGET_FILE)
+        TARGET_FILE
+        PACKAGE_TYPE)
     cmake_parse_arguments(WXS "" "${oneValueArgs}" "" ${ARGN})
 
     get_filename_component(filename ${WXS_SOURCE_FILE} NAME)
 
     set(engineExeFile "${CMAKE_CURRENT_BINARY_DIR}/${filename}-engine.exe")
     set(signCommand "")
-    nx_get_windows_sign_command(signCommand)
+    nx_get_windows_sign_command(signCommand PACKAGE_TYPE ${WXS_PACKAGE_TYPE})
 
     add_custom_command(
         COMMAND ${insignia_executable}

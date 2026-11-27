@@ -15,7 +15,10 @@ execute_process(
         "--output" ${client_qml_directory}
         "--prefer-compiled"
         "--skip-styles"
-        "--clean"
+        # Not --clean: light signs the files in place before packing them, and does not rerun
+        # for files copied again with the old mtime, while the client update package packs them.
+        "--sync"
+    COMMAND_ERROR_IS_FATAL ANY
 )
 
 file(GLOB_RECURSE client_qml_files CONFIGURE_DEPENDS "${client_qml_directory}/*")

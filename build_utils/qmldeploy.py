@@ -153,7 +153,58 @@ class QmlDeployUtil:
             "class_name": plugin_class
         }
 
-    def copy_components(self, imports, output_dir, ignore_function):
+    @staticmethod
+    def sync_tree(src_dir, dst_dir, ignore_function, deployed):
+        """Copy src_dir to dst_dir, keeping the files with the source mtime.
+
+        A file is copied only if it is missing or its mtime differs from the source, like Conan
+        finish_import does. A file signed in place keeps the source mtime, so it is kept signed.
+        Add the destination paths to the deployed set.
+        """
+        if not os.path.isdir(dst_dir) or os.path.islink(dst_dir):
+            QmlDeployUtil.remove(dst_dir)  # E.g. a file which a newer Qt replaced by a directory.
+        os.makedirs(dst_dir, exist_ok=True)
+        deployed.add(os.path.normcase(dst_dir))
+        names = os.listdir(src_dir)
+        ignored = ignore_function(src_dir, names)
+        for name in names:
+            if name in ignored:
+                continue
+            src = os.path.join(src_dir, name)
+            dst = os.path.join(dst_dir, name)
+            if os.path.isdir(src) and not os.path.islink(src):
+                QmlDeployUtil.sync_tree(src, dst, ignore_function, deployed)
+                continue
+            deployed.add(os.path.normcase(dst))
+            if os.path.islink(src):
+                if not os.path.islink(dst) or os.readlink(dst) != os.readlink(src):
+                    QmlDeployUtil.remove(dst)
+                    os.symlink(os.readlink(src), dst)
+                continue
+            if (os.path.isfile(dst) and not os.path.islink(dst)
+                    and os.stat(dst).st_mtime_ns == os.stat(src).st_mtime_ns):
+                continue
+            QmlDeployUtil.remove(dst)
+            shutil.copy2(src, dst)
+
+    @staticmethod
+    def remove(path):
+        if os.path.isdir(path) and not os.path.islink(path):
+            shutil.rmtree(path)
+        elif os.path.lexists(path):
+            os.remove(path)
+
+    @staticmethod
+    def remove_not_deployed(output_dir, deployed):
+        for root, dirs, files in os.walk(output_dir, topdown=False):
+            for name in files + dirs:
+                path = os.path.join(root, name)
+                if os.path.normcase(path) not in deployed:
+                    QmlDeployUtil.remove(path)
+
+    def copy_components(self, imports, output_dir, ignore_function, sync=False):
+        # Normalized, so the parent directories of a module, kept with sync, end at output_dir.
+        output_dir = os.path.abspath(output_dir)
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
@@ -168,9 +219,19 @@ class QmlDeployUtil:
             paths.append(path)
             previous_path = path + os.sep
 
+        deployed = set()
         for path in paths:
             subdir = os.path.relpath(path, self.import_path)
-            dst = os.path.join(output_dir, subdir)
+            dst = os.path.normpath(os.path.join(output_dir, subdir))
+            if sync:
+                self.sync_tree(path, dst, ignore_function, deployed)
+                # Keep the parent directories of the module.
+                parent = os.path.dirname(dst)
+                while (os.path.normcase(parent) != os.path.normcase(output_dir)
+                        and parent != os.path.dirname(parent)):
+                    deployed.add(os.path.normcase(parent))
+                    parent = os.path.dirname(parent)
+                continue
             if os.path.exists(dst):
                 shutil.rmtree(dst)
             shutil.copytree(
@@ -179,13 +240,19 @@ class QmlDeployUtil:
                 symlinks=True,
                 ignore=ignore_function)
 
-    def deploy(self, qml_root, output_dir, ignore_function):
+        if sync:
+            self.remove_not_deployed(output_dir, deployed)
+
+    def deploy(self, qml_root, output_dir, ignore_function, sync=False):
         imports_dict = self.invoke_qmlimportscanner(qml_root)
         if not imports_dict:
+            if sync:
+                # Otherwise the output silently keeps the files of an older deploy.
+                exit("qmlimportscanner found no imports in {}".format(qml_root))
             return
 
         imports = self.get_qt_imports(imports_dict)
-        self.copy_components(imports, output_dir, ignore_function)
+        self.copy_components(imports, output_dir, ignore_function, sync)
 
     def print_static_plugins(self, qml_root, file_name=None, additional_plugins=[]):
         imports_dict = self.invoke_qmlimportscanner(qml_root)
@@ -259,8 +326,14 @@ def main():
     parser.add_argument("--skip-styles", action="store_true", help="Skip QuickControls2 styles")
     parser.add_argument("--additional-plugins", nargs="+", help="Additional plugins to process.")
     parser.add_argument("--clean", action="store_true", help="Clean output folder before copying files.")
+    parser.add_argument(
+        "--sync", action="store_true",
+        help="Copy only files missing or with another mtime in the output folder, and remove the"
+            " files not deployed. Files signed in place keep their signature.")
 
     args = parser.parse_args()
+    if args.clean and args.sync:
+        exit("--clean and --sync are mutually exclusive.")
 
     deploy_util = QmlDeployUtil(args.qt_root, args.qt_host_root)
     if args.qmlimportscanner:
@@ -282,7 +355,8 @@ def main():
         deploy_util.deploy(
             args.qml_root,
             args.output,
-            deploy_util.make_ignore_function(args.prefer_compiled, args.skip_styles))
+            deploy_util.make_ignore_function(args.prefer_compiled, args.skip_styles),
+            args.sync)
 
 
 if __name__ == "__main__":

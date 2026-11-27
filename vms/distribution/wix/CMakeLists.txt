@@ -47,6 +47,12 @@ endif()
 if(withDesktopClient)
     add_subdirectory(desktop_client)
 
+    set(client_update_dependencies applauncher minilauncher desktop_client)
+    if(codeSigning)
+        # The update package reuses the client msi payload, which is signed when the msi is linked.
+        list(APPEND client_update_dependencies distribution_wix_client_msi)
+    endif()
+
     set(client_update_file "${distribution_output_dir}/${client_update_distribution_name}.zip")
     nx_create_distribution_package(
         PACKAGE_NAME "client update"
@@ -55,7 +61,7 @@ if(withDesktopClient)
         OUTPUT_FILE ${client_update_file}
         CONFIG_FILES ${distribution_config_file}
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/scripts"
-        DEPENDENCIES applauncher minilauncher desktop_client)
+        DEPENDENCIES ${client_update_dependencies})
     if(NOT openSourceBuild)
         nx_sign_update_package(generate_client_update_package ${client_update_file})
     endif()

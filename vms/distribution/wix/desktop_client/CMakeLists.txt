@@ -2,6 +2,7 @@
 
 include(wix_utils)
 
+set(wix_signing_package_type client)
 set(client_modules_output_path ${CMAKE_CURRENT_BINARY_DIR}/msm)
 
 add_subdirectory(modules)
@@ -49,6 +50,7 @@ nx_wix_candle(client_feature EXTENSIONS WixFirewallExtension)
 nx_wix_candle(client_product)
 
 nx_wix_light(${unsigned_msi_filename}
+    STRENGTHEN
     LOCALIZATION_FILE ${localization_file}
     SOURCE_FILES
         ${client_translation_wixobj_path}
@@ -84,8 +86,6 @@ nx_wix_light(${unsigned_msi_filename}
         distribution_wix_client_help_module
 )
 
-nx_add_targets_to_strengthened(${unsigned_msi_filename})
-
 if(codeSigning)
     set(unsigned_distribution_path
         "${CMAKE_CURRENT_BINARY_DIR}/client-unsigned.exe")
@@ -93,7 +93,9 @@ if(codeSigning)
     set(client_package_wixobject_filename
         ${CMAKE_CURRENT_BINARY_DIR}/client_signed_package.wixobj CACHE INTERNAL "" FORCE)
     set(msi_filename ${signed_msi_filename})
-    nx_wix_sign_msi(${signed_msi_filename} SOURCE_FILE ${unsigned_msi_filename})
+    nx_wix_sign_msi(${signed_msi_filename}
+        SOURCE_FILE ${unsigned_msi_filename}
+        PACKAGE_TYPE client)
 else()
     set(unsigned_distribution_path
         "${distribution_output_dir}/${client_distribution_name}.exe")
@@ -141,6 +143,7 @@ if(codeSigning)
     nx_wix_add_signed_exe_target(distribution_wix_client_signed_exe
         SOURCE_FILE ${unsigned_distribution_path}
         TARGET_FILE ${signed_distribution_path}
+        PACKAGE_TYPE client
     )
 else()
     add_custom_target(distribution_wix_client ALL

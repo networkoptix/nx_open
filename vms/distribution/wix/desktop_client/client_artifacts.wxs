@@ -3,7 +3,7 @@
     <Fragment>
         <ComponentGroup
                 Id="openal_libraries"
-                Source="${CONAN_OPENAL_ROOT}/bin"
+                Source="${bin_source_dir}"
                 Directory="InstallDirRoot">
             <Component><File Name="OpenAL32.dll" KeyPath="yes" DiskId="3"/></Component>
         </ComponentGroup>

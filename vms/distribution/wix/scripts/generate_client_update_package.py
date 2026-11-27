@@ -23,7 +23,6 @@ qt_libraries = [
     'OpenGLWidgets',
     'Positioning',
     'PositioningQuick',
-    'PrintSupport',
     'Qml',
     'QmlMeta',
     'QmlModels',
