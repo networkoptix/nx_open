@@ -95,6 +95,16 @@ std::pair<QString, QJsonValue> toApi(
     return {kIdRenamer.toApi(fieldName), asObject};
 }
 
+// Listed ids select exactly those resources, even if the field accepts all of them by default.
+void fixUuidSelection(const QMetaObject* fieldMeta, QMap<QString, QJsonValue>* propMap)
+{
+    if (fieldMeta->indexOfProperty("acceptAll") < 0 || fieldMeta->indexOfProperty("ids") < 0)
+        return;
+
+    if (!propMap->contains("acceptAll") && !propMap->value("ids").toArray().isEmpty())
+        (*propMap)["acceptAll"] = false;
+}
+
 template <class T>
 bool fromApi(std::map<QString, QJsonValue>&& fieldMap, T* target, QString* error)
 {
@@ -114,19 +124,21 @@ bool fromApi(std::map<QString, QJsonValue>&& fieldMap, T* target, QString* error
             const auto converter = unitConverter(propMeta.userType());
             const auto apiFieldName = converter->nameToApi(fieldName);
 
-            if (!fieldMap.contains(apiFieldName))
+            const auto apiField = fieldMap.extract(apiFieldName);
+            if (!apiField)
                 continue;
 
-            propMap[propMeta.name()] = converter->valueFromApi(fieldMap[apiFieldName]);
+            propMap[propMeta.name()] = converter->valueFromApi(apiField.mapped());
         }
         else
         {
             const auto apiFieldName = kIdRenamer.toApi(fieldName);
 
-            if (!fieldMap.contains(apiFieldName))
+            const auto apiField = fieldMap.extract(apiFieldName);
+            if (!apiField)
                 continue;
 
-            const auto fieldValue = fieldMap[apiFieldName];
+            const auto fieldValue = apiField.mapped();
 
             if (!fieldValue.isObject())
             {
@@ -149,18 +161,29 @@ bool fromApi(std::map<QString, QJsonValue>&& fieldMap, T* target, QString* error
 
                 propMap[propMeta.name()] = converter->valueFromApi(fieldObject[apiPropName]);
             }
+
+            fixUuidSelection(fieldMeta, &propMap);
         }
 
         if (!deserializeProperties(propMap, field))
         {
             if (error)
             {
-                *error = format(Strings::tr(
-                    "Unable to deserialize properties for field: %1"), fieldName);
+                *error = format(Strings::tr("Unable to deserialize properties for field: %1"),
+                    toApiFieldName(fieldName, field->type()));
             }
 
             return false;
         }
+    }
+
+    fieldMap.erase(utils::kType);
+    if (!fieldMap.empty())
+    {
+        if (error)
+            *error = format(Strings::tr("Unexpected field \"%1\""), fieldMap.begin()->first);
+
+        return false;
     }
 
     return true;

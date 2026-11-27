@@ -6,12 +6,14 @@
 #include <QtCore/QScopedValueRollback>
 
 #include <core/misc/schedule_task.h>
+#include <nx/utils/log/format.h>
 
 #include "action_builder.h"
 #include "action_builder_field.h"
 #include "engine.h"
 #include "event_filter.h"
 #include "event_filter_field.h"
+#include "utils/api_renamer.h"
 #include "utils/common.h"
 
 namespace nx::vms::rules {
@@ -274,10 +276,10 @@ ValidationResult Rule::validity(
 
             if (!fieldValidity.description.isEmpty())
             {
-                eventFilterAlerts << QString{" - %1(%2): %3"}
-                    .arg(fieldName)
-                    .arg(field->type())
-                    .arg(fieldValidity.description);
+                eventFilterAlerts << NX_FMT(" - %1(%2): %3",
+                    toApiFieldName(fieldName, field->type()),
+                    field->type(),
+                    fieldValidity.description);
             }
         }
 
@@ -309,10 +311,10 @@ ValidationResult Rule::validity(
 
             if (!fieldValidity.description.isEmpty())
             {
-                actionBuilderAlerts << QString{" - %1(%2): %3"}
-                    .arg(fieldName)
-                    .arg(field->type())
-                    .arg(fieldValidity.description);
+                actionBuilderAlerts << NX_FMT(" - %1(%2): %3",
+                    toApiFieldName(fieldName, field->type()),
+                    field->type(),
+                    fieldValidity.description);
             }
         }
 
