@@ -163,44 +163,44 @@
     </message>
     <message>
       <source>Advanced Viewers</source>
-      <translation type="unfinished">Advanced Viewers</translation>
+      <translation>Erweiterte Betrachter</translation>
     </message>
     <message>
       <source>Viewers</source>
-      <translation type="unfinished">Viewers</translation>
+      <translation>Betrachter</translation>
     </message>
     <message>
       <source>Live Viewers</source>
-      <translation type="unfinished">Live Viewers</translation>
+      <translation>Live-Betrachter</translation>
     </message>
     <message>
       <source>Members of this group can view live videos, I/O modules and web pages.</source>
-      <translation type="unfinished">Members of this group can view live videos, I/O modules and web pages.</translation>
+      <translation>Mitglieder dieser Gruppe können Live-Videos, I/O-Module und Webseiten ansehen.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</translation>
+      <translation>Mitglieder dieser Gruppe können zusätzlich zu den von der Gruppe „Betrachter“ gewährten Berechtigungen PTZ-Positionen und PTZ-Touren sehen und aktivieren, Zwei-Wege-Audio nutzen, die Tasten des I/O-Moduls bedienen, Lesezeichen erstellen und bearbeiten sowie das Ereignisprotokoll anzeigen.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</translation>
+      <translation>Mitglieder dieser Gruppe können zusätzlich zu den von der Gruppe „Live-Betrachter“ gewährten Berechtigungen Archiv und Lesezeichen anzeigen und exportieren.</translation>
     </message>
     <message>
       <source>Site Health Viewers</source>
-      <translation type="unfinished">Site Health Viewers</translation>
+      <translation>Site Health-Betrachter</translation>
     </message>
     <message>
       <source>Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</translation>
+      <translation>Mitglieder dieser Gruppe verfügen über uneingeschränkte Site-Berechtigungen. Administratoren können Power-Benutzer erstellen und bearbeiten, Sites zusammenführen und Sites mit %1 verbinden oder trennen.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
+      <translation>Mitglieder dieser Gruppe können zusätzlich zu den Berechtigungen, die ihnen von der Gruppe „Erweiterte Betrachter“ gewährt werden, den größten Teil der Site-Konfiguration steuern, dürfen jedoch keine Administrator-bezogenen Einstellungen ändern, wie z. B. ihre eigenen Gruppen und Berechtigungen löschen oder ändern, und sie können keine anderen Hauptbenutzer erstellen oder bearbeiten.</translation>
     </message>
     <message>
       <source>Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
-      <translation type="unfinished">Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</translation>
+      <translation>Mitglieder dieser Gruppe können Informationen zur Site Health und zur Serverprozessorauslastung in Echtzeit einsehen (Serverüberwachung).</translation>
     </message>
   </context>
   <context>
@@ -254,14 +254,14 @@
     <name>QnCameraAnalyticsEventsPolicy</name>
     <message>
       <source>Analytics events are not available for %1</source>
-      <translation type="unfinished">Analytics events are not available for %1</translation>
+      <translation>Analyse Ereignisse sind für %1 nicht verfügbar.</translation>
     </message>
   </context>
   <context>
     <name>QnCameraAnalyticsObjectsPolicy</name>
     <message>
       <source>Analytics objects are not available for %1</source>
-      <translation type="unfinished">Analytics objects are not available for %1</translation>
+      <translation>Analyse Objekte sind für %1 nicht verfügbar.</translation>
     </message>
   </context>
   <context>
@@ -499,15 +499,15 @@
     </message>
     <message>
       <source>Invalid data was received from the device. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the device. Details: &quot;%1&quot;.</translation>
+      <translation>Vom Gerät wurden ungültige Daten empfangen. Details: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Invalid data was received from the camera. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the camera. Details: &quot;%1&quot;.</translation>
+      <translation>Von der Kamera wurden ungültige Daten empfangen. Details: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Invalid data was received from the I/O module. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the I/O module. Details: &quot;%1&quot;.</translation>
+      <translation>Vom E/A-Modul wurden ungültige Daten empfangen. Details: &quot;%1&quot;.</translation>
     </message>
   </context>
   <context>
@@ -590,22 +590,22 @@
     </message>
     <message>
       <source>This camera is not currently on the selected layout</source>
-      <translation type="unfinished">This camera is not currently on the selected layout</translation>
+      <translation>Diese Kamera befindet sich derzeit nicht im ausgewählten Layout.</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts</source>
-      <translation type="unfinished">This camera is not currently on some of the selected layouts</translation>
+      <translation>Diese Kamera ist derzeit in einigen der ausgewählten Layouts nicht verfügbar.</translation>
     </message>
   </context>
   <context>
     <name>QnLayoutAccessValidationPolicy</name>
     <message>
       <source>Users do not have access to the selected layout</source>
-      <translation type="unfinished">Users do not have access to the selected layout</translation>
+      <translation>Die Benutzer haben keinen Zugriff auf das ausgewählte Layout.</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout</source>
-      <translation type="unfinished">Some users do not have access to the selected layout</translation>
+      <translation>Einige Benutzer haben keinen Zugriff auf das ausgewählte Layout.</translation>
     </message>
   </context>
   <context>
@@ -911,13 +911,13 @@
     </message>
     <message>
       <source>Local recording</source>
-      <translation type="unfinished">Local recording</translation>
+      <translation>Lokale Aufnahme</translation>
     </message>
     <message numerus="yes">
       <source>%n Local recording services</source>
-      <translation type="unfinished">
-        <numerusform>%n Local recording services</numerusform>
-        <numerusform>%n Local recording services</numerusform>
+      <translation>
+        <numerusform>%n Lokaler Aufnahmedienst</numerusform>
+        <numerusform>%n Lokale Aufnahmedienste</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -951,9 +951,9 @@
     <name>QnRequiredAccessRightPolicy</name>
     <message numerus="yes">
       <source>%n groups</source>
-      <translation type="unfinished">
-        <numerusform>%n groups</numerusform>
-        <numerusform>%n groups</numerusform>
+      <translation>
+        <numerusform>%n Gruppen</numerusform>
+        <numerusform>%n Gruppen</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -971,28 +971,28 @@
     <message numerus="yes">
       <source>%n groups do not have %1 permission for some of selected cameras</source>
       <comment>%1 is the permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
-        <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
+      <translation>
+        <numerusform>%n Gruppen haben keine %1 Berechtigung für einige der ausgewählten Kameras</numerusform>
+        <numerusform>%n Gruppen haben keine %1 Berechtigung für einige der ausgewählten Kameras</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 group does not have %2 permission for some of selected cameras</source>
       <comment>%1 is the name of selected user group, %2 is the permission name</comment>
-      <translation type="unfinished">%1 group does not have %2 permission for some of selected cameras</translation>
+      <translation>Die Gruppe %1 hat keine Berechtigung %2 für einige der ausgewählten Kameras</translation>
     </message>
     <message numerus="yes">
       <source>%n users do not have %1 permission for some of selected cameras</source>
       <comment>%1 is the permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
-        <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
+      <translation>
+        <numerusform>%n Benutzer hat keine %1 Berechtigung für einige der ausgewählten Kameras</numerusform>
+        <numerusform>%n Benutzer haben keine %1 Berechtigung für einige der ausgewählten Kameras</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 user does not have %2 permission for some of selected cameras</source>
       <comment>%1 is the name of the selected user, %2 is the permission name</comment>
-      <translation type="unfinished">%1 user does not have %2 permission for some of selected cameras</translation>
+      <translation>%1 Benutzer hat keine %2 Berechtigung für einige der ausgewählten Kameras</translation>
     </message>
   </context>
   <context>
@@ -1067,7 +1067,7 @@
     <name>QnSubjectValidationPolicy</name>
     <message>
       <source>None of selected user roles contain users</source>
-      <translation type="unfinished">None of selected user roles contain users</translation>
+      <translation>Keine der ausgewählten Benutzerrollen enthält Benutzer</translation>
     </message>
     <message>
       <source>Select at least one user</source>
@@ -1223,12 +1223,12 @@
     <message>
       <source>Msec</source>
       <comment>Numerus: Capitalized long suffix for displaying milliseconds</comment>
-      <translation type="unfinished">Msec</translation>
+      <translation>Millisekunden</translation>
     </message>
     <message>
       <source>Sec</source>
       <comment>Numerus: Capitalized long suffix for displaying seconds</comment>
-      <translation type="unfinished">Sec</translation>
+      <translation>Sekunden</translation>
     </message>
     <message>
       <source>Min</source>
@@ -1238,7 +1238,7 @@
     <message>
       <source>Hrs</source>
       <comment>Numerus: Capitalized long suffix for displaying hours</comment>
-      <translation type="unfinished">Hrs</translation>
+      <translation>Stunden</translation>
     </message>
     <message>
       <source>Days</source>
@@ -1248,32 +1248,32 @@
     <message>
       <source>Wks</source>
       <comment>Numerus: Capitalized long suffix for displaying weeks</comment>
-      <translation type="unfinished">Wks</translation>
+      <translation>Wochen</translation>
     </message>
     <message>
       <source>Mos</source>
       <comment>Numerus: Capitalized long suffix for displaying months</comment>
-      <translation type="unfinished">Mos</translation>
+      <translation>Monate</translation>
     </message>
     <message>
       <source>Yrs</source>
       <comment>Numerus: Capitalized long suffix for displaying years</comment>
-      <translation type="unfinished">Yrs</translation>
+      <translation>Jahre</translation>
     </message>
     <message numerus="yes">
       <source>Milliseconds</source>
       <comment>Numerus: Capitalized full suffix for displaying milliseconds</comment>
-      <translation type="unfinished">
-        <numerusform>Milliseconds</numerusform>
-        <numerusform>Milliseconds</numerusform>
+      <translation>
+        <numerusform>Millisekunde</numerusform>
+        <numerusform>Millisekunden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Seconds</source>
       <comment>Numerus: Capitalized full suffix for displaying seconds</comment>
-      <translation type="unfinished">
-        <numerusform>Seconds</numerusform>
-        <numerusform>Seconds</numerusform>
+      <translation>
+        <numerusform>Sekunde</numerusform>
+        <numerusform>Sekunden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1311,17 +1311,17 @@
     <message numerus="yes">
       <source>Months</source>
       <comment>Numerus: Capitalized full suffix for displaying months</comment>
-      <translation type="unfinished">
-        <numerusform>Months</numerusform>
-        <numerusform>Months</numerusform>
+      <translation>
+        <numerusform>Monat</numerusform>
+        <numerusform>Monate</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Years</source>
       <comment>Numerus: Capitalized full suffix for displaying years</comment>
-      <translation type="unfinished">
-        <numerusform>Years</numerusform>
-        <numerusform>Years</numerusform>
+      <translation>
+        <numerusform>Jahr</numerusform>
+        <numerusform>Jahre</numerusform>
       </translation>
     </message>
     <message>
@@ -1358,11 +1358,11 @@
     </message>
     <message>
       <source>Milliseconds</source>
-      <translation type="unfinished">Milliseconds</translation>
+      <translation>Millisekunde</translation>
     </message>
     <message>
       <source>Seconds</source>
-      <translation type="unfinished">Seconds</translation>
+      <translation>Sekunden</translation>
     </message>
     <message>
       <source>Minutes</source>
@@ -1382,11 +1382,11 @@
     </message>
     <message>
       <source>Months</source>
-      <translation type="unfinished">Months</translation>
+      <translation>Monat</translation>
     </message>
     <message>
       <source>Years</source>
-      <translation type="unfinished">Years</translation>
+      <translation>Jahr</translation>
     </message>
   </context>
   <context>
@@ -1397,25 +1397,25 @@
     </message>
     <message>
       <source>Multiple groups</source>
-      <translation type="unfinished">Multiple groups</translation>
+      <translation>Mehrere Gruppen</translation>
     </message>
   </context>
   <context>
     <name>QnUsersWithEmailValidationPolicy</name>
     <message>
       <source>Email address is not set for all the selected users.</source>
-      <translation type="unfinished">Email address is not set for all the selected users.</translation>
+      <translation>Nicht für alle ausgewählten Benutzer ist eine E-Mail-Adresse festgelegt.</translation>
     </message>
     <message>
       <source>Email address is not set for some selected users.</source>
-      <translation type="unfinished">Email address is not set for some selected users.</translation>
+      <translation>Für einige ausgewählte Benutzer ist keine E-Mail-Adresse hinterlegt.</translation>
     </message>
   </context>
   <context>
     <name>ServiceTypeDisplayStringHelper</name>
     <message>
       <source>Local recording</source>
-      <translation type="unfinished">Local recording</translation>
+      <translation>Lokale Aufnahme</translation>
     </message>
     <message>
       <source>Integration</source>
@@ -1423,11 +1423,11 @@
     </message>
     <message>
       <source>Cloud storage</source>
-      <translation type="unfinished">Cloud storage</translation>
+      <translation>Cloud-Speicher</translation>
     </message>
     <message>
       <source>Live view</source>
-      <translation type="unfinished">Live view</translation>
+      <translation>Live-Ansicht</translation>
     </message>
     <message>
       <source>Generic</source>
@@ -1438,11 +1438,11 @@
     <name>StringsHelper</name>
     <message>
       <source>Check internet connection between VMS and license server.</source>
-      <translation type="unfinished">Check internet connection between VMS and license server.</translation>
+      <translation>Prüfen Sie die Internetverbindung zwischen VMS und Lizenzserver.</translation>
     </message>
     <message>
       <source>Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Contact your channel partner for assistance.</translation>
+      <translation>Wenden Sie sich an Ihren Vertriebspartner, um Unterstützung zu erhalten.</translation>
     </message>
   </context>
   <context>
@@ -1456,35 +1456,35 @@
     <name>TimeFormat</name>
     <message>
       <source>just now</source>
-      <translation type="unfinished">just now</translation>
+      <translation>soeben</translation>
     </message>
     <message>
       <source>yesterday</source>
-      <translation type="unfinished">yesterday</translation>
+      <translation>gestern</translation>
     </message>
     <message>
       <source>a week ago</source>
-      <translation type="unfinished">a week ago</translation>
+      <translation>vor einer Woche</translation>
     </message>
     <message numerus="yes">
       <source>%n minutes ago</source>
-      <translation type="unfinished">
-        <numerusform>%n minutes ago</numerusform>
-        <numerusform>%n minutes ago</numerusform>
+      <translation>
+        <numerusform>vor %n Minute</numerusform>
+        <numerusform>vor %n Minuten</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n hours ago</source>
-      <translation type="unfinished">
-        <numerusform>%n hours ago</numerusform>
-        <numerusform>%n hours ago</numerusform>
+      <translation>
+        <numerusform>vor %n Stunde</numerusform>
+        <numerusform>vor %n Stunden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n days ago</source>
-      <translation type="unfinished">
-        <numerusform>%n days ago</numerusform>
-        <numerusform>%n days ago</numerusform>
+      <translation>
+        <numerusform>vor %n Tag</numerusform>
+        <numerusform>vor %n Tagen</numerusform>
       </translation>
     </message>
   </context>
@@ -1536,7 +1536,7 @@
     </message>
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
-      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+      <translation>Entsperren Sie diesen Teil des Archivs, um dessen Inhalt zu exportieren.</translation>
     </message>
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
@@ -1548,47 +1548,47 @@
     </message>
     <message>
       <source>Audio transcoding required.</source>
-      <translation type="unfinished">Audio transcoding required.</translation>
+      <translation>Audiotranskodierung erforderlich.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
-      <translation type="unfinished">Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</translation>
+      <translation>Maximale Anzahl der in der Datenbank zu speichernden Ereignisprotokolleinträge. Die tatsächliche Anzahl der nicht gelöschten Einträge kann bis zu 20 % höher als der angegebene Wert sein.</translation>
     </message>
     <message>
       <source>Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
-      <translation type="unfinished">Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</translation>
+      <translation>Gibt an, ob einige Frames für den Hauptstream zwischengespeichert werden sollen. Werte: &apos;ja&apos; - immer aktiviert (kann viel RAM verbrauchen), &apos;nein&apos; - immer deaktiviert, außer wenn für die Wiedergabe erforderlich (z. B. HLS), &apos;automatisch&apos; - ähnlich wie &apos;nein&apos;- wird jedoch aktiviert, um die Benutzerfreundlichkeit zu verbessern (z. B. wenn ein Analyse-Plugin auf die Kamera zugreift).</translation>
     </message>
     <message>
       <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
-      <translation type="unfinished">Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</translation>
+      <translation>Maximale Anzahl von HTTP-Verbindungen mit Transkodierung für den Server. Chrome öffnet zwei Verbindungen gleichzeitig und schließt dann die erste. Wir empfehlen, diesen Parameter&apos;auf mindestens 2 zu setzen.</translation>
     </message>
     <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
-      <translation type="unfinished">Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</translation>
+      <translation>Eine durch Semikolons getrennte Liste der Server, die für die Verbindung zur Cloud vorgesehen sind. Server am Anfang der Liste haben höhere Priorität. Ist die Liste leer, wird automatisch ein Server für die Cloud-Verbindung ausgewählt.</translation>
     </message>
     <message>
       <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
-      <translation type="unfinished">Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</translation>
+      <translation>Maximale Anzahl aufeinanderfolgender RTP-Fehler, bevor der Server die RTSP-Sitzung wiederherstellt.</translation>
     </message>
     <message>
       <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
       <comment>%1 is a company name</comment>
-      <translation type="unfinished">Enable deprecated API functions currently used by %1 software (insecure)</translation>
+      <translation>Aktiviere veraltete API-Funktionen, die derzeit von %1 Software verwendet werden (unsicher)</translation>
     </message>
     <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
-      <translation type="unfinished">Interval between the Cloud polling HTTP requests to synchronize the data.</translation>
+      <translation>Intervall zwischen der Cloud, die HTTP-Anfragen abfragt, um die Daten zu synchronisieren.</translation>
     </message>
     <message>
       <source>Local Site ID, null means the Site is not set up yet.</source>
-      <translation type="unfinished">Local Site ID, null means the Site is not set up yet.</translation>
+      <translation>Lokale Site-ID, null bedeutet, dass die Site noch nicht eingerichtet ist.</translation>
     </message>
     <message>
       <source>Enable or disable the creation of new Integration registration requests</source>
-      <translation type="unfinished">Enable or disable the creation of new Integration registration requests</translation>
+      <translation>Aktivieren oder deaktivieren Sie die Erstellung neuer Integrations-Registrierungsanfragen.</translation>
     </message>
     <message>
       <source>Anonymous statistics report allowed.</source>
@@ -1620,7 +1620,7 @@
     </message>
     <message>
       <source>Anonymous Crash Report Server API URL.</source>
-      <translation type="unfinished">Anonymous Crash Report Server API URL.</translation>
+      <translation>URL der API für anonyme Absturzberichte.</translation>
     </message>
     <message>
       <source>Anonymous statistics report Client settings.</source>
@@ -1628,11 +1628,11 @@
     </message>
     <message>
       <source>Device storage information update interval.</source>
-      <translation type="unfinished">Device storage information update interval.</translation>
+      <translation>Aktualisierungsintervall der Gerätespeicherinformationen.</translation>
     </message>
     <message>
       <source>Site alive update interval (seconds, 1s-1h).</source>
-      <translation type="unfinished">Site alive update interval (seconds, 1s-1h).</translation>
+      <translation>Aktualisierungsintervall für die Verfügbarkeit der Site (Sekunden, 1s-1h).</translation>
     </message>
     <message>
       <source>Proxy connection timeout (seconds, 1s-1h).</source>
@@ -1640,7 +1640,7 @@
     </message>
     <message>
       <source>Proxy connection access policy.</source>
-      <translation type="unfinished">Proxy connection access policy.</translation>
+      <translation>Zugriffsrichtlinie für Proxy-Verbindungen.</translation>
     </message>
     <message>
       <source>Time synchronization enabled.</source>
@@ -1672,11 +1672,11 @@
     </message>
     <message>
       <source>Organization Id.</source>
-      <translation type="unfinished">Organization Id.</translation>
+      <translation>Unternehmens-ID</translation>
     </message>
     <message>
       <source>Cloud Site ID.</source>
-      <translation type="unfinished">Cloud Site ID.</translation>
+      <translation>Cloud-Site-ID.</translation>
     </message>
     <message>
       <source>Cloud authorization key.</source>
@@ -1684,19 +1684,19 @@
     </message>
     <message>
       <source>Enable 2FA for the Site.</source>
-      <translation type="unfinished">Enable 2FA for the Site.</translation>
+      <translation>Aktivieren Sie die Zwei-Faktor-Authentifizierung für die Site.</translation>
     </message>
     <message>
       <source>Site name.</source>
-      <translation type="unfinished">Site name.</translation>
+      <translation>Site-Name.</translation>
     </message>
     <message>
       <source>Last master Site merge ID.</source>
-      <translation type="unfinished">Last master Site merge ID.</translation>
+      <translation>Letzte Master-Site-Merge-ID.</translation>
     </message>
     <message>
       <source>Last slave Site merge ID.</source>
-      <translation type="unfinished">Last slave Site merge ID.</translation>
+      <translation>Letzte Slave-Site-Merge-ID.</translation>
     </message>
     <message>
       <source>Disable Device vendors.</source>
@@ -1732,7 +1732,7 @@
     </message>
     <message>
       <source>Maximum number of bookmarks. Value less than or equal to 0 is infinite.</source>
-      <translation type="unfinished">Maximum number of bookmarks. Value less than or equal to 0 is infinite.</translation>
+      <translation>Maximale Anzahl an Lesezeichen. Werte kleiner oder gleich 0 bedeuten unendlich viele.</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption).</source>
@@ -1744,7 +1744,7 @@
     </message>
     <message>
       <source>Expose device passwords stored in VMS for administrators (for web pages).</source>
-      <translation type="unfinished">Expose device passwords stored in VMS for administrators (for web pages).</translation>
+      <translation>Gerätepasswörter, die im VMS gespeichert sind, für Administratoren (für Webseiten) zugänglich machen.</translation>
     </message>
     <message>
       <source>Enable auto-discovery.</source>
@@ -1832,7 +1832,7 @@
     </message>
     <message>
       <source>Update releases.json file URL.</source>
-      <translation type="unfinished">Update releases.json file URL.</translation>
+      <translation>Aktualisieren Sie die URL der releases.json-Datei.</translation>
     </message>
     <message>
       <source>Target update information.</source>
@@ -1852,7 +1852,7 @@
     </message>
     <message>
       <source>Thread count limit for camera archive synchronization.</source>
-      <translation type="unfinished">Thread count limit for camera archive synchronization.</translation>
+      <translation>Begrenzung der Threadanzahl für die Kameraarchivsynchronisierung.</translation>
     </message>
     <message>
       <source>Watermark settings.</source>
@@ -1860,15 +1860,15 @@
     </message>
     <message>
       <source>Pixelation settings.</source>
-      <translation type="unfinished">Pixelation settings.</translation>
+      <translation>Pixeleinstellungen.</translation>
     </message>
     <message>
       <source>Authorization Session token lifetime (seconds).</source>
-      <translation type="unfinished">Authorization Session token lifetime (seconds).</translation>
+      <translation>Dauer des Autorisierungssitzungstokens (Sekunden).</translation>
     </message>
     <message>
       <source>Apply session limit for Cloud tokens.</source>
-      <translation type="unfinished">Apply session limit for Cloud tokens.</translation>
+      <translation>Sitzungslimit für Cloud-Tokens anwenden.</translation>
     </message>
     <message>
       <source>Session token count limit on a single Server.</source>
@@ -1924,7 +1924,7 @@
     </message>
     <message>
       <source>Default locale for new users.</source>
-      <translation type="unfinished">Default locale for new users.</translation>
+      <translation>Standardgebietsschema für neue Benutzer.</translation>
     </message>
     <message>
       <source>Additional local FS storage types for recording.</source>
@@ -1948,7 +1948,7 @@
     </message>
     <message>
       <source>Check video stream permissions on VMS server period (milliseconds).</source>
-      <translation type="unfinished">Check video stream permissions on VMS server period (milliseconds).</translation>
+      <translation>Überprüfen Sie die Videostream-Berechtigungen auf dem VMS-Server (Zeitraum in Millisekunden).</translation>
     </message>
     <message>
       <source>Storage encryption enabled.</source>
@@ -1964,7 +1964,7 @@
     </message>
     <message>
       <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility.</source>
-      <translation type="unfinished">HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility.</translation>
+      <translation>HTTP-Header: Server, unterstützte Variablen: $vmsName, $vmsVersion, $company, $compatibility.</translation>
     </message>
     <message>
       <source>HTTP header: X-Frame-Options.</source>
@@ -1976,7 +1976,7 @@
     </message>
     <message>
       <source>Allow Power User editing Security Settings.</source>
-      <translation type="unfinished">Allow Power User editing Security Settings.</translation>
+      <translation>Erlauben Sie Power-Usern die Bearbeitung der Sicherheitseinstellungen.</translation>
     </message>
     <message>
       <source>Enable deprecated API functions (insecure).</source>
@@ -1996,11 +1996,11 @@
     </message>
     <message>
       <source>LDAP settings.</source>
-      <translation type="unfinished">LDAP settings.</translation>
+      <translation>LDAP-Einstellungen.</translation>
     </message>
     <message>
       <source>SMTP settings. These settings are visible for Power Users only.</source>
-      <translation type="unfinished">SMTP settings. These settings are visible for Power Users only.</translation>
+      <translation>SMTP-Einstellungen. Diese Einstellungen sind nur für fortgeschrittene Benutzer sichtbar.</translation>
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
@@ -2008,15 +2008,15 @@
     </message>
     <message>
       <source>Encryption key used to encode secure cookie values.</source>
-      <translation type="unfinished">Encryption key used to encode secure cookie values.</translation>
+      <translation>Verschlüsselungsschlüssel zur Kodierung sicherer Cookie-Werte.</translation>
     </message>
     <message>
       <source>Update interval for public keys from the Cloud.</source>
-      <translation type="unfinished">Update interval for public keys from the Cloud.</translation>
+      <translation>Aktualisierungsintervall für öffentliche Schlüssel aus der Cloud.</translation>
     </message>
     <message>
       <source>Socket sending timeout when Server streams media data (Seconds).</source>
-      <translation type="unfinished">Socket sending timeout when Server streams media data (Seconds).</translation>
+      <translation>Socket-Timeout beim Streamen von Mediendaten durch den Server (Sekunden).</translation>
     </message>
     <message>
       <source>Controls how integrations are loaded. Possible values are: &quot;manifestControlled&quot;, &quot;forceLoadingInSeparateProcess&quot;,&quot;forceLoadingInCurrentProcess&quot;</source>
