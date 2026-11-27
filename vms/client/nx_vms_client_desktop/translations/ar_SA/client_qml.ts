@@ -1052,7 +1052,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>GroupCreateDialog</name>
     <message>
       <source>New Group</source>
-      <translation type="unfinished">New Group</translation>
+      <translation>مجموعة جديدة</translation>
     </message>
     <message>
       <source>General</source>
@@ -1060,7 +1060,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>المجموعات</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -1083,7 +1083,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>GroupCreateTab</name>
     <message>
       <source>New Group</source>
-      <translation type="unfinished">New Group</translation>
+      <translation>مجموعة جديدة</translation>
     </message>
     <message>
       <source>Name</source>
@@ -1110,7 +1110,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>المجموعات</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -1141,7 +1141,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>المجموعات</translation>
     </message>
     <message>
       <source>Members</source>
@@ -1180,7 +1180,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>المجموعات</translation>
     </message>
     <message>
       <source>No members</source>
@@ -1481,7 +1481,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>المجموعات</translation>
     </message>
     <message>
       <source>Last Sync</source>
@@ -2870,7 +2870,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Last day</source>
-      <translation type="unfinished">Last day</translation>
+      <translation>آخر يوم</translation>
     </message>
     <message>
       <source>Last 7 days</source>
@@ -2916,7 +2916,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>المجموعات</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -3003,7 +3003,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>لغة الإشعارات</translation>
     </message>
   </context>
   <context>
@@ -3018,7 +3018,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>المجموعات</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -3143,7 +3143,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>لغة الإشعارات</translation>
     </message>
     <message>
       <source>Interface Language</source>
