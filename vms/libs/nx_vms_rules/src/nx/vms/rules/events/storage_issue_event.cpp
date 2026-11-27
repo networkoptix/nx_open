@@ -87,6 +87,9 @@ QString StorageIssueEvent::extendedCaption(common::SystemContext* context,
         case EventReason::backupFailedSourceFileError:
             return tr("Archive Backup Failed at %1").arg(resourceName);
 
+        case EventReason::archiveIndexDamaged:
+            return tr("Archive Index Damaged at %1").arg(resourceName);
+
         case EventReason::none: //< Special case for unit tests.
             return {};
 
@@ -137,6 +140,12 @@ QString StorageIssueEvent::extendedReasonText() const
 
         case EventReason::backupFailedSourceFileError:
             return tr("Archive backup failed. Failed to backup file %1.").arg(m_reasonText);
+
+        case EventReason::archiveIndexDamaged:
+            return tr(
+                "The archive index on \"%1\" is damaged. The recordings on this storage "
+                "will be indexed again. Check the storage for errors.")
+                .arg(storageUrl);
 
         case EventReason::none: //< Special case for unit tests.
             return {};

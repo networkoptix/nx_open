@@ -41,6 +41,7 @@ NX_REFLECTION_ENUM_CLASS(EventReason,
     raidStorageError = 1012,
     metadataStoragePermissionDenied = 1013,
     encryptionFailed = 1014,
+    archiveIndexDamaged = 1015,
 
     // License Issue event
     licenseRemoved = 10,
@@ -56,8 +57,7 @@ NX_REFLECTION_ENUM_CLASS(EventReason,
     notEnoughCloudRecordingServices = 30,
     notEnoughIntegrationServices = 31,
     licenseMigrationFailed = 32,
-    licenseMigrationSkipped = 33
-)
+    licenseMigrationSkipped = 33)
 
 enum class EventState
 {

@@ -4,61 +4,10 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/reflect/json.h>
-#include <utils/common/id.h>
 
 namespace nx {
 namespace vms {
 namespace event {
-
-nx::Uuid EventParameters::getParamsHash() const
-{
-    QByteArray paramKey(QByteArray::number(eventType));
-    switch (eventType)
-    {
-        case EventType::serverFailureEvent:
-        case EventType::storageFailureEvent:
-            paramKey += '_' + QByteArray::number(int(reasonCode));
-            if (reasonCode == EventReason::storageIoError
-                || reasonCode == EventReason::storageTooSlow
-                || reasonCode == EventReason::storageFull
-                || reasonCode == EventReason::systemStorageFull
-                || reasonCode == EventReason::metadataStorageOffline
-                || reasonCode == EventReason::metadataStorageFull
-                || reasonCode == EventReason::metadataStoragePermissionDenied
-                || reasonCode == EventReason::raidStorageError
-                || reasonCode == EventReason::encryptionFailed)
-            {
-                paramKey += '_' + description.toUtf8();
-            }
-            break;
-
-        case EventType::softwareTriggerEvent:
-            return nx::Uuid::createUuid(); //< Warning: early return.
-            break;
-
-        case EventType::cameraInputEvent:
-            paramKey += '_' + inputPortId.toUtf8();
-            break;
-
-        case EventType::cameraDisconnectEvent:
-            paramKey += '_' + eventResourceId.toByteArray(QUuid::WithBraces);
-            break;
-
-        case EventType::networkIssueEvent:
-            paramKey += '_' + eventResourceId.toByteArray(QUuid::WithBraces);
-            paramKey += '_' + QByteArray::number(int(reasonCode));
-            break;
-
-        case EventType::ldapSyncIssueEvent:
-            paramKey += '_' + QByteArray::number(int(reasonCode));
-            break;
-
-        default:
-            break;
-    }
-
-    return guidFromArbitraryData(paramKey);
-}
 
 QString EventParameters::getAnalyticsEventTypeId() const
 {

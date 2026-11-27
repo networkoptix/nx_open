@@ -155,9 +155,6 @@ struct NX_VMS_COMMON_API EventParameters
     nx::vms::api::EventLevels getDiagnosticEventLevels() const;
     void setDiagnosticEventLevels(nx::vms::api::EventLevels levels);
 
-    /** Hash for events aggregation. */
-    nx::Uuid getParamsHash() const;
-
     bool canHaveVideoLink() const;
 };
 
