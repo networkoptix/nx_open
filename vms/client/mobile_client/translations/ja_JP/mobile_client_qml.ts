@@ -816,19 +816,19 @@
     <name>OrganizationMenu</name>
     <message>
       <source>BETA</source>
-      <translation type="unfinished">BETA</translation>
+      <translation>ベータ</translation>
     </message>
     <message>
       <source>Organization Structure</source>
-      <translation type="unfinished">Organization Structure</translation>
+      <translation>組織構造</translation>
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>ログイン</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>キャンセル</translation>
     </message>
   </context>
   <context>

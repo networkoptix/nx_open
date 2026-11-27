@@ -1976,7 +1976,7 @@
     </message>
     <message>
       <source>Encryption of video streams received from devices (e.g. RTSPS, SRTP): &quot;allowInsecureStream&quot; (not required), &quot;preferSecureStream&quot; (used if supported by the device), &quot;requireSecureStream&quot; (always used).</source>
-      <translation type="unfinished">Encryption of video streams received from devices (e.g. RTSPS, SRTP): &quot;allowInsecureStream&quot; (not required), &quot;preferSecureStream&quot; (used if supported by the device), &quot;requireSecureStream&quot; (always used).</translation>
+      <translation>Cifrado de fluxos de vídeo recibidos de dispositivos (por exemplo, RTSPS, SRTP): &quot;allowInsecureStream&quot; (non é obrigatorio), &quot;preferSecureStream&quot; (úsase se o dispositivo o admite), &quot;requireSecureStream&quot; (úsase sempre).</translation>
     </message>
     <message>
       <source>Allow Power User editing Security Settings.</source>

@@ -1699,7 +1699,7 @@
     </message>
     <message>
       <source>Advanced Update Settings</source>
-      <translation type="unfinished">Advanced Update Settings</translation>
+      <translation>إعدادات التحديث المتقدمة</translation>
     </message>
     <message>
       <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
@@ -2483,7 +2483,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>المجموعات</translation>
     </message>
   </context>
   <context>

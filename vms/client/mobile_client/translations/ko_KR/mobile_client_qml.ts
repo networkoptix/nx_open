@@ -816,7 +816,7 @@
     <name>OrganizationMenu</name>
     <message>
       <source>BETA</source>
-      <translation type="unfinished">BETA</translation>
+      <translation>베타</translation>
     </message>
     <message>
       <source>Organization Structure</source>
@@ -824,11 +824,11 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>로그인</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>취소</translation>
     </message>
   </context>
   <context>

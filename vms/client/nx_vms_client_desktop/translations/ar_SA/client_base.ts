@@ -6837,7 +6837,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Last day</source>
-      <translation type="unfinished">Last day</translation>
+      <translation>آخر يوم</translation>
     </message>
     <message>
       <source>Last 7 days</source>
@@ -8112,7 +8112,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Objects + Lo-Res</source>
-      <translation type="unfinished">Objects + Lo-Res</translation>
+      <translation>كائنات + دقة منخفضة</translation>
     </message>
     <message>
       <source>Motion &amp; Objects + Lo-Res</source>
@@ -9285,11 +9285,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>New Group</source>
-      <translation type="unfinished">New Group</translation>
+      <translation>مجموعة جديدة</translation>
     </message>
     <message>
       <source>New Group %1</source>
-      <translation type="unfinished">New Group %1</translation>
+      <translation>مجموعة جديدة %1</translation>
     </message>
     <message>
       <source>Save changes</source>
@@ -11308,7 +11308,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
-      <translation type="unfinished">Motion, Objects</translation>
+      <translation>الحركة، الأجسام</translation>
     </message>
     <message>
       <source>Motion, Objects
@@ -12297,7 +12297,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>المجموعات</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -12392,7 +12392,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>المجموعات</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -12435,7 +12435,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>المجموعات</translation>
     </message>
     <message>
       <source>LDAP</source>

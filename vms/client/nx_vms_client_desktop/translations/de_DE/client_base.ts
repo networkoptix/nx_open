@@ -12434,7 +12434,7 @@ Diese Webseite präsentierte ein nicht vertrauenswürdiges Zertifikat. Es wird n
     </message>
     <message>
       <source>Health Monitors</source>
-      <translation type="unfinished">Health Monitors</translation>
+      <translation>Statusüberwachung</translation>
     </message>
     <message>
       <source>Video Walls</source>

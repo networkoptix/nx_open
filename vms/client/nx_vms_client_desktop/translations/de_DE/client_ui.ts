@@ -381,7 +381,7 @@
     <name>CameraBookmarkSharingLinkDialog</name>
     <message>
       <source>Share Bookmark</source>
-      <translation type="unfinished">Share Bookmark</translation>
+      <translation>Lesezeichen teilen</translation>
     </message>
     <message>
       <source>URL</source>
@@ -404,7 +404,7 @@
     <name>CameraBookmarkSharingSettingsDialog</name>
     <message>
       <source>Share Bookmark</source>
-      <translation type="unfinished">Share Bookmark</translation>
+      <translation>Lesezeichen teilen</translation>
     </message>
     <message>
       <source>Lifetime</source>
@@ -1034,7 +1034,7 @@
     <name>ExportMetadataSettingsWidget</name>
     <message>
       <source>Metadata</source>
-      <translation type="unfinished">Metadata</translation>
+      <translation>Metadaten</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -1050,7 +1050,7 @@
     </message>
     <message>
       <source>Has attributes</source>
-      <translation type="unfinished">Has attributes</translation>
+      <translation>Besitzt Attribute</translation>
     </message>
     <message>
       <source>Display attributes</source>
@@ -2276,7 +2276,7 @@ und klicken Sie auf die Schaltfläche &quot;Suchen&quot;</translation>
     </message>
     <message>
       <source>Configure...</source>
-      <translation type="unfinished">Configure...</translation>
+      <translation>Konfigurieren...</translation>
     </message>
     <message>
       <source>Blur</source>
