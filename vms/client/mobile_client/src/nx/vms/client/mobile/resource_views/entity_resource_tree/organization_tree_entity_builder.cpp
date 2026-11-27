@@ -140,6 +140,9 @@ AbstractEntityPtr OrganizationTreeEntityBuilder::createResourceTreeEntity(
         helper.cameraResourceIndex =
             std::make_unique<core::entity_resource_tree::CameraResourceIndex>(
                 systemContext->resourcePool());
+        helper.recorderItemDataHelper =
+            QSharedPointer<core::entity_resource_tree::RecorderItemDataHelper>::create(
+                helper.cameraResourceIndex.get());
     }
 
     auto treeEntity = std::make_unique<CompositionEntity>();

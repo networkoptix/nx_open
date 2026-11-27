@@ -19,11 +19,13 @@ public:
         const QString& systemId,
         const nx::vms::api::CameraDataEx& source);
 
-    /** Resource thumb constructor, used to create temporary camera replacement. */
+    /**
+     * Resource thumb constructor, used to create temporary camera replacement.
+     * @param typeId Type of the camera, null if it is not known. It defines the camera kind, like
+     *     a desktop or virtual camera.
+     */
     CrossSystemCameraResource(
-        const QString& systemId,
-        const nx::Uuid& id,
-        const QString& name);
+        const QString& systemId, nx::Uuid id, const QString& name, nx::Uuid typeId);
 
     virtual ~CrossSystemCameraResource() override;
 

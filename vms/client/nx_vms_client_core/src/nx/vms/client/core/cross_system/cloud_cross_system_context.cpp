@@ -772,9 +772,16 @@ struct CloudCrossSystemContext::Private
 
     QnVirtualCameraResourcePtr createThumbCameraResource(const nx::Uuid& id, const QString& name)
     {
+        // The Device may be added already, e.g. from edgeDb or for another Layout. A thumb added
+        // for it would overwrite its data, like the type and the group.
+        const auto resourcePool = systemContext->resourcePool();
+        if (const auto camera = resourcePool->getResourceById<QnVirtualCameraResource>(id))
+            return camera;
+
+        // Layout items and notifications do not know the Device type.
         const auto camera = core::CrossSystemCameraResourcePtr(
-            new core::CrossSystemCameraResource(systemDescription->id(), id, name));
-        systemContext->resourcePool()->addResource(camera);
+            new core::CrossSystemCameraResource(systemDescription->id(), id, name, /*typeId*/ {}));
+        resourcePool->addResource(camera);
 
         return camera;
     }

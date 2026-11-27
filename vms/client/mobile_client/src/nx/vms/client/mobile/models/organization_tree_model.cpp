@@ -2,9 +2,9 @@
 
 #include "organization_tree_model.h"
 
-#include <nx/vms/client/core/cross_system/vmsdb_data_loader.h>
-#include <nx/vms/client/core/cross_system/vmsdb_data_processor.h>
-#include <nx/vms/client/core/network/vmsdb_connection.h>
+#include <nx/vms/client/core/cross_system/edge_db_data_loader.h>
+#include <nx/vms/client/core/cross_system/edge_db_data_processor.h>
+#include <nx/vms/client/core/network/edge_db_connection.h>
 #include <nx/vms/client/mobile/resource_views/entity_resource_tree/organization_tree_entity_builder.h>
 
 namespace nx::vms::client::mobile {
@@ -17,17 +17,28 @@ struct OrganizationTreeModel::Private
     std::unique_ptr<Builder> builder = std::make_unique<Builder>();
 
     // TODO: #amalov Find a better place for connection & loader.
-    std::unique_ptr<core::VmsDbConnection> connection = std::make_unique<core::VmsDbConnection>();
-    std::unique_ptr<core::VmsDbDataLoader> loader = std::make_unique<core::VmsDbDataLoader>(connection.get());
-    std::unique_ptr<core::VmsDbDataProcessor> processor = std::make_unique<core::VmsDbDataProcessor>();
+    std::unique_ptr<core::EdgeDbConnection> connection =
+        std::make_unique<core::EdgeDbConnection>();
+    std::unique_ptr<core::EdgeDbDataLoader> loader =
+        std::make_unique<core::EdgeDbDataLoader>(connection.get());
+    std::unique_ptr<core::EdgeDbDataProcessor> processor =
+        std::make_unique<core::EdgeDbDataProcessor>(loader.get());
 };
 
 OrganizationTreeModel::OrganizationTreeModel(QObject* parent):
     base_type(parent),
     d(new Private{})
 {
-    connect(d->loader.get(), &core::VmsDbDataLoader::ready, this,
-        [this]{ d->processor->onDataReady(d->loader.get()); });
+    connect(d->loader.get(),
+        &core::EdgeDbDataLoader::failed,
+        this,
+        [this](const nx::network::rest::Result& error)
+        {
+            NX_WARNING(this,
+                "Organization %1 data loading failed: %2",
+                d->organizationId,
+                error.errorString);
+        });
 }
 
 OrganizationTreeModel::~OrganizationTreeModel()
