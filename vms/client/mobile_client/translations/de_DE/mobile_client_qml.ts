@@ -569,7 +569,7 @@
     <message>
       <source>Logged in as %1</source>
       <comment>%1 is a user name</comment>
-      <translation type="unfinished">Logged in as %1</translation>
+      <translation>Angemeldet als %1</translation>
     </message>
     <message>
       <source>Add Server</source>
@@ -699,7 +699,7 @@
     </message>
     <message>
       <source>All Sites</source>
-      <translation type="unfinished">All Sites</translation>
+      <translation>Alle Sites</translation>
     </message>
     <message>
       <source>Selected Sites</source>
@@ -745,7 +745,7 @@
     <name>RangeSelector</name>
     <message>
       <source>From</source>
-      <translation type="unfinished">From</translation>
+      <translation>Von</translation>
     </message>
     <message>
       <source>To</source>
