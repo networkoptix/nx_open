@@ -1,7 +1,7 @@
 # Please list here only packages, required to build VMS
 
 conan==2.30.0
-dmgbuild==1.6.5
+dmgbuild==1.6.7
 PyYAML==6.*
 requests==2.25.1
 cmake==3.31.10
