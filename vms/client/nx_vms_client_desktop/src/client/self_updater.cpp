@@ -144,6 +144,58 @@ QString getCompleteBaseName(const QString& fileName)
     return fileName.first(lastDotIndex);
 }
 
+/**
+ * Removes targetDir or backupDir of updateApplauncher(). The version file is removed first: the
+ * launcher scripts on Linux and macOS and the minilauncher on Windows run applauncher from
+ * targetDir only if this file exists, so it must not be left in a partly removed directory if the
+ * Client is killed (e.g. by a reboot). This applies to backupDir too, as it can be renamed back to
+ * targetDir.
+ * @return False if the version file could not be removed; nothing is removed then. True if the
+ *     version file is gone; other files may remain.
+ */
+bool removeApplauncherInstance(const QDir& dir)
+{
+    QFile versionFile(dir.absoluteFilePath(nx::branding::launcherVersionFile()));
+    if (versionFile.exists() && !versionFile.remove())
+    {
+        NX_WARNING(typeid(SelfUpdater),
+            "Could not remove %1: %2",
+            versionFile.fileName(),
+            versionFile.errorString());
+        return false;
+    }
+
+    if (!QDir(dir).removeRecursively())
+        NX_WARNING(typeid(SelfUpdater), "Could not remove applauncher at %1", dir.absolutePath());
+
+    return true;
+}
+
+/**
+ * Removes the .desktop file written by updateApplauncherDesktopIcon(). It overrides the one from
+ * the deb package and runs applauncher-bin from targetDir directly, without the launcher script
+ * bin/applauncher, which checks that targetDir is complete.
+ */
+void removeApplauncherDesktopFile()
+{
+    if (!nx::build_info::isLinux())
+        return;
+
+    const auto appsLocation =
+        QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation);
+    if (appsLocation.isEmpty())
+        return;
+
+    QFile desktopFile(QDir(appsLocation).filePath(kDesktopFileName));
+    if (desktopFile.exists() && !desktopFile.remove())
+    {
+        NX_WARNING(typeid(SelfUpdater),
+            "Could not remove %1: %2",
+            desktopFile.fileName(),
+            desktopFile.errorString());
+    }
+}
+
 } // namespace
 
 SelfUpdater::SelfUpdater(const QnStartupParameters& startupParams) :
@@ -398,7 +450,7 @@ void SelfUpdater::updateApplauncher()
         if (backupDir.exists())
         {
             NX_INFO(this, "Removing the outdated backup %1", backupDir.absolutePath());
-            QDir(backupDir).removeRecursively();
+            removeApplauncherInstance(backupDir);
         }
 
         return;
@@ -439,17 +491,33 @@ void SelfUpdater::updateApplauncher()
     if (retriesLeft != kKillApplauncherRetries)
         QThread::msleep(kWaitProcessDeathMs);
 
+    // The .desktop file must not run applauncher from targetDir until the copy is done: if the
+    // Client is killed meanwhile (e.g. by a reboot), targetDir is left incomplete.
+    removeApplauncherDesktopFile();
+
     if (backupDir.exists())
     {
         NX_INFO(this, "Using the existing backup %1", backupDir.absolutePath());
-        QDir(targetDir).removeRecursively();
+        if (!removeApplauncherInstance(targetDir))
+        {
+            NX_ERROR(this, "Applauncher update skipped.");
+            return;
+        }
     }
     else if (targetDir.exists())
     {
         if (!QDir().rename(targetDir.absolutePath(), backupDir.absolutePath()))
         {
             NX_ERROR(this, "Could not backup applauncher to %1", backupDir.absolutePath());
-            // Continue without backup
+            // Without a backup, remove targetDir before the copy: the version file must not be
+            // there during the copy, and if targetDir was left by a Client killed during the copy
+            // (e.g. by a reboot), it can contain a symlink whose target was not copied, which
+            // copy() cannot overwrite.
+            if (!removeApplauncherInstance(targetDir))
+            {
+                NX_ERROR(this, "Applauncher update skipped.");
+                return;
+            }
         }
     }
 
@@ -459,7 +527,7 @@ void SelfUpdater::updateApplauncher()
         guard = nx::utils::Guard(
             [this, backupDir, targetDir]()
             {
-                QDir(targetDir).removeRecursively();
+                removeApplauncherInstance(targetDir);
                 if (!QDir().rename(backupDir.absolutePath(), targetDir.absolutePath()))
                 {
                     NX_ERROR(this, "Could not restore applauncher from %1!",
@@ -504,7 +572,7 @@ void SelfUpdater::updateApplauncher()
         return;
     }
 
-    QDir(backupDir).removeRecursively();
+    removeApplauncherInstance(backupDir);
 
     NX_INFO(this, "Applauncher updated successfully.");
 }

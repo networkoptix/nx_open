@@ -6,7 +6,46 @@ export QT_IM_MODULE=ibus
 
 USER_APPLAUNCHER_DIR="$HOME/.local/share/@customization.companyName@/applauncher/@customization@"
 
-if [ -x "$USER_APPLAUNCHER_DIR/bin/applauncher-bin" ]
+# Succeeds if the version $1 is not older than $2. Missing components are treated as 0.
+isVersionNotOlder()
+{
+    local IFS=.
+    local -a left=($1) right=($2)
+
+    local i
+    for ((i = 0; i < ${#left[@]} || i < ${#right[@]}; ++i))
+    do
+        local -i l=$((10#${left[i]:-0})) r=$((10#${right[i]:-0}))
+        ((l > r)) && return 0
+        ((l < r)) && return 1
+    done
+    return 0
+}
+
+# The Client copies applauncher to USER_APPLAUNCHER_DIR and writes the version file there last, so
+# the file is missing if the Client was killed during the copy (e.g. by a reboot). In this case,
+# or if the version is older than this package, the bundled applauncher is started instead, and
+# the Client it starts repeats the copy.
+isUserApplauncherUsable()
+{
+    [ -x "$USER_APPLAUNCHER_DIR/bin/applauncher-bin" ] || return 1
+
+    # Like SelfUpdater::getVersionFromFile() in the Client, the version is read from the first
+    # line of the file, and whitespace around it is ignored: the Client does not rewrite a file
+    # with an up-to-date version, so a stricter check would leave a complete copy unused until a
+    # newer Client updates it.
+    local -r firstLine="$(head -n 1 "$USER_APPLAUNCHER_DIR/@launcher.version.file@" 2>/dev/null)"
+    local -r versionPattern='^[[:space:]]*([0-9]+(\.[0-9]+)*)[[:space:]]*$'
+    [[ $firstLine =~ $versionPattern ]] || return 1
+    local -r version="${BASH_REMATCH[1]}"
+
+    # The package version is checked as well: a non-numeric component is an arithmetic error in
+    # isVersionNotOlder, which aborts the calling if statement and leaves APPLAUNCHER_DIR empty.
+    [[ "@releaseVersion.full@" =~ $versionPattern ]] || return 1
+    isVersionNotOlder "$version" "${BASH_REMATCH[1]}"
+}
+
+if isUserApplauncherUsable
 then
     APPLAUNCHER_DIR="$USER_APPLAUNCHER_DIR/bin"
 else
