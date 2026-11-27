@@ -12339,7 +12339,7 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     </message>
     <message>
       <source>Health Monitors</source>
-      <translation type="unfinished">Health Monitors</translation>
+      <translation>Statusüberwachung</translation>
     </message>
     <message>
       <source>Video Walls</source>

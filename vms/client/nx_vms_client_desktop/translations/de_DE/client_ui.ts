@@ -2214,7 +2214,7 @@ und klicken Sie auf die Schaltfläche &quot;Suchen&quot;</translation>
     </message>
     <message>
       <source>Configure...</source>
-      <translation type="unfinished">Configure...</translation>
+      <translation>Konfigurieren...</translation>
     </message>
     <message>
       <source>Blur</source>
