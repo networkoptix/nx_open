@@ -1262,14 +1262,14 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     <message numerus="yes">
       <source>%n suitable integration services are required to turn on the integration</source>
       <comment>Required integration count</comment>
-      <translation type="unfinished">
-        <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
-        <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
+      <translation>
+        <numerusform>%n geeignete Integrationsdienste werden benötigt, um die Integration zu aktivieren</numerusform>
+        <numerusform>%n geeignete Integrationsdienste werden benötigt, um die Integration zu aktivieren</numerusform>
       </translation>
     </message>
     <message>
       <source>0 suitable services available</source>
-      <translation type="unfinished">0 suitable services available</translation>
+      <translation>0 geeignete Dienste verfügbar</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -1281,7 +1281,7 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     </message>
     <message>
       <source>Services Required</source>
-      <translation type="unfinished">Services Required</translation>
+      <translation>Dienste erforderlich</translation>
     </message>
     <message>
       <source>Refreshing...</source>
@@ -1290,7 +1290,7 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     <message>
       <source>There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
       <comment>%1 will be substituted by a date</comment>
-      <translation type="unfinished">There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</translation>
+      <translation>Es gibt mehr Kameras, die diese Integration nutzen, als verfügbare Dienste. Bitte deaktivieren Sie die Integration für einige Kameras oder fügen Sie weitere geeignete Dienste hinzu. Andernfalls erfolgt dies automatisch am %1</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -1317,14 +1317,14 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     </message>
     <message>
       <source>Usage</source>
-      <translation type="unfinished">Usage</translation>
+      <translation>Verwendung</translation>
     </message>
   </context>
   <context>
     <name>IntegrationsDialog</name>
     <message>
       <source>Manage Integrations</source>
-      <translation type="unfinished">Manage Integrations</translation>
+      <translation>Integrationen verwalten</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -1389,7 +1389,7 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     </message>
     <message>
       <source>Joystick Investigation</source>
-      <translation type="unfinished">Joystick Investigation</translation>
+      <translation>Joystick-Untersuchung</translation>
     </message>
   </context>
   <context>
@@ -1435,7 +1435,7 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     </message>
     <message>
       <source>Log in to the site to configure how to open layouts</source>
-      <translation type="unfinished">Log in to the site to configure how to open layouts</translation>
+      <translation>Melden Sie sich auf der Site an, um zu konfigurieren, wie Layouts geöffnet werden.</translation>
     </message>
   </context>
   <context>
@@ -1449,7 +1449,7 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     <name>LdapSettings</name>
     <message>
       <source>ONLINE</source>
-      <translation type="unfinished">ONLINE</translation>
+      <translation>ONLINE</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -1465,7 +1465,7 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     </message>
     <message>
       <source>Last Sync</source>
-      <translation type="unfinished">Last Sync</translation>
+      <translation>Letzte Synchronisierung</translation>
     </message>
     <message>
       <source>Edit</source>
@@ -1473,7 +1473,7 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     </message>
     <message>
       <source>Advanced Settings</source>
-      <translation type="unfinished">Advanced Settings</translation>
+      <translation>Erweiterte Einstellungen</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -1485,39 +1485,39 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     </message>
     <message>
       <source>Not configured yet</source>
-      <translation type="unfinished">Not configured yet</translation>
+      <translation>Noch nicht konfiguriert</translation>
     </message>
     <message>
       <source>Configure</source>
-      <translation type="unfinished">Configure</translation>
+      <translation>Konfigurieren</translation>
     </message>
     <message>
       <source>Search Bases</source>
-      <translation type="unfinished">Search Bases</translation>
+      <translation>Suchdatenbanken</translation>
     </message>
     <message>
       <source>Add Search Base</source>
-      <translation type="unfinished">Add Search Base</translation>
+      <translation>Suchdatenbank hinzufügen</translation>
     </message>
     <message>
       <source>Specify at least one search base to synchronize users and groups</source>
-      <translation type="unfinished">Specify at least one search base to synchronize users and groups</translation>
+      <translation>Geben Sie mindestens eine Suchdatenbank an, um Benutzer und Gruppen zu synchronisieren.</translation>
     </message>
     <message>
       <source>Connect your Site to an LDAP server for easier user management</source>
-      <translation type="unfinished">Connect your Site to an LDAP server for easier user management</translation>
+      <translation>Verbinden Sie Ihre Website mit einem LDAP-Server, um die Benutzerverwaltung zu vereinfachen.</translation>
     </message>
     <message>
       <source>Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
-      <translation type="unfinished">Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</translation>
+      <translation>Der kontinuierliche Import vom LDAP-Server ist für diese Site deaktiviert. Aktualisierungen für Gruppen und Benutzer- und Gruppenmitgliedschaft erfolgen ausschließlich durch manuelle Synchronisierung.</translation>
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</source>
-      <translation type="unfinished">No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</translation>
+      <translation>Keine Benutzer oder Gruppen stimmen mit den Synchronisationseinstellungen überein und werden zur Site DB hinzugefügt. Stellen Sie sicher, dass die LDAP-Server-Parameter und -Filter korrekt konfiguriert sind.</translation>
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</source>
-      <translation type="unfinished">Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</translation>
+      <translation>Bitte gehen Sie beim Ändern der LDAP-Einstellungen vorsichtig vor. Eine fehlerhafte Konfiguration kann die Verfügbarkeit der Site für eine große Anzahl von Benutzern gleichzeitig beeinträchtigen.</translation>
     </message>
   </context>
   <context>
@@ -1553,7 +1553,7 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     <name>LookupListElementEditor</name>
     <message>
       <source>Any %1</source>
-      <translation type="unfinished">Any %1</translation>
+      <translation>Alle %1</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -1580,11 +1580,11 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     <name>LookupListImportDialog</name>
     <message>
       <source>Import List</source>
-      <translation type="unfinished">Import List</translation>
+      <translation>Liste importieren</translation>
     </message>
     <message>
       <source>Import Options</source>
-      <translation type="unfinished">Import Options</translation>
+      <translation>Import Optionen</translation>
     </message>
     <message>
       <source>File:</source>
@@ -1596,11 +1596,11 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     </message>
     <message>
       <source>Separator:</source>
-      <translation type="unfinished">Separator:</translation>
+      <translation>Trennzeichen:</translation>
     </message>
     <message>
       <source>Data contains header</source>
-      <translation type="unfinished">Data contains header</translation>
+      <translation>Daten enthalten Header</translation>
     </message>
     <message>
       <source>Preview</source>
@@ -1616,38 +1616,38 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     </message>
     <message>
       <source>Importing</source>
-      <translation type="unfinished">Importing</translation>
+      <translation>Importieren...</translation>
     </message>
     <message>
       <source>Could not open file</source>
-      <translation type="unfinished">Could not open file</translation>
+      <translation>Konnte Datei nicht öffnen</translation>
     </message>
     <message>
       <source>Please ensure that file exists and you have access to selected file</source>
-      <translation type="unfinished">Please ensure that file exists and you have access to selected file</translation>
+      <translation>Bitte stellen Sie sicher, dass die Datei existiert und Sie Zugriff auf die ausgewählte Datei haben.</translation>
     </message>
     <message>
       <source>Fixing imported entries</source>
-      <translation type="unfinished">Fixing imported entries</translation>
+      <translation>Importierte Einträge korrigieren</translation>
     </message>
     <message>
       <source>Could not import selected file</source>
-      <translation type="unfinished">Could not import selected file</translation>
+      <translation>Die ausgewählte Datei konnte nicht importiert werden.</translation>
     </message>
     <message>
       <source>The file appears to be empty.</source>
-      <translation type="unfinished">The file appears to be empty.</translation>
+      <translation>Die Datei scheint leer zu sein</translation>
     </message>
     <message>
       <source>Please ensure the selected file exists and you have access.</source>
-      <translation type="unfinished">Please ensure the selected file exists and you have access.</translation>
+      <translation>Bitte vergewissern Sie sich, dass die ausgewählte Datei existiert und Sie Zugriff darauf haben.</translation>
     </message>
   </context>
   <context>
     <name>LookupListsDialog</name>
     <message>
       <source>Lookup Lists</source>
-      <translation type="unfinished">Lookup Lists</translation>
+      <translation>Suchlisten</translation>
     </message>
     <message>
       <source>Add</source>
@@ -1675,7 +1675,7 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     </message>
     <message>
       <source>No Entries</source>
-      <translation type="unfinished">No Entries</translation>
+      <translation>Keine Einträge</translation>
     </message>
     <message>
       <source>New List...</source>
@@ -1683,11 +1683,11 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     </message>
     <message>
       <source>Could not save file</source>
-      <translation type="unfinished">Could not save file</translation>
+      <translation>Konnte Datei nicht speichern</translation>
     </message>
     <message>
       <source>Please ensure that you have access to selected folder and enough disk space</source>
-      <translation type="unfinished">Please ensure that you have access to selected folder and enough disk space</translation>
+      <translation>Bitte stellen Sie sicher, dass Sie Zugriff auf den ausgewählten Ordner und ausreichend Speicherplatz haben.</translation>
     </message>
     <message>
       <source>Export failed</source>
@@ -1695,7 +1695,7 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     </message>
     <message>
       <source>Export Selected</source>
-      <translation type="unfinished">Export Selected</translation>
+      <translation>Auswahl exportieren</translation>
     </message>
   </context>
   <context>
@@ -1751,11 +1751,11 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     <name>NewLinkDialog</name>
     <message>
       <source>New Link - %1</source>
-      <translation type="unfinished">New Link - %1</translation>
+      <translation>Neuer Link - %1</translation>
     </message>
     <message>
       <source>The previous link will be invalidated once a new one has been issued</source>
-      <translation type="unfinished">The previous link will be invalidated once a new one has been issued</translation>
+      <translation>Der bisherige Link verliert seine Gültigkeit, sobald ein neuer Link ausgestellt wurde.</translation>
     </message>
     <message>
       <source>Create</source>
@@ -1766,15 +1766,15 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     <name>NoListsPage</name>
     <message>
       <source>No Lists</source>
-      <translation type="unfinished">No Lists</translation>
+      <translation>Keine Listen</translation>
     </message>
     <message>
       <source>You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</source>
-      <translation type="unfinished">You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</translation>
+      <translation>Sie haben noch keine Listen erstellt. Mit Listen können Sie mehrere Werte speichern und in Ereignisregeln verwenden. Erstellen Sie eine neue Liste, um Einträge hinzuzufügen.</translation>
     </message>
     <message>
       <source>Create New...</source>
-      <translation type="unfinished">Create New...</translation>
+      <translation>Neu erstellen ...</translation>
     </message>
   </context>
   <context>
@@ -1810,9 +1810,9 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     <name>ObjectTypeSelector</name>
     <message numerus="yes">
       <source>with %n attributes</source>
-      <translation type="unfinished">
-        <numerusform>with %n attributes</numerusform>
-        <numerusform>with %n attributes</numerusform>
+      <translation>
+        <numerusform>mit %n Attributen</numerusform>
+        <numerusform>mit %n Attributen</numerusform>
       </translation>
     </message>
     <message>
@@ -1851,7 +1851,7 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     <name>PanelBase</name>
     <message>
       <source>Approve</source>
-      <translation type="unfinished">Approve</translation>
+      <translation>Bestätigen</translation>
     </message>
     <message>
       <source>Reject</source>
@@ -1890,7 +1890,7 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     </message>
     <message>
       <source>Use controls on the left to add to a group</source>
-      <translation type="unfinished">Use controls on the left to add to a group</translation>
+      <translation>Verwenden Sie die Steuerelemente auf der linken Seite, um einer Gruppe etwas hinzuzufügen.</translation>
     </message>
     <message>
       <source>Member of</source>
@@ -1905,7 +1905,7 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     <message>
       <source>Built-in</source>
       <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
-      <translation type="unfinished">Built-in</translation>
+      <translation>Integriert</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -1917,7 +1917,7 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     <name>PasswordChangeDialog</name>
     <message>
       <source>Change password - %1</source>
-      <translation type="unfinished">Change password - %1</translation>
+      <translation>Passwort ändern - %1</translation>
     </message>
     <message>
       <source>Login</source>
@@ -1933,7 +1933,7 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     </message>
     <message>
       <source>Confirm password</source>
-      <translation type="unfinished">Confirm password</translation>
+      <translation>Passwort bestätigen</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
@@ -1944,33 +1944,33 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     <name>PermissionSummary</name>
     <message>
       <source>No custom permissions</source>
-      <translation type="unfinished">No custom permissions</translation>
+      <translation>Keine benutzerdefinierten Berechtigungen</translation>
     </message>
   </context>
   <context>
     <name>Permissions</name>
     <message>
       <source>Required permission group</source>
-      <translation type="unfinished">Required permission group</translation>
+      <translation>Erforderliche Berechtigungsgruppe</translation>
     </message>
     <message>
       <source>View Permissions</source>
-      <translation type="unfinished">View Permissions</translation>
+      <translation>Berechtigungen anzeigen</translation>
     </message>
     <message>
       <source>Hide Permissions</source>
-      <translation type="unfinished">Hide Permissions</translation>
+      <translation>Berechtigungen ausblenden</translation>
     </message>
   </context>
   <context>
     <name>PermissionsTab</name>
     <message>
       <source>No resources found</source>
-      <translation type="unfinished">No resources found</translation>
+      <translation>Keine Ressourcen gefunden</translation>
     </message>
     <message>
       <source>Automatically add dependent permissions</source>
-      <translation type="unfinished">Automatically add dependent permissions</translation>
+      <translation>Abhängige Berechtigungen automatisch hinzufügen</translation>
     </message>
     <message>
       <source>Use %1 or %2 to select multiple resources, or %3 to clear the selection</source>
@@ -1979,11 +1979,11 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     </message>
     <message>
       <source>Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</source>
-      <translation type="unfinished">Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</translation>
+      <translation>Die Ressourcentabelle bietet Ihnen einen Überblick über Benutzer- oder Gruppenberechtigungen und ermöglicht es Ihnen, Berechtigungen für bestimmte Ressourcen zuzuweisen.</translation>
     </message>
     <message>
       <source>If you select a permission that depends on another permission both permissions will be granted automatically.</source>
-      <translation type="unfinished">If you select a permission that depends on another permission both permissions will be granted automatically.</translation>
+      <translation>Wenn Sie eine Berechtigung auswählen, die von einer anderen Berechtigung abhängt, werden beide Berechtigungen automatisch erteilt.</translation>
     </message>
   </context>
   <context>
@@ -2024,7 +2024,7 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     <message>
       <source>Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</source>
       <comment>%1 is like Nx Witness</comment>
-      <translation type="unfinished">Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</translation>
+      <translation>Plugins sind Programme, die auf dem %1 Server laufen, um eine nahtlose Integration von Videoanalysen zu ermöglichen.</translation>
     </message>
   </context>
   <context>
@@ -2094,14 +2094,14 @@ Wählen Sie eine Integration aus, um mit der Konfiguration ihrer Parameter zu be
     </message>
     <message>
       <source>Filter by</source>
-      <translation type="unfinished">Filter by</translation>
+      <translation>Filtern nach</translation>
     </message>
   </context>
   <context>
     <name>PreviewTableView</name>
     <message>
       <source>Select attribute</source>
-      <translation type="unfinished">Select attribute</translation>
+      <translation>Attribut wählen</translation>
     </message>
   </context>
   <context>
@@ -2144,64 +2144,62 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Press arrow keys to move around. Use plus and minus keys to zoom.</source>
-      <translation type="unfinished">Press arrow keys to move around. Use plus and minus keys to zoom.</translation>
+      <translation>Drücken Sie die Pfeiltasten, um sich zu bewegen, und die Plus- oder Minustasten, um zu zoomen.</translation>
     </message>
     <message>
       <source>Use mouse wheel to zoom</source>
-      <translation type="unfinished">Use mouse wheel to zoom</translation>
+      <translation>Mausrad zum Zoomen verwenden</translation>
     </message>
     <message>
       <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
-      <translation type="unfinished">You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</translation>
+      <translation>Sie können diese Anleitung wieder aktivieren, indem Sie zu Lokale Einstellungen &gt; Erweitert &gt; Alle Warnungen zurücksetzen gehen.</translation>
     </message>
     <message>
       <source>Introducing
 New PTZ controls</source>
-      <translation type="unfinished">Introducing
-New PTZ controls</translation>
+      <translation>Wir stellen Ihnen
+neue PTZ-Steuerelemente vor</translation>
     </message>
     <message>
       <source>Click, double-click, or drag
 mouse pointer while pressing
 Shift key to use Advanced PTZ</source>
-      <translation type="unfinished">Click, double-click, or drag
-mouse pointer while pressing
-Shift key to use Advanced PTZ</translation>
+      <translation>Klicken, doppelklicken oder ziehen Sie den Mauszeiger, während Sie die Umschalttaste drücken, um Advanced PTZ zu verwenden</translation>
     </message>
     <message>
       <source>Here is a quick guide
 on what has changed.</source>
-      <translation type="unfinished">Here is a quick guide
-on what has changed.</translation>
+      <translation>Hier ist eine kurze Übersicht
+darüber, was sich geändert hat.</translation>
     </message>
     <message>
       <source>To use Target Lock Tracking,
 Press Alt + Click to follow object</source>
-      <translation type="unfinished">To use Target Lock Tracking,
-Press Alt + Click to follow object</translation>
+      <translation>Um die Zielverfolgung zu verwenden,
+drücken Sie Alt + Klicken Sie, um dem Objekt zu folgen.</translation>
     </message>
   </context>
   <context>
     <name>QuickIntervalPanel</name>
     <message>
       <source>today</source>
-      <translation type="unfinished">today</translation>
+      <translation>heute</translation>
     </message>
     <message>
       <source>-1 hour</source>
-      <translation type="unfinished">-1 hour</translation>
+      <translation>-1 Stunde</translation>
     </message>
     <message>
       <source>-24 hours</source>
-      <translation type="unfinished">-24 hours</translation>
+      <translation>-24 Stunden</translation>
     </message>
     <message>
       <source>-7 days</source>
-      <translation type="unfinished">-7 days</translation>
+      <translation>-7 Tage</translation>
     </message>
     <message>
       <source>-30 days</source>
-      <translation type="unfinished">-30 days</translation>
+      <translation>-30 Tage</translation>
     </message>
   </context>
   <context>
@@ -2234,11 +2232,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Server is not configured for remote access feature</source>
-      <translation type="unfinished">Server is not configured for remote access feature</translation>
+      <translation>Der Server ist nicht für die Fernzugriffsfunktion konfiguriert.</translation>
     </message>
     <message>
       <source>Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</source>
-      <translation type="unfinished">Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</translation>
+      <translation>Das Fernzugriffstool ist derzeit deaktiviert. Bitte aktivieren Sie es oder wenden Sie sich an Ihren Administrator, um es einzuschalten.</translation>
     </message>
     <message>
       <source>Learn more</source>
@@ -2250,15 +2248,15 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Connect %1 client application to localhost:%2</source>
-      <translation type="unfinished">Connect %1 client application to localhost:%2</translation>
+      <translation>Verbinden Sie die Clientanwendung %1 mit localhost:%2</translation>
     </message>
     <message>
       <source>Local port</source>
-      <translation type="unfinished">Local port</translation>
+      <translation>Lokaler Port</translation>
     </message>
     <message>
       <source>An error occurred</source>
-      <translation type="unfinished">An error occurred</translation>
+      <translation>Ein Fehler ist aufgetreten</translation>
     </message>
     <message>
       <source>Username</source>
@@ -2270,7 +2268,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Remote access is unavailable</source>
-      <translation type="unfinished">Remote access is unavailable</translation>
+      <translation>Fernzugriff ist nicht verfügbar</translation>
     </message>
   </context>
   <context>
@@ -2289,45 +2287,45 @@ Press Alt + Click to follow object</translation>
     <message>
       <source>Has %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Has %1 permission</translation>
+      <translation>Hat %1 Berechtigung</translation>
     </message>
     <message>
       <source>Add %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Add %1 and dependent permissions</translation>
+      <translation>Füge %1 und abhängige Berechtigungen hinzu</translation>
     </message>
     <message>
       <source>Add %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Add %1 permission</translation>
+      <translation>%1 Berechtigung hinzufügen</translation>
     </message>
     <message>
       <source>Remove %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Remove %1 and dependent permissions</translation>
+      <translation>Entfernen Sie %1 und abhängige Berechtigungen</translation>
     </message>
     <message>
       <source>Remove %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Remove %1 permission</translation>
+      <translation>%1 Berechtigung entfernen</translation>
     </message>
     <message>
       <source>Also inherits it from</source>
       <comment>&apos;it&apos; refers to a permission</comment>
-      <translation type="unfinished">Also inherits it from</translation>
+      <translation>Erbt es auch von</translation>
     </message>
     <message>
       <source>Inherits %1 permission from</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Inherits %1 permission from</translation>
+      <translation>Erbt %1 Berechtigung von</translation>
     </message>
     <message>
       <source>Already inherited from</source>
-      <translation type="unfinished">Already inherited from</translation>
+      <translation>Bereits vererbt von</translation>
     </message>
     <message>
       <source>Will stay inherited from</source>
-      <translation type="unfinished">Will stay inherited from</translation>
+      <translation>Wird geerbt bleiben von</translation>
     </message>
   </context>
   <context>
@@ -2353,7 +2351,7 @@ Press Alt + Click to follow object</translation>
     <name>ResourceFilterButton</name>
     <message>
       <source>Available by Permissions</source>
-      <translation type="unfinished">Available by Permissions</translation>
+      <translation>Verfügbar durch Berechtigungen</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
@@ -2365,7 +2363,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
-      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+      <translation>Webseiten &amp; Integrationen</translation>
     </message>
     <message>
       <source>Web Pages</source>
@@ -2373,7 +2371,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Health Monitors</source>
-      <translation type="unfinished">Health Monitors</translation>
+      <translation>Statusüberwachung</translation>
     </message>
     <message>
       <source>Video Walls</source>
@@ -2487,26 +2485,26 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Die Site wurde vorübergehend deaktiviert. Um die Integration für das aktuelle Gerät zu aktiviren/deaktivieren, muss die Site aktiv sein. Wenden Sie sich für weitere Informationen an Ihren Vertriebspartner</translation>
     </message>
     <message>
       <source>Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Die Site wurde vorübergehend deaktiviert. Um die Integration für ein Gerät zu aktiviren/deaktivieren, muss die Site aktiv sein. Wenden Sie sich für weitere Informationen an Ihren Vertriebspartner</translation>
     </message>
   </context>
   <context>
     <name>SavingResults</name>
     <message>
       <source>Choose file to save</source>
-      <translation type="unfinished">Choose file to save</translation>
+      <translation>Wählen Sie die zu speichernde Datei aus.</translation>
     </message>
     <message>
       <source>JSON files (*.json)</source>
-      <translation type="unfinished">JSON files (*.json)</translation>
+      <translation>JSON-Dateien (*.json)</translation>
     </message>
     <message>
       <source>File to save the results:</source>
-      <translation type="unfinished">File to save the results:</translation>
+      <translation>Datei zum Speichern der Ergebnisse:</translation>
     </message>
   </context>
   <context>
@@ -2567,7 +2565,7 @@ Press Alt + Click to follow object</translation>
     <name>SettingsTab</name>
     <message>
       <source>Accept API Integrations registration requests</source>
-      <translation type="unfinished">Accept API Integrations registration requests</translation>
+      <translation>API-Integrations-Registrierungs-Anfragen annehmen</translation>
     </message>
     <message>
       <source>Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</source>
@@ -2716,11 +2714,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Always</source>
-      <translation type="unfinished">Always</translation>
+      <translation>Immer</translation>
     </message>
     <message>
       <source>On Log In</source>
-      <translation type="unfinished">On Log In</translation>
+      <translation>Beim Anmelden</translation>
     </message>
   </context>
   <context>
@@ -2728,36 +2726,36 @@ Press Alt + Click to follow object</translation>
     <message>
       <source>Valid from %1 to %2 (by server time)</source>
       <extracomment>Example: Valid from 14.05.2023 to 24.05.2023, 12:24 (by server time)</extracomment>
-      <translation type="unfinished">Valid from %1 to %2 (by server time)</translation>
+      <translation>Gültig von %1 bis %2 (nach Serverzeit)</translation>
     </message>
     <message>
       <source>Valid from %1 to %2 (by server time) or for %3 after login</source>
       <extracomment>Valid from 14.05.2023 to 24.05.2023 (by server time) or for 12 hours after login</extracomment>
-      <translation type="unfinished">Valid from %1 to %2 (by server time) or for %3 after login</translation>
+      <translation>Gültig von %1 bis %2 (nach Serverzeit) oder für %3 nach der Anmeldung</translation>
     </message>
   </context>
   <context>
     <name>TemporaryLinkSettings</name>
     <message>
       <source>Link Valid Until</source>
-      <translation type="unfinished">Link Valid Until</translation>
+      <translation>Link gültig bis</translation>
     </message>
     <message>
       <source>The link will remain accessible until the date specified (including, based on server time)</source>
-      <translation type="unfinished">The link will remain accessible until the date specified (including, based on server time)</translation>
+      <translation>Der Link bleibt bis zum angegebenen Datum erreichbar (einschließlich, basierend auf Serverzeit)</translation>
     </message>
     <message>
       <source>Revoke access after login</source>
-      <translation type="unfinished">Revoke access after login</translation>
+      <translation>Zugriff nach der Anmeldung widerrufen</translation>
     </message>
     <message>
       <source>Access may be revoked earlier if the link validity period ends</source>
-      <translation type="unfinished">Access may be revoked earlier if the link validity period ends</translation>
+      <translation>Der Zugriff kann früher widerrufen werden, wenn die Gültigkeitsdauer des Links endet</translation>
     </message>
     <message>
       <source>In</source>
       <extracomment>&apos;In&apos; as in sentence: &apos;Revoke access after login in N hours&apos;.</extracomment>
-      <translation type="unfinished">In</translation>
+      <translation>In</translation>
     </message>
   </context>
   <context>
@@ -2768,15 +2766,15 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>No Favorite Sites</source>
-      <translation type="unfinished">No Favorite Sites</translation>
+      <translation>Keine bevorzugten Sites</translation>
     </message>
     <message>
       <source>No Hidden Sites</source>
-      <translation type="unfinished">No Hidden Sites</translation>
+      <translation>Keine versteckten Sites</translation>
     </message>
     <message>
       <source>You can add site to the favorites from the context menu</source>
-      <translation type="unfinished">You can add site to the favorites from the context menu</translation>
+      <translation>Sie können die Site über das Kontextmenü zu den Favoriten hinzufügen</translation>
     </message>
     <message>
       <source>You can hide sites from the main list from the context menu</source>
@@ -2834,7 +2832,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Time is unavailable due to DST changes</source>
-      <translation type="unfinished">Time is unavailable due to DST changes</translation>
+      <translation>Aufgrund der Sommerzeitumstellung ist die Uhrzeit nicht verfügbar.</translation>
     </message>
   </context>
   <context>
@@ -2852,7 +2850,7 @@ Press Alt + Click to follow object</translation>
     <name>UserCreateDialog</name>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>Neuer Benutzer</translation>
     </message>
     <message>
       <source>General</source>
@@ -2879,7 +2877,7 @@ Press Alt + Click to follow object</translation>
     <name>UserCreateTab</name>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>Neuer Benutzer</translation>
     </message>
     <message>
       <source>Type</source>
@@ -2915,11 +2913,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication</source>
-      <translation type="unfinished">Allow insecure (digest) authentication</translation>
+      <translation>Unsichere (digest) Authentifizierung erlauben</translation>
     </message>
     <message>
       <source>You need to specify only user&apos;s email address.</source>
-      <translation type="unfinished">You need to specify only user&apos;s email address.</translation>
+      <translation>Sie müssen nur die E-Mail-Adresse des Benutzers&apos;angeben.</translation>
     </message>
     <message>
       <source>Permission Groups</source>
@@ -2927,15 +2925,15 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Access</source>
-      <translation type="unfinished">Access</translation>
+      <translation>Zugang</translation>
     </message>
     <message>
       <source>Regular user with credentials</source>
-      <translation type="unfinished">Regular user with credentials</translation>
+      <translation>Normaler Benutzer mit Anmeldedaten</translation>
     </message>
     <message>
       <source>Temporary with link</source>
-      <translation type="unfinished">Temporary with link</translation>
+      <translation>Temporär mit Link</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
@@ -2943,7 +2941,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
-      <translation type="unfinished">The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</translation>
+      <translation>Die hinzugefügte Site wird für Nutzer mit einem bestehenden Cloud-Konto schnell sichtbar sein, während Nutzer ohne bestehendes Cloud-Konto Anweisungen per E-Mail erhalten.</translation>
     </message>
     <message>
       <source>Notification Language</source>
@@ -2954,7 +2952,7 @@ Press Alt + Click to follow object</translation>
     <name>UserEditDialog</name>
     <message>
       <source>User - %1</source>
-      <translation type="unfinished">User - %1</translation>
+      <translation>Benutzer - %1</translation>
     </message>
     <message>
       <source>General</source>
@@ -2982,11 +2980,11 @@ Press Alt + Click to follow object</translation>
     <name>UserEnabledSwitch</name>
     <message>
       <source>Enabled user</source>
-      <translation type="unfinished">Enabled user</translation>
+      <translation>Aktivierter Benutzer</translation>
     </message>
     <message>
       <source>Disabled user</source>
-      <translation type="unfinished">Disabled user</translation>
+      <translation>Deaktivierter Benutzer</translation>
     </message>
   </context>
   <context>
@@ -3021,15 +3019,15 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Set password to enable insecure authentication</source>
-      <translation type="unfinished">Set password to enable insecure authentication</translation>
+      <translation>Legen Sie ein Passwort fest, um die unsichere Authentifizierung zu aktivieren.</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication</source>
-      <translation type="unfinished">Allow insecure (digest) authentication</translation>
+      <translation>Unsichere (Digest-)Authentifizierung zulassen</translation>
     </message>
     <message>
       <source>This user is not found in LDAP database and is not able to log in.</source>
-      <translation type="unfinished">This user is not found in LDAP database and is not able to log in.</translation>
+      <translation>Dieser Benutzer wurde in der LDAP-Datenbank nicht gefunden und kann sich daher nicht anmelden.</translation>
     </message>
     <message>
       <source>Permission Groups</source>
@@ -3037,27 +3035,27 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Access expires</source>
-      <translation type="unfinished">Access expires</translation>
+      <translation>Zugriff läuft ab</translation>
     </message>
     <message>
       <source>Access Link</source>
-      <translation type="unfinished">Access Link</translation>
+      <translation>Zugangslink</translation>
     </message>
     <message>
       <source>Copy Link</source>
-      <translation type="unfinished">Copy Link</translation>
+      <translation>Link kopieren</translation>
     </message>
     <message>
       <source>Terminate</source>
-      <translation type="unfinished">Terminate</translation>
+      <translation>Beenden</translation>
     </message>
     <message>
       <source>New Link...</source>
-      <translation type="unfinished">New Link...</translation>
+      <translation>Neuer Link...</translation>
     </message>
     <message>
       <source>No valid link for this user</source>
-      <translation type="unfinished">No valid link for this user</translation>
+      <translation>Für diesen Benutzer ist kein gültiger Link vorhanden.</translation>
     </message>
     <message>
       <source>Copied</source>
@@ -3066,7 +3064,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Obtaining Link...</source>
-      <translation type="unfinished">Obtaining Link...</translation>
+      <translation>Link wird abgerufen...</translation>
     </message>
     <message>
       <source>Ensure that this computer is able to connect to the %1</source>
@@ -3075,11 +3073,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>LDAP server is offline. User is not able to log in.</source>
-      <translation type="unfinished">LDAP server is offline. User is not able to log in.</translation>
+      <translation>Der LDAP-Server ist offline. Der Benutzer kann sich nicht anmelden.</translation>
     </message>
     <message>
       <source>When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</source>
-      <translation type="unfinished">When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</translation>
+      <translation>Wenn die kontinuierliche Synchronisierung mit dem LDAP-Server deaktiviert ist, werden die Gruppenzugehörigkeiten der Benutzer nicht automatisch synchronisiert. Um diese Informationen zu aktualisieren, starten Sie eine manuelle Synchronisierung.</translation>
     </message>
     <message>
       <source>This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
@@ -3091,7 +3089,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Interface Language</source>
-      <translation type="unfinished">Interface Language</translation>
+      <translation>Sprache der Benutzeroberfläche</translation>
     </message>
   </context>
   <context>
@@ -3106,18 +3104,18 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>All Sites</source>
-      <translation type="unfinished">All Sites</translation>
+      <translation>Alle Sites</translation>
     </message>
   </context>
   <context>
     <name>VmsRulesDialog</name>
     <message>
       <source>Add Rule</source>
-      <translation type="unfinished">Add Rule</translation>
+      <translation>Regel hinzufügen</translation>
     </message>
     <message>
       <source>Duplicate</source>
-      <translation type="unfinished">Duplicate</translation>
+      <translation>Duplikat</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -3125,7 +3123,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>No Entries</source>
-      <translation type="unfinished">No Entries</translation>
+      <translation>Keine Einträge</translation>
     </message>
     <message>
       <source>Event Log...</source>
@@ -3183,21 +3181,21 @@ Press Alt + Click to follow object</translation>
     <name>XAxis</name>
     <message>
       <source>Move the joystick left and right several times.</source>
-      <translation type="unfinished">Move the joystick left and right several times.</translation>
+      <translation>Bewegen Sie den Joystick mehrmals nach links und rechts.</translation>
     </message>
   </context>
   <context>
     <name>YAxis</name>
     <message>
       <source>Move the joystick up and down several times.</source>
-      <translation type="unfinished">Move the joystick up and down several times.</translation>
+      <translation>Bewegen Sie den Joystick mehrmals auf und ab.</translation>
     </message>
   </context>
   <context>
     <name>ZAxis</name>
     <message>
       <source>Rotate the joystick clockwise and counterclockwise several times.</source>
-      <translation type="unfinished">Rotate the joystick clockwise and counterclockwise several times.</translation>
+      <translation>Drehen Sie den Joystick mehrmals im Uhrzeigersinn und gegen den Uhrzeigersinn.</translation>
     </message>
   </context>
 </TS>
