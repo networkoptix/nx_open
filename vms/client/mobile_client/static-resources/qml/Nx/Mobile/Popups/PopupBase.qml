@@ -78,9 +78,10 @@ Popup
                 Layout.fillWidth: true
                 Layout.margins: 24
                 Layout.bottomMargin: icon.visible ? 12 : 24
-                Layout.rightMargin: icon.visible ? 24 : 24 + closeButton.width + 12
+                Layout.rightMargin: icon.visible || !closeButton.visible
+                    ? 24
+                    : 24 + closeButton.width + 12
 
-                text: control.title
                 font.pixelSize: 20
                 font.weight: Font.Medium
                 wrapMode: Text.WordWrap
@@ -102,8 +103,6 @@ Popup
             {
                 id: scrollView
 
-                property bool needScroll: contentHeight > height
-
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.leftMargin: 24
@@ -122,6 +121,8 @@ Popup
 
                     Repeater
                     {
+                        id: messagesRepeater
+
                         model: control.messages
                         delegate: PopupText
                         {

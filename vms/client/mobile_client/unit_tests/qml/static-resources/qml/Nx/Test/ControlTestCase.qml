@@ -44,6 +44,7 @@ TestCase
         windowContext.reset()
         mainWindow.reset()
         mainWindow.contentItem = test
+        cloudUserProfileWatcher.reset()
         control = createTemporaryObject(component, test)
         signals.reset()
     }

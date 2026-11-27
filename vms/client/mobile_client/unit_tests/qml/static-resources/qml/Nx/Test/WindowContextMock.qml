@@ -17,6 +17,28 @@ QtObject
         property int currentScreen: Controller.UnknownScreen
     }
 
+    readonly property QtObject mainSystemContext: QtObject
+    {
+        readonly property QtObject userWatcher: QtObject
+        {
+            property string userFullName
+        }
+    }
+
+    // Functions only report the call, for SignalSpy.
+    readonly property QtObject sessionManager: QtObject
+    {
+        property bool isCloudSession: false
+        property string systemName
+
+        signal stopSessionByUserCalled()
+
+        function stopSessionByUser()
+        {
+            stopSessionByUserCalled()
+        }
+    }
+
     readonly property QtObject ui: QtObject
     {
         readonly property QtObject measurements: QtObject
@@ -58,6 +80,9 @@ QtObject
     function reset()
     {
         deprecatedUiController.currentScreen = Controller.UnknownScreen
+        mainSystemContext.userWatcher.userFullName = ""
+        sessionManager.isCloudSession = false
+        sessionManager.systemName = ""
         ui.measurements.androidKeyboardHeight = 0
         ui.measurements.deviceStatusBarHeight = 0
     }

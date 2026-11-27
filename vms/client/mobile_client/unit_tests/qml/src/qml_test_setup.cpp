@@ -70,6 +70,7 @@ void QmlTestSetup::qmlEngineAvailable(QQmlEngine* engine)
 
     addMock(engine, "windowContext", "WindowContextMock");
     addMock(engine, "mainWindow", "MainWindowMock");
+    addMock(engine, "cloudUserProfileWatcher", "CloudUserProfileWatcherMock");
 }
 
 void QmlTestSetup::cleanupTestCase()

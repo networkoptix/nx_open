@@ -18,12 +18,16 @@ PopupBase
     [
         PopupButton
         {
+            id: cancelButton
+
             text: qsTr("Cancel")
 
             onClicked: popup.close()
         },
         PopupButton
         {
+            id: disconnectButton
+
             text: qsTr("Disconnect")
             accented: true
 

@@ -26,6 +26,11 @@ to itself. A test of a component which shows banners sets `mainWindow.banner`. U
 renamed or removed, the mock must be changed by hand, otherwise the tests keep passing while the
 component fails in the application.
 
+Note: `cloudUserProfileWatcher` is a mock as well, `CloudUserProfileWatcherMock` from `Nx.Test`: in
+the application it is an object of main.qml. `ControlTestCase` resets it before every test
+function. `tst_CloudUserProfileWatcherMock.qml` compares its members with the
+`CloudUserProfileWatcher` class, but not its name with the id in main.qml.
+
 Note: Settings are shared by all test files and some persist between runs, so a test restores the
 ones it changes in `cleanup()`.
 

@@ -256,10 +256,15 @@ function openDialog(path, properties, owner)
     var dialog = component.createObject(
         owner ?? stackView?.currentItem ?? mainWindow.contentItem,
         properties ? properties : {})
-    if (dialog)
-        dialog.open()
-    else
+    if (!dialog)
+    {
         console.log(component.errorString())
+        return dialog
+    }
+
+    // Nobody opens the dialog again, and the owner may live as long as the application does.
+    dialog.closed.connect(() => dialog.destroy())
+    dialog.open()
     return dialog
 }
 
