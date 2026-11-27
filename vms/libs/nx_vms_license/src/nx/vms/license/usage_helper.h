@@ -19,14 +19,13 @@ namespace nx::vms::license {
 
 struct LicenseServer
 {
-    static const nx::Url indexUrl(common::SystemContext* context);
-    static const nx::Url activateUrl(common::SystemContext* context);
-    static const nx::Url activateV2Url(common::SystemContext* context);
-    static const nx::Url deactivateUrl(common::SystemContext* context);
-    static const nx::Url validateUrl(common::SystemContext* context);
-    static const nx::Url inspectUrl(common::SystemContext* context);
+    static const nx::Url activateUrl(const common::SystemSettings* settings);
+    static const nx::Url deactivateUrl(const common::SystemSettings* settings);
+    static const nx::Url validateUrl(const common::SystemSettings* settings);
+    static const nx::Url inspectUrl(const common::SystemSettings* settings);
+
 private:
-    static const QString baseUrl(common::SystemContext* context);
+    static const QString baseUrl(const common::SystemSettings* settings);
 };
 
 struct ChannelPartnerServer

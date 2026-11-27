@@ -45,42 +45,32 @@ QString joinedString(
 
 namespace nx::vms::license {
 
-const QString LicenseServer::baseUrl(common::SystemContext* context)
+const QString LicenseServer::baseUrl(const common::SystemSettings* settings)
 {
-    auto result = context->globalSettings()->licenseServerUrl();
+    auto result = settings->licenseServerUrl();
     result = result.trimmed();
     while (result.endsWith('/'))
         result.chop(1);
     return result + "/nxlicensed";
 }
 
-const nx::Url LicenseServer::indexUrl(common::SystemContext* context)
+const nx::Url LicenseServer::activateUrl(const common::SystemSettings* settings)
 {
-    return baseUrl(context);
+    return baseUrl(settings) + "/activate.php";
 }
 
-const nx::Url LicenseServer::activateUrl(common::SystemContext* context)
+const nx::Url LicenseServer::deactivateUrl(const common::SystemSettings* settings)
 {
-    return baseUrl(context) + "/activate.php";
+    return baseUrl(settings) + "/api/v1/deactivate/";
+}
+const nx::Url LicenseServer::validateUrl(const common::SystemSettings* settings)
+{
+    return baseUrl(settings) + "/api/v1/validate/";
 }
 
-const nx::Url LicenseServer::deactivateUrl(common::SystemContext* context)
+const nx::Url LicenseServer::inspectUrl(const common::SystemSettings* settings)
 {
-    return baseUrl(context) + "/api/v1/deactivate/";
-}
-const nx::Url LicenseServer::validateUrl(common::SystemContext* context)
-{
-    return baseUrl(context) + "/api/v1/validate/";
-}
-
-const nx::Url LicenseServer::inspectUrl(common::SystemContext* context)
-{
-    return baseUrl(context) + "/api/v2/license/inspect/";
-}
-
-const nx::Url LicenseServer::activateV2Url(common::SystemContext* context)
-{
-    return baseUrl(context) + "/api/v2/license/cloud/activate";
+    return baseUrl(settings) + "/api/v2/license/inspect/";
 }
 
 //#define QN_NO_LICENSE_CHECK

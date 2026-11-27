@@ -532,9 +532,11 @@ void LicenseManagerWidget::deactivateLicenses(const QnLicenseList& licenses)
             }
         };
 
-    Deactivator::deactivateAsync(
-        LicenseServer::deactivateUrl(systemContext()),
-        m_deactivationReason, licenses, handler, parentWidget());
+    Deactivator::deactivateAsync(LicenseServer::deactivateUrl(systemContext()->globalSettings()),
+        m_deactivationReason,
+        licenses,
+        handler,
+        parentWidget());
 }
 
 void LicenseManagerWidget::takeAwaySelectedLicenses()
