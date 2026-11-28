@@ -1283,6 +1283,10 @@
       <translation>حدث خطأ في الإدخال/الإخراج عند %1.</translation>
     </message>
     <message>
+      <source>Archive Index Damaged at %1</source>
+      <translation type="unfinished">Archive Index Damaged at %1</translation>
+    </message>
+    <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
       <translation>القرص الصلب/القرص ذو الحالة الصلبة &quot;%1&quot; ممتلئ. يحتوي القرص على بيانات كثيرة لا يديرها نظام إدارة الفيديو</translation>
     </message>
@@ -1357,6 +1361,10 @@
     <message>
       <source>Archive Backup Failed at %1</source>
       <translation>فشل النسخ الاحتياطي للأرشيف في %1</translation>
+    </message>
+    <message>
+      <source>The archive index on &quot;%1&quot; is damaged. The recordings on this storage will be indexed again. Check the storage for errors.</source>
+      <translation type="unfinished">The archive index on &quot;%1&quot; is damaged. The recordings on this storage will be indexed again. Check the storage for errors.</translation>
     </message>
   </context>
   <context>

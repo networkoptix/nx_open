@@ -1213,6 +1213,10 @@
       <translation>在寫入資料至 %1 時發生I/O錯誤問題。</translation>
     </message>
     <message>
+      <source>Archive Index Damaged at %1</source>
+      <translation type="unfinished">Archive Index Damaged at %1</translation>
+    </message>
+    <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
       <translation>HDD/SSD &quot;%1&quot; 已滿。硬碟裡包含太多非VMS資料。</translation>
     </message>
@@ -1287,6 +1291,10 @@
     <message>
       <source>Archive Backup Failed at %1</source>
       <translation>%1 備份錄影資料失敗</translation>
+    </message>
+    <message>
+      <source>The archive index on &quot;%1&quot; is damaged. The recordings on this storage will be indexed again. Check the storage for errors.</source>
+      <translation type="unfinished">The archive index on &quot;%1&quot; is damaged. The recordings on this storage will be indexed again. Check the storage for errors.</translation>
     </message>
   </context>
   <context>

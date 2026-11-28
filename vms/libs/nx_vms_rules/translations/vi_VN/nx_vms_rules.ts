@@ -1213,6 +1213,10 @@
       <translation>I/O lỗi tại %1.</translation>
     </message>
     <message>
+      <source>Archive Index Damaged at %1</source>
+      <translation type="unfinished">Archive Index Damaged at %1</translation>
+    </message>
+    <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
       <translation>Ổ HDD/SSD &quot;%1&quot; đã đầy. Ổ chứa quá nhiều dữ liệu không được quản lý bởi VMS.</translation>
     </message>
@@ -1287,6 +1291,10 @@
     <message>
       <source>Archive Backup Failed at %1</source>
       <translation>Sao lưu kho lưu trữ thất bại tại %1</translation>
+    </message>
+    <message>
+      <source>The archive index on &quot;%1&quot; is damaged. The recordings on this storage will be indexed again. Check the storage for errors.</source>
+      <translation type="unfinished">The archive index on &quot;%1&quot; is damaged. The recordings on this storage will be indexed again. Check the storage for errors.</translation>
     </message>
   </context>
   <context>

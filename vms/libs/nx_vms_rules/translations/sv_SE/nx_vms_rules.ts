@@ -1227,6 +1227,10 @@
       <translation>I/O-fel har uppstått vid %1.</translation>
     </message>
     <message>
+      <source>Archive Index Damaged at %1</source>
+      <translation type="unfinished">Archive Index Damaged at %1</translation>
+    </message>
+    <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
       <translation>HDD / SSD &quot;%1&quot; är full. Disken innehåller för mycket data som inte hanteras av VMS.</translation>
     </message>
@@ -1301,6 +1305,10 @@
     <message>
       <source>Archive Backup Failed at %1</source>
       <translation>Säkerhetskopiering av arkiv misslyckades vid %1</translation>
+    </message>
+    <message>
+      <source>The archive index on &quot;%1&quot; is damaged. The recordings on this storage will be indexed again. Check the storage for errors.</source>
+      <translation type="unfinished">The archive index on &quot;%1&quot; is damaged. The recordings on this storage will be indexed again. Check the storage for errors.</translation>
     </message>
   </context>
   <context>
