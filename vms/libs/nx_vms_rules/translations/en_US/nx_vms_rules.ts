@@ -237,6 +237,10 @@
         <translation></translation>
     </message>
     <message>
+        <source>Unexpected field &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Event: %1 is not registered</source>
         <translation></translation>
     </message>
