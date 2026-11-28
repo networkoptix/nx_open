@@ -235,6 +235,10 @@
       <translation>無法反序列化以下欄位的屬性： %1</translation>
     </message>
     <message>
+      <source>Unexpected field &quot;%1&quot;</source>
+      <translation type="unfinished">Unexpected field &quot;%1&quot;</translation>
+    </message>
+    <message>
       <source>Event: %1 is not registered</source>
       <translation>事件%1 尚未註冊</translation>
     </message>

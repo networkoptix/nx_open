@@ -237,6 +237,10 @@
       <translation>Egenskaber for feltet %1kan ikke deserialisere</translation>
     </message>
     <message>
+      <source>Unexpected field &quot;%1&quot;</source>
+      <translation type="unfinished">Unexpected field &quot;%1&quot;</translation>
+    </message>
+    <message>
       <source>Event: %1 is not registered</source>
       <translation>Hændelsen: %1 er ikke registreret</translation>
     </message>

@@ -237,6 +237,10 @@
       <translation>Δεν ήταν δυνατή η αποσειριοποίηση των ιδιοτήτων του πεδίου: %1</translation>
     </message>
     <message>
+      <source>Unexpected field &quot;%1&quot;</source>
+      <translation type="unfinished">Unexpected field &quot;%1&quot;</translation>
+    </message>
+    <message>
       <source>Event: %1 is not registered</source>
       <translation>Συμβάν: Το %1 δεν έχει καταχωρηθεί</translation>
     </message>

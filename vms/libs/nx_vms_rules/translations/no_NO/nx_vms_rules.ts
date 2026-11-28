@@ -237,6 +237,10 @@
       <translation type="unfinished">Unable to deserialize properties for field: %1</translation>
     </message>
     <message>
+      <source>Unexpected field &quot;%1&quot;</source>
+      <translation type="unfinished">Unexpected field &quot;%1&quot;</translation>
+    </message>
+    <message>
       <source>Event: %1 is not registered</source>
       <translation type="unfinished">Event: %1 is not registered</translation>
     </message>

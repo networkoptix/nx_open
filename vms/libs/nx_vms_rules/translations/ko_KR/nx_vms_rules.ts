@@ -235,6 +235,10 @@
       <translation>%1필드에 대한 속성을 역직렬화할 수 없습니다</translation>
     </message>
     <message>
+      <source>Unexpected field &quot;%1&quot;</source>
+      <translation type="unfinished">Unexpected field &quot;%1&quot;</translation>
+    </message>
+    <message>
       <source>Event: %1 is not registered</source>
       <translation>이벤트: %1 가 등록되지 않았습니다</translation>
     </message>
